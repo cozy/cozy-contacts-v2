@@ -1,47 +1,45 @@
 {
-  "name": "cozy-contacts",
+  "name": "Cozic",
   "version": "0.0.1",
-  "description": "A cozy application to manage your contacts.",
+  "engines": [
+    "node = 0.8.x"
+  ],
+  "description": "A cozy application to play, upload and organize your music",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rdubigny/cozy-music.git"
+  },
   "main": "server.coffee",
   "dependencies": {
-    "cozy-i18n-helper": "0.0.4",
-    "express": "~3.1.0",
-    "async": "~0.2.9",
-    "jade": "~0.32.0",
-    "americano": "~0.2.10",
-    "americano-cozy": "0.1.4",
-    "cozy-realtime-adapter": "~0.12.0"
+    "jade": "= 0.27.6",
+    "express": "= 3.0.0",
+    "connect": "= 2.6.1",
+    "compound": "= 1.1.6",
+    "co-generators": "= 0.0.1-6",
+    "coffee-script": "= 1.4.0",
+    "mime": "= 1.2.7",
+    "qs": "= 0.5.0",
+    "jugglingdb": "= 0.2.0-23",
+    "jugglingdb-cozy-adapter": "0.3.11",
+    "request-json": "0.4.3"
   },
   "devDependencies": {
-    "chai": "~1.5.0",
-    "request-json": "=0.3.0",
-    "mocha": "~1.9.0",
-    "sinon": "~1.6.0",
-    "coffee-script": "*"
+    "should": "= 1.2.0",
+    "mocha": "= 1.6.0",
+    "chai": "= 1.3.0",
+    "request-json": ">= 0"
   },
   "scripts": {
     "test": "cake tests",
     "start": "coffee server.coffee"
   },
-  "repository": "https://github.com/mycozycloud/cozy-contacts",
-  "author": "Romain M. Foucault",
-  "readmeFilename": "README.md",
   "cozy-permissions": {
-    "Contact": {
-      "description": "Creates and edits your contacts."
+    "Track": {
+      "description": "upload and store your music on your cozy"
     },
-    "CozyInstance": {
-      "description": "Read language setting"
-    },
-    "PhoneCommunicationLog": {
-      "description": "FING/Orange retrieve calls log from your invoice"
-    },
-    "ContactLog": {
-      "description": "Log your history with a contact"
-    },
-    "Mail": {
-      "description": "Display last emails for a contact"
+    "Playlist": {
+      "description": "manage your playlists"
     }
-  },
-  "cozy-widget": "/apps/contacts/widget"
+  }
 }

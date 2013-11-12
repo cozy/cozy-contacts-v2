@@ -1,0 +1,68 @@
+doctype 5
+html(lang="en")
+    head
+        include knacss.css
+        include style.css 
+        include prettyPhoto.css 
+        link(rel="shortcut icon", href="favicon.png")
+        title="Cozy Contacts, The CRM for Individuals"
+        meta(name="description", content="")
+        meta(name="viewport", content="width=device-width,initial-scale=1")
+        meta(http-equiv="content-type", content="text/html; charset=utf-8")
+        script(src='jquery-2.0.0.min.js')
+        script(src='jquery.prettyPhoto.js')
+        script(type='text/javascript').
+          $(document).ready(function() {
+            $("a[rel^='prettyPhoto']").prettyPhoto({
+              social_tools: ""
+            });
+            $('.left-bar').hide();
+            $('.left-bar').slideDown(900);
+          });
+    body
+        .left-bar.w66.clearfix
+            .col.left.w50.clearfix
+                .container.mt2.mb2
+                    p
+                        img.title-icon(src="./icon.png", alt="Cozic Logo")
+                        br
+                    h1.mt2 Cozy Contacts
+                    h2.mt0 The CRM for individuals
+
+                .other
+                    h3
+                        span.mr1.icon-bull
+                        | Manage your contact list in the cloud
+                    h3
+                        span.mr1.icon-bull
+                        | Sync your contacts with your phone
+                    h3 
+                        span.mr1.icon-bull
+                        | Qualify your contacts with tags
+                    h3.mb3
+                        span.mr1.icon-bull
+                        | Keep track of your last calls
+                    p.pb3
+                        a(href="https://demo.cozycloud.cc/#apps/contacts/")
+                            button Have a look at the demo
+                        br
+                        a(href="https://cozy.io")
+                            button Setup your Cozy and use Contacts
+                        br
+                        a(href="https://cozycloud.cc")
+                            button Rent your Cozy and use Contacts
+                    p.pb3.smaller
+                        a(href="http://github.com/mycozycloud/cozy-contacts") 
+                            | source code
+
+            .col.left.w50.pl2.pt2.clearfix.mt1.screenshots
+                a(href="images/screen_01.jpg", rel="prettyPhoto[pp_gal]",
+                    title="Contact informations")
+                  img.pa2(src="images/screen_01_small.jpg")
+                a(href="images/screen_02.jpg", rel="prettyPhoto[pp_gal]",
+                    title="Modify contact")
+                  img.pa2(src="images/screen_02_small.jpg")
+                a(href="images/screen_03.jpg", rel="prettyPhoto[pp_gal]",
+                    title="Import call log")
+                  img.pa2(src="images/screen_03_small.jpg")
+
