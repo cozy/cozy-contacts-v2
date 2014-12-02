@@ -120,8 +120,12 @@ Contact.prototype.toVCF = function(config) {
         out += "ADR;" + content + "\n";
         break;
       default:
-        type = "TYPE=" + (dp.type.toUpperCase());
-        out += "" + key + ";" + type + ":" + value + "\n";
+        if (dp.type != null) {
+          type = ";TYPE=" + (dp.type.toUpperCase());
+        } else {
+          type = "";
+        }
+        out += "" + key + type + ":" + value + "\n";
     }
   }
   return out += "END:VCARD\n";
