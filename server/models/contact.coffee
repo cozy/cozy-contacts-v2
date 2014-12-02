@@ -87,7 +87,10 @@ Contact::toVCF = (config) ->
                 content = "TYPE=home,postal:;;#{value};;;;"
                 out += "ADR;#{content}\n"
             else
-                type = "TYPE=#{dp.type.toUpperCase()}"
-                out += "#{key};#{type}:#{value}\n"
+                if dp.type?
+                    type = ";TYPE=#{dp.type.toUpperCase()}"
+                else
+                    type = ""
+                out += "#{key}#{type}:#{value}\n"
 
     out += "END:VCARD\n"
