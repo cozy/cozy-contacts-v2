@@ -259,11 +259,11 @@ module.exports = class ContactView extends ViewCollection
             img.src = reader.result
             img.onload = =>
                 ratiodim = if img.width > img.height then 'height' else 'width'
-                ratio = 64 / img[ratiodim]
+                ratio = 300 / img[ratiodim]
 
                 # use canvas to resize the image
                 canvas = document.createElement 'canvas'
-                canvas.height = canvas.width = 64
+                canvas.height = canvas.width = 300
                 ctx = canvas.getContext '2d'
                 ctx.drawImage img, 0, 0, ratio*img.width, ratio*img.height
                 dataUrl =  canvas.toDataURL 'image/jpeg'
