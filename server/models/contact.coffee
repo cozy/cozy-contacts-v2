@@ -56,7 +56,7 @@ Contact::toVCF = (config, callback) ->
         out += "NOTE:#{model.note}\n" if model.note
 
         if picture?
-            out += "PHOTO:data:image/png;base64,#{picture}\n"
+            out += "PHOTO:data:image/jpeg;base64,#{picture}\n"
 
         if model.n
             out += "N:#{model.n}\n"
