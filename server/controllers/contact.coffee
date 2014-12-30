@@ -1,9 +1,10 @@
+path    = require 'path'
+multiparty = require 'multiparty'
+async = require 'async'
 Contact = require '../models/contact'
 Config = require '../models/config'
 Todolist = require '../models/todolist'
 Task = require '../models/task'
-path    = require 'path'
-multiparty = require 'multiparty'
 
 module.exports =
 
@@ -108,28 +109,27 @@ module.exports =
     vCard: (req, res, next) ->
         Config.getInstance (err, config) ->
             Contact.request 'all', (err, contacts) ->
-                next err if err
+                async.mapSeries contacts, (contact, done) ->
+                    contact.toVCF config, done
+                , (err, outputs) ->
+                    return next err if err?
 
-                out = ""
-                out += contact.toVCF(config) for contact in contacts
-
-                date = new Date()
-                date = "#{date.getYear()}-#{date.getMonth()}-#{date.getDate()}"
-                res.attachment "cozy-contacts-#{date}.vcf"
-                res.set 'Content-Type', 'text/x-vcard'
-                res.send out
+                    vCardOutput = outputs.join ''
+                    date = new Date()
+                    year = date.getYear()
+                    month = date.getMonth()
+                    day = date.getDay()
+                    date = "#{year}-#{month}-#{day}"
+                    res.attachment "cozy-contacts-#{date}.vcf"
+                    res.set 'Content-Type', 'text/x-vcard'
+                    res.send vCardOutput
 
     # Export a single contact to a VCard file.
     vCardContact: (req, res, next) ->
         Config.getInstance (err, config) ->
-            Contact.request 'all', key: req.params.contactid, (err, contacts) ->
-                next err if err
+            req.contact.toVCF config, (err, vCardOutput) ->
+                return next err if err?
 
-                out = ""
-                out += contact.toVCF(config) for contact in contacts
-
-                date = new Date()
-                date = "#{date.getYear()}-#{date.getMonth()}-#{date.getDate()}"
                 res.attachment "#{req.params.fn}.vcf"
                 res.set 'Content-Type', 'text/x-vcard'
-                res.send out
+                res.send vCardOutput

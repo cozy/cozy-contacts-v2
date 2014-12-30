@@ -46,51 +46,65 @@ Contact::getComputedFN = (config) ->
         when 'given-middleinitial-familly'
             "#{given} #{initial(middle)} #{familly}"
 
-Contact::toVCF = (config) ->
+Contact::toVCF = (config, callback) ->
 
     model = @toJSON()
 
-    out = "BEGIN:VCARD\n"
-    out += "VERSION:3.0\n"
-    out += "NOTE:#{model.note}\n" if model.note
+    getVCardOutput = (picture = null) =>
+        out = "BEGIN:VCARD\n"
+        out += "VERSION:3.0\n"
+        out += "NOTE:#{model.note}\n" if model.note
 
-    if model.n
-        out += "N:#{model.n}\n"
-        out += "FN:#{@getComputedFN(config)}\n"
-    else if model.fn
-        out += "N:;;;;\n"
-        out += "FN:#{model.fn}\n"
-    else
-        out += "N:;;;;\n"
-        out += "FN:\n"
+        if picture?
+            out += "PHOTO:data:image/png;base64,#{picture}\n"
 
-    for i, dp of model.datapoints
+        if model.n
+            out += "N:#{model.n}\n"
+            out += "FN:#{@getComputedFN config}\n"
+        else if model.fn
+            out += "N:;;;;\n"
+            out += "FN:#{model.fn}\n"
+        else
+            out += "N:;;;;\n"
+            out += "FN:\n"
 
-        value = dp.value
+        for i, dp of model.datapoints
 
-        key = dp.name.toUpperCase()
-        switch key
+            value = dp.value
 
-            when 'ABOUT'
-                if dp.type is 'org' or dp.type is 'title'
-                    out += "#{dp.type.toUpperCase()}:#{value}\n"
-                else
+            key = dp.name.toUpperCase()
+            switch key
+
+                when 'ABOUT'
+                    if dp.type is 'org' or dp.type is 'title'
+                        out += "#{dp.type.toUpperCase()}:#{value}\n"
+                    else
+                        out += "X-#{dp.type.toUpperCase()}:#{value}\n"
+
+                when 'OTHER'
                     out += "X-#{dp.type.toUpperCase()}:#{value}\n"
 
-            when 'OTHER'
-                out += "X-#{dp.type.toUpperCase()}:#{value}\n"
-
-            when 'ADR'
-                # since a proper address management would be very complicated
-                # we trick it a bit so it matched the standard
-                value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
-                content = "TYPE=home,postal:;;#{value};;;;"
-                out += "ADR;#{content}\n"
-            else
-                if dp.type?
-                    type = ";TYPE=#{dp.type.toUpperCase()}"
+                when 'ADR'
+                    # since a proper address management would be very complicated
+                    # we trick it a bit so it matched the standard
+                    value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
+                    content = "TYPE=home,postal:;;#{value};;;;"
+                    out += "ADR;#{content}\n"
                 else
-                    type = ""
-                out += "#{key}#{type}:#{value}\n"
+                    if dp.type?
+                        type = ";TYPE=#{dp.type.toUpperCase()}"
+                    else
+                        type = ""
+                    out += "#{key}#{type}:#{value}\n"
 
-    out += "END:VCARD\n"
+        return out += "END:VCARD\n"
+
+    if model._attachments?.picture?
+        buffers = []
+        stream = @getFile 'picture', ->
+        stream.on 'data', buffers.push.bind(buffers)
+        stream.on 'end', ->
+            picture = Buffer.concat(buffers).toString 'base64'
+            callback null, getVCardOutput picture
+    else
+        callback null, getVCardOutput()
