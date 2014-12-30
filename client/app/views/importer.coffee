@@ -35,7 +35,7 @@ module.exports = class ImporterView extends BaseView
         reader.readAsText file
         reader.onloadend = =>
             @toImport = Contact.fromVCF reader.result
-
+            console.log @toImport.at(0).attributes
             txt = t 'import.ready-msg', smart_count: @toImport
             txt = "<p>#{txt} :</p><ul>"
             @toImport.each (contact) ->
@@ -79,6 +79,7 @@ module.exports = class ImporterView extends BaseView
                     success: =>
                         @updateProgress (total - @toImport.size()), total
                         app.contacts.add contact
+                        contact.savePicture()
                         importContact()
                     error: =>
                         $(".errors").append """

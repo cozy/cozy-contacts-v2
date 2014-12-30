@@ -215,7 +215,7 @@ Contact.fromVCF = (vcf) ->
     regexps =
         begin:       /^BEGIN:VCARD$/i
         end:         /^END:VCARD$/i
-        simple:      /^(version|fn|n|title|org|note)\:(.+)$/i
+        simple:      /^(version|fn|n|title|org|note|photo)\:(.+)$/i
         android:     /^x-android-custom\:(.+)$/i
         composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/
         complex:     /^([^\:\;]+);([^\:]+)\:(.+)$/
@@ -259,7 +259,6 @@ Contact.fromVCF = (vcf) ->
 
         else if regexps.simple.test line
             [all, key, value] = line.match regexps.simple
-
             key = key.toLowerCase()
 
             switch key
@@ -268,6 +267,15 @@ Contact.fromVCF = (vcf) ->
                     current.addDP 'about', key, value
                 when 'fn', 'note'
                     current.set key, value
+                when 'photo'
+                    if  value.indexOf('base64') isnt -1
+                        binary = atob value.split(',')[1]
+                        buffer = []
+                        for i in [0..binary.length]
+                            buffer.push binary.charCodeAt i
+                        blobValue = [new Uint8Array(buffer)]
+                        blob = new Blob blobValue, type: 'image/jpeg'
+                        current.picture = blob
                 when 'n'
                     current.set key, value.split ';'
                 when 'bday'
