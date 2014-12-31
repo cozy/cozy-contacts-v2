@@ -68,6 +68,7 @@ module.exports = class ContactView extends ViewCollection
         _.extend {}, @model.toJSON(),
             hasPicture: @model.hasPicture or false
             fn: @model.getFN()
+            timestamp: Date.now()
 
     afterRender: ->
         @zones = {}
@@ -220,6 +221,9 @@ module.exports = class ContactView extends ViewCollection
         @notesfield.val @model.get 'note'
         @namefield.val  @model.getFN()
         @tags?.refresh()
+        timestamp = Date.now()
+        url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
+        @$('#picture img').attr 'src', url
         @resizeNote()
 
     addBelowIfEnter: (event) ->

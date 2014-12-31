@@ -212,8 +212,6 @@
               }
               return model.fetch({
                 success: function(fetched) {
-                  console.log(fetched.changedAttributes());
-                  console.log(fetched.hasChanged());
                   if (fetched.changedAttributes()) {
                     return _this.onRemoteUpdate(fetched, collection);
                   }
