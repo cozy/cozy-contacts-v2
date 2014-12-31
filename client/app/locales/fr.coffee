@@ -1,7 +1,7 @@
 module.exports =
 
 # ContactView
-  "saving"                : "Sauvegarde ..."
+  "saving"                : "Sauvegarde…"
   "saved"                 : "Sauvegardé"
   "delete"                : "Supprimer"
   "delete contact"        : "Supprimer le contact"
@@ -10,7 +10,7 @@ module.exports =
   "company"               : "Société"
   "title"                 : "Titre"
   "birthday"              : "Anniversaire"
-  "phone"                 : "Telephone"
+  "phone"                 : "Téléphone"
   "skype"                 : "Skype"
   "email"                 : "Email"
   "postal"                : "Adresse"
@@ -18,12 +18,12 @@ module.exports =
   "other"                 : "Autre"
   "add"                   : "Ajouter"
   "notes"                 : "Notes"
-  "about"                 : "A propos"
+  "about"                 : "À propos"
   "name"                  : "Nom"
   "change"                : "Changer"
   "notes placeholder"     : "Prenez des notes ici"
   "type here"             : "Tapez ici"
-  "phones"                : "Telephones"
+  "phones"                : "Téléphones"
   "emails"                : "Emails"
   "postal"                : "Adresses"
   "links"                 : "Liens"
@@ -32,7 +32,7 @@ module.exports =
   "add fields"            : "Ajouter des champs"
   "more options"          : "Plus d'options"
 
-  "save changes alert"    : "Sauvegarder ?"
+  "save changes alert"    : "Sauvegarder ?"
   "not an image"          : "Ceci n'est pas une image"
   "remove datapoint"      : "Enlever"
   "changes saved"         : "Changements sauvegardés"
@@ -49,19 +49,19 @@ module.exports =
   "minutes"               : "min"
   "hours"                 : "h"
   "you called"            : "Vous avez appelé"
-  "you were called"       : "Vous avez été appelé"
+  "you were called"       : "Vous avez été appelé(e)"
   "create call task"      : "Créer une tâche de contact"
-  "creating..."           : "en création..."
+  "creating..."           : "création en cours…"
 
 # Name modal
   "edit name"             : "Modifier le nom"
-  "name editor"           : "Editeur de nom"
+  "name editor"           : "Éditeur de nom"
   "prefix"                : "Préfixe"
   "placeholder prefix"    : "M."
   "first name"            : "Prénom courant"
   "placeholder first"     : "Pierre"
   "middle name"           : "Autres prénoms"
-  "placeholder middle"    : "Marie Jacque"
+  "placeholder middle"    : "Marie Jacques"
   "last name"             : "Nom"
   "placeholder last"      : "Dupont"
   "suffix"                : "Suffixe"
@@ -70,7 +70,7 @@ module.exports =
   "save"                  : "Enregister"
 
 # ContactList
-  "search placeholder"    : "Recherche ..."
+  "search placeholder"    : "Recherche…"
   "new contact"           : "Nouveau Contact"
   "go to settings"        : "Paramètres"
 
@@ -83,42 +83,42 @@ module.exports =
   "import call log help"  : "N'utilisez pas cette fonction si vous êtes un client FING/Orange"
   "choose log file"       : "Puis uploadez le fichier que vous avez généré"
   "import ios calls"      : """
-    Pas de support pour iOS pour le moment. Pour contribuer, rendez vous sur """
+    Pas de support pour iOS pour le moment. Pour contribuer, rendez-vous sur """
   "import.ready-msg"      : """
     Prêt à importer %{smart_count} contact ||||
     Prêt à importer %{smart_count} contacts"""
   "import android calls"  : """
-    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : """
+    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : """
   "import android sms"  : """
-    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : """
-  "dont close navigator import": "Ne fermez pas le navigateur durant l'impor des contacts."
+    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : """
+  "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts."
 
   "choose phone country" : "Choisissez le pays de ce téléphone"
-  "ready to import"      : "Prêt à l'import"
+  "ready to import"      : "Prêt à l'importation"
   "log direction"        : "Direction"
-  "log number"           : "Number"
+  "log number"           : "Numéro"
   "log date"             : "Date"
   "importing this file"  : "Nous importons ce fichier"
   "may take a while"     : "Cela peut prendre quelques minutes"
   "progress"             : "Progression"
-  "loading import preview": "chargement de d'apperçu de l'import..."
-  "import succeeded": "Votre import de contact a réussi."
-  "import progress": "Progression de l'import: "
-  "fail to import": "Echec de l'import "
+  "loading import preview": "chargement de l'aperçu de l'importation…"
+  "import succeeded": "Votre importation de contact a réussi."
+  "import progress": "Progression de l'importation : "
+  "fail to import": "Échec de l'importation"
 
 # doc
-  "click left to display" : "Navigation: cliquez sur un contact dans le panneau de gauche pour l'afficher"
+  "click left to display" : "Navigation : cliquez sur un contact dans le panneau de gauche pour l'afficher"
 
-  "import export"         : "Import / Export"
-  "call log info"         : "Cliquez ici pour importer votre historique mobile :"
+  "import export"         : "Importer / Exporter"
+  "call log info"         : "Cliquez ici pour importer votre historique mobile :"
   "import call log"       : "Importer l'historique"
-  "vcard import info"     : "Cliquez ici pour importer vos contacts :"
+  "vcard import info"     : "Cliquez ici pour importer vos contacts :"
   "import vcard"          : "Importer vCard"
   "export all vcard"      : "Exporter un fichier vCard"
-  "export vcard"          : "Exporter un fichier vCard file"
+  "export vcard"          : "Exporter un fichier vCard"
   "settings"              : "Paramètres"
   "help"                  : "Aide"
-  "name format info"      : "Selectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)"
+  "name format info"      : "Sélectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)"
   "format given familly"  : "Prénom Nom (Pierre Dupont)"
   "format familly given"  : "Nom Prénom (Dupont Pierre)"
   "format given mid familly": "Format américain (John J. Johnson)"
@@ -132,14 +132,14 @@ module.exports =
     installez l'application Webdav depuis le market place."""
   "search info"           : """
     Recherche : utilisez le champ situé en haut à gauche pour effectuer
-    une recherche sur tous les champs de contacts. Si vous tapez un nom de tag,
-    il affichera tous les contacts taggés avec celui ci.
+    une recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,
+    il affichera tous les contacts tagués avec celui-ci.
   """
   "creation info"           : """
-    Création : Cliquez sur le bouton plus situé à côté du champ de recherche
+    Création : Cliquez sur le bouton « + » situé à côté du champ de recherche
     pour afficher une nouvelle page de contact. Donnez un nom au contact pour
     qu'il soit sauvegardé.
   """
-  "export": "Export"
+  "export": "Exporter"
   "export contact": "Exporter contact"
-  "are you sure": "Etes vous sûr?"
+  "are you sure": "Le voulez-vous vraiment ?"
