@@ -536,6 +536,15 @@ module.exports = ContactListener = (function(_super) {
     return this.collection.remove(model);
   };
 
+  ContactListener.prototype.process = function(event) {
+    var model;
+    ContactListener.__super__.process.call(this, event);
+    if (event.operation === 'update') {
+      model = this.collection.get(event.id);
+      return model.trigger('change', model);
+    }
+  };
+
   return ContactListener;
 
 })(CozySocketListener);
@@ -1932,7 +1941,7 @@ AndroidToDP = function(contact, raw) {
 };
 
 Contact.fromVCF = function(vcf) {
-  var ContactCollection, all, current, currentdp, currentidx, currentversion, imported, itemidx, key, line, match, part, pname, properties, property, pvalue, regexps, value, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+  var ContactCollection, all, binary, blob, blobValue, buffer, current, currentdp, currentidx, currentversion, i, imported, itemidx, key, line, match, part, pname, properties, property, pvalue, regexps, unfolded, value, _i, _j, _k, _l, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
   regexps = {
     begin: /^BEGIN:VCARD$/i,
     end: /^END:VCARD$/i,
@@ -1948,7 +1957,8 @@ Contact.fromVCF = function(vcf) {
   current = null;
   currentidx = null;
   currentdp = null;
-  _ref = vcf.split(/\r?\n/);
+  unfolded = vcf.replace(/\r?\n\s/gm, '');
+  _ref = unfolded.split(/\r?\n/);
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     line = _ref[_i];
     if (regexps.begin.test(line)) {
@@ -2059,13 +2069,26 @@ Contact.fromVCF = function(vcf) {
           }
           value = value.replace(/\n+/g, "\n");
         }
+      } else if (key === 'photo') {
+        currentdp = null;
+        binary = atob(value);
+        buffer = [];
+        for (i = _k = 0, _ref6 = binary.length; 0 <= _ref6 ? _k <= _ref6 : _k >= _ref6; i = 0 <= _ref6 ? ++_k : --_k) {
+          buffer.push(binary.charCodeAt(i));
+        }
+        blobValue = [new Uint8Array(buffer)];
+        blob = new Blob(blobValue, {
+          type: 'image/jpeg'
+        });
+        current.picture = blob;
+        continue;
       } else {
         currentdp = null;
         continue;
       }
       properties = properties.split(';');
-      for (_k = 0, _len2 = properties.length; _k < _len2; _k++) {
-        property = properties[_k];
+      for (_l = 0, _len2 = properties.length; _l < _len2; _l++) {
+        property = properties[_l];
         match = property.match(regexps.property);
         if (match) {
           all = match[0], pname = match[1], pvalue = match[2];
@@ -2393,10 +2416,10 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,bestmail = locals_.bestmail,besttel = locals_.besttel;
+var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,fn = locals_.fn,bestmail = locals_.bestmail,besttel = locals_.besttel;
 if ( hasPicture)
 {
-buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png", true, false)) + "/>");
+buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png?" + (timestamp) + "", true, false)) + "/>");
 }
 else
 {
@@ -2787,7 +2810,8 @@ module.exports = ContactView = (function(_super) {
   ContactView.prototype.getRenderData = function() {
     return _.extend({}, this.model.toJSON(), {
       hasPicture: this.model.hasPicture || false,
-      fn: this.model.getFN()
+      fn: this.model.getFN(),
+      timestamp: Date.now()
     });
   };
 
@@ -3007,12 +3031,15 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.modelChanged = function() {
-    var _ref;
+    var timestamp, url, _ref;
     this.notesfield.val(this.model.get('note'));
     this.namefield.val(this.model.getFN());
     if ((_ref = this.tags) != null) {
       _ref.refresh();
     }
+    timestamp = Date.now();
+    url = "contacts/" + (this.model.get('id')) + "/picture.png?" + timestamp;
+    this.$('#picture img').attr('src', url);
     return this.resizeNote();
   };
 
@@ -3063,9 +3090,9 @@ module.exports = ContactView = (function(_super) {
         return img.onload = function() {
           var array, binary, blob, canvas, ctx, dataUrl, i, ratio, ratiodim, _i, _ref;
           ratiodim = img.width > img.height ? 'height' : 'width';
-          ratio = 64 / img[ratiodim];
+          ratio = 300 / img[ratiodim];
           canvas = document.createElement('canvas');
-          canvas.height = canvas.width = 64;
+          canvas.height = canvas.width = 300;
           ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, ratio * img.width, ratio * img.height);
           dataUrl = canvas.toDataURL('image/jpeg');
@@ -3502,7 +3529,8 @@ module.exports = ContactsListItemView = (function(_super) {
       hasPicture: this.model.hasPicture || false,
       bestmail: this.model.getBest('email'),
       besttel: this.model.getBest('tel'),
-      fn: this.model.get('fn') || this.model.getComputedFN()
+      fn: this.model.get('fn') || this.model.getComputedFN(),
+      timestamp: Date.now()
     });
   };
 
@@ -4105,6 +4133,7 @@ module.exports = ImporterView = (function(_super) {
             success: function() {
               _this.updateProgress(total - _this.toImport.size(), total);
               app.contacts.add(contact);
+              contact.savePicture();
               return importContact();
             },
             error: function() {

@@ -80,53 +80,77 @@ Contact.prototype.getComputedFN = function(config) {
   }
 };
 
-Contact.prototype.toVCF = function(config) {
-  var content, dp, i, key, model, out, type, value, _ref;
+Contact.prototype.toVCF = function(config, callback) {
+  var buffers, getVCardOutput, model, stream, _ref;
   model = this.toJSON();
-  out = "BEGIN:VCARD\n";
-  out += "VERSION:3.0\n";
-  if (model.note) {
-    out += "NOTE:" + model.note + "\n";
-  }
-  if (model.n) {
-    out += "N:" + model.n + "\n";
-    out += "FN:" + (this.getComputedFN(config)) + "\n";
-  } else if (model.fn) {
-    out += "N:;;;;\n";
-    out += "FN:" + model.fn + "\n";
+  getVCardOutput = (function(_this) {
+    return function(picture) {
+      var content, dp, folded, i, key, out, type, value, _ref;
+      if (picture == null) {
+        picture = null;
+      }
+      out = "BEGIN:VCARD\n";
+      out += "VERSION:3.0\n";
+      if (model.note) {
+        out += "NOTE:" + model.note + "\n";
+      }
+      if (picture != null) {
+        folded = picture.match(/.{1,75}/g).join('\n ');
+        out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n " + folded + "\n";
+      }
+      if (model.n) {
+        out += "N:" + model.n + "\n";
+        out += "FN:" + (_this.getComputedFN(config)) + "\n";
+      } else if (model.fn) {
+        out += "N:;;;;\n";
+        out += "FN:" + model.fn + "\n";
+      } else {
+        out += "N:;;;;\n";
+        out += "FN:\n";
+      }
+      _ref = model.datapoints;
+      for (i in _ref) {
+        dp = _ref[i];
+        value = dp.value;
+        key = dp.name.toUpperCase();
+        switch (key) {
+          case 'ABOUT':
+            if (dp.type === 'org' || dp.type === 'title') {
+              out += "" + (dp.type.toUpperCase()) + ":" + value + "\n";
+            } else {
+              out += "X-" + (dp.type.toUpperCase()) + ":" + value + "\n";
+            }
+            break;
+          case 'OTHER':
+            out += "X-" + (dp.type.toUpperCase()) + ":" + value + "\n";
+            break;
+          case 'ADR':
+            value = value.replace(/(\r\n|\n\r|\r|\n)/g, ";");
+            content = "TYPE=home,postal:;;" + value + ";;;;";
+            out += "ADR;" + content + "\n";
+            break;
+          default:
+            if (dp.type != null) {
+              type = ";TYPE=" + (dp.type.toUpperCase());
+            } else {
+              type = "";
+            }
+            out += "" + key + type + ":" + value + "\n";
+        }
+      }
+      return out += "END:VCARD\n";
+    };
+  })(this);
+  if (((_ref = model._attachments) != null ? _ref.picture : void 0) != null) {
+    buffers = [];
+    stream = this.getFile('picture', function() {});
+    stream.on('data', buffers.push.bind(buffers));
+    return stream.on('end', function() {
+      var picture;
+      picture = Buffer.concat(buffers).toString('base64');
+      return callback(null, getVCardOutput(picture));
+    });
   } else {
-    out += "N:;;;;\n";
-    out += "FN:\n";
+    return callback(null, getVCardOutput());
   }
-  _ref = model.datapoints;
-  for (i in _ref) {
-    dp = _ref[i];
-    value = dp.value;
-    key = dp.name.toUpperCase();
-    switch (key) {
-      case 'ABOUT':
-        if (dp.type === 'org' || dp.type === 'title') {
-          out += "" + (dp.type.toUpperCase()) + ":" + value + "\n";
-        } else {
-          out += "X-" + (dp.type.toUpperCase()) + ":" + value + "\n";
-        }
-        break;
-      case 'OTHER':
-        out += "X-" + (dp.type.toUpperCase()) + ":" + value + "\n";
-        break;
-      case 'ADR':
-        value = value.replace(/(\r\n|\n\r|\r|\n)/g, ";");
-        content = "TYPE=home,postal:;;" + value + ";;;;";
-        out += "ADR;" + content + "\n";
-        break;
-      default:
-        if (dp.type != null) {
-          type = ";TYPE=" + (dp.type.toUpperCase());
-        } else {
-          type = "";
-        }
-        out += "" + key + type + ":" + value + "\n";
-    }
-  }
-  return out += "END:VCARD\n";
 };
