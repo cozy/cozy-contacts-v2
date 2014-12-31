@@ -215,7 +215,7 @@ Contact.fromVCF = (vcf) ->
     regexps =
         begin:       /^BEGIN:VCARD$/i
         end:         /^END:VCARD$/i
-        simple:      /^(version|fn|n|title|org|note|photo)\:(.+)$/i
+        simple:      /^(version|fn|n|title|org|note)\:(.+)$/i
         android:     /^x-android-custom\:(.+)$/i
         composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/
         complex:     /^([^\:\;]+);([^\:]+)\:(.+)$/
@@ -229,7 +229,9 @@ Contact.fromVCF = (vcf) ->
     currentidx = null
     currentdp = null
 
-    for line in vcf.split /\r?\n/
+    # unfold folded fields (like photo)
+    unfolded = vcf.replace /\r?\n\s/gm, ''
+    for line in unfolded.split /\r?\n/
 
         if regexps.begin.test line
             current = new Contact()
@@ -267,15 +269,6 @@ Contact.fromVCF = (vcf) ->
                     current.addDP 'about', key, value
                 when 'fn', 'note'
                     current.set key, value
-                when 'photo'
-                    if  value.indexOf('base64') isnt -1
-                        binary = atob value.split(',')[1]
-                        buffer = []
-                        for i in [0..binary.length]
-                            buffer.push binary.charCodeAt i
-                        blobValue = [new Uint8Array(buffer)]
-                        blob = new Blob blobValue, type: 'image/jpeg'
-                        current.picture = blob
                 when 'n'
                     current.set key, value.split ';'
                 when 'bday'
@@ -343,6 +336,16 @@ Contact.fromVCF = (vcf) ->
                     if typeof value isnt 'string'
                         value = value.join '\n'
                     value = value.replace /\n+/g, "\n"
+            else if key is 'photo'
+                currentdp = null
+                binary = atob value
+                buffer = []
+                for i in [0..binary.length]
+                    buffer.push binary.charCodeAt i
+                blobValue = [new Uint8Array(buffer)]
+                blob = new Blob blobValue, type: 'image/jpeg'
+                current.picture = blob
+                continue
             else
                 currentdp = null
                 continue

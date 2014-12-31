@@ -56,7 +56,8 @@ Contact::toVCF = (config, callback) ->
         out += "NOTE:#{model.note}\n" if model.note
 
         if picture?
-            out += "PHOTO:data:image/jpeg;base64,#{picture}\n"
+            folded = picture.match(/.{1,75}/g).join '\n '
+            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
 
         if model.n
             out += "N:#{model.n}\n"
