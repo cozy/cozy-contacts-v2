@@ -3088,11 +3088,12 @@ module.exports = ContactView = (function(_super) {
       return function() {
         img.src = reader.result;
         return img.onload = function() {
-          var array, binary, blob, canvas, ctx, dataUrl, i, ratio, ratiodim, _i, _ref;
+          var IMAGE_DIMENSION, array, binary, blob, canvas, ctx, dataUrl, i, ratio, ratiodim, _i, _ref;
+          IMAGE_DIMENSION = 600;
           ratiodim = img.width > img.height ? 'height' : 'width';
-          ratio = 300 / img[ratiodim];
+          ratio = IMAGE_DIMENSION / img[ratiodim];
           canvas = document.createElement('canvas');
-          canvas.height = canvas.width = 300;
+          canvas.height = canvas.width = IMAGE_DIMENSION;
           ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, ratio * img.width, ratio * img.height);
           dataUrl = canvas.toDataURL('image/jpeg');
