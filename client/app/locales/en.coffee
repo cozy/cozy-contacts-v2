@@ -7,6 +7,9 @@ module.exports =
   "delete contact"        : "Delete the contact permanently"
   "add contact"           : "Create a new contact"
 
+  "show"                  : "Show"
+  "hide"                  : "Hide"
+
   "company"               : "Company"
   "title"                 : "Title"
   "birthday"              : "Birthday"
@@ -126,9 +129,17 @@ module.exports =
   "vcard export info"     : """
     Click here to export all your contacts as a vCard file:"""
 
-  "carddav info"          : """
-    Synchronization: To sync your contacts with your mobile, install the Webdav
-    application from the market place."""
+  "sync title"                : "Mobile Synchronization (CardDav)"
+  "sync healine no data"      : "To synchronize your calendar with your devices, you must follow two steps"
+  "sync headline with data"   : "To synchronize your calendar, use the following information:"
+  "sync url"                  : "URL:"
+  "sync login"                : "Username:"
+  "sync password"             : "Password: "
+  "sync help"                 : "Are you lost? Follow the "
+  "sync help link"            : "step-by-step guide!"
+  "install the sync module"   : "Install the Sync module from the Cozy App Store"
+  "connect to it and follow"  : "Connect to it and follow the instructions related to CalDAV."
+
   "search info"           : """
     Search: Use the search field located on the top left
     corner to perform a search on all the fields of your contacts. If you
