@@ -1,0 +1,42 @@
+input#uploader(type='file',style="display:none")
+
+
+.objectPickerCont
+
+    nav.fp-nav-tabs(role='tablist', aria-controls='objectPickerCont')
+        div(role='tabMarginTop')
+        div
+            div(role='tab', aria-controls='thumbPicker', aria-selected='true') photo
+            div(role='tab', aria-controls='photoUpload', aria-selected='false') upload
+            div(role='tab', aria-controls='urlPhotoUpload', aria-selected='false') url
+        div(role='tabMarginBottom')
+
+    section.thumbPicker(role='tabpanel', aria-hidden='false')
+        .thumbsContainer
+        a.btn.btn-cozy.right.next
+            p #{t('more thumbs')} &nbsp;&#12297
+
+    section.photoUpload(role='tabpanel', aria-hidden='true')
+        button.modal-uploadBtn #{t('ObjPicker upload btn')}
+        .modal-file-drop-zone
+            p #{t('drop a file')}
+            div
+
+    section.urlPhotoUpload(role='tabpanel', aria-hidden='true')
+        div
+            div.url-preview
+        input.modal-url-input(placeholder="url" value="")
+        //- for tests : https://weechat.org/media/images/weechat_logo_small.png
+
+.croperCont
+    table
+        tbody
+            tr
+                td
+                    img#img-to-crop
+                td
+                    div#frame-img-preview
+                        img#img-preview
+
+    a.chooseAgain #{t('photo-modal chooseAgain')}
+

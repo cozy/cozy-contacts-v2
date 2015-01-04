@@ -1,15 +1,15 @@
-path    = require 'path'
+path       = require 'path'
 multiparty = require 'multiparty'
-async = require 'async'
-Contact = require '../models/contact'
-helpers = require '../helpers/helpers'
-americano = require 'cozydb'
+async      = require 'async'
+Contact    = require '../models/contact'
+helpers    = require '../helpers/helpers'
+americano  = require 'cozydb'
 
 
 baseController = new americano.SimpleController
-    model: Contact
-    reqParamID: 'contactid'
-    reqProp: 'contact'
+    model      : Contact
+    reqParamID : 'contactid'
+    reqProp    : 'contact'
 
 module.exports =
     fetch: baseController.fetch
@@ -116,6 +116,7 @@ module.exports =
             return next err if err?
 
             date = helpers.makeDateStamp()
-            res.attachment "#{date}-#{req.params.fn.replace(/ /g, '-')}.vcf"
+            txt = req.params.fn.replace(new RegExp(' ','g'), '-')
+            res.attachment "#{date}-#{txt}.vcf"
             res.set 'Content-Type', 'text/x-vcard'
             res.send vCardOutput

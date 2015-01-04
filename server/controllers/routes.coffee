@@ -1,11 +1,12 @@
-contact = require './contact'
+tags        = require './tags'
+contact     = require './contact'
 application = require './application'
-tags = require './tags'
 
 module.exports =
 
     '':
         get: application.index
+
 
     'config':
         post: application.setConfig
@@ -32,6 +33,7 @@ module.exports =
 
     'contacts/:contactid/picture.png':
         get: contact.picture
+
 
      # Tag management
     'tags':

@@ -1,0 +1,190 @@
+.object-picker
+
+  .modalCY-body
+    display  :flex
+    position :relative
+
+  .objectPickerCont
+    flex            :1
+    display         :flex
+    flex-direction  :row
+    justify-content :stretch
+    position        :absolute
+    top             :0
+    bottom          :0
+    right           :0
+    left            :0
+    background-color:white
+
+  .fp-nav-tabs
+    background-color :#ddd
+    flex-shrink      :0
+    flex-grow        :0
+
+  [role='tablist']
+    display:flex
+    flex-direction:column
+
+  [role='tabMarginTop']
+    flex-grow:2
+
+  [role='tabMarginBottom']
+    flex-grow:3
+
+  [role='tab']
+    padding-right:8px
+    padding-left:8px
+    height:35px
+    color:#3F3F3F
+    cursor:pointer
+    text-align: center
+    line-height: 35px
+
+  [aria-selected='true']
+    background-color:#fff
+
+  [aria-hidden="true"]
+    display:none
+
+  [role='tabpanel']
+    flex-grow:1
+    // height:100%
+  //   position:relative
+
+  .thumbPicker
+    overflow:auto
+    // padding-right:15px
+    // margin-left:15px
+
+  .photoUpload[aria-hidden="false"]
+    display:flex
+    flex-direction:column
+    justify-content: center
+    align-content:center
+
+  .thumbsContainer
+    display:flex
+    flex-wrap:wrap
+    justify-content:center
+    margin:7px
+    img
+      border: 5px solid transparent
+      height: 120px
+      // margin-bottom: 2px
+      // margin-right: 2px
+      cursor:pointer
+    img.selected
+      border: 5px solid #34a6ff
+      border-radius: 3px
+      -webkit-border-radius: 3px
+      -ms-filter: none
+      filter: none
+
+  .next
+    margin-top:10px
+    margin-bottom:10px
+    width:30%
+    min-width:40px
+
+  .modal-uploadBtn
+    width:250px
+    height:30px
+    margin-top:1em
+    margin-left:auto
+    margin-right:auto
+
+    // margin:auto
+
+  .modal-file-drop-zone
+    flex-grow:1
+    position:relative
+
+    >div
+      border-color:#E4E2E2
+      border-style:dashed
+      border-width:5px
+      margin:0px
+      left:15px
+      right:15px
+      top:15px
+      bottom:15px
+      z-index:1
+      position:absolute
+    .dragging
+      border-color:#34A6FF
+
+    p
+      font-size:2em
+      font-weight:bold
+      color:#B5ADAD
+      line-height:1em
+      text-align:center
+      position:absolute
+      top:50%
+      left:50%
+      transform: translateX(-50%) translateY(-50%)
+
+  margin-urlUpload = 1.3em
+
+  .urlPhotoUpload[aria-hidden="false"]
+    display         :flex
+    flex-direction  :column
+    align-items     :stretch
+    justify-content :center
+    margin-bottom :margin-urlUpload
+
+  .urlPhotoUpload > div
+    position    :relative
+    flex-grow   :1
+    flex-shrink :1
+    display         :none // will be replaced by 'flex' when the first image is loaded
+    justify-content :center
+    align-items     :center
+    margin-top    :margin-urlUpload
+    margin-bottom :0.5em
+    margin-right  :margin-urlUpload
+    margin-left   :margin-urlUpload
+
+  .url-preview
+    position  :absolute
+    top       :50%
+    left      :50%
+    transform : translateX(-50%) translateY(-50%)
+    width  :100%
+    height :100%
+    background-repeat   : no-repeat
+    background-position : center
+    background-size     : contain
+
+  .modal-url-input
+    flex-shrink :0
+    flex-grow   :0
+    align-self  : center
+    width     :93%
+    max-width :45em
+    height    :1.8em
+    margin-bottom:0
+    padding-left:0.4em
+
+  #img-to-crop
+    display: block
+    max-width  :300px
+    max-height :300px
+
+  #frame-img-preview
+    width       :100px
+    height      :100px
+    overflow    :hidden
+    margin-left :30px
+
+  #img-preview
+    max-width: none
+
+  .croperCont
+    flex-grow:1
+    display:flex
+    flex-direction:column
+    align-items:center
+    justify-content:center
+    table
+      flex-shrink:1

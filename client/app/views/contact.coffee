@@ -1,10 +1,9 @@
+TagsView       = require 'widgets/tags'
+ContactName    = require 'views/contact_name'
+Contact        = require 'models/contact'
 ViewCollection = require 'lib/view_collection'
-TagsView = require 'widgets/tags'
-ContactName = require 'views/contact_name'
-Datapoint = require 'models/datapoint'
-Contact = require 'models/contact'
-request = require '../lib/request'
-
+Datapoint      = require 'models/datapoint'
+request        = require '../lib/request'
 
 module.exports = class ContactView extends ViewCollection
 
@@ -13,34 +12,34 @@ module.exports = class ContactView extends ViewCollection
     itemView: require 'views/datapoint'
 
     events: ->
-        'click .addcozy'    : @addClicked 'about', 'cozy'
-        'click .addtwitter' : @addClicked 'social', 'twitter'
-        'click .addabout'   : @addClicked 'about'
-        'click .addtel'     : @addClicked 'tel'
-        'click .addemail'   : @addClicked 'email'
-        'click .addadr'     : @addClicked 'adr'
-        'click .addother'   : @addClicked 'other'
-        'click .addurl'     : @addClicked 'url'
-        'click .addrelation': @addClicked 'relation'
-        'click .addchat'    : @addClicked 'chat'
-        'click .addskype'   : @addClicked 'chat', 'skype'
-        'click #more-options': 'onMoreOptionsClicked'
-        'click #name'       : 'toggleContactName'
-        'click #undo'       : 'undo'
-        'click #delete'     : 'delete'
-        'change #uploader'  : 'photoChanged'
+        'click .addcozy'      : @addClicked 'about', 'cozy'
+        'click .addtwitter'   : @addClicked 'social', 'twitter'
+        'click .addabout'     : @addClicked 'about'
+        'click .addtel'       : @addClicked 'tel'
+        'click .addemail'     : @addClicked 'email'
+        'click .addadr'       : @addClicked 'adr'
+        'click .addother'     : @addClicked 'other'
+        'click .addurl'       : @addClicked 'url'
+        'click .addrelation'  : @addClicked 'relation'
+        'click .addchat'      : @addClicked 'chat'
+        'click .addskype'     : @addClicked 'chat', 'skype'
+        'click #more-options' : 'onMoreOptionsClicked'
+        'click #name'         : 'toggleContactName'
+        'click #undo'         : 'undo'
+        'click #delete'       : 'delete'
 
-        'keyup input.value': 'addBelowIfEnter'
-        'keydown #notes': 'resizeNote'
-        'keypress #notes': 'resizeNote'
+        'keyup input.value' : 'addBelowIfEnter'
+        'keydown #notes'    : 'resizeNote'
+        'keypress #notes'   : 'resizeNote'
 
-        'keyup #notes': 'doNeedSaving'
-        'keydown #name': 'onNameKeyPress'
-        'keydown textarea#notes': 'onNoteKeyPress'
-        'keydown .ui-widget-content': 'onTagInputKeyPress'
+        'keyup #notes'               : 'doNeedSaving'
+        'keydown #name'              : 'onNameKeyPress'
+        'keydown textarea#notes'     : 'onNoteKeyPress'
+        'keydown .ui-widget-content' : 'onTagInputKeyPress'
 
-        'blur #notes': 'changeOccured'
-        'blur .datapoint input.value': 'changeOccured'
+        'blur #notes'                 : 'changeOccured'
+        'blur .datapoint input.value' : 'changeOccured'
+        'click #picture'              : 'choosePhoto'
 
     constructor: (options) ->
         options.collection = options.model.dataPoints
@@ -48,12 +47,12 @@ module.exports = class ContactView extends ViewCollection
 
     initialize: ->
         super
-        @listenTo @model, 'change', @modelChanged
-        @listenTo @model, 'sync', @onSuccess
-        @listenTo @collection, 'change' , =>
+        @listenTo @model         , 'change' , @modelChanged
+        @listenTo @model         , 'sync'   , @onSuccess
+        @listenTo @collection    , 'change' , =>
             @needSaving = true
             @changeOccured()
-        @listenTo @collection, 'remove' , =>
+        @listenTo @collection    , 'remove' , =>
             @needSaving = true
             @changeOccured()
 
@@ -92,7 +91,6 @@ module.exports = class ContactView extends ViewCollection
         @savedInfo = @$('#save-info').hide()
         @needSaving = false
         @notesfield = @$('#notes')
-        @uploader = @$('#uploader')[0]
         @picture  = @$('#picture .picture')
         @tags = new TagsView
             el: @$ '.tags'
@@ -205,6 +203,37 @@ module.exports = class ContactView extends ViewCollection
             @$('#contact-name').hide()
             @$('#name').blur()
 
+
+    choosePhoto: =>
+        intent =
+            type  : 'pickObject'
+            params:
+                objectType : 'singlePhoto'
+                isCropped  : true
+                proportion : 1
+                maxWidth   : 10
+                minWidth   : 10
+        timeout = 10800000 # 3 hours
+        that = this
+        choosePhoto_answer = @choosePhoto_answer
+        window.app.intentManager.send('nameSpace',intent, timeout)
+        .then( choosePhoto_answer
+            ,
+            (error) ->
+                console.log 'contact : response in error : ', error
+        )
+
+
+    choosePhoto_answer : (message) =>
+        answer = message.data
+        console.log 'CONTACT : response: ', answer
+        if answer.newPhotoChosen
+            @changePhoto(answer.dataUrl)
+
+    intentHandler: (intentID, cb)->
+        @castIntent[intentID] = cb
+
+
     onMoreOptionsClicked: =>
         @$("#more-options").fadeOut =>
             @$("#adder h2").show()
@@ -265,8 +294,10 @@ module.exports = class ContactView extends ViewCollection
         @notesfield.prop 'rows', rows + 2
         @resizeNiceScroll()
 
+
     resizeNiceScroll: (event) =>
         @$el.getNiceScroll().resize()
+
 
     bindTabs: ->
         @$('[role=tablist]').on 'click', '[role=tab]', (event) =>
@@ -293,33 +324,12 @@ module.exports = class ContactView extends ViewCollection
         @$el
             .on 'click', toggleMenu
 
-    photoChanged: =>
-        file = @uploader.files[0]
 
-        unless file.type.match /image\/.*/
-            return alert t 'This is not an image'
+    changePhoto:(dataUrl)->
+        @picture.attr 'src', dataUrl
+        @model.photo = dataUrl.split(',')[1]
+        @model.savePicture()
 
-        reader = new FileReader()
-        img = new Image()
-        reader.readAsDataURL file
-        reader.onloadend = =>
-            img.src = reader.result
-            img.onload = =>
-                IMAGE_DIMENSION = 600
-                ratiodim = if img.width > img.height then 'height' else 'width'
-                ratio = IMAGE_DIMENSION / img[ratiodim]
-
-                # use canvas to resize the image
-                canvas = document.createElement 'canvas'
-                canvas.height = canvas.width = IMAGE_DIMENSION
-                ctx = canvas.getContext '2d'
-                ctx.drawImage img, 0, 0, ratio*img.width, ratio*img.height
-                dataUrl =  canvas.toDataURL 'image/jpeg'
-
-                @picture.attr 'src', dataUrl
-
-                @model.photo = dataUrl.split(',')[1]
-                @model.savePicture()
 
     onTagInputKeyPress: (event) ->
         keyCode = event.keyCode || event.which
