@@ -22,7 +22,7 @@ module.exports =
   "name"                  : "Nom"
   "change"                : "Changer"
   "notes placeholder"     : "Prenez des notes ici"
-  "type here"             : "Tapez ici"
+  "type here"             : "Écrivez ici"
   "phones"                : "Téléphones"
   "emails"                : "Emails"
   "postal"                : "Adresses"
@@ -35,7 +35,7 @@ module.exports =
   "save changes alert"    : "Sauvegarder ?"
   "not an image"          : "Ceci n'est pas une image"
   "remove datapoint"      : "Enlever"
-  "changes saved"         : "Changements sauvegardés"
+  "changes saved"         : "Changements enregistrés"
   "undo"                  : "Annuler"
   "undone"                : "Annulé"
   "history"               : "Historique"
@@ -43,7 +43,7 @@ module.exports =
   "cozy url"              : "Cozy"
   "twitter"               : "Twitter"
   "add tags"              : "Ajouter des tags"
-  "add note"              : "Ajouter une une note"
+  "add note"              : "Ajouter une note"
   "duration"              : "Durée"
   "seconds"               : "s"
   "minutes"               : "min"
@@ -88,9 +88,9 @@ module.exports =
     Prêt à importer %{smart_count} contact ||||
     Prêt à importer %{smart_count} contacts"""
   "import android calls"  : """
-    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : """
+    Si vous avez un téléphone Android, utilisez cette application pour importer vos appels : """
   "import android sms"  : """
-    Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : """
+    Si vous avez un téléphone Android, utilisez cette application pour importer vos sms : """
   "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts."
 
   "choose phone country" : "Choisissez le pays de ce téléphone"
@@ -118,7 +118,7 @@ module.exports =
   "export vcard"          : "Exporter un fichier vCard"
   "settings"              : "Paramètres"
   "help"                  : "Aide"
-  "name format info"      : "Sélectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)"
+  "name format info"      : "Sélectionnez le format d'affichage des noms (les contacts déjà importés ne seront pas affectés)."
   "format given familly"  : "Prénom Nom (Pierre Dupont)"
   "format familly given"  : "Nom Prénom (Dupont Pierre)"
   "format given mid familly": "Format américain (John J. Johnson)"
@@ -128,15 +128,15 @@ module.exports =
     Cliquez ici pour exporter tous vos contacts dans un fichier vCard :"""
 
   "carddav info"          : """
-    Synchronization : Pour synchroniser vos contacts sur votre mobile,
+    Synchronisation : pour synchroniser vos contacts sur votre mobile,
     installez l'application Webdav depuis le market place."""
   "search info"           : """
-    Recherche : utilisez le champ situé en haut à gauche pour effectuer
+    Recherche : utilisez le champ situé en haut à gauche pour effectuer
     une recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,
     il affichera tous les contacts tagués avec celui-ci.
   """
   "creation info"           : """
-    Création : Cliquez sur le bouton « + » situé à côté du champ de recherche
+    Création : cliquez sur le bouton « + » situé à côté du champ de recherche
     pour afficher une nouvelle page de contact. Donnez un nom au contact pour
     qu'il soit sauvegardé.
   """
