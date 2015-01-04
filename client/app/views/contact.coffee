@@ -4,7 +4,7 @@ TagsView = require 'views/contact_tags'
 NameModal = require 'views/contact_name_modal'
 Datapoint = require 'models/datapoint'
 request = require '../lib/request'
-
+PhotoBrowser = require './photo_browser'
 
 module.exports = class ContactView extends ViewCollection
 
@@ -13,6 +13,7 @@ module.exports = class ContactView extends ViewCollection
     itemView: require 'views/datapoint'
 
     events: ->
+        'click #picture': 'choosePhoto'
         'click .addbirthday': @addClicked 'about', 'birthday'
         'click .addorg'     : @addClicked 'about', 'company'
         'click .addtitle'   : @addClicked 'about', 'title'
@@ -180,6 +181,13 @@ module.exports = class ContactView extends ViewCollection
            success: =>
                @collection.trigger 'change', @model
 
+    choosePhoto: =>
+        # alert 'tretre'
+        new PhotoBrowser
+            model: @album
+            collection: @collection
+
+
     showNameModal: =>
         modal = new NameModal
             model: @model
@@ -251,6 +259,7 @@ module.exports = class ContactView extends ViewCollection
         @$el.getNiceScroll().resize()
 
     photoChanged: =>
+        console.log 'trotro'
         file = @uploader.files[0]
 
         unless file.type.match /image\/.*/

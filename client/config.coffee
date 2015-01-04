@@ -20,6 +20,7 @@ exports.config =
                 before: [
                     # Backbone
                     'vendor/scripts/jquery-2.1.1.js',
+                    'vendor/scripts/jquery.Jcrop.min-0.9.12.js',
                     'vendor/scripts/underscore.js',
                     'vendor/scripts/backbone.js',
                     # Twitter Bootstrap jquery plugins
