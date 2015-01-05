@@ -59,7 +59,6 @@ Contact::getComputedFN = ->
     parts = [prefix, given, middle, familly, suffix]
     # remove empty parts
     parts = parts.filter (part) -> part? and part isnt ''
-
     return parts.join ' '
 
 # Parse n field (splitted) from fn (display).
