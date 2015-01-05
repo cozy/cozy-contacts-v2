@@ -55,10 +55,6 @@ Contact::toVCF = (config, callback) ->
         out += "VERSION:3.0\n"
         out += "NOTE:#{model.note}\n" if model.note
 
-        if picture?
-            folded = picture.match(/.{1,75}/g).join '\n '
-            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
-
         if model.n
             out += "N:#{model.n}\n"
             out += "FN:#{@getComputedFN config}\n"
@@ -97,6 +93,13 @@ Contact::toVCF = (config, callback) ->
                     else
                         type = ""
                     out += "#{key}#{type}:#{value}\n"
+
+        if picture?
+            # vCard 3.0 specifies that lines must be folded at 75 characters
+            # with "\n " as a delimiter
+            folded = picture.match(/.{1,75}/g).join '\n '
+            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
+
 
         return out += "END:VCARD\n"
 
