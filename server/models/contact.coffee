@@ -7,6 +7,7 @@ log = require('printit')
 module.exports = Contact = americano.getModel 'Contact',
     id            : String
     fn            : String # vCard FullName = display name
+    # (Prefix Given Middle Familly Suffix)
     n             : String # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
     datapoints    : (x) -> x
@@ -36,17 +37,30 @@ Contact::savePicture = (path, callback) ->
                 log.error "failed to purge #{file.path}" if err
                 callback()
 
-Contact::getComputedFN = (config) ->
-    [familly, given, middle, prefix, suffix] = @n.split ';'
-    config ?= {}
-    config.nameOrder ?= 'given-familly'
-    switch config.nameOrder
-        when 'given-familly' then "#{given} #{middle} #{familly}"
-        when 'familly-given' then "#{familly}, #{given} #{middle}"
-        when 'given-middleinitial-familly'
-            "#{given} #{initial(middle)} #{familly}"
+Contact::getComputedFN = ->
+    if not @n? # defensive against data in DS.
+        @n = ''
 
-Contact::toVCF = (config, callback) ->
+    [familly, given, middle, prefix, suffix] = @n.split ';'
+    # order parts of name.
+    parts = [prefix, given, middle, familly, suffix]
+    # remove empty parts
+    parts = parts.filter (part) -> part? and part isnt ''
+
+    return parts.join ' '
+
+# Parse n field (splitted) from fn (display).
+Contact::getParsedN = ->
+    if not @fn? # defensive against data in DS.
+        @fn = ''
+
+    [given, middle..., familly] = @fn.split ' '
+    parts = [familly, given, middle.join(' '), '', '']
+
+    return parts.join ';'
+
+
+Contact::toVCF = (callback) ->
 
     model = @toJSON()
 
@@ -57,9 +71,9 @@ Contact::toVCF = (config, callback) ->
 
         if model.n
             out += "N:#{model.n}\n"
-            out += "FN:#{@getComputedFN config}\n"
+            out += "FN:#{@getComputedFN()}\n"
         else if model.fn
-            out += "N:;;;;\n"
+            out += "N:#{@getParsedN()}\n"
             out += "FN:#{model.fn}\n"
         else
             out += "N:;;;;\n"
