@@ -65,6 +65,7 @@ Contact::getComputedFN = ->
 Contact::getParsedN = ->
     return ";#{@fn};;;"
 
+
 Contact::toVCF = (callback) ->
 
     model = @toJSON()
