@@ -68,7 +68,7 @@ module.exports = class Contact extends Backbone.Model
             attrs.n = attrs.n.split ';'
 
         unless Array.isArray attrs.n
-            attrs.n = []
+            attrs.n = @getComputedN attrs.fn
 
         return attrs
 
@@ -162,6 +162,18 @@ module.exports = class Contact extends Backbone.Model
     # TODO: should be useless as n should always exists.
     getN: -> @get('n') or @getComputedN()
 
+    getDisplayName: ->
+        n = @get 'n'
+        return '' unless n and n.length > 0
+
+        [familly, given, middle, prefix, suffix] = n
+        switch app.config.get 'nameOrder'
+            when 'given-familly' then "#{given} #{middle} #{familly}"
+
+            when 'given-middleinitial-familly'
+                "#{given} #{initial(middle)} #{familly}"
+            else "#{familly}, #{given} #{middle}"
+
     initial =  (middle) ->
         if i = middle.split(/[ \,]/)[0][0]?.toUpperCase() then i + '.'
         else ''
@@ -253,8 +265,8 @@ Contact.fromVCF = (vcf) ->
             currentversion = "3.0"
 
         else if regexps.simple.test line
-            [all, key, quoted..., value] = line.match regexps.simple
-            if quoted.length is 1
+            [all, key, quoted, value] = line.match regexps.simple
+            if quoted?
                 value = VCard.unquotePrintable value
 
             key = key.toLowerCase()

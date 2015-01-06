@@ -15,6 +15,22 @@ module.exports = Contact = americano.getModel 'Contact',
     tags          : (x) -> x # DAMN IT JUGGLING
     _attachments  : Object
 
+Contact.afterInitialize = ->
+    # Cleanup the model,
+    # Defensive against data from DataSystem
+
+    # n and fn MUST be valid.
+    if not @n? or @n is ''
+        if not @fn?
+            @fn = ''
+
+        @n = @getParsedN()
+
+    else if not @fn? or @fn is ''
+        @fn = @getComputedFN()
+
+    return @
+
 Contact::remoteKeys = ->
     model = @toJSON()
     out = [@id]
@@ -39,9 +55,6 @@ Contact::savePicture = (path, callback) ->
 
 #TODO use client/app/lib/vcard_helper
 Contact::getComputedFN = ->
-    if not @n? # defensive against data in DS.
-        @n = ''
-
     [familly, given, middle, prefix, suffix] = @n.split ';'
     # order parts of name.
     parts = [prefix, given, middle, familly, suffix]
@@ -53,9 +66,6 @@ Contact::getComputedFN = ->
 #TODO use client/app/lib/vcard_helper
 # Parse n field (splitted) from fn (display).
 Contact::getParsedN = ->
-    if not @fn? # defensive against data in DS.
-        @fn = ''
-
     [given, middle..., familly] = @fn.split ' '
     parts = [familly, given, middle.join(' '), '', '']
 
