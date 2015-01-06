@@ -91,3 +91,4 @@ module.exports = class ImporterView extends BaseView
         unless @importing
             @$el.modal 'hide'
             @remove()
+            app.router.navigate '#help', trigger: true

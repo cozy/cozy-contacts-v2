@@ -42,3 +42,9 @@ module.exports =
 
     task:
         all: americano.defaultRequests.all
+
+    cozy_instance:
+        all: americano.defaultRequests.all
+
+    webdavaccount:
+        all: americano.defaultRequests.all

@@ -7,6 +7,9 @@ module.exports =
   "delete contact"        : "Supprimer le contact"
   "add contact"           : "Créer un contact"
 
+  "show"                  : "Montrer"
+  "hide"                  : "Cacher"
+
   "company"               : "Société"
   "title"                 : "Titre"
   "birthday"              : "Anniversaire"
@@ -127,9 +130,17 @@ module.exports =
   "vcard export info"     : """
     Cliquez ici pour exporter tous vos contacts dans un fichier vCard :"""
 
-  "carddav info"          : """
-    Synchronisation : pour synchroniser vos contacts sur votre mobile,
-    installez l'application Webdav depuis le market place."""
+  "sync title"                : "Synchronisation mobile (CardDav)"
+  "sync headline no data"     : "Pour synchroniser votre agenda avec votre mobile vous devez :"
+  "sync headline with data"   : "Pour synchroniser votre agenda, utilisez les identifiants suivant :"
+  "sync url"                  : "URL :"
+  "sync login"                : "Nom d'utilisateur :"
+  "sync password"             : "Mot de passe : "
+  "sync help"                 : "Vous êtes perdu(e) ? Suivez le "
+  "sync help link"            : "guide pas à pas !"
+  "install the sync module"   : "Installer le module Sync depuis l'applithèque."
+  "connect to it and follow"  : "Vous connecter et suivre les instructions relatives à CalDAV."
+
   "search info"           : """
     Recherche : utilisez le champ situé en haut à gauche pour effectuer
     une recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,

@@ -1387,11 +1387,13 @@ module.exports = ViewCollection = (function(_super) {
 
 ;require.register("locales/en", function(exports, require, module) {
 module.exports = {
-  "saving": "Saving ...",
+  "saving": "Saving…",
   "saved": "Saved",
   "delete": "Delete",
   "delete contact": "Delete the contact permanently",
   "add contact": "Create a new contact",
+  "show": "Show",
+  "hide": "Hide",
   "company": "Company",
   "title": "Title",
   "birthday": "Birthday",
@@ -1416,7 +1418,7 @@ module.exports = {
   "actions": "Actions",
   "add fields": "Add fields",
   "more options": "More options",
-  "save changes alert": "Save changes ?",
+  "save changes alert": "Save changes?",
   "not an image": "This is not an image",
   "remove datapoint": "Remove",
   "changes saved": "Changes saved",
@@ -1435,22 +1437,22 @@ module.exports = {
   "you called": "You called",
   "you were called": "You were called",
   "create call task": "Create contact task",
-  "creating...": "creating...",
+  "creating...": "creating…",
   "edit name": "Edit Name",
   "name editor": "Name Editor",
   "prefix": "Prefix",
   "placeholder prefix": "Sir",
   "first name": "Given Name",
   "placeholder first": "John",
-  "middle name": "Middel Name",
+  "middle name": "Middle Name",
   "placeholder middle": "D.",
-  "last name": "Familly Name",
+  "last name": "Family Name",
   "placeholder last": "Doe",
   "suffix": "Suffix",
   "placeholder suffix": "III",
   "full name": "Full name",
   "save": "Save",
-  "search placeholder": "Search ...",
+  "search placeholder": "Search…",
   "new contact": "New Contact",
   "go to settings": "Settings",
   "choose vcard file": "Choose a vCard file",
@@ -1472,10 +1474,10 @@ module.exports = {
   "importing this file": "We are importing this file",
   "may take a while": "It may take a while",
   "progress": "Progress",
-  "loading import preview": "loading import preview...",
+  "loading import preview": "loading import preview…",
   "import succeeded": "Your contact import succeeded.",
   "import progress": "Import progress",
-  "fail to import": "Fail to import",
+  "fail to import": "Import failed",
   "click left to display": "Browse: Click on a contact in the left panel to display it.",
   "import export": "Import / Export",
   "call log info": "Click here to import your mobile's call log:",
@@ -1486,15 +1488,24 @@ module.exports = {
   "export vcard": "Export vCard file",
   "settings": "Settings",
   "help": "Help",
-  "name format info": "Select display name format (will not change contacts already imported)",
-  "format given familly": "Given Familly (John Johnson)",
+  "name format info": "Select display name format (will not change already imported contacts)",
+  "format given familly": "Given Family (John Johnson)",
   "format familly given": "Name, First name (Johnson John)",
   "format given mid familly": "Full (John J. Johnson)",
-  "do this now": "Select the format your contacts have now.",
+  "do this now": "Select the current format of your contacts.",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
-  "carddav info": "Synchronization: To sync your contacts with your mobile, install the Webdav\napplication from the market place.",
+  "sync title": "Mobile Synchronization (CardDav)",
+  "sync healine no data": "To synchronize your calendar with your devices, you must follow two steps",
+  "sync headline with data": "To synchronize your calendar, use the following information:",
+  "sync url": "URL:",
+  "sync login": "Username:",
+  "sync password": "Password: ",
+  "sync help": "Are you lost? Follow the ",
+  "sync help link": "step-by-step guide!",
+  "install the sync module": "Install the Sync module from the Cozy App Store",
+  "connect to it and follow": "Connect to it and follow the instructions related to CalDAV.",
   "search info": "Search: Use the search field located on the top left\ncorner to perform a search on all the fields of your contacts. If you\ntype a tag name, results will contain all people tagged with it.",
-  "creation info": "Creation: Click on the plus button located aside the search field to\ndisplay a new contact page. Fill the name field and your contact will\nbe created.",
+  "creation info": "Creation: Click on the '+' button located beside the search field to\ndisplay a new contact page. Fill the name field and your contact will\nbe created.",
   "export": "Export",
   "export contact": "Export contact",
   "are you sure": "Are you sure?"
@@ -1503,15 +1514,17 @@ module.exports = {
 
 ;require.register("locales/fr", function(exports, require, module) {
 module.exports = {
-  "saving": "Sauvegarde ...",
+  "saving": "Sauvegarde…",
   "saved": "Sauvegardé",
   "delete": "Supprimer",
   "delete contact": "Supprimer le contact",
   "add contact": "Créer un contact",
+  "show": "Montrer",
+  "hide": "Cacher",
   "company": "Société",
   "title": "Titre",
   "birthday": "Anniversaire",
-  "phone": "Telephone",
+  "phone": "Téléphone",
   "skype": "Skype",
   "email": "Email",
   "postal": "Adresse",
@@ -1519,12 +1532,12 @@ module.exports = {
   "other": "Autre",
   "add": "Ajouter",
   "notes": "Notes",
-  "about": "A propos",
+  "about": "À propos",
   "name": "Nom",
   "change": "Changer",
   "notes placeholder": "Prenez des notes ici",
-  "type here": "Tapez ici",
-  "phones": "Telephones",
+  "type here": "Écrivez ici",
+  "phones": "Téléphones",
   "emails": "Emails",
   "postal": "Adresses",
   "links": "Liens",
@@ -1532,10 +1545,10 @@ module.exports = {
   "actions": "Actions",
   "add fields": "Ajouter des champs",
   "more options": "Plus d'options",
-  "save changes alert": "Sauvegarder ?",
+  "save changes alert": "Sauvegarder ?",
   "not an image": "Ceci n'est pas une image",
   "remove datapoint": "Enlever",
-  "changes saved": "Changements sauvegardés",
+  "changes saved": "Changements enregistrés",
   "undo": "Annuler",
   "undone": "Annulé",
   "history": "Historique",
@@ -1543,30 +1556,30 @@ module.exports = {
   "cozy url": "Cozy",
   "twitter": "Twitter",
   "add tags": "Ajouter des tags",
-  "add note": "Ajouter une une note",
+  "add note": "Ajouter une note",
   "duration": "Durée",
   "seconds": "s",
   "minutes": "min",
   "hours": "h",
   "you called": "Vous avez appelé",
-  "you were called": "Vous avez été appelé",
+  "you were called": "Vous avez été appelé(e)",
   "create call task": "Créer une tâche de contact",
-  "creating...": "en création...",
+  "creating...": "création en cours…",
   "edit name": "Modifier le nom",
-  "name editor": "Editeur de nom",
+  "name editor": "Éditeur de nom",
   "prefix": "Préfixe",
   "placeholder prefix": "M.",
   "first name": "Prénom courant",
   "placeholder first": "Pierre",
   "middle name": "Autres prénoms",
-  "placeholder middle": "Marie Jacque",
+  "placeholder middle": "Marie Jacques",
   "last name": "Nom",
   "placeholder last": "Dupont",
   "suffix": "Suffixe",
   "placeholder suffix": "III",
   "full name": "Nom complet",
   "save": "Enregister",
-  "search placeholder": "Recherche ...",
+  "search placeholder": "Recherche…",
   "new contact": "Nouveau Contact",
   "go to settings": "Paramètres",
   "choose vcard file": "Choisissez un fichier vCard",
@@ -1575,45 +1588,54 @@ module.exports = {
   "import": "Importer",
   "import call log help": "N'utilisez pas cette fonction si vous êtes un client FING/Orange",
   "choose log file": "Puis uploadez le fichier que vous avez généré",
-  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez vous sur ",
+  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez-vous sur ",
   "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
-  "import android calls": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : ",
-  "import android sms": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : ",
-  "dont close navigator import": "Ne fermez pas le navigateur durant l'impor des contacts.",
+  "import android calls": "Si vous avez un téléphone Android, utilisez cette application pour importer vos appels : ",
+  "import android sms": "Si vous avez un téléphone Android, utilisez cette application pour importer vos sms : ",
+  "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
   "choose phone country": "Choisissez le pays de ce téléphone",
-  "ready to import": "Prêt à l'import",
+  "ready to import": "Prêt à l'importation",
   "log direction": "Direction",
-  "log number": "Number",
+  "log number": "Numéro",
   "log date": "Date",
   "importing this file": "Nous importons ce fichier",
   "may take a while": "Cela peut prendre quelques minutes",
   "progress": "Progression",
-  "loading import preview": "chargement de d'apperçu de l'import...",
-  "import succeeded": "Votre import de contact a réussi.",
-  "import progress": "Progression de l'import: ",
-  "fail to import": "Echec de l'import ",
-  "click left to display": "Navigation: cliquez sur un contact dans le panneau de gauche pour l'afficher",
-  "import export": "Import / Export",
-  "call log info": "Cliquez ici pour importer votre historique mobile :",
+  "loading import preview": "chargement de l'aperçu de l'importation…",
+  "import succeeded": "Votre importation de contact a réussi.",
+  "import progress": "Progression de l'importation : ",
+  "fail to import": "Échec de l'importation",
+  "click left to display": "Navigation : cliquez sur un contact dans le panneau de gauche pour l'afficher",
+  "import export": "Importer / Exporter",
+  "call log info": "Cliquez ici pour importer votre historique mobile :",
   "import call log": "Importer l'historique",
-  "vcard import info": "Cliquez ici pour importer vos contacts :",
+  "vcard import info": "Cliquez ici pour importer vos contacts :",
   "import vcard": "Importer vCard",
   "export all vcard": "Exporter un fichier vCard",
-  "export vcard": "Exporter un fichier vCard file",
+  "export vcard": "Exporter un fichier vCard",
   "settings": "Paramètres",
   "help": "Aide",
-  "name format info": "Selectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)",
+  "name format info": "Sélectionnez le format d'affichage des noms (les contacts déjà importés ne seront pas affectés).",
   "format given familly": "Prénom Nom (Pierre Dupont)",
   "format familly given": "Nom Prénom (Dupont Pierre)",
   "format given mid familly": "Format américain (John J. Johnson)",
   "do this now": "Indiquez le format qu'ont actuellement vos contacts.",
   "vcard export info": "Cliquez ici pour exporter tous vos contacts dans un fichier vCard :",
-  "carddav info": "Synchronization : Pour synchroniser vos contacts sur votre mobile,\ninstallez l'application Webdav depuis le market place.",
-  "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous tapez un nom de tag,\nil affichera tous les contacts taggés avec celui ci.",
-  "creation info": "Création : Cliquez sur le bouton plus situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
-  "export": "Export",
+  "sync title": "Synchronisation mobile (CardDav)",
+  "sync headline no data": "Pour synchroniser votre agenda avec votre mobile vous devez :",
+  "sync headline with data": "Pour synchroniser votre agenda, utilisez les identifiants suivant :",
+  "sync url": "URL :",
+  "sync login": "Nom d'utilisateur :",
+  "sync password": "Mot de passe : ",
+  "sync help": "Vous êtes perdu(e) ? Suivez le ",
+  "sync help link": "guide pas à pas !",
+  "install the sync module": "Installer le module Sync depuis l'applithèque.",
+  "connect to it and follow": "Vous connecter et suivre les instructions relatives à CalDAV.",
+  "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,\nil affichera tous les contacts tagués avec celui-ci.",
+  "creation info": "Création : cliquez sur le bouton « + » situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
+  "export": "Exporter",
   "export contact": "Exporter contact",
-  "are you sure": "Etes vous sûr?"
+  "are you sure": "Le voulez-vous vraiment ?"
 };
 });
 
@@ -2471,8 +2493,17 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-
-buf.push("<a id=\"close\" href=\"#\">&lt;</a><h2>" + (jade.escape(null == (jade_interp = t('help')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("search info")) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t("click left to display")) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t("creation info")) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t("carddav info")) ? "" : jade_interp)) + "</p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><p id=\"config-now\" class=\"important\">" + (jade.escape(null == (jade_interp = t('do this now')) ? "" : jade_interp)) + "</p><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><h2>" + (jade.escape(null == (jade_interp = t('import export')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("call log info") + ' ') ? "" : jade_interp)) + "<a href=\"#callimport\">" + (jade.escape(null == (jade_interp = t('import call log')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
+var locals_ = (locals || {}),account = locals_.account;
+buf.push("<a id=\"close\" href=\"#\">&lt;</a><h2>" + (jade.escape(null == (jade_interp = t('help')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("search info")) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t("click left to display")) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t("creation info")) ? "" : jade_interp)) + "</p><h2>" + (jade.escape(null == (jade_interp = t('sync title')) ? "" : jade_interp)) + "</h2>");
+if ( account == null)
+{
+buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync headline no data')) ? "" : jade_interp)) + "</p><ol><li>" + (jade.escape(null == (jade_interp = t('install the sync module')) ? "" : jade_interp)) + "</li><li>" + (jade.escape(null == (jade_interp = t('connect to it and follow')) ? "" : jade_interp)) + "</li></ol>");
+}
+else
+{
+buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync headline with data')) ? "" : jade_interp)) + "</p><ul><li>" + (jade.escape((jade_interp = t('sync url')) == null ? '' : jade_interp)) + " https://" + (jade.escape((jade_interp = account.domain) == null ? '' : jade_interp)) + "/public/sync/principals/me</li><li>" + (jade.escape((jade_interp = t('sync login')) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = account.login) == null ? '' : jade_interp)) + "</li><li>" + (jade.escape((jade_interp = t('sync password')) == null ? '' : jade_interp)) + "<span id=\"placeholder\">" + (jade.escape(null == (jade_interp = account.placeholder) ? "" : jade_interp)) + "</span><button id=\"show-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('show')) ? "" : jade_interp)) + "</button><button id=\"hide-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('hide')) ? "" : jade_interp)) + "</button></li></ul>");
+}
+buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync help')) ? "" : jade_interp)) + "<a href=\"https://cozy.io/mobile/contacts.html\" target=\"_blank\">" + (jade.escape(null == (jade_interp = t('sync help link')) ? "" : jade_interp)) + "</a></p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><p id=\"config-now\" class=\"important\">" + (jade.escape(null == (jade_interp = t('do this now')) ? "" : jade_interp)) + "</p><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><h2>" + (jade.escape(null == (jade_interp = t('import export')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("call log info") + ' ') ? "" : jade_interp)) + "<a href=\"#callimport\">" + (jade.escape(null == (jade_interp = t('import call log')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -3800,7 +3831,22 @@ module.exports = DocView = (function(_super) {
   DocView.prototype.template = require('templates/doc');
 
   DocView.prototype.events = {
-    'change #nameFormat': 'saveNameFormat'
+    'change #nameFormat': 'saveNameFormat',
+    'click #show-password': 'showPassword',
+    'click #hide-password': 'hidePassword'
+  };
+
+  DocView.prototype.getRenderData = function() {
+    return {
+      account: this.model
+    };
+  };
+
+  DocView.prototype.initialize = function() {
+    this.model = window.webDavAccount;
+    if (this.model != null) {
+      return this.model.placeholder = this.getPlaceholder(this.model.token);
+    }
   };
 
   DocView.prototype.afterRender = function() {
@@ -3827,6 +3873,27 @@ module.exports = DocView = (function(_super) {
         return help.addClass('error').text(t('server error occured'));
       }
     });
+  };
+
+  DocView.prototype.getPlaceholder = function(password) {
+    var i, placeholder, _i, _ref;
+    placeholder = [];
+    for (i = _i = 1, _ref = password.length; _i <= _ref; i = _i += 1) {
+      placeholder.push('*');
+    }
+    return placeholder.join('');
+  };
+
+  DocView.prototype.showPassword = function() {
+    this.$('#placeholder').html(this.model.token);
+    this.$('#show-password').hide();
+    return this.$('#hide-password').show();
+  };
+
+  DocView.prototype.hidePassword = function() {
+    this.$('#placeholder').html(this.model.placeholder);
+    this.$('#hide-password').hide();
+    return this.$('#show-password').show();
   };
 
   return DocView;
@@ -4150,7 +4217,10 @@ module.exports = ImporterView = (function(_super) {
   ImporterView.prototype.close = function() {
     if (!this.importing) {
       this.$el.modal('hide');
-      return this.remove();
+      this.remove();
+      return app.router.navigate('#help', {
+        trigger: true
+      });
     }
   };
 
