@@ -7,7 +7,7 @@ log = require('printit')
 module.exports = Contact = americano.getModel 'Contact',
     id            : String
     fn            : String # vCard FullName = display name
-    # (Prefix Given Middle Familly Suffix)
+    # (Prefix Given Middle Familly Suffix), or something else.
     n             : String # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
     datapoints    : (x) -> x
@@ -37,6 +37,7 @@ Contact::savePicture = (path, callback) ->
                 log.error "failed to purge #{file.path}" if err
                 callback()
 
+#TODO use client/app/lib/vcard_helper
 Contact::getComputedFN = ->
     if not @n? # defensive against data in DS.
         @n = ''
@@ -49,6 +50,7 @@ Contact::getComputedFN = ->
 
     return parts.join ' '
 
+#TODO use client/app/lib/vcard_helper
 # Parse n field (splitted) from fn (display).
 Contact::getParsedN = ->
     if not @fn? # defensive against data in DS.

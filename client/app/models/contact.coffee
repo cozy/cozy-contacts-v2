@@ -2,6 +2,7 @@ request = require 'lib/request'
 DataPoint = require 'models/datapoint'
 DataPointCollection  = require 'collections/datapoint'
 ContactLogCollection = require 'collections/contactlog'
+VCard = require 'lib/vcard_helper'
 
 ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child',
             'domestic partner', 'father', 'friend', 'manager', 'mother',
@@ -32,6 +33,8 @@ module.exports = class Contact extends Backbone.Model
             @history.url = @url() + '/logs'
 
     defaults: ->
+        n: []
+        fn: ''
         note: ''
         tags: []
 
@@ -65,7 +68,7 @@ module.exports = class Contact extends Backbone.Model
             attrs.n = attrs.n.split ';'
 
         unless Array.isArray attrs.n
-            attrs.n = undefined
+            attrs.n = []
 
         return attrs
 
@@ -146,13 +149,18 @@ module.exports = class Contact extends Backbone.Model
         return json
 
     setFN: (value) ->
-        if @has('n')
-            @set 'n', @getComputedN value
-            @set 'fn', ''
-        else @set 'fn', value
+        @set 'fn', value
+        @set 'n', @getComputedN value
 
+    setN: (value) ->
+        @set 'n', value
+        @set 'fn', @getComputedFN value
+
+    # TODO: should be useless as fn should always exists.
     getFN: -> @get('fn') or @getComputedFN()
 
+    # TODO: should be useless as n should always exists.
+    getN: -> @get('n') or @getComputedN()
 
     initial =  (middle) ->
         if i = middle.split(/[ \,]/)[0][0]?.toUpperCase() then i + '.'
@@ -161,30 +169,13 @@ module.exports = class Contact extends Backbone.Model
     getComputedFN: (n) ->
         n ?= @get 'n'
         return '' unless n and n.length > 0
-        [familly, given, middle, prefix, suffix] = n or @get 'n'
-        switch app.config.get 'nameOrder'
-            when 'given-familly' then "#{given} #{middle} #{familly}"
-            when 'given-middleinitial-familly'
-                "#{given} #{initial(middle)} #{familly}"
-            else "#{familly}, #{given} #{middle}"
 
+        return VCard.nToFN n
 
     getComputedN: (fn) ->
-        familly = given = middle = prefix = suffix = ""
         fn ?= @get 'fn'
-        parts = fn.split(/[ \,]/)
-            .filter (part) -> part isnt ""
-        switch app.config.get 'nameOrder'
-            when 'given-familly', 'given-middleinitial-familly'
-                given = parts[0]
-                familly = parts[parts.length-1]
-                middle = parts[1..parts.length-2].join(' ')
-            when 'familly-given'
-                familly = parts[0]
-                given = parts[1]
-                middle = parts[2..].join(' ')
 
-        return [familly, given, middle, prefix, suffix]
+        return VCard.fnToN fn
 
 
     # Ask to server to create a new task that says to call back current
@@ -215,7 +206,8 @@ Contact.fromVCF = (vcf) ->
     regexps =
         begin:       /^BEGIN:VCARD$/i
         end:         /^END:VCARD$/i
-        simple:      /^(version|fn|n|title|org|note)\:(.+)$/i
+        # vCard 2.1 files can use quoted-pirntable text.
+        simple:      /^(version|fn|n|title|org|note)(;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i
         android:     /^x-android-custom\:(.+)$/i
         composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/
         complex:     /^([^\:\;]+);([^\:]+)\:(.+)$/
@@ -230,7 +222,9 @@ Contact.fromVCF = (vcf) ->
     currentdp = null
 
     # unfold folded fields (like photo)
-    unfolded = vcf.replace /\r?\n\s/gm, ''
+    # some vCard 2.1  files use = at end of line
+    # instead of space a start of next line.
+    unfolded = vcf.replace /(\r?\n\s)|(=\r?\n)/gm, ''
     for line in unfolded.split /\r?\n/
 
         if regexps.begin.test line
@@ -240,19 +234,18 @@ Contact.fromVCF = (vcf) ->
             current.dataPoints.add currentdp if currentdp
             imported.add current
 
-            # There is two fields N and FN that does the same thing but the
+            # There is two fields N and FN that does the same thing but not the
             # same way. Some vCard have one or ther other, or both.
-            # If both are present, we use the following order:
-            # N (if it exists and is valid) > FN
-            if current.has('n') and current.has('fn')
-                if _.compact(current.get 'n').length is 0
-                    current.unset 'n'
-                else
-                    current.unset 'fn'
-
-            else if not current.has('n') and not current.has('fn')
+            # If both are present, we keep them.
+            # If only one is present, we compute the other one.
+            if not current.has('n') and not current.has('fn')
                 console.error 'There should be at least a N field or a FN field'
-            # else already well formatted
+
+            if not current.has('n') or _.compact(current.get 'n').length is 0
+                current.set 'n', current.getComputedN()
+
+            if not current.has 'fn'
+                    current.set 'fn', current.getComputedFN()
 
             currentdp = null
             current = null
@@ -260,7 +253,10 @@ Contact.fromVCF = (vcf) ->
             currentversion = "3.0"
 
         else if regexps.simple.test line
-            [all, key, value] = line.match regexps.simple
+            [all, key, quoted..., value] = line.match regexps.simple
+            if quoted.length is 1
+                value = VCard.unquotePrintable value
+
             key = key.toLowerCase()
 
             switch key
@@ -291,7 +287,7 @@ Contact.fromVCF = (vcf) ->
             key = part[0]
             properties = part.splice 1
 
-            value = value.split(';')
+            value = value.split ';'
             value = value[0] if value.length is 1
 
             key = key.toLowerCase()
@@ -324,7 +320,7 @@ Contact.fromVCF = (vcf) ->
             current.dataPoints.add currentdp if currentdp
             currentdp = new DataPoint()
 
-            value = value.split(';')
+            value = value.split ';'
             value = value[0] if value.length is 1
 
             key = key.toLowerCase()
@@ -335,7 +331,7 @@ Contact.fromVCF = (vcf) ->
                     value ?= []
                     if typeof value isnt 'string'
                         value = value.join '\n'
-                    value = value.replace /\n+/g, "\n"
+                    value = VCard.unescapeText value
             else if key is 'photo'
                 currentdp = null
                 binary = atob value
@@ -361,6 +357,8 @@ Contact.fromVCF = (vcf) ->
 
                 if pname is 'type' and pvalue is 'pref'
                     currentdp.set 'pref', 1
+                else if pname is 'ENCODING' and pvalue is 'QUOTED-PRINTABLE'
+                    value = VCard.unquotePrintable value
                 else
                     currentdp.set pname.toLowerCase(), pvalue.toLowerCase()
 

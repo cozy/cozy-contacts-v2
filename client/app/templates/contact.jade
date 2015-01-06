@@ -11,7 +11,7 @@
       input#uploader(type="file")
 
     #wrap-name-notes
-      input#name(placeholder=t("name"), value="#{fn}")
+      input#name(placeholder=t("firstname lastname"), value="#{fn}")
       a#name-edit= t('edit name')
       input#tags.tagit(value=tags.join(','))
 

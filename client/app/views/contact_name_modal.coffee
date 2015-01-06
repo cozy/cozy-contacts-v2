@@ -24,15 +24,14 @@ module.exports = class CallImporterView extends BaseView
     getRenderData: ->
         _.extend {}, @model.attributes,
             fn: @model.getFN()
-            n: @model.get('n') or @model.getComputedN()
+            n: @model.getN()
 
     getStructuredName: ->
         fields = ['last', 'first', 'middle', 'prefix', 'suffix']
         return fields.map (field) -> $('#' + field).val()
 
     save: ->
-        @model.set 'n', @getStructuredName()
-        @model.set 'fn', ''
+        @model.setN @getStructuredName()
         @options.onChange()
         @close()
 
