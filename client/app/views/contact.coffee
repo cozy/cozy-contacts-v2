@@ -93,9 +93,12 @@ module.exports = class ContactView extends ViewCollection
         @resizeNote()
         @currentState = @model.toJSON()
 
-        @history = new HistoryView
-            collection: @model.history
-        @history.render().$el.appendTo @$('#history')
+        # don't try to display history of newly created contact
+        # before it is created
+        if @model.get('id')?
+            @history = new HistoryView
+                collection: @model.history
+            @history.render().$el.appendTo @$('#history')
 
         @$('a#infotab').tab('show') if $(window).width() < 900
         # resize nice scroll when we switch to history tab
@@ -177,8 +180,8 @@ module.exports = class ContactView extends ViewCollection
         @savedInfo.show().text 'saving changes'
 
         @model.save
-           success: =>
-               @collection.trigger 'change', @model
+            success: =>
+                @collection.trigger 'change', @model
 
     showNameModal: =>
         modal = new NameModal
@@ -221,9 +224,12 @@ module.exports = class ContactView extends ViewCollection
         @notesfield.val @model.get 'note'
         @namefield.val  @model.getFN()
         @tags?.refresh()
-        timestamp = Date.now()
-        url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
-        @$('#picture img').attr 'src', url
+        id = @model.get 'id'
+        if id?
+            # don't update picture of newly created contact
+            timestamp = Date.now()
+            url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
+            @$('#picture img').attr 'src', url
         @resizeNote()
 
     addBelowIfEnter: (event) ->

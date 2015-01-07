@@ -94,10 +94,6 @@ Contact.prototype.toVCF = function(config, callback) {
       if (model.note) {
         out += "NOTE:" + model.note + "\n";
       }
-      if (picture != null) {
-        folded = picture.match(/.{1,75}/g).join('\n ');
-        out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n " + folded + "\n";
-      }
       if (model.n) {
         out += "N:" + model.n + "\n";
         out += "FN:" + (_this.getComputedFN(config)) + "\n";
@@ -137,6 +133,10 @@ Contact.prototype.toVCF = function(config, callback) {
             }
             out += "" + key + type + ":" + value + "\n";
         }
+      }
+      if (picture != null) {
+        folded = picture.match(/.{1,75}/g).join('\n ');
+        out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n " + folded + "\n";
       }
       return out += "END:VCARD\n";
     };

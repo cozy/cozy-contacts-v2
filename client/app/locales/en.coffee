@@ -1,11 +1,14 @@
 module.exports =
 
 # ContactView
-  "saving"                : "Saving ..."
+  "saving"                : "Saving…"
   "saved"                 : "Saved"
   "delete"                : "Delete"
   "delete contact"        : "Delete the contact permanently"
   "add contact"           : "Create a new contact"
+
+  "show"                  : "Show"
+  "hide"                  : "Hide"
 
   "company"               : "Company"
   "title"                 : "Title"
@@ -32,7 +35,7 @@ module.exports =
   "add fields"            : "Add fields"
   "more options"          : "More options"
 
-  "save changes alert"    : "Save changes ?"
+  "save changes alert"    : "Save changes?"
   "not an image"          : "This is not an image"
   "remove datapoint"      : "Remove"
   "changes saved"         : "Changes saved"
@@ -51,7 +54,7 @@ module.exports =
   "you called"            : "You called"
   "you were called"       : "You were called"
   "create call task"      : "Create contact task"
-  "creating..."           : "creating..."
+  "creating..."           : "creating…"
 
 # Name modal
   "edit name"             : "Edit Name"
@@ -60,9 +63,9 @@ module.exports =
   "placeholder prefix"    : "Sir"
   "first name"            : "Given Name"
   "placeholder first"     : "John"
-  "middle name"           : "Middel Name"
+  "middle name"           : "Middle Name"
   "placeholder middle"    : "D."
-  "last name"             : "Familly Name"
+  "last name"             : "Family Name"
   "placeholder last"      : "Doe"
   "suffix"                : "Suffix"
   "placeholder suffix"    : "III"
@@ -70,7 +73,7 @@ module.exports =
   "save"                  : "Save"
 
 # ContactList
-  "search placeholder"    : "Search ..."
+  "search placeholder"    : "Search…"
   "new contact"           : "New Contact"
   "go to settings"        : "Settings"
 
@@ -100,10 +103,10 @@ module.exports =
   "importing this file"  : "We are importing this file"
   "may take a while"     : "It may take a while"
   "progress"             : "Progress"
-  "loading import preview": "loading import preview..."
+  "loading import preview": "loading import preview…"
   "import succeeded": "Your contact import succeeded."
   "import progress": "Import progress"
-  "fail to import": "Fail to import"
+  "fail to import": "Import failed"
 
 # doc
   "click left to display" : "Browse: Click on a contact in the left panel to display it."
@@ -117,25 +120,33 @@ module.exports =
   "export vcard"          : "Export vCard file"
   "settings"              : "Settings"
   "help"                  : "Help"
-  "name format info"      : "Select display name format (will not change contacts already imported)"
-  "format given familly"  : "Given Familly (John Johnson)"
+  "name format info"      : "Select display name format (will not change already imported contacts)"
+  "format given familly"  : "Given Family (John Johnson)"
   "format familly given"  : "Name, First name (Johnson John)"
   "format given mid familly": "Full (John J. Johnson)"
-  "do this now"           : "Select the format your contacts have now."
+  "do this now"           : "Select the current format of your contacts."
 
   "vcard export info"     : """
     Click here to export all your contacts as a vCard file:"""
 
-  "carddav info"          : """
-    Synchronization: To sync your contacts with your mobile, install the Webdav
-    application from the market place."""
+  "sync title"                : "Mobile Synchronization (CardDav)"
+  "sync headline no data"     : "To synchronize your calendar with your devices, you must follow two steps"
+  "sync headline with data"   : "To synchronize your calendar, use the following information:"
+  "sync url"                  : "URL:"
+  "sync login"                : "Username:"
+  "sync password"             : "Password: "
+  "sync help"                 : "Are you lost? Follow the "
+  "sync help link"            : "step-by-step guide!"
+  "install the sync module"   : "Install the Sync module from the Cozy App Store"
+  "connect to it and follow"  : "Connect to it and follow the instructions related to CalDAV."
+
   "search info"           : """
     Search: Use the search field located on the top left
     corner to perform a search on all the fields of your contacts. If you
     type a tag name, results will contain all people tagged with it.
   """
   "creation info"           : """
-    Creation: Click on the plus button located aside the search field to
+    Creation: Click on the '+' button located beside the search field to
     display a new contact page. Fill the name field and your contact will
     be created.
   """

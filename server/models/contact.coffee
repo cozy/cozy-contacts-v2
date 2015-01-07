@@ -21,7 +21,7 @@ Contact::remoteKeys = ->
         if dp.name is 'tel'
             out.push ContactLog.normalizeNumber dp.value
         else if dp.name is 'email'
-            out.push dp.value.toLowerCase()
+            out.push dp.value?.toLowerCase()
     return out
 
 # Save given file as contact picture then delete given file from disk.
@@ -55,10 +55,6 @@ Contact::toVCF = (config, callback) ->
         out += "VERSION:3.0\n"
         out += "NOTE:#{model.note}\n" if model.note
 
-        if picture?
-            folded = picture.match(/.{1,75}/g).join '\n '
-            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
-
         if model.n
             out += "N:#{model.n}\n"
             out += "FN:#{@getComputedFN config}\n"
@@ -86,8 +82,8 @@ Contact::toVCF = (config, callback) ->
                     out += "X-#{dp.type.toUpperCase()}:#{value}\n"
 
                 when 'ADR'
-                    # since a proper address management would be very complicated
-                    # we trick it a bit so it matched the standard
+                    # since a proper address management would be very
+                    # complicated we trick it a bit so it matched the standard
                     value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
                     content = "TYPE=home,postal:;;#{value};;;;"
                     out += "ADR;#{content}\n"
@@ -97,6 +93,13 @@ Contact::toVCF = (config, callback) ->
                     else
                         type = ""
                     out += "#{key}#{type}:#{value}\n"
+
+        if picture?
+            # vCard 3.0 specifies that lines must be folded at 75 characters
+            # with "\n " as a delimiter
+            folded = picture.match(/.{1,75}/g).join '\n '
+            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
+
 
         return out += "END:VCARD\n"
 
