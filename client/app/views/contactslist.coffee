@@ -1,5 +1,6 @@
 ViewCollection = require 'lib/view_collection'
 App            = require 'application'
+Contact        = require 'models/contact'
 
 # "Home" view : the list of contacts
 # simple ViewCollection
@@ -61,8 +62,11 @@ module.exports = class ContactsList extends ViewCollection
     getTags: => @collection.getTags()
 
     onContactChanged: (model) =>
-        @views[model.cid].render()
-        @activate model
+        # @TODO find why onContactChanged is sometime called with a
+        # ContactCollection on sync
+        if model instanceof Contact
+            @views[model.cid].render()
+            @activate model
 
     keyUpCallback: (event) =>
 

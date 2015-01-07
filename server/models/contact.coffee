@@ -21,7 +21,7 @@ Contact::remoteKeys = ->
         if dp.name is 'tel'
             out.push ContactLog.normalizeNumber dp.value
         else if dp.name is 'email'
-            out.push dp.value.toLowerCase()
+            out.push dp.value?.toLowerCase()
     return out
 
 # Save given file as contact picture then delete given file from disk.
@@ -82,8 +82,8 @@ Contact::toVCF = (config, callback) ->
                     out += "X-#{dp.type.toUpperCase()}:#{value}\n"
 
                 when 'ADR'
-                    # since a proper address management would be very complicated
-                    # we trick it a bit so it matched the standard
+                    # since a proper address management would be very
+                    # complicated we trick it a bit so it matched the standard
                     value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
                     content = "TYPE=home,postal:;;#{value};;;;"
                     out += "ADR;#{content}\n"
