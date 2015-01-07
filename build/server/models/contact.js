@@ -26,7 +26,7 @@ module.exports = Contact = americano.getModel('Contact', {
 });
 
 Contact.prototype.remoteKeys = function() {
-  var dp, model, out, _i, _len, _ref;
+  var dp, model, out, _i, _len, _ref, _ref1;
   model = this.toJSON();
   out = [this.id];
   _ref = model.datapoints;
@@ -35,7 +35,7 @@ Contact.prototype.remoteKeys = function() {
     if (dp.name === 'tel') {
       out.push(ContactLog.normalizeNumber(dp.value));
     } else if (dp.name === 'email') {
-      out.push(dp.value.toLowerCase());
+      out.push((_ref1 = dp.value) != null ? _ref1.toLowerCase() : void 0);
     }
   }
   return out;

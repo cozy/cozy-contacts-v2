@@ -1495,7 +1495,7 @@ module.exports = {
   "do this now": "Select the current format of your contacts.",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "sync title": "Mobile Synchronization (CardDav)",
-  "sync healine no data": "To synchronize your calendar with your devices, you must follow two steps",
+  "sync headline no data": "To synchronize your calendar with your devices, you must follow two steps",
   "sync headline with data": "To synchronize your calendar, use the following information:",
   "sync url": "URL:",
   "sync login": "Username:",
@@ -2875,10 +2875,12 @@ module.exports = ContactView = (function(_super) {
     this.$el.niceScroll();
     this.resizeNote();
     this.currentState = this.model.toJSON();
-    this.history = new HistoryView({
-      collection: this.model.history
-    });
-    this.history.render().$el.appendTo(this.$('#history'));
+    if (this.model.get('id') != null) {
+      this.history = new HistoryView({
+        collection: this.model.history
+      });
+      this.history.render().$el.appendTo(this.$('#history'));
+    }
     if ($(window).width() < 900) {
       this.$('a#infotab').tab('show');
     }
@@ -3062,15 +3064,18 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.modelChanged = function() {
-    var timestamp, url, _ref;
+    var id, timestamp, url, _ref;
     this.notesfield.val(this.model.get('note'));
     this.namefield.val(this.model.getFN());
     if ((_ref = this.tags) != null) {
       _ref.refresh();
     }
-    timestamp = Date.now();
-    url = "contacts/" + (this.model.get('id')) + "/picture.png?" + timestamp;
-    this.$('#picture img').attr('src', url);
+    id = this.model.get('id');
+    if (id != null) {
+      timestamp = Date.now();
+      url = "contacts/" + (this.model.get('id')) + "/picture.png?" + timestamp;
+      this.$('#picture img').attr('src', url);
+    }
     return this.resizeNote();
   };
 
@@ -3353,7 +3358,7 @@ module.exports = TagsView = (function(_super) {
 });
 
 ;require.register("views/contactslist", function(exports, require, module) {
-var App, ContactsList, ViewCollection,
+var App, Contact, ContactsList, ViewCollection,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3361,6 +3366,8 @@ var App, ContactsList, ViewCollection,
 ViewCollection = require('lib/view_collection');
 
 App = require('application');
+
+Contact = require('models/contact');
 
 module.exports = ContactsList = (function(_super) {
   __extends(ContactsList, _super);
@@ -3450,8 +3457,10 @@ module.exports = ContactsList = (function(_super) {
   };
 
   ContactsList.prototype.onContactChanged = function(model) {
-    this.views[model.cid].render();
-    return this.activate(model);
+    if (model instanceof Contact) {
+      this.views[model.cid].render();
+      return this.activate(model);
+    }
   };
 
   ContactsList.prototype.keyUpCallback = function(event) {
