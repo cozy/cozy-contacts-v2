@@ -221,9 +221,12 @@ module.exports = class ContactView extends ViewCollection
         @notesfield.val @model.get 'note'
         @namefield.val  @model.getFN()
         @tags?.refresh()
-        timestamp = Date.now()
-        url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
-        @$('#picture img').attr 'src', url
+        id = @model.get 'id'
+        if id?
+            # don't update picture of newly created contact
+            timestamp = Date.now()
+            url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
+            @$('#picture img').attr 'src', url
         @resizeNote()
 
     addBelowIfEnter: (event) ->
