@@ -72,31 +72,6 @@ module.exports = class Contact extends Backbone.Model
 
         return attrs
 
-    getBest: (name) ->
-        result = null
-        @dataPoints.each (dp) ->
-            if dp.get('name') is name
-                if dp.get('pref') then result = dp.get 'value'
-                else result ?= dp.get 'value'
-
-        attrs?.addDP 'mail', 'main', ''
-
-        if attrs.datapoints
-            @dataPoints.reset attrs.datapoints
-            delete attrs.datapoints
-
-        if attrs._attachments?.picture
-            @hasPicture = true
-            delete attrs._attachments
-
-        if typeof attrs.n is 'string'
-            attrs.n = attrs.n.split ';'
-
-        unless Array.isArray attrs.n
-            attrs.n = undefined
-
-        return attrs
-
     savePicture: (callback) ->
         unless @get('id')?
             @save {},
@@ -234,9 +209,7 @@ Contact.fromVCF = (vcf) ->
     currentdp = null
 
     # unfold folded fields (like photo)
-    # some vCard 2.1  files use = at end of line
-    # instead of space a start of next line.
-    unfolded = vcf.replace /(\r?\n\s)|(=\r?\n)/gm, ''
+    unfolded = vcf.replace /(\r?\n\s)/gm, ''
     for line in unfolded.split /\r?\n/
 
         if regexps.begin.test line

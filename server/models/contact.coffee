@@ -53,7 +53,6 @@ Contact::savePicture = (path, callback) ->
                 log.error "failed to purge #{file.path}" if err
                 callback()
 
-#TODO use client/app/lib/vcard_helper
 Contact::getComputedFN = ->
     [familly, given, middle, prefix, suffix] = @n.split ';'
     # order parts of name.
@@ -63,14 +62,9 @@ Contact::getComputedFN = ->
 
     return parts.join ' '
 
-#TODO use client/app/lib/vcard_helper
 # Parse n field (splitted) from fn (display).
 Contact::getParsedN = ->
-    [given, middle..., familly] = @fn.split ' '
-    parts = [familly, given, middle.join(' '), '', '']
-
-    return parts.join ';'
-
+    return ";#{@fn};;;"
 
 Contact::toVCF = (callback) ->
 

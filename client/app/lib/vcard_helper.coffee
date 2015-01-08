@@ -25,11 +25,8 @@ exports.nToFN = (n) ->
 exports.fnToN = (fn) ->
     if not fn?
         fn = ''
+    return ['', fn, '', '', '']
 
-    [given, middle..., familly] = fn.split ' '
-    parts = [familly, given, middle.join(' '), '', '']
-
-    return parts
 
 ##
 # vCard serialisation.
