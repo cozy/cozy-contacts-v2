@@ -1,5 +1,6 @@
 americano = require 'americano-cozy'
 ContactLog = require './contact_log'
+VCardParser = require 'cozy-vcard'
 fs = require 'fs'
 log = require('printit')
     prefix: 'Contact Model'
@@ -65,8 +66,9 @@ Contact::getComputedFN = ->
 Contact::getParsedN = ->
     return ";#{@fn};;;"
 
-
+# TODO: move the logic somewhere in cozy-vcard.
 Contact::toVCF = (callback) ->
+<<<<<<< HEAD
 
     model = @toJSON()
 
@@ -125,10 +127,16 @@ Contact::toVCF = (callback) ->
 
     if model._attachments?.picture?
         buffers = []
+=======
+    if @_attachments?.picture?
+        # we get a stream that we need to convert into a buffer
+        # so we can output a base64 version of the picture
+>>>>>>> Add cozy-vcard dependency, in server and client.
         stream = @getFile 'picture', ->
+        buffers = []
         stream.on 'data', buffers.push.bind(buffers)
-        stream.on 'end', ->
+        stream.on 'end', =>
             picture = Buffer.concat(buffers).toString 'base64'
-            callback null, getVCardOutput picture
+            callback null, VCardParser.toVCF(@, picture)
     else
-        callback null, getVCardOutput()
+        callback null, VCardParser.toVCF(@)
