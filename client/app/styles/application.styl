@@ -241,8 +241,6 @@ textarea
     display block
     position absolute
     border 1px solid transparent
-    left 3%
-    top 30px
     width 64px
     height 64px
     overflow hidden
@@ -309,14 +307,16 @@ textarea
     background-color red
 
   #wrap-name-notes
-    position absolute
-    top 30px
-    left 120px
-    right 3%
+    padding-left 90px
 
     #name-edit
-      display: none
+      display none
       float right
+
+    #toggle-name-fields
+      display inline-block
+      vertical-align top
+      margin 10px
 
     &:hover
       #name-edit
@@ -398,9 +398,37 @@ textarea
     padding 0px 5px
     background-color #f9edbe
 
+#top
+  margin-top 30px
+  margin-left 2%
+  margin-right 3%
+  width 95%
+
+#contact-name
+  .form-horizontal
+    display inline-block
+    margin 0px
+
+  .control-group
+    margin 0
+
+    label
+      font-family styled
+      font-size 17px
+      width 120px
+
+    .controls
+      margin-left 140px
+
+    input
+      font-family main
+      font-size 17px
+      width 150px
+
+    &:after
+      clear none
+
 #right, #left
-  position absolute
-  top 120px
   width 47%
 
   h2, .nav-tabs li a
@@ -424,7 +452,8 @@ textarea
     background-color: #EEE
 
 #right
-  right 3%
+  margin-right 3%
+  float right
 
   .nav-tabs
     margin-top: 0px
@@ -515,7 +544,8 @@ textarea
 
 
 #left
-  left 2%
+  margin-left 2%
+  float left
 
   .zone
     width 93%
@@ -688,31 +718,32 @@ textarea
           a.btn.add
             display: none
 
-      #picture
-          top 50px
-
-      #wrap-name-notes
-          top: 48px
-          left: 95px
-
       #adder
         display: none
 
 @media (max-width: 600px)
     #contact
         #name
-            padding-left: 0
+            padding-left 0
 
         #picture
-            display: none
+            display none
 
         #wrap-name-notes
-            left: 10px
+            padding-left 10px
 
         #wrap-name-notes:hover
             #name-edit
-                display: none
+                display none
 
+@media (max-width: 480px)
+
+    #contact-name
+        .control-group
+            .control-label
+                float left
+                padding-top 5px
+                text-align right
 
 // Widget
 #contacts-list.contact-widget
