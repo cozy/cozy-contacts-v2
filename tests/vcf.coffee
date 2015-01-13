@@ -27,7 +27,7 @@ describe 'VCF Import/Export', ->
 BEGIN:VCARD
 VERSION:3.0
 NOTE:notes
-N:;;;;
+N:Smith;John;;;
 FN:John Smith
 TEL;TYPE=HOME:+331234567
 TEL;TYPE=WORK:12584367
