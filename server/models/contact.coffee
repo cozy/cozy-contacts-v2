@@ -25,7 +25,7 @@ Contact.afterInitialize = ->
         if not @fn?
             @fn = ''
 
-        @n = @getParsedN()
+        @n = @getComputedN()
 
     else if not @fn? or @fn is ''
         @fn = @getComputedFN()
@@ -55,83 +55,18 @@ Contact::savePicture = (path, callback) ->
                 callback()
 
 Contact::getComputedFN = ->
-    [familly, given, middle, prefix, suffix] = @n.split ';'
-    # order parts of name.
-    parts = [prefix, given, middle, familly, suffix]
-    # remove empty parts
-    parts = parts.filter (part) -> part? and part isnt ''
-    return parts.join ' '
+    return VCardParser.nToFN @n.split ';'
 
 # Parse n field (splitted) from fn (display).
-Contact::getParsedN = ->
-    return ";#{@fn};;;"
+Contact::getComputedN = ->
+    return VCardParser.fnToN @fn
+            .join ';'
 
 # TODO: move the logic somewhere in cozy-vcard.
 Contact::toVCF = (callback) ->
-<<<<<<< HEAD
-
-    model = @toJSON()
-
-    getVCardOutput = (picture = null) =>
-        out = "BEGIN:VCARD\n"
-        out += "VERSION:3.0\n"
-        out += "NOTE:#{model.note}\n" if model.note
-
-        if model.n
-            out += "N:#{model.n}\n"
-            out += "FN:#{@getComputedFN()}\n"
-        else if model.fn
-            out += "N:#{@getParsedN()}\n"
-            out += "FN:#{model.fn}\n"
-        else
-            out += "N:;;;;\n"
-            out += "FN:\n"
-
-        for i, dp of model.datapoints
-
-            value = dp.value
-
-            key = dp.name.toUpperCase()
-            switch key
-
-                when 'ABOUT'
-                    if dp.type is 'org' or dp.type is 'title'
-                        out += "#{dp.type.toUpperCase()}:#{value}\n"
-                    else
-                        out += "X-#{dp.type.toUpperCase()}:#{value}\n"
-
-                when 'OTHER'
-                    out += "X-#{dp.type.toUpperCase()}:#{value}\n"
-
-                when 'ADR'
-                    # since a proper address management would be very
-                    # complicated we trick it a bit so it matched the standard
-                    value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
-                    content = "TYPE=home,postal:;;#{value};;;;"
-                    out += "ADR;#{content}\n"
-                else
-                    if dp.type?
-                        type = ";TYPE=#{dp.type.toUpperCase()}"
-                    else
-                        type = ""
-                    out += "#{key}#{type}:#{value}\n"
-
-        if picture?
-            # vCard 3.0 specifies that lines must be folded at 75 characters
-            # with "\n " as a delimiter
-            folded = picture.match(/.{1,75}/g).join '\n '
-            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
-
-
-        return out += "END:VCARD\n"
-
-    if model._attachments?.picture?
-        buffers = []
-=======
     if @_attachments?.picture?
         # we get a stream that we need to convert into a buffer
         # so we can output a base64 version of the picture
->>>>>>> Add cozy-vcard dependency, in server and client.
         stream = @getFile 'picture', ->
         buffers = []
         stream.on 'data', buffers.push.bind(buffers)

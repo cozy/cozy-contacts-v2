@@ -66,7 +66,7 @@ module.exports = class ContactView extends ViewCollection
     getRenderData: ->
         _.extend {}, @model.toJSON(),
             hasPicture: @model.hasPicture or false
-            fn: @model.getFN()
+            fn: @model.get 'fn'
             timestamp: Date.now()
 
     afterRender: ->
