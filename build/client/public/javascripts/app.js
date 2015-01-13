@@ -156,8 +156,8 @@ module.exports = ContactCollection = (function(_super) {
 
   ContactCollection.prototype.comparator = function(a, b) {
     var compare, nameA, nameB, out;
-    nameA = a.getFN().toLowerCase();
-    nameB = b.getFN().toLowerCase();
+    nameA = a.getDisplayName().toLowerCase();
+    nameB = b.getDisplayName().toLowerCase();
     compare = nameA.localeCompare(nameB);
     return out = compare > 0 ? 1 : compare < 0 ? -1 : 0;
   };
@@ -1287,6 +1287,55 @@ exports.del = function(url, callback, json) {
 };
 });
 
+;require.register("lib/vcard_helper", function(exports, require, module) {
+exports.nToFN = function(n) {
+  var familly, given, middle, parts, prefix, suffix;
+  if (!n) {
+    n = [];
+  }
+  familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
+  parts = [prefix, given, middle, familly, suffix];
+  parts = parts.filter(function(part) {
+    return (part != null) && part !== '';
+  });
+  return parts.join(' ');
+};
+
+exports.fnToN = function(fn) {
+  if (fn == null) {
+    fn = '';
+  }
+  return ['', fn, '', '', ''];
+};
+
+exports.escapeText = function(s) {
+  var t;
+  if (s == null) {
+    return s;
+  }
+  t = s.replace(/([,;\\])/ig, "\\$1");
+  t = t.replace(/\n/g, '\\n');
+  return t;
+};
+
+exports.unescapeText = function(t) {
+  var s;
+  if (t == null) {
+    return t;
+  }
+  s = t.replace(/\\n/ig, '\n');
+  s = s.replace(/\\([,;\\])/ig, "$1");
+  return s;
+};
+
+exports.unquotePrintable = function(s) {
+  if (s == null) {
+    s = '';
+  }
+  return utf8.decode(quotedPrintable.decode(s));
+};
+});
+
 ;require.register("lib/view_collection", function(exports, require, module) {
 var BaseView, ViewCollection,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -1407,6 +1456,7 @@ module.exports = {
   "notes": "Notes",
   "about": "About",
   "name": "Name",
+  "firstname lastname": "Firstname Lastname",
   "change": "Change",
   "notes placeholder": "Take notes here",
   "type here": "Type here",
@@ -1488,11 +1538,10 @@ module.exports = {
   "export vcard": "Export vCard file",
   "settings": "Settings",
   "help": "Help",
-  "name format info": "Select display name format (will not change already imported contacts)",
+  "name format info": "Select display name format",
   "format given familly": "Given Family (John Johnson)",
   "format familly given": "Name, First name (Johnson John)",
   "format given mid familly": "Full (John J. Johnson)",
-  "do this now": "Select the current format of your contacts.",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "sync title": "Mobile Synchronization (CardDav)",
   "sync headline no data": "To synchronize your calendar with your devices, you must follow two steps",
@@ -1534,6 +1583,7 @@ module.exports = {
   "notes": "Notes",
   "about": "À propos",
   "name": "Nom",
+  "firstname lastname": "Prénom Nom",
   "change": "Changer",
   "notes placeholder": "Prenez des notes ici",
   "type here": "Écrivez ici",
@@ -1615,11 +1665,10 @@ module.exports = {
   "export vcard": "Exporter un fichier vCard",
   "settings": "Paramètres",
   "help": "Aide",
-  "name format info": "Sélectionnez le format d'affichage des noms (les contacts déjà importés ne seront pas affectés).",
+  "name format info": "Sélectionnez le format d'affichage des noms.",
   "format given familly": "Prénom Nom (Pierre Dupont)",
   "format familly given": "Nom Prénom (Dupont Pierre)",
   "format given mid familly": "Format américain (John J. Johnson)",
-  "do this now": "Indiquez le format qu'ont actuellement vos contacts.",
   "vcard export info": "Cliquez ici pour exporter tous vos contacts dans un fichier vCard :",
   "sync title": "Synchronisation mobile (CardDav)",
   "sync headline no data": "Pour synchroniser votre agenda avec votre mobile vous devez :",
@@ -1667,7 +1716,7 @@ module.exports = Config = (function(_super) {
 });
 
 ;require.register("models/contact", function(exports, require, module) {
-var ANDROID_RELATION_TYPES, AndroidToDP, Contact, ContactLogCollection, DataPoint, DataPointCollection, request,
+var ANDROID_RELATION_TYPES, AndroidToDP, Contact, ContactLogCollection, DataPoint, DataPointCollection, VCard, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1679,6 +1728,8 @@ DataPoint = require('models/datapoint');
 DataPointCollection = require('collections/datapoint');
 
 ContactLogCollection = require('collections/contactlog');
+
+VCard = require('lib/vcard_helper');
 
 ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child', 'domestic partner', 'father', 'friend', 'manager', 'mother', 'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'];
 
@@ -1718,6 +1769,8 @@ module.exports = Contact = (function(_super) {
 
   Contact.prototype.defaults = function() {
     return {
+      n: [],
+      fn: '',
       note: '',
       tags: []
     };
@@ -1763,39 +1816,7 @@ module.exports = Contact = (function(_super) {
       attrs.n = attrs.n.split(';');
     }
     if (!Array.isArray(attrs.n)) {
-      attrs.n = void 0;
-    }
-    return attrs;
-  };
-
-  Contact.prototype.getBest = function(name) {
-    var result, _ref;
-    result = null;
-    this.dataPoints.each(function(dp) {
-      if (dp.get('name') === name) {
-        if (dp.get('pref')) {
-          return result = dp.get('value');
-        } else {
-          return result != null ? result : result = dp.get('value');
-        }
-      }
-    });
-    if (typeof attrs !== "undefined" && attrs !== null) {
-      attrs.addDP('mail', 'main', '');
-    }
-    if (attrs.datapoints) {
-      this.dataPoints.reset(attrs.datapoints);
-      delete attrs.datapoints;
-    }
-    if ((_ref = attrs._attachments) != null ? _ref.picture : void 0) {
-      this.hasPicture = true;
-      delete attrs._attachments;
-    }
-    if (typeof attrs.n === 'string') {
-      attrs.n = attrs.n.split(';');
-    }
-    if (!Array.isArray(attrs.n)) {
-      attrs.n = void 0;
+      attrs.n = this.getComputedN(attrs.fn);
     }
     return attrs;
   };
@@ -1872,16 +1893,38 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.prototype.setFN = function(value) {
-    if (this.has('n')) {
-      this.set('n', this.getComputedN(value));
-      return this.set('fn', '');
-    } else {
-      return this.set('fn', value);
-    }
+    this.set('fn', value);
+    return this.set('n', this.getComputedN(value));
+  };
+
+  Contact.prototype.setN = function(value) {
+    this.set('n', value);
+    return this.set('fn', this.getComputedFN(value));
   };
 
   Contact.prototype.getFN = function() {
     return this.get('fn') || this.getComputedFN();
+  };
+
+  Contact.prototype.getN = function() {
+    return this.get('n') || this.getComputedN();
+  };
+
+  Contact.prototype.getDisplayName = function() {
+    var familly, given, middle, n, prefix, suffix;
+    n = this.get('n');
+    if (!(n && n.length > 0)) {
+      return '';
+    }
+    familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
+    switch (app.config.get('nameOrder')) {
+      case 'given-familly':
+        return "" + given + " " + middle + " " + familly;
+      case 'given-middleinitial-familly':
+        return "" + given + " " + (initial(middle)) + " " + familly;
+      default:
+        return "" + familly + ", " + given + " " + middle;
+    }
   };
 
   initial = function(middle) {
@@ -1894,46 +1937,20 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.prototype.getComputedFN = function(n) {
-    var familly, given, middle, prefix, suffix, _ref;
     if (n == null) {
       n = this.get('n');
     }
     if (!(n && n.length > 0)) {
       return '';
     }
-    _ref = n || this.get('n'), familly = _ref[0], given = _ref[1], middle = _ref[2], prefix = _ref[3], suffix = _ref[4];
-    switch (app.config.get('nameOrder')) {
-      case 'given-familly':
-        return "" + given + " " + middle + " " + familly;
-      case 'given-middleinitial-familly':
-        return "" + given + " " + (initial(middle)) + " " + familly;
-      default:
-        return "" + familly + ", " + given + " " + middle;
-    }
+    return VCard.nToFN(n);
   };
 
   Contact.prototype.getComputedN = function(fn) {
-    var familly, given, middle, parts, prefix, suffix;
-    familly = given = middle = prefix = suffix = "";
     if (fn == null) {
       fn = this.get('fn');
     }
-    parts = fn.split(/[ \,]/).filter(function(part) {
-      return part !== "";
-    });
-    switch (app.config.get('nameOrder')) {
-      case 'given-familly':
-      case 'given-middleinitial-familly':
-        given = parts[0];
-        familly = parts[parts.length - 1];
-        middle = parts.slice(1, +(parts.length - 2) + 1 || 9e9).join(' ');
-        break;
-      case 'familly-given':
-        familly = parts[0];
-        given = parts[1];
-        middle = parts.slice(2).join(' ');
-    }
-    return [familly, given, middle, prefix, suffix];
+    return VCard.fnToN(fn);
   };
 
   Contact.prototype.createTask = function(callback) {
@@ -1963,11 +1980,11 @@ AndroidToDP = function(contact, raw) {
 };
 
 Contact.fromVCF = function(vcf) {
-  var ContactCollection, all, binary, blob, blobValue, buffer, current, currentdp, currentidx, currentversion, i, imported, itemidx, key, line, match, part, pname, properties, property, pvalue, regexps, unfolded, value, _i, _j, _k, _l, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+  var ContactCollection, all, binary, blob, blobValue, buffer, current, currentdp, currentidx, currentversion, i, imported, itemidx, key, line, match, part, pname, properties, property, pvalue, quoted, regexps, unfolded, value, _i, _j, _k, _l, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
   regexps = {
     begin: /^BEGIN:VCARD$/i,
     end: /^END:VCARD$/i,
-    simple: /^(version|fn|n|title|org|note)\:(.+)$/i,
+    simple: /^(version|fn|n|title|org|note)(;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
     android: /^x-android-custom\:(.+)$/i,
     composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/,
     complex: /^([^\:\;]+);([^\:]+)\:(.+)$/,
@@ -1979,7 +1996,7 @@ Contact.fromVCF = function(vcf) {
   current = null;
   currentidx = null;
   currentdp = null;
-  unfolded = vcf.replace(/\r?\n\s/gm, '');
+  unfolded = vcf.replace(/(\r?\n\s)/gm, '');
   _ref = unfolded.split(/\r?\n/);
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
     line = _ref[_i];
@@ -1990,21 +2007,24 @@ Contact.fromVCF = function(vcf) {
         current.dataPoints.add(currentdp);
       }
       imported.add(current);
-      if (current.has('n') && current.has('fn')) {
-        if (_.compact(current.get('n')).length === 0) {
-          current.unset('n');
-        } else {
-          current.unset('fn');
-        }
-      } else if (!current.has('n') && !current.has('fn')) {
+      if (!current.has('n') && !current.has('fn')) {
         console.error('There should be at least a N field or a FN field');
+      }
+      if (!current.has('n') || _.compact(current.get('n')).length === 0) {
+        current.set('n', current.getComputedN());
+      }
+      if (!current.has('fn')) {
+        current.set('fn', current.getComputedFN());
       }
       currentdp = null;
       current = null;
       currentidx = null;
       currentversion = "3.0";
     } else if (regexps.simple.test(line)) {
-      _ref1 = line.match(regexps.simple), all = _ref1[0], key = _ref1[1], value = _ref1[2];
+      _ref1 = line.match(regexps.simple), all = _ref1[0], key = _ref1[1], quoted = _ref1[2], value = _ref1[3];
+      if (quoted != null) {
+        value = VCard.unquotePrintable(value);
+      }
       key = key.toLowerCase();
       switch (key) {
         case 'version':
@@ -2089,7 +2109,7 @@ Contact.fromVCF = function(vcf) {
           if (typeof value !== 'string') {
             value = value.join('\n');
           }
-          value = value.replace(/\n+/g, "\n");
+          value = VCard.unescapeText(value);
         }
       } else if (key === 'photo') {
         currentdp = null;
@@ -2120,6 +2140,8 @@ Contact.fromVCF = function(vcf) {
         }
         if (pname === 'type' && pvalue === 'pref') {
           currentdp.set('pref', 1);
+        } else if (pname === 'ENCODING' && pvalue === 'QUOTED-PRINTABLE') {
+          value = VCard.unquotePrintable(value);
         } else {
           currentdp.set(pname.toLowerCase(), pvalue.toLowerCase());
         }
@@ -2392,7 +2414,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,tags = locals_.tags,note = locals_.note;
-buf.push("<div id=\"contact-container\"><a id=\"close\" href=\"#\">&lt;</a><div id=\"picture\">");
+buf.push("<div id=\"contact-container\"><a id=\"close\" href=\"#\">&lt;</a><div id=\"top\"><div id=\"picture\">");
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png", true, false)) + " class=\"picture\"/>");
@@ -2401,7 +2423,26 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><input id=\"name\"" + (jade.attr("placeholder", t("name"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><a id=\"name-edit\">" + (jade.escape(null == (jade_interp = t('edit name')) ? "" : jade_interp)) + "</a><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
+;require.register("templates/contact_name", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+var locals_ = (locals || {}),n = locals_.n;
+buf.push("<form class=\"form-horizontal\"><div class=\"control-group prefix\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group first\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group middle\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group last\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group suffix\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div></form><a id=\"toggle-name-fields\" class=\"icon-black icon-minus\"></a>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2438,7 +2479,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,fn = locals_.fn,bestmail = locals_.bestmail,besttel = locals_.besttel;
+var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,displayName = locals_.displayName,bestmail = locals_.bestmail,besttel = locals_.besttel;
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png?" + (timestamp) + "", true, false)) + "/>");
@@ -2447,7 +2488,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\"/>");
 }
-buf.push("<h2>" + (jade.escape((jade_interp = fn) == null ? '' : jade_interp)) + "</h2><div class=\"infos\"><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
+buf.push("<h2>" + (jade.escape((jade_interp = displayName) == null ? '' : jade_interp)) + "</h2><div class=\"infos\"><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2503,7 +2544,7 @@ else
 {
 buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync headline with data')) ? "" : jade_interp)) + "</p><ul><li>" + (jade.escape((jade_interp = t('sync url')) == null ? '' : jade_interp)) + " https://" + (jade.escape((jade_interp = account.domain) == null ? '' : jade_interp)) + "/public/sync/principals/me</li><li>" + (jade.escape((jade_interp = t('sync login')) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = account.login) == null ? '' : jade_interp)) + "</li><li>" + (jade.escape((jade_interp = t('sync password')) == null ? '' : jade_interp)) + "<span id=\"placeholder\">" + (jade.escape(null == (jade_interp = account.placeholder) ? "" : jade_interp)) + "</span><button id=\"show-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('show')) ? "" : jade_interp)) + "</button><button id=\"hide-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('hide')) ? "" : jade_interp)) + "</button></li></ul>");
 }
-buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync help')) ? "" : jade_interp)) + "<a href=\"https://cozy.io/mobile/contacts.html\" target=\"_blank\">" + (jade.escape(null == (jade_interp = t('sync help link')) ? "" : jade_interp)) + "</a></p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><p id=\"config-now\" class=\"important\">" + (jade.escape(null == (jade_interp = t('do this now')) ? "" : jade_interp)) + "</p><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><h2>" + (jade.escape(null == (jade_interp = t('import export')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("call log info") + ' ') ? "" : jade_interp)) + "<a href=\"#callimport\">" + (jade.escape(null == (jade_interp = t('import call log')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
+buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync help')) ? "" : jade_interp)) + "<a href=\"https://cozy.io/mobile/contacts.html\" target=\"_blank\">" + (jade.escape(null == (jade_interp = t('sync help link')) ? "" : jade_interp)) + "</a></p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><h2>" + (jade.escape(null == (jade_interp = t('import export')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("call log info") + ' ') ? "" : jade_interp)) + "<a href=\"#callimport\">" + (jade.escape(null == (jade_interp = t('import call log')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2542,25 +2583,6 @@ var jade_mixins = {};
 var jade_interp;
 
 buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("import vcard")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><div class=\"control-group\"><label for=\"vcfupload\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("choose vcard file")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"vcfupload\" type=\"file\"/><span class=\"help-inline\"></span></div><div class=\"infos\"><span class=\"loading\">" + (jade.escape(null == (jade_interp = t("loading import preview")) ? "" : jade_interp)) + "</span><span class=\"progress\"></span></div></div></div><div class=\"modal-footer\"><a id=\"cancel-btn\" href=\"#\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button disabled\">" + (jade.escape(null == (jade_interp = t("import")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
-;require.register("templates/name_modal", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-var locals_ = (locals || {}),n = locals_.n,fn = locals_.fn;
-buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("name editor")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><form class=\"form-horizontal\"><div class=\"control-group\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"full\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("full name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"full\" type=\"text\" disabled=\"disabled\"" + (jade.attr("value", fn, true, false)) + "/></div></div></form></div><div class=\"modal-footer\"><a id=\"cancel-btn\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button\">" + (jade.escape(null == (jade_interp = t("save")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2744,7 +2766,7 @@ module.exports = CallImporterView = (function(_super) {
 });
 
 ;require.register("views/contact", function(exports, require, module) {
-var ContactView, Datapoint, HistoryView, NameModal, TagsView, ViewCollection, request,
+var ContactName, ContactView, Datapoint, HistoryView, TagsView, ViewCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2755,7 +2777,7 @@ HistoryView = require('views/history');
 
 TagsView = require('views/contact_tags');
 
-NameModal = require('views/contact_name_modal');
+ContactName = require('views/contact_name');
 
 Datapoint = require('models/datapoint');
 
@@ -2785,6 +2807,7 @@ module.exports = ContactView = (function(_super) {
       'click .addurl': this.addClicked('url'),
       'click .addskype': this.addClicked('other', 'skype'),
       'click #more-options': 'onMoreOptionsClicked',
+      'click #name': 'toggleContactName',
       'click #name-edit': 'showNameModal',
       'click #undo': 'undo',
       'click #delete': 'delete',
@@ -2792,12 +2815,10 @@ module.exports = ContactView = (function(_super) {
       'keyup input.value': 'addBelowIfEnter',
       'keydown #notes': 'resizeNote',
       'keypress #notes': 'resizeNote',
-      'keyup #name': 'doNeedSaving',
       'keyup #notes': 'doNeedSaving',
       'keydown #name': 'onNameKeyPress',
       'keydown textarea#notes': 'onNoteKeyPress',
       'keydown .ui-widget-content': 'onTagInputKeyPress',
-      'blur #name': 'changeOccured',
       'blur #notes': 'changeOccured'
     };
   };
@@ -2848,6 +2869,20 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.afterRender = function() {
     var type, _i, _len, _ref;
+    this.contactName = new ContactName({
+      model: this.model,
+      onKeyup: (function(_this) {
+        return function(ev) {
+          return _this.doNeedSaving(ev);
+        };
+      })(this),
+      onBlur: (function(_this) {
+        return function(ev) {
+          return _this.changeOccured(ev);
+        };
+      })(this)
+    });
+    this.contactName.render();
     this.zones = {};
     _ref = ['about', 'email', 'adr', 'tel', 'url', 'other'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -2857,7 +2892,6 @@ module.exports = ContactView = (function(_super) {
     this.hideEmptyZones();
     this.savedInfo = this.$('#save-info').hide();
     this.needSaving = false;
-    this.namefield = this.$('#name');
     this.notesfield = this.$('#notes');
     this.uploader = this.$('#uploader')[0];
     this.picture = this.$('#picture .picture');
@@ -2892,12 +2926,15 @@ module.exports = ContactView = (function(_super) {
         return _this.resizeNiceScroll();
       };
     })(this));
-    return this.$('a#infotab').on('shown', (function(_this) {
+    this.$('a#infotab').on('shown', (function(_this) {
       return function() {
         _this.$('#left').show();
         return _this.resizeNiceScroll();
       };
     })(this));
+    if (this.model.isNew()) {
+      return this.toggleContactName();
+    }
   };
 
   ContactView.prototype.remove = function() {
@@ -2971,7 +3008,7 @@ module.exports = ContactView = (function(_super) {
         if (_this.$('input:focus, textarea:focus').length && !forceImmediate) {
           return true;
         }
-        _this.model.setFN(_this.namefield.val());
+        _this.model.setN(_this.contactName.getStructuredName());
         _this.model.set({
           note: _this.notesfield.val()
         });
@@ -3004,6 +3041,11 @@ module.exports = ContactView = (function(_super) {
         };
       })(this)
     });
+  };
+
+  ContactView.prototype.toggleContactName = function() {
+    this.$('#name').hide();
+    return this.$('#contact-name').show();
   };
 
   ContactView.prototype.showNameModal = function() {
@@ -3066,7 +3108,6 @@ module.exports = ContactView = (function(_super) {
   ContactView.prototype.modelChanged = function() {
     var id, timestamp, url, _ref;
     this.notesfield.val(this.model.get('note'));
-    this.namefield.val(this.model.getFN());
     if ((_ref = this.tags) != null) {
       _ref.refresh();
     }
@@ -3196,8 +3237,8 @@ module.exports = ContactView = (function(_super) {
 })(ViewCollection);
 });
 
-;require.register("views/contact_name_modal", function(exports, require, module) {
-var BaseView, CallImporterView, CallLogReader, ContactLogCollection, app,
+;require.register("views/contact_name", function(exports, require, module) {
+var BaseView, CallLogReader, ContactLogCollection, ContactName, app,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3210,44 +3251,85 @@ ContactLogCollection = require('collections/contactlog');
 
 app = require('application');
 
-module.exports = CallImporterView = (function(_super) {
-  __extends(CallImporterView, _super);
+module.exports = ContactName = (function(_super) {
+  __extends(ContactName, _super);
 
-  function CallImporterView() {
-    this.close = __bind(this.close, this);
-    return CallImporterView.__super__.constructor.apply(this, arguments);
+  function ContactName() {
+    this.setName = __bind(this.setName, this);
+    return ContactName.__super__.constructor.apply(this, arguments);
   }
 
-  CallImporterView.prototype.template = require('templates/name_modal');
+  ContactName.prototype.template = require('templates/contact_name');
 
-  CallImporterView.prototype.id = 'namemodal';
+  ContactName.prototype.el = '#contact-name';
 
-  CallImporterView.prototype.tagName = 'div';
-
-  CallImporterView.prototype.className = 'modal fade';
-
-  CallImporterView.prototype.attributes = {
-    tabindex: '-1'
+  ContactName.prototype.events = {
+    'keyup input': 'onKeyup',
+    'blur input': 'onBlur',
+    'click #toggle-name-fields': 'toggleFields'
   };
 
-  CallImporterView.prototype.events = {
-    'click #cancel-btn': 'close',
-    'click #confirm-btn': 'save',
-    'change input': 'refreshFN'
+  ContactName.prototype.afterRender = function() {
+    this.listenTo(this.model, 'change', this.setName);
+    return this.toggleFields();
   };
 
-  CallImporterView.prototype.afterRender = function() {
-    return this.$el.modal('show');
+  ContactName.prototype.toggleFields = function() {
+    var toggleButton;
+    toggleButton = this.$('#toggle-name-fields');
+    if (toggleButton.hasClass('icon-minus')) {
+      this.showFew();
+    } else {
+      this.showAll();
+    }
+    return toggleButton.toggleClass('icon-plus icon-minus');
   };
 
-  CallImporterView.prototype.getRenderData = function() {
+  ContactName.prototype.showFew = function() {
+    var elem, field, nameParts, value, _results;
+    nameParts = _.object(['last', 'first', 'middle', 'prefix', 'suffix'], this.model.get('n'));
+    _results = [];
+    for (field in nameParts) {
+      value = nameParts[field];
+      elem = this.$('.control-group.' + field);
+      if ((field === 'last' || field === 'first') || ((value != null) && value !== '')) {
+        _results.push(elem.show());
+      } else {
+        _results.push(elem.hide());
+      }
+    }
+    return _results;
+  };
+
+  ContactName.prototype.showAll = function() {
+    var fields;
+    fields = ['last', 'first', 'middle', 'prefix', 'suffix'];
+    return fields.forEach((function(_this) {
+      return function(field) {
+        return _this.$('.control-group.' + field).show();
+      };
+    })(this));
+  };
+
+  ContactName.prototype.setName = function() {
+    var field, nameParts, value, _results;
+    nameParts = _.object(['last', 'first', 'middle', 'prefix', 'suffix'], this.model.get('n'));
+    _results = [];
+    for (field in nameParts) {
+      value = nameParts[field];
+      _results.push(this.$('input#' + field).val(value));
+    }
+    return _results;
+  };
+
+  ContactName.prototype.getRenderData = function() {
     return _.extend({}, this.model.attributes, {
       fn: this.model.getFN(),
-      n: this.model.get('n') || this.model.getComputedN()
+      n: this.model.getN()
     });
   };
 
-  CallImporterView.prototype.getStructuredName = function() {
+  ContactName.prototype.getStructuredName = function() {
     var fields;
     fields = ['last', 'first', 'middle', 'prefix', 'suffix'];
     return fields.map(function(field) {
@@ -3255,27 +3337,15 @@ module.exports = CallImporterView = (function(_super) {
     });
   };
 
-  CallImporterView.prototype.save = function() {
-    this.model.set('n', this.getStructuredName());
-    this.model.set('fn', '');
-    this.options.onChange();
-    return this.close();
+  ContactName.prototype.onKeyup = function(ev) {
+    return this.options.onKeyup(ev);
   };
 
-  CallImporterView.prototype.refreshFN = function() {
-    return this.$('#full').val(this.model.getComputedFN(this.getStructuredName()));
+  ContactName.prototype.onBlur = function(ev) {
+    return this.options.onBlur(ev);
   };
 
-  CallImporterView.prototype.close = function() {
-    this.$el.modal('hide');
-    return this.$el.on('hidden', (function(_this) {
-      return function() {
-        return _this.remove();
-      };
-    })(this));
-  };
-
-  return CallImporterView;
+  return ContactName;
 
 })(BaseView);
 });
@@ -3570,7 +3640,7 @@ module.exports = ContactsListItemView = (function(_super) {
       hasPicture: this.model.hasPicture || false,
       bestmail: this.model.getBest('email'),
       besttel: this.model.getBest('tel'),
-      fn: this.model.get('fn') || this.model.getComputedFN(),
+      displayName: this.model.getDisplayName(),
       timestamp: Date.now()
     });
   };
@@ -3860,10 +3930,7 @@ module.exports = DocView = (function(_super) {
 
   DocView.prototype.afterRender = function() {
     if (app.config.get('nameOrder') !== 'not-set') {
-      this.$('#config-now').hide();
       return this.$('#nameFormat').val(app.config.get('nameOrder'));
-    } else if (app.contacts.length === 0) {
-      return this.$('#config-now').hide();
     }
   };
 

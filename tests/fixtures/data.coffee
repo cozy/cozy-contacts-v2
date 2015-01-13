@@ -12,6 +12,7 @@ module.exports =
 
     contact1:
         fn: "John Smith"
+        n: "Smith;John;;;"
         note: "notes"
         datapoints: [
             {name: 'tel'  , type: 'home', value: '+331234567'}

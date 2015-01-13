@@ -25,6 +25,18 @@ module.exports = Contact = americano.getModel('Contact', {
   _attachments: Object
 });
 
+Contact.afterInitialize = function() {
+  if ((this.n == null) || this.n === '') {
+    if (this.fn == null) {
+      this.fn = '';
+    }
+    this.n = this.getParsedN();
+  } else if ((this.fn == null) || this.fn === '') {
+    this.fn = this.getComputedFN();
+  }
+  return this;
+};
+
 Contact.prototype.remoteKeys = function() {
   var dp, model, out, _i, _len, _ref, _ref1;
   model = this.toJSON();
@@ -61,26 +73,21 @@ Contact.prototype.savePicture = function(path, callback) {
   });
 };
 
-Contact.prototype.getComputedFN = function(config) {
-  var familly, given, middle, prefix, suffix, _ref;
+Contact.prototype.getComputedFN = function() {
+  var familly, given, middle, parts, prefix, suffix, _ref;
   _ref = this.n.split(';'), familly = _ref[0], given = _ref[1], middle = _ref[2], prefix = _ref[3], suffix = _ref[4];
-  if (config == null) {
-    config = {};
-  }
-  if (config.nameOrder == null) {
-    config.nameOrder = 'given-familly';
-  }
-  switch (config.nameOrder) {
-    case 'given-familly':
-      return "" + given + " " + middle + " " + familly;
-    case 'familly-given':
-      return "" + familly + ", " + given + " " + middle;
-    case 'given-middleinitial-familly':
-      return "" + given + " " + (initial(middle)) + " " + familly;
-  }
+  parts = [prefix, given, middle, familly, suffix];
+  parts = parts.filter(function(part) {
+    return (part != null) && part !== '';
+  });
+  return parts.join(' ');
 };
 
-Contact.prototype.toVCF = function(config, callback) {
+Contact.prototype.getParsedN = function() {
+  return ";" + this.fn + ";;;";
+};
+
+Contact.prototype.toVCF = function(callback) {
   var buffers, getVCardOutput, model, stream, _ref;
   model = this.toJSON();
   getVCardOutput = (function(_this) {
@@ -96,9 +103,9 @@ Contact.prototype.toVCF = function(config, callback) {
       }
       if (model.n) {
         out += "N:" + model.n + "\n";
-        out += "FN:" + (_this.getComputedFN(config)) + "\n";
+        out += "FN:" + (_this.getComputedFN()) + "\n";
       } else if (model.fn) {
-        out += "N:;;;;\n";
+        out += "N:" + (_this.getParsedN()) + "\n";
         out += "FN:" + model.fn + "\n";
       } else {
         out += "N:;;;;\n";

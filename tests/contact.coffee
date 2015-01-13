@@ -53,7 +53,7 @@ describe 'Contacts', ->
     describe 'Create - POST /contacts', ->
 
         contact =
-            name: 'Jane Smith'
+            fn: 'Jane Smith'
 
         it 'should allow requests', (done) ->
             @client.post 'contacts', contact, done
