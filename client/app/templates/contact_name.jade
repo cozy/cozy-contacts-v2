@@ -1,0 +1,24 @@
+
+form.form-horizontal
+    .control-group.prefix
+        label.control-label(for="prefix")= t("prefix")
+        .controls
+            input#prefix(type="text", value=n[3], placeholder=t("placeholder prefix"))
+    .control-group.first
+        label.control-label(for="first")= t("first name")
+        .controls
+            input#first(type="text", value=n[1], placeholder=t("placeholder first"))
+    .control-group.middle
+        label.control-label(for="middle")= t("middle name")
+        .controls
+            input#middle(type="text", value=n[2], placeholder=t("placeholder middle"))
+    .control-group.last
+        label.control-label(for="last")= t("last name")
+        .controls
+            input#last(type="text", value=n[0], placeholder=t("placeholder last"))
+    .control-group.suffix
+        label.control-label(for="suffix")= t("suffix")
+        .controls
+            input#suffix(type="text", value=n[4], placeholder=t("placeholder suffix"))
+
+a#toggle-name-fields.icon-black.icon-minus

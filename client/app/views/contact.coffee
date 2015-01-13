@@ -1,7 +1,7 @@
 ViewCollection = require 'lib/view_collection'
 HistoryView = require 'views/history'
 TagsView = require 'views/contact_tags'
-NameModal = require 'views/contact_name_modal'
+ContactName = require 'views/contact_name'
 Datapoint = require 'models/datapoint'
 request = require '../lib/request'
 
@@ -26,6 +26,7 @@ module.exports = class ContactView extends ViewCollection
         'click .addurl'     : @addClicked 'url'
         'click .addskype'   : @addClicked 'other', 'skype'
         'click #more-options': 'onMoreOptionsClicked'
+        'click #name'       : 'toggleContactName'
         'click #name-edit'  : 'showNameModal'
         'click #undo'       : 'undo'
         'click #delete'     : 'delete'
@@ -35,13 +36,11 @@ module.exports = class ContactView extends ViewCollection
         'keydown #notes'       : 'resizeNote'
         'keypress #notes'      : 'resizeNote'
 
-        'keyup #name'      : 'doNeedSaving'
         'keyup #notes'     : 'doNeedSaving'
         'keydown #name'   : 'onNameKeyPress'
         'keydown textarea#notes': 'onNoteKeyPress'
         'keydown .ui-widget-content': 'onTagInputKeyPress'
 
-        'blur #name'      : 'changeOccured'
         'blur #notes'     : 'changeOccured'
 
     constructor: (options) ->
@@ -71,6 +70,17 @@ module.exports = class ContactView extends ViewCollection
             timestamp: Date.now()
 
     afterRender: ->
+        @contactName = new ContactName
+            model: @model
+            onKeyup: (ev) =>
+                @doNeedSaving ev
+
+            onBlur: (ev) =>
+                @changeOccured ev
+
+
+        @contactName.render()
+
         @zones = {}
         for type in ['about', 'email', 'adr', 'tel', 'url', 'other']
             @zones[type] = @$('#' + type + 's ul')
@@ -78,7 +88,6 @@ module.exports = class ContactView extends ViewCollection
         @hideEmptyZones()
         @savedInfo = @$('#save-info').hide()
         @needSaving = false
-        @namefield = @$('#name')
         @notesfield = @$('#notes')
         @uploader = @$('#uploader')[0]
         @picture  = @$('#picture .picture')
@@ -108,6 +117,9 @@ module.exports = class ContactView extends ViewCollection
         @$('a#infotab').on 'shown', =>
             @$('#left').show()
             @resizeNiceScroll()
+
+        if @model.isNew()
+            @toggleContactName()
 
     remove: ->
         @$el.getNiceScroll().remove()
@@ -159,7 +171,7 @@ module.exports = class ContactView extends ViewCollection
             if @$('input:focus, textarea:focus').length and not forceImmediate
                 return true
 
-            @model.setFN @namefield.val()
+            @model.setN @contactName.getStructuredName()
             @model.set note: @notesfield.val()
 
             # no need to save in this case
@@ -182,6 +194,10 @@ module.exports = class ContactView extends ViewCollection
         @model.save
             success: =>
                 @collection.trigger 'change', @model
+
+    toggleContactName: ->
+        @$('#name').hide()
+        @$('#contact-name').show()
 
     showNameModal: =>
         modal = new NameModal
@@ -222,7 +238,6 @@ module.exports = class ContactView extends ViewCollection
 
     modelChanged: =>
         @notesfield.val @model.get 'note'
-        @namefield.val  @model.getFN()
         @tags?.refresh()
         id = @model.get 'id'
         if id?

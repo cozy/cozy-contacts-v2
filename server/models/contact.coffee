@@ -7,12 +7,29 @@ log = require('printit')
 module.exports = Contact = americano.getModel 'Contact',
     id            : String
     fn            : String # vCard FullName = display name
+    # (Prefix Given Middle Familly Suffix), or something else.
     n             : String # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
     datapoints    : (x) -> x
     note          : String
     tags          : (x) -> x # DAMN IT JUGGLING
     _attachments  : Object
+
+Contact.afterInitialize = ->
+    # Cleanup the model,
+    # Defensive against data from DataSystem
+
+    # n and fn MUST be valid.
+    if not @n? or @n is ''
+        if not @fn?
+            @fn = ''
+
+        @n = @getParsedN()
+
+    else if not @fn? or @fn is ''
+        @fn = @getComputedFN()
+
+    return @
 
 Contact::remoteKeys = ->
     model = @toJSON()
@@ -36,17 +53,20 @@ Contact::savePicture = (path, callback) ->
                 log.error "failed to purge #{file.path}" if err
                 callback()
 
-Contact::getComputedFN = (config) ->
+Contact::getComputedFN = ->
     [familly, given, middle, prefix, suffix] = @n.split ';'
-    config ?= {}
-    config.nameOrder ?= 'given-familly'
-    switch config.nameOrder
-        when 'given-familly' then "#{given} #{middle} #{familly}"
-        when 'familly-given' then "#{familly}, #{given} #{middle}"
-        when 'given-middleinitial-familly'
-            "#{given} #{initial(middle)} #{familly}"
+    # order parts of name.
+    parts = [prefix, given, middle, familly, suffix]
+    # remove empty parts
+    parts = parts.filter (part) -> part? and part isnt ''
 
-Contact::toVCF = (config, callback) ->
+    return parts.join ' '
+
+# Parse n field (splitted) from fn (display).
+Contact::getParsedN = ->
+    return ";#{@fn};;;"
+
+Contact::toVCF = (callback) ->
 
     model = @toJSON()
 
@@ -57,9 +77,9 @@ Contact::toVCF = (config, callback) ->
 
         if model.n
             out += "N:#{model.n}\n"
-            out += "FN:#{@getComputedFN config}\n"
+            out += "FN:#{@getComputedFN()}\n"
         else if model.fn
-            out += "N:;;;;\n"
+            out += "N:#{@getParsedN()}\n"
             out += "FN:#{model.fn}\n"
         else
             out += "N:;;;;\n"

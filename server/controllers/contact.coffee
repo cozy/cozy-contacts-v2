@@ -2,7 +2,6 @@ path    = require 'path'
 multiparty = require 'multiparty'
 async = require 'async'
 Contact = require '../models/contact'
-Config = require '../models/config'
 Todolist = require '../models/todolist'
 Task = require '../models/task'
 
@@ -41,22 +40,21 @@ module.exports =
             # If creation is related to an import, it checks first if the
             # contact doesn't exist already by comparing the names
             # or emails if name is not specified.
-            Config.getInstance (err, config) ->
-                name = ''
-                if toCreate.fn? and toCreate.fn.length > 0
-                    name = toCreate.fn
-                else if toCreate.n and toCreate.n.length > 0
-                    name = toCreate.n.split(';').join(' ').trim()
-                else
-                    for dp in toCreate.datapoints
-                        if dp.name is 'email'
-                            name = dp.value
+            name = ''
+            if toCreate.fn? and toCreate.fn.length > 0
+                name = toCreate.fn
+            else if toCreate.n and toCreate.n.length > 0
+                name = toCreate.n.split(';').join(' ').trim()
+            else
+                for dp in toCreate.datapoints
+                    if dp.name is 'email'
+                        name = dp.value
 
-                Contact.request 'byName', key: name, (err, contacts) ->
-                    if contacts.length is 0
-                        create()
-                    else
-                        res.send contacts[0], 201
+            Contact.request 'byName', key: name, (err, contacts) ->
+                if contacts.length is 0
+                    create()
+                else
+                    res.send contacts[0], 201
         else
             create()
 
@@ -107,29 +105,27 @@ module.exports =
 
     # Export contacts to a vcard file.
     vCard: (req, res, next) ->
-        Config.getInstance (err, config) ->
-            Contact.request 'all', (err, contacts) ->
-                async.mapSeries contacts, (contact, done) ->
-                    contact.toVCF config, done
-                , (err, outputs) ->
-                    return next err if err?
+        Contact.request 'all', (err, contacts) ->
+            async.mapSeries contacts, (contact, done) ->
+                contact.toVCF done
+            , (err, outputs) ->
+                return next err if err?
 
-                    vCardOutput = outputs.join ''
-                    date = new Date()
-                    year = date.getYear()
-                    month = date.getMonth()
-                    day = date.getDay()
-                    date = "#{year}-#{month}-#{day}"
-                    res.attachment "cozy-contacts-#{date}.vcf"
-                    res.set 'Content-Type', 'text/x-vcard'
-                    res.send vCardOutput
+                vCardOutput = outputs.join ''
+                date = new Date()
+                year = date.getYear()
+                month = date.getMonth()
+                day = date.getDay()
+                date = "#{year}-#{month}-#{day}"
+                res.attachment "cozy-contacts-#{date}.vcf"
+                res.set 'Content-Type', 'text/x-vcard'
+                res.send vCardOutput
 
     # Export a single contact to a VCard file.
     vCardContact: (req, res, next) ->
-        Config.getInstance (err, config) ->
-            req.contact.toVCF config, (err, vCardOutput) ->
-                return next err if err?
+        req.contact.toVCF (err, vCardOutput) ->
+            return next err if err?
 
-                res.attachment "#{req.params.fn}.vcf"
-                res.set 'Content-Type', 'text/x-vcard'
-                res.send vCardOutput
+            res.attachment "#{req.params.fn}.vcf"
+            res.set 'Content-Type', 'text/x-vcard'
+            res.send vCardOutput

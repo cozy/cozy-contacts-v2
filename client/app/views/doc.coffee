@@ -20,11 +20,8 @@ module.exports = class DocView extends BaseView
 
     afterRender: ->
         if app.config.get('nameOrder') isnt 'not-set'
-            @$('#config-now').hide()
             @$('#nameFormat').val app.config.get 'nameOrder'
 
-        else if app.contacts.length is 0
-            @$('#config-now').hide()
 
     saveNameFormat: ->
         help = @$('.help-inline').show().text t 'saving'

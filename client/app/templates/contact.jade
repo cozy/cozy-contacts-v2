@@ -1,22 +1,24 @@
 #contact-container
     a#close(href="#") &lt;
 
-    div#picture
-      if hasPicture
-        img.picture(src="contacts/#{id}/picture.png")
-      else
-        img.picture(src="img/defaultpicture.png")
+    #top
+      #picture
+        if hasPicture
+          img.picture(src="contacts/#{id}/picture.png")
+        else
+          img.picture(src="img/defaultpicture.png")
 
-      #uploadnotice= t("change")
-      input#uploader(type="file")
+        #uploadnotice= t("change")
+        input#uploader(type="file")
 
-    #wrap-name-notes
-      input#name(placeholder=t("name"), value="#{fn}")
-      a#name-edit= t('edit name')
-      input#tags.tagit(value=tags.join(','))
+      #wrap-name-notes
+        #contact-name(style="display: none;")
+        input#name(placeholder=t("firstname lastname"), value="#{fn}")
+        //- a#name-edit= t('edit name')
+        input#tags.tagit(value=tags.join(','))
 
-    span#save-info= t('changes saved') + ' '
-      a#undo=t('undo')
+      span#save-info= t('changes saved') + ' '
+        a#undo=t('undo')
 
 
     #right
