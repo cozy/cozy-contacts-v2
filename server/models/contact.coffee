@@ -62,7 +62,6 @@ Contact::getComputedN = ->
     return VCardParser.fnToN @fn
             .join ';'
 
-# TODO: move the logic somewhere in cozy-vcard.
 Contact::toVCF = (callback) ->
     if @_attachments?.picture?
         # we get a stream that we need to convert into a buffer
