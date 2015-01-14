@@ -1,4 +1,4 @@
-americano = require 'americano-cozy'
+americano = require 'cozydb'
 async = require 'async'
 
 # this is a cozy-contact log
@@ -8,7 +8,7 @@ module.exports = ContactLog = americano.getModel 'ContactLog',
     direction           : type: String, default: 'NA'
     timestamp           : String
     remote              : Object
-    content             : (x) -> x
+    content             : Object
     wrong               : type: Boolean, default: false
 
 ContactLog.byRemote = (keys, callback) ->

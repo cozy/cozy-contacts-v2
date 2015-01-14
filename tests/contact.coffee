@@ -4,7 +4,6 @@ expect = require('chai').expect
 fixtures = require './fixtures/data'
 helpers = require './helpers'
 
-Task = require "#{helpers.prefix}server/models/task"
 Contact = require "#{helpers.prefix}server/models/contact"
 
 

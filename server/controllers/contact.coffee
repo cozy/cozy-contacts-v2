@@ -2,8 +2,6 @@ path    = require 'path'
 multiparty = require 'multiparty'
 async = require 'async'
 Contact = require '../models/contact'
-Todolist = require '../models/todolist'
-Task = require '../models/task'
 
 module.exports =
 

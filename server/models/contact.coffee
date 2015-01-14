@@ -1,4 +1,4 @@
-americano = require 'americano-cozy'
+cozydb = require 'cozydb'
 async = require 'async'
 ContactLog = require './contact_log'
 VCardParser = require 'cozy-vcard'
@@ -6,7 +6,19 @@ fs = require 'fs'
 log = require('printit')
     prefix: 'Contact Model'
 
-module.exports = Contact = americano.getModel 'Contact',
+
+# Datapoints is an array of { name, type, value ...} objects,
+# values are typically String. Particular case, adr :
+# name: 'adr',
+# type: 'home',
+# value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
+class DataPoint extends cozydb.Model
+    @schema:
+        name: String
+        value: String
+        type: cozydb.NoSchema
+
+module.exports = Contact = cozydb.getModel 'Contact',
     id            : String
     # vCard FullName = display name
     # (Prefix Given Middle Familly Suffix), or something else.
@@ -14,14 +26,9 @@ module.exports = Contact = americano.getModel 'Contact',
     # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
     n             : String
-    # Datapoints is an array of { name, type, value ...} objects,
-    # values are typically String. Particular case, adr :
-    # name: 'adr',
-    # type: 'home',
-    # value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
-    datapoints    : (x) -> x
+    datapoints    : [DataPoint]
     note          : String
-    tags          : (x) -> x # DAMN IT JUGGLING
+    tags          : [String]
     _attachments  : Object
 
 Contact.afterInitialize = ->

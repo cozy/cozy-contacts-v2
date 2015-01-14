@@ -6,8 +6,6 @@ else
     prefix = path.join __dirname, '../'
 
 Contact = require "#{prefix}server/models/contact"
-Task = require "#{prefix}server/models/task"
-PCLog = require "#{prefix}server/models/phone_communication_log"
 ContactLog = require "#{prefix}server/models/contact_log"
 Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
@@ -30,9 +28,7 @@ module.exports =
     clearDb: (done) ->
         Config.requestDestroy "all", ->
             Contact.requestDestroy "all", ->
-                PCLog.requestDestroy "all", ->
-                    Task.requestDestroy "all", ->
-                        ContactLog.requestDestroy "all", done
+                ContactLog.requestDestroy "all", done
 
     createContact: (data) -> (done) ->
         baseContact = new Contact(data)

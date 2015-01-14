@@ -1,4 +1,4 @@
-americano = require 'americano-cozy'
+americano = require 'cozydb'
 ContactLog = require './contact_log'
 
 module.exports = Config = americano.getModel 'ContactConfig',
