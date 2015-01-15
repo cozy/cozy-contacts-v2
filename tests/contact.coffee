@@ -6,6 +6,7 @@ helpers = require './helpers'
 
 Contact = require "#{helpers.prefix}server/models/contact"
 
+_global = {}
 
 describe 'Contacts', ->
 
@@ -37,12 +38,12 @@ describe 'Contacts', ->
             expect(@body).to.have.length 1
             expect(@body[0].id).to.exist
             expect(@body[0].fn).to.equal fixtures.contact1.fn
-            @id = @body[0].id
+            _global.id = @body[0].id
 
     describe 'Read - GET /contacts/:id', ->
 
         it 'should allow requests', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'should reply with one contact', ->
             expect(@body.fn).to.equal fixtures.contact1.fn
@@ -60,7 +61,7 @@ describe 'Contacts', ->
         it 'should reply with the created contact', ->
             expect(@body.fn).to.equal contact.fn
             expect(@body.id).to.exist
-            @id = @body.id
+            _global.id = @body.id
 
         it 'When you create the same contact with import flag', (done) ->
             contact =
@@ -99,13 +100,13 @@ describe 'Contacts', ->
             note: 'funny guy'
 
         it 'should allow requests', (done) ->
-            @client.put "contacts/#{@id}", update, done
+            @client.put "contacts/#{_global.id}", update, done
 
         it 'should reply with the updated album', ->
             expect(@body.note).to.equal update.note
 
         it 'when I GET the contact', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'then it is changed', ->
             expect(@body.note).to.equal update.note
@@ -113,13 +114,13 @@ describe 'Contacts', ->
     describe 'Delete - DELETE /contacts/:id', ->
 
         it 'should allow requests', (done) ->
-            @client.del "contacts/#{@id}", done
+            @client.del "contacts/#{_global.id}", done
 
         it 'should reply with 204 status', ->
             expect(@response.statusCode).to.equal 204
 
         it 'when I GET the contact', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'then i get an error', ->
             expect(@response.statusCode).to.equal 404

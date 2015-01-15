@@ -46,7 +46,8 @@ task 'tests:client', 'run client tests through mocha', (opts) ->
 
 
 runTests = (fileList) ->
-    env = " USE_JS=true" if options['use-js']? and options['use-js']
+    env = "NODE_ENV=test"
+    env += " USE_JS=true" if options['use-js']? and options['use-js']
 
     command = "#{env} mocha " + fileList.join(" ") + " "
     command += " --globals setImmediate,clearImmediate"

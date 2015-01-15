@@ -38,6 +38,7 @@ module.exports =
 
     makeTestClient: (done) ->
         old = new Client "http://localhost:#{TESTPORT}/"
+        old.headers['accept'] = 'application/json'
 
         store = this # this will be the common scope of tests
 

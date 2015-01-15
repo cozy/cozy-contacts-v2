@@ -9,10 +9,12 @@ module.exports =
                 maxAge: 86400000
             americano.bodyParser keepExtensions: true
             require('./helpers/shortcut')
-            americano.errorHandler
+        ]
+        afterStart: (app, server) ->
+            # move it here needed after express 4.4
+            app.use americano.errorHandler
                 dumpExceptions: true
                 showStack: true
-        ]
         set:
             'views': './client/'
 
