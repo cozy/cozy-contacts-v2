@@ -4,4 +4,9 @@ module.exports =
         .replace(/-/gi, '_')
         .replace(/\s/gi, '-')
 
-    noop: ->
+    makeDateStamp: ->
+        date = new Date()
+        year = date.getYear()
+        month = date.getMonth()
+        day = date.getDay()
+        date = "#{year}-#{month}-#{day}"

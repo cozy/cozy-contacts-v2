@@ -9,11 +9,11 @@ getImports = (callback) ->
     async.parallel [
         (cb) -> Contact.request 'all', cb
         Config.getInstance
-        CozyInstance.first
+        (cb) -> CozyInstance.first cb
         (cb) ->
             dataSystem = new Client "http://localhost:9101/"
             dataSystem.get 'tags', (err, response, body) -> cb err, body
-        WebDavAccount.first
+        (cb) -> WebDavAccount.first cb
     ], (err, results) ->
         [contacts, config, instance, tags, webDavAccount] = results
 

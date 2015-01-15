@@ -1,7 +1,18 @@
 ContactLog = require '../models/contact_log'
 async   = require 'async'
+americano = require 'cozydb'
+
+
+baseController = new americano.SimpleController
+    model: ContactLog
+    reqParamID: 'logid'
+    reqProp: 'log'
 
 module.exports =
+
+    fetch: baseController.fetch
+    update: baseController.update
+    delete: baseController.destroy
 
     # send all logs for the req.contact
     byContact: (req, res) ->
@@ -22,13 +33,6 @@ module.exports =
             return res.error err if err
             res.send logs, 200
 
-    fetch: (req, res, next, id) ->
-        ContactLog.find id, (err, log) ->
-            return res.error 500, 'An error occured', err if err
-            return res.error 404, 'Log not found' if not log
-
-            req.log = log
-            next()
 
     # create a note-typed log (manual)
     create: (req, res) ->
@@ -43,18 +47,6 @@ module.exports =
             return res.error err if err
             res.send log, 201
 
-    update: (req, res) ->
-        req.log.updateAttributes req.body, (err) ->
-            return res.error err if err
-            res.send req.log, 200
-
-
-    delete: (req, res) ->
-        req.log.destroy (err) ->
-            return res.error err if err
-            res.send success: true, 204
-
-
     # merge a batch of voice typed log
     # exported from the phone
     merge: (req, res) ->
@@ -62,22 +54,3 @@ module.exports =
         ContactLog.merge toMerge, (err) ->
             return res.error err if err
             res.send success: true, 201
-
-    # merge voice & sms typed log from carrier's invoice
-    mergeFing: (req, res) ->
-        PhoneCommunicationLog.all (finglogs) ->
-            return res.error err if err
-
-            # convert to ContactLog Doctype
-            converted = finglogs.map (log) ->
-                log = log.toJSON()
-                log.remote = tel: log.correspondantNumber
-                if log.type is 'VOICE'
-                    log.content = duration: log.chipCount
-
-                return log
-
-            ContactLog.merge converted, (err) ->
-                return res.error err if err
-                res.send success: true, 201
-
