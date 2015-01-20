@@ -15,7 +15,7 @@
     "async": "0.9.0",
     "jade": "0.32.0",
     "americano": "0.3.11",
-    "cozy-db": "0.0.1",
+    "cozydb": "0.0.1",
     "cozy-realtime-adapter": "0.11.3",
     "request-json": "0.4.13",
     "printit": "0.1.3",
