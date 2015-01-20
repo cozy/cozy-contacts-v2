@@ -28,8 +28,5 @@ module.exports =
             remote = doc.remote.id or doc.remote.tel or doc.remote.mail
             emit remote, doc
 
-    cozy_instance:
-        all: americano.defaultRequests.all
-
     webdavaccount:
         all: americano.defaultRequests.all

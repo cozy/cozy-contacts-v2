@@ -1,18 +1,15 @@
 Contact = require '../models/contact'
 Config  = require '../models/config'
-CozyInstance = require '../models/cozy_instance'
 WebDavAccount = require '../models/webdavaccount'
 async   = require 'async'
-Client  = require('request-json').JsonClient
+cozydb = require 'cozydb'
 
 getImports = (callback) ->
     async.parallel [
-        (cb) -> Contact.request 'all', cb
+        (cb) -> Contact.all cb
         Config.getInstance
-        (cb) -> CozyInstance.first cb
-        (cb) ->
-            dataSystem = new Client "http://localhost:9101/"
-            dataSystem.get 'tags', (err, response, body) -> cb err, body
+        (cb) -> cozydb.api.getCozyInstance cb
+        (cb) -> cozydb.api.getCozyTags cb
         (cb) -> WebDavAccount.first cb
     ], (err, results) ->
         [contacts, config, instance, tags, webDavAccount] = results
