@@ -15,11 +15,11 @@
     "async": "0.9.0",
     "jade": "0.32.0",
     "americano": "0.3.11",
-    "cozydb": "0.0.1",
+    "cozydb": "0.0.2",
     "cozy-realtime-adapter": "0.11.3",
     "request-json": "0.4.13",
     "printit": "0.1.3",
-    "multiparty": "^4.0.0",
+    "multiparty": "4.0.0",
     "cozy-vcard": "0.2.0"
   },
   "devDependencies": {

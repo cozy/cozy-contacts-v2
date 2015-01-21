@@ -111,6 +111,51 @@ describe 'Contacts', ->
         it 'then it is changed', ->
             expect(@body.note).to.equal update.note
 
+    describe 'Add picture - PUT /contacts/:id/picture ', ->
+
+        file = __dirname + '/fixtures/thumb.jpg'
+        dest = './picture.jpg'
+
+        it 'should allow request', (done) ->
+            # request-json doesnt allow PUT form.
+            # do it manually
+            stream = require('http').request
+                port: process.env.PORT or 8013
+                method: 'PUT'
+                path: "/contacts/#{_global.id}/picture"
+
+            , (res) =>
+                res.setEncoding 'utf8'
+                @body = ''
+                res.on 'data', (data) => @body += data
+                res.on 'end', -> done null
+
+            stream.on 'error', done
+            stream.setHeader 'Content-Type', 'multipart/form-data; ' + \
+                                'boundary=randomBoundary'
+            stream.write "--randomBoundary\r\n"
+            stream.write 'Content-Disposition: form-data; name="picture"; ' + \
+                                '; filename="thumb.jpg"'
+            stream.write "\r\nContent-Type: image/jpeg"
+            stream.write "\r\n\r\n"
+            stream.write fs.readFileSync file
+            stream.write "\r\n--randomBoundary--"
+            stream.end()
+
+        it 'should return the contact', ->
+            expect(JSON.parse(@body).fn).to.equal 'Jane Smith'
+
+        it 'when i GET the picture', (done) ->
+            path = "contacts/#{_global.id}/picture.png"
+            @client.saveFile path, dest, done
+
+        it 'the file has not been corrupted', ->
+            stat1 = fs.statSync file
+            stat2 = fs.statSync dest
+            expect(stat1.size).to.equal stat2.size
+            process.exit 1
+
+
     describe 'Delete - DELETE /contacts/:id', ->
 
         it 'should allow requests', (done) ->

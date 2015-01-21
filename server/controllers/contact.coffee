@@ -16,7 +16,8 @@ module.exports =
     list: baseController.listAll
     read: baseController.send
     delete: baseController.destroy
-    picture: baseController.sendAttachment 'picture',
+    picture: baseController.sendAttachment
+        filename: 'picture'
         default: path.resolve __dirname, '../assets/defaultpicture.png'
 
 
