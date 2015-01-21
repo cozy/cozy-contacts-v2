@@ -1,4 +1,5 @@
 americano = require 'americano-cozy'
+async = require 'async'
 ContactLog = require './contact_log'
 VCardParser = require 'cozy-vcard'
 fs = require 'fs'
@@ -7,10 +8,17 @@ log = require('printit')
 
 module.exports = Contact = americano.getModel 'Contact',
     id            : String
-    fn            : String # vCard FullName = display name
+    # vCard FullName = display name
     # (Prefix Given Middle Familly Suffix), or something else.
-    n             : String # vCard Name = splitted
+    fn            : String
+    # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
+    n             : String
+    # Datapoints is an array of { name, type, value ...} objects,
+    # values are typically String. Particular case, adr :
+    # name: 'adr',
+    # type: 'home',
+    # value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
     datapoints    : (x) -> x
     note          : String
     tags          : (x) -> x # DAMN IT JUGGLING
@@ -74,3 +82,30 @@ Contact::toVCF = (callback) ->
             callback null, VCardParser.toVCF(@, picture)
     else
         callback null, VCardParser.toVCF(@)
+
+
+# Migration 2015-01 : datapoints.where 'name' is 'adr':
+# Simple string is replaced by an String[7] .
+Contact::migrateAdr = (callback) ->
+    hasMigrate = false
+    @?.datapoints?.forEach (dp) ->
+        if dp.name is 'adr'
+            if typeof dp.value is 'string' or dp.value instanceof String
+                dp.value = VCardParser.adrStringToArray dp.value
+                hasMigrate = true
+
+    if hasMigrate
+        @updateAttributes {}, callback
+    else
+        callback()
+
+
+Contact.migrateAll = (callback) ->
+    Contact.all {}, (err, contacts) ->
+        if err?
+            console.log err
+            callback()
+        else
+            async.eachLimit contacts, 10, (contact, done) ->
+                contact.migrateAdr done
+            , callback

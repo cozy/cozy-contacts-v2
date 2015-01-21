@@ -14,7 +14,7 @@
   regexps = {
     begin: /^BEGIN:VCARD$/i,
     end: /^END:VCARD$/i,
-    simple: /^(version|fn|n|title|org|note)(;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
+    simple: /^(version|fn|n|title|org|note)(;CHARSET=UTF-8)?(;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
     android: /^x-android-custom\:(.+)$/i,
     composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/,
     complex: /^([^\:\;]+);([^\:]+)\:(.+)$/,
@@ -124,10 +124,11 @@
     };
 
     VCardParser.prototype.storeCurrentContact = function() {
+      var _ref;
       if ((this.currentContact.n == null) && (this.currentContact.fn == null)) {
         console.error('There should be at least a N field or a FN field');
       }
-      if ((this.currentContact.n == null) || this.currentContact.n === '') {
+      if ((this.currentContact.n == null) || ((_ref = this.currentContact.n) === '' || _ref === ';;;;')) {
         this.currentContact.n = VCardParser.fnToN(this.currentContact.fn).join(';');
       }
       if ((this.currentContact.fn == null) || this.currentContact.fn === '') {
@@ -137,8 +138,8 @@
     };
 
     VCardParser.prototype.handleSimpleLine = function(line) {
-      var all, key, quoted, value, _ref;
-      _ref = line.match(regexps.simple), all = _ref[0], key = _ref[1], quoted = _ref[2], value = _ref[3];
+      var all, key, quoted, utf, value, _ref;
+      _ref = line.match(regexps.simple), all = _ref[0], key = _ref[1], utf = _ref[2], quoted = _ref[3], value = _ref[4];
       if (quoted != null) {
         value = VCardParser.unquotePrintable(value);
       }
@@ -194,7 +195,7 @@
       }
       key = key.toLowerCase();
       if (key === 'x-ablabel' || key === 'x-abadr') {
-        return this.currentDatapoint['type'] = value.toLowerCase();
+        return this.addTypeProperty(this.currentDatapoint, value.toLowerCase());
       } else {
         this.handleProperties(this.currentDatapoint, properties);
         if (key === 'x-abdate') {
@@ -204,7 +205,11 @@
           key = 'other';
         }
         if (key === 'adr') {
-          value = this.parseAdrValue(value);
+          if (Array.isArray(value)) {
+            value = value.map(VCardParser.unescapeText);
+          } else {
+            value = ['', '', VCardParser.unescapeText(value), '', '', '', ''];
+          }
         }
         this.currentDatapoint['name'] = key.toLowerCase();
         return this.currentDatapoint['value'] = value;
@@ -224,7 +229,11 @@
       if (key === 'email' || key === 'tel' || key === 'adr' || key === 'url') {
         this.currentDatapoint['name'] = key;
         if (key === 'adr') {
-          value = this.parseAdrValue(value);
+          if (Array.isArray(value)) {
+            value = value.map(VCardParser.unescapeText);
+          } else {
+            value = ['', '', VCardParser.unescapeText(value), '', '', '', ''];
+          }
         }
       } else if (key === 'bday') {
         this.currentContact['bday'] = value;
@@ -240,7 +249,11 @@
       }
       this.handleProperties(this.currentDatapoint, properties.split(';'));
       if (this.currentDatapoint.encoding === 'quoted-printable') {
-        value = VCardParser.unquotePrintable(value);
+        if (Array.isArray(value)) {
+          value = value.map(VCardParser.unquotePrintable);
+        } else {
+          value = VCardParser.unquotePrintable(value);
+        }
         delete this.currentDatapoint.encoding;
       }
       return this.currentDatapoint.value = value;
@@ -261,30 +274,33 @@
           pname = 'type';
           pvalue = property.toLowerCase();
         }
-        _results.push(dp[pname.toLowerCase()] = pvalue);
+        if (pname === 'type' && pvalue === 'pref') {
+          pname = 'pref';
+          pvalue = true;
+        }
+        if (pname === 'type') {
+          _results.push(this.addTypeProperty(dp, pvalue));
+        } else {
+          _results.push(dp[pname.toLowerCase()] = pvalue);
+        }
       }
       return _results;
     };
 
-    VCardParser.prototype.parseAdrValue = function(value) {
-      var countryPart, flat, streetPart, structuredToFlat;
-      if (value == null) {
-        value = [];
+    VCardParser.prototype.addTypeProperty = function(dp, pvalue) {
+      var oldTypeValue;
+      if ('type' in dp) {
+        dp.typesOther = dp.typesOther || [];
+        if (pvalue === 'home' || pvalue === 'work' || pvalue === 'cell') {
+          oldTypeValue = dp.type;
+          dp.type = pvalue;
+          return dp.typesOther.push(oldTypeValue);
+        } else {
+          return dp.typesOther.push(pvalue);
+        }
+      } else {
+        return dp['type'] = pvalue;
       }
-      structuredToFlat = function(t) {
-        t = t.filter(function(part) {
-          return (part != null) && part !== '';
-        });
-        t = t.map(VCardParser.unescapeText);
-        return t.join(', ');
-      };
-      streetPart = structuredToFlat(value.slice(0, 3));
-      countryPart = structuredToFlat(value.slice(3, 7));
-      flat = streetPart;
-      if (countryPart !== '') {
-        flat += '\n' + countryPart;
-      }
-      return flat;
     };
 
     return VCardParser;
@@ -292,10 +308,14 @@
   })();
 
   VCardParser.unquotePrintable = function(s) {
-    if (s == null) {
-      s = '';
+    var error;
+    s = s || '';
+    try {
+      return utf8.decode(quotedPrintable.decode(s));
+    } catch (_error) {
+      error = _error;
+      return s;
     }
-    return utf8.decode(quotedPrintable.decode(s));
   };
 
   VCardParser.escapeText = function(s) {
@@ -349,9 +369,10 @@
       type = ((_ref2 = dp.type) != null ? _ref2.toUpperCase() : void 0) || null;
       value = dp.value;
       if (Array.isArray(value)) {
-        value = value.join(';');
+        value = value.map(VCardParser.escapeText);
+      } else {
+        value = VCardParser.escapeText(value);
       }
-      value = VCardParser.escapeText(value);
       if (type != null) {
         formattedType = ";TYPE=" + type;
       } else {
@@ -369,7 +390,6 @@
           out.push("X-" + formattedType + ":" + value);
           break;
         case 'ADR':
-          value = ['', '', value, '', '', '', ''];
           out.push("" + key + formattedType + ":" + (value.join(';')));
           break;
         default:
@@ -387,9 +407,7 @@
 
   VCardParser.nToFN = function(n) {
     var familly, given, middle, parts, prefix, suffix;
-    if (!n) {
-      n = [];
-    }
+    n = n || [];
     familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
     parts = [prefix, given, middle, familly, suffix];
     parts = parts.filter(function(part) {
@@ -399,20 +417,39 @@
   };
 
   VCardParser.fnToN = function(fn) {
-    if (fn == null) {
-      fn = '';
-    }
+    fn = fn || '';
     return ['', fn, '', '', ''];
   };
 
   VCardParser.fnToNLastnameNFirstname = function(fn) {
     var familly, given, middle, parts, _i, _ref;
-    if (fn == null) {
-      fn = '';
-    }
+    fn = fn || '';
     _ref = fn.split(' '), given = _ref[0], middle = 3 <= _ref.length ? __slice.call(_ref, 1, _i = _ref.length - 1) : (_i = 1, []), familly = _ref[_i++];
     parts = [familly, given, middle.join(' '), '', ''];
     return parts;
+  };
+
+  VCardParser.adrArrayToString = function(value) {
+    var countryPart, flat, streetPart, structuredToFlat;
+    value = value || [];
+    structuredToFlat = function(t) {
+      t = t.filter(function(part) {
+        return (part != null) && part !== '';
+      });
+      return t.join(', ');
+    };
+    streetPart = structuredToFlat(value.slice(0, 3));
+    countryPart = structuredToFlat(value.slice(3, 7));
+    flat = streetPart;
+    if (countryPart !== '') {
+      flat += '\n' + countryPart;
+    }
+    return flat;
+  };
+
+  VCardParser.adrStringToArray = function(s) {
+    s = s || '';
+    return ['', '', s, '', '', '', ''];
   };
 
   if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
