@@ -500,6 +500,41 @@ module.exports.parse = function(log, context, callback, progress) {
 };
 });
 
+;require.register("lib/client", function(exports, require, module) {
+exports.request = function(type, url, data, callbacks) {
+  var error, success;
+  success = callbacks.success || function(res) {
+    return callbacks(null, res);
+  };
+  error = callbacks.error || function(err) {
+    return callbacks(err);
+  };
+  return $.ajax({
+    type: type,
+    url: url,
+    data: data,
+    success: success,
+    error: error
+  });
+};
+
+exports.get = function(url, callbacks) {
+  return exports.request("GET", url, null, callbacks);
+};
+
+exports.post = function(url, data, callbacks) {
+  return exports.request("POST", url, data, callbacks);
+};
+
+exports.put = function(url, data, callbacks) {
+  return exports.request("PUT", url, data, callbacks);
+};
+
+exports.del = function(url, callbacks) {
+  return exports.request("DELETE", url, null, callbacks);
+};
+});
+
 ;require.register("lib/contact_listener", function(exports, require, module) {
 var Contact, ContactListener,
   __hasProp = {}.hasOwnProperty,
@@ -1387,7 +1422,7 @@ module.exports = ViewCollection = (function(_super) {
 
 ;require.register("locales/en", function(exports, require, module) {
 module.exports = {
-  "saving": "Saving ...",
+  "saving": "Saving…",
   "saved": "Saved",
   "delete": "Delete",
   "delete contact": "Delete the contact permanently",
@@ -1416,7 +1451,7 @@ module.exports = {
   "actions": "Actions",
   "add fields": "Add fields",
   "more options": "More options",
-  "save changes alert": "Save changes ?",
+  "save changes alert": "Save changes?",
   "not an image": "This is not an image",
   "remove datapoint": "Remove",
   "changes saved": "Changes saved",
@@ -1435,22 +1470,22 @@ module.exports = {
   "you called": "You called",
   "you were called": "You were called",
   "create call task": "Create contact task",
-  "creating...": "creating...",
+  "creating...": "creating…",
   "edit name": "Edit Name",
   "name editor": "Name Editor",
   "prefix": "Prefix",
   "placeholder prefix": "Sir",
   "first name": "Given Name",
   "placeholder first": "John",
-  "middle name": "Middel Name",
+  "middle name": "Middle Name",
   "placeholder middle": "D.",
-  "last name": "Familly Name",
+  "last name": "Family Name",
   "placeholder last": "Doe",
   "suffix": "Suffix",
   "placeholder suffix": "III",
   "full name": "Full name",
   "save": "Save",
-  "search placeholder": "Search ...",
+  "search placeholder": "Search…",
   "new contact": "New Contact",
   "go to settings": "Settings",
   "choose vcard file": "Choose a vCard file",
@@ -1472,10 +1507,10 @@ module.exports = {
   "importing this file": "We are importing this file",
   "may take a while": "It may take a while",
   "progress": "Progress",
-  "loading import preview": "loading import preview...",
+  "loading import preview": "loading import preview…",
   "import succeeded": "Your contact import succeeded.",
   "import progress": "Import progress",
-  "fail to import": "Fail to import",
+  "fail to import": "Import failed",
   "click left to display": "Browse: Click on a contact in the left panel to display it.",
   "import export": "Import / Export",
   "call log info": "Click here to import your mobile's call log:",
@@ -1486,15 +1521,15 @@ module.exports = {
   "export vcard": "Export vCard file",
   "settings": "Settings",
   "help": "Help",
-  "name format info": "Select display name format (will not change contacts already imported)",
-  "format given familly": "Given Familly (John Johnson)",
+  "name format info": "Select display name format (will not change already imported contacts)",
+  "format given familly": "Given Family (John Johnson)",
   "format familly given": "Name, First name (Johnson John)",
   "format given mid familly": "Full (John J. Johnson)",
-  "do this now": "Select the format your contacts have now.",
+  "do this now": "Select the current format of your contacts.",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "carddav info": "Synchronization: To sync your contacts with your mobile, install the Webdav\napplication from the market place.",
   "search info": "Search: Use the search field located on the top left\ncorner to perform a search on all the fields of your contacts. If you\ntype a tag name, results will contain all people tagged with it.",
-  "creation info": "Creation: Click on the plus button located aside the search field to\ndisplay a new contact page. Fill the name field and your contact will\nbe created.",
+  "creation info": "Creation: Click on the '+' button located beside the search field to\ndisplay a new contact page. Fill the name field and your contact will\nbe created.",
   "export": "Export",
   "export contact": "Export contact",
   "are you sure": "Are you sure?"
@@ -1503,7 +1538,7 @@ module.exports = {
 
 ;require.register("locales/fr", function(exports, require, module) {
 module.exports = {
-  "saving": "Sauvegarde ...",
+  "saving": "Sauvegarde…",
   "saved": "Sauvegardé",
   "delete": "Supprimer",
   "delete contact": "Supprimer le contact",
@@ -1511,7 +1546,7 @@ module.exports = {
   "company": "Société",
   "title": "Titre",
   "birthday": "Anniversaire",
-  "phone": "Telephone",
+  "phone": "Téléphone",
   "skype": "Skype",
   "email": "Email",
   "postal": "Adresse",
@@ -1519,12 +1554,12 @@ module.exports = {
   "other": "Autre",
   "add": "Ajouter",
   "notes": "Notes",
-  "about": "A propos",
+  "about": "À propos",
   "name": "Nom",
   "change": "Changer",
   "notes placeholder": "Prenez des notes ici",
   "type here": "Tapez ici",
-  "phones": "Telephones",
+  "phones": "Téléphones",
   "emails": "Emails",
   "postal": "Adresses",
   "links": "Liens",
@@ -1532,7 +1567,7 @@ module.exports = {
   "actions": "Actions",
   "add fields": "Ajouter des champs",
   "more options": "Plus d'options",
-  "save changes alert": "Sauvegarder ?",
+  "save changes alert": "Sauvegarder ?",
   "not an image": "Ceci n'est pas une image",
   "remove datapoint": "Enlever",
   "changes saved": "Changements sauvegardés",
@@ -1549,24 +1584,24 @@ module.exports = {
   "minutes": "min",
   "hours": "h",
   "you called": "Vous avez appelé",
-  "you were called": "Vous avez été appelé",
+  "you were called": "Vous avez été appelé(e)",
   "create call task": "Créer une tâche de contact",
-  "creating...": "en création...",
+  "creating...": "création en cours…",
   "edit name": "Modifier le nom",
-  "name editor": "Editeur de nom",
+  "name editor": "Éditeur de nom",
   "prefix": "Préfixe",
   "placeholder prefix": "M.",
   "first name": "Prénom courant",
   "placeholder first": "Pierre",
   "middle name": "Autres prénoms",
-  "placeholder middle": "Marie Jacque",
+  "placeholder middle": "Marie Jacques",
   "last name": "Nom",
   "placeholder last": "Dupont",
   "suffix": "Suffixe",
   "placeholder suffix": "III",
   "full name": "Nom complet",
   "save": "Enregister",
-  "search placeholder": "Recherche ...",
+  "search placeholder": "Recherche…",
   "new contact": "Nouveau Contact",
   "go to settings": "Paramètres",
   "choose vcard file": "Choisissez un fichier vCard",
@@ -1575,45 +1610,45 @@ module.exports = {
   "import": "Importer",
   "import call log help": "N'utilisez pas cette fonction si vous êtes un client FING/Orange",
   "choose log file": "Puis uploadez le fichier que vous avez généré",
-  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez vous sur ",
+  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez-vous sur ",
   "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
-  "import android calls": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : ",
-  "import android sms": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : ",
-  "dont close navigator import": "Ne fermez pas le navigateur durant l'impor des contacts.",
+  "import android calls": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : ",
+  "import android sms": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : ",
+  "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
   "choose phone country": "Choisissez le pays de ce téléphone",
-  "ready to import": "Prêt à l'import",
+  "ready to import": "Prêt à l'importation",
   "log direction": "Direction",
-  "log number": "Number",
+  "log number": "Numéro",
   "log date": "Date",
   "importing this file": "Nous importons ce fichier",
   "may take a while": "Cela peut prendre quelques minutes",
   "progress": "Progression",
-  "loading import preview": "chargement de d'apperçu de l'import...",
-  "import succeeded": "Votre import de contact a réussi.",
-  "import progress": "Progression de l'import: ",
-  "fail to import": "Echec de l'import ",
-  "click left to display": "Navigation: cliquez sur un contact dans le panneau de gauche pour l'afficher",
-  "import export": "Import / Export",
-  "call log info": "Cliquez ici pour importer votre historique mobile :",
+  "loading import preview": "chargement de l'aperçu de l'importation…",
+  "import succeeded": "Votre importation de contact a réussi.",
+  "import progress": "Progression de l'importation : ",
+  "fail to import": "Échec de l'importation",
+  "click left to display": "Navigation : cliquez sur un contact dans le panneau de gauche pour l'afficher",
+  "import export": "Importer / Exporter",
+  "call log info": "Cliquez ici pour importer votre historique mobile :",
   "import call log": "Importer l'historique",
-  "vcard import info": "Cliquez ici pour importer vos contacts :",
+  "vcard import info": "Cliquez ici pour importer vos contacts :",
   "import vcard": "Importer vCard",
   "export all vcard": "Exporter un fichier vCard",
-  "export vcard": "Exporter un fichier vCard file",
+  "export vcard": "Exporter un fichier vCard",
   "settings": "Paramètres",
   "help": "Aide",
-  "name format info": "Selectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)",
+  "name format info": "Sélectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)",
   "format given familly": "Prénom Nom (Pierre Dupont)",
   "format familly given": "Nom Prénom (Dupont Pierre)",
   "format given mid familly": "Format américain (John J. Johnson)",
   "do this now": "Indiquez le format qu'ont actuellement vos contacts.",
   "vcard export info": "Cliquez ici pour exporter tous vos contacts dans un fichier vCard :",
   "carddav info": "Synchronization : Pour synchroniser vos contacts sur votre mobile,\ninstallez l'application Webdav depuis le market place.",
-  "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous tapez un nom de tag,\nil affichera tous les contacts taggés avec celui ci.",
-  "creation info": "Création : Cliquez sur le bouton plus situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
-  "export": "Export",
+  "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,\nil affichera tous les contacts tagués avec celui-ci.",
+  "creation info": "Création : Cliquez sur le bouton « + » situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
+  "export": "Exporter",
   "export contact": "Exporter contact",
-  "are you sure": "Etes vous sûr?"
+  "are you sure": "Le voulez-vous vraiment ?"
 };
 });
 
@@ -2149,6 +2184,61 @@ module.exports = DataPoint = (function(_super) {
 })(Backbone.Model);
 });
 
+;require.register("models/photo", function(exports, require, module) {
+var Photo, client,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+client = require('../lib/client');
+
+module.exports = Photo = (function(_super) {
+  __extends(Photo, _super);
+
+  function Photo() {
+    return Photo.__super__.constructor.apply(this, arguments);
+  }
+
+  Photo.prototype.defaults = function() {
+    return {
+      thumbsrc: 'img/loading.gif',
+      src: '',
+      orientation: 1
+    };
+  };
+
+  Photo.prototype.url = function() {
+    return Photo.__super__.url.apply(this, arguments) + app.urlKey;
+  };
+
+  Photo.prototype.parse = function(attrs) {
+    if (!attrs.id) {
+      return attrs;
+    } else {
+      return _.extend(attrs, {
+        thumbsrc: ("photos/thumbs/" + attrs.id + ".jpg") + app.urlKey,
+        src: ("photos/" + attrs.id + ".jpg") + app.urlKey,
+        orientation: attrs.orientation
+      });
+    }
+  };
+
+  Photo.prototype.getPrevSrc = function() {
+    return "photos/" + (this.get('id')) + ".jpg";
+  };
+
+  return Photo;
+
+})(Backbone.Model);
+
+Photo.listFromFiles = function(page, callback) {
+  return client.get("files/" + page, callback);
+};
+
+Photo.makeFromFile = function(fileid, attr, callback) {
+  return client.post("files/" + fileid + "/toPhoto", attr, callback);
+};
+});
+
 ;require.register("router", function(exports, require, module) {
 var CallImporterView, Contact, ContactView, DocView, ImporterView, Router, app,
   __hasProp = {}.hasOwnProperty,
@@ -2379,7 +2469,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><input id=\"name\"" + (jade.attr("placeholder", t("name"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><a id=\"name-edit\">" + (jade.escape(null == (jade_interp = t('edit name')) ? "" : jade_interp)) + "</a><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><input id=\"name\"" + (jade.attr("placeholder", t("name"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><a id=\"name-edit\">" + (jade.escape(null == (jade_interp = t('edit name')) ? "" : jade_interp)) + "</a><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2530,6 +2620,117 @@ var jade_mixins = {};
 var jade_interp;
 var locals_ = (locals || {}),n = locals_.n,fn = locals_.fn;
 buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("name editor")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><form class=\"form-horizontal\"><div class=\"control-group\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"full\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("full name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"full\" type=\"text\" disabled=\"disabled\"" + (jade.attr("value", fn, true, false)) + "/></div></div></form></div><div class=\"modal-footer\"><a id=\"cancel-btn\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button\">" + (jade.escape(null == (jade_interp = t("save")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
+;require.register("templates/photo_browser", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+var locals_ = (locals || {}),dates = locals_.dates,percent = locals_.percent,photos = locals_.photos,hasPrev = locals_.hasPrev,hasNext = locals_.hasNext;
+buf.push("<div class=\"files\"><!-- TODO BJA : juste pour mise au point--><button id=\"crop-req-btn\">SIMULATE SINGLE IMAGE SELECTION AND VALIDATION</button>");
+if ( dates.length === 0)
+{
+buf.push("<p>" + (jade.escape(null == (jade_interp = t("photos search")) ? "" : jade_interp)) + "</p>");
+}
+else if ( dates === "No photos found")
+{
+buf.push("<p>" + (jade.escape(null == (jade_interp = t("no photos found")) ? "" : jade_interp)) + "</p>");
+}
+else if ( dates === "Thumb creation")
+{
+buf.push("<p>" + (jade.escape(null == (jade_interp = t("thumb creation")) ? "" : jade_interp)) + "</p><p>" + (jade.escape((jade_interp = t('progress')) == null ? '' : jade_interp)) + ": " + (jade.escape((jade_interp = percent) == null ? '' : jade_interp)) + "%</p>");
+}
+else
+{
+// iterate dates
+;(function(){
+  var $$obj = dates;
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var date = $$obj[$index];
+
+buf.push("<h4>" + (jade.escape((jade_interp = t(date.split('-')[1])) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = date.split('-')[0]) == null ? '' : jade_interp)) + "</h4><br/>");
+// iterate photos[date]
+;(function(){
+  var $$obj = photos[date];
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var photo = $$obj[$index];
+
+buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var photo = $$obj[$index];
+
+buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
+    }
+
+  }
+}).call(this);
+
+buf.push("<br/>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var date = $$obj[$index];
+
+buf.push("<h4>" + (jade.escape((jade_interp = t(date.split('-')[1])) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = date.split('-')[0]) == null ? '' : jade_interp)) + "</h4><br/>");
+// iterate photos[date]
+;(function(){
+  var $$obj = photos[date];
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var photo = $$obj[$index];
+
+buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var photo = $$obj[$index];
+
+buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
+    }
+
+  }
+}).call(this);
+
+buf.push("<br/>");
+    }
+
+  }
+}).call(this);
+
+if ( hasPrev)
+{
+buf.push("<a class=\"btn btn-cozy left prev\"><p>&#12296 " + (jade.escape((jade_interp = t('modal prev')) == null ? '' : jade_interp)) + "</p></a>");
+}
+if ( hasNext)
+{
+buf.push("<a class=\"btn btn-cozy right next\"><p>" + (jade.escape((jade_interp = t('modal next')) == null ? '' : jade_interp)) + " &#12297</p></a>");
+}
+}
+buf.push("</div><div class=\"cropping\"><table><tbody><tr><td><img id=\"img-to-crop\" src=\"img/photo-pour-tests.png\"/></td><td><div id=\"frame-img-preview\"><img id=\"img-preview\" src=\"img/photo-pour-tests.png\"/></div></td></tr></tbody></table></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2713,7 +2914,7 @@ module.exports = CallImporterView = (function(_super) {
 });
 
 ;require.register("views/contact", function(exports, require, module) {
-var ContactView, Datapoint, HistoryView, NameModal, TagsView, ViewCollection, request,
+var ContactView, Datapoint, HistoryView, NameModal, PhotoBrowser, TagsView, ViewCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2730,6 +2931,8 @@ Datapoint = require('models/datapoint');
 
 request = require('../lib/request');
 
+PhotoBrowser = require('./photo_browser');
+
 module.exports = ContactView = (function(_super) {
   __extends(ContactView, _super);
 
@@ -2741,6 +2944,7 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.events = function() {
     return {
+      'click #picture': 'choosePhoto',
       'click .addbirthday': this.addClicked('about', 'birthday'),
       'click .addorg': this.addClicked('about', 'company'),
       'click .addtitle': this.addClicked('about', 'title'),
@@ -2778,6 +2982,7 @@ module.exports = ContactView = (function(_super) {
     this.undo = __bind(this.undo, this);
     this.onMoreOptionsClicked = __bind(this.onMoreOptionsClicked, this);
     this.showNameModal = __bind(this.showNameModal, this);
+    this.choosePhoto = __bind(this.choosePhoto, this);
     this.save = __bind(this.save, this);
     this.changeOccured = __bind(this.changeOccured, this);
     this.doNeedSaving = __bind(this.doNeedSaving, this);
@@ -2973,6 +3178,13 @@ module.exports = ContactView = (function(_super) {
     });
   };
 
+  ContactView.prototype.choosePhoto = function() {
+    return new PhotoBrowser({
+      model: this.album,
+      collection: this.collection
+    });
+  };
+
   ContactView.prototype.showNameModal = function() {
     var modal;
     modal = new NameModal({
@@ -3077,6 +3289,7 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.photoChanged = function() {
     var file, img, reader;
+    console.log('trotro');
     file = this.uploader.files[0];
     if (!file.type.match(/image\/.*/)) {
       return alert(t('This is not an image'));
@@ -4157,6 +4370,215 @@ module.exports = ImporterView = (function(_super) {
   return ImporterView;
 
 })(BaseView);
+});
+
+;require.register("views/photo_browser", function(exports, require, module) {
+var FilesBrowser, Modal, Photo,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Modal = require('cozy-clearance/modal');
+
+Photo = require('../models/photo');
+
+module.exports = FilesBrowser = (function(_super) {
+  __extends(FilesBrowser, _super);
+
+  function FilesBrowser() {
+    return FilesBrowser.__super__.constructor.apply(this, arguments);
+  }
+
+  FilesBrowser.prototype.id = 'files-browser-modal';
+
+  FilesBrowser.prototype.template_content = require('../templates/photo_browser');
+
+  FilesBrowser.prototype.title = t('pick from files');
+
+  FilesBrowser.prototype.content = '<p>Loading ...</p>';
+
+  FilesBrowser.prototype.events = function() {
+    return _.extend(FilesBrowser.__super__.events.apply(this, arguments), {
+      'click img': 'toggleSelected',
+      'click a.next': 'displayNextPage',
+      'click a.prev': 'displayPrevPage',
+      'click #crop-req-btn': 'showCropingTool'
+    });
+  };
+
+  FilesBrowser.prototype.toggleSelected = function(e) {
+    return $(e.target).toggleClass('selected');
+  };
+
+  FilesBrowser.prototype.getRenderData = function() {
+    return this.options;
+  };
+
+  FilesBrowser.prototype.initialize = function(options) {
+    this.yes = t('modal ok');
+    this.no = t('modal cancel');
+    if (options.page == null) {
+      FilesBrowser.__super__.initialize.call(this, {});
+    }
+    if (options.page == null) {
+      options.page = 0;
+    }
+    this.options = {};
+    if (options.selected == null) {
+      this.options.selected = [];
+    }
+    this.options.page = options.page;
+    return Photo.listFromFiles(options.page, (function(_this) {
+      return function(err, body) {
+        var dates, img, pathToSocketIO, showPreview, socket, _i, _len, _ref, _results;
+        if ((body != null ? body.files : void 0) != null) {
+          dates = body.files;
+        }
+        if (err) {
+          return console.log(err);
+        } else if (body.percent != null) {
+          _this.options.dates = "Thumb creation";
+          _this.options.percent = body.percent;
+          pathToSocketIO = "" + (window.location.pathname.substring(1)) + "socket.io";
+          socket = io.connect(window.location.origin, {
+            resource: pathToSocketIO
+          });
+          socket.on('progress', function(event) {
+            var template;
+            _this.options.percent = event.percent;
+            if (_this.options.percent === 100) {
+              return _this.initialize(options);
+            } else {
+              template = _this.template_content(_this.getRenderData());
+              return _this.$('.modal-body').html(template);
+            }
+          });
+        } else if ((dates != null) && Object.keys(dates).length === 0) {
+          _this.options.dates = "No photos found";
+        } else {
+          if ((body != null ? body.hasNext : void 0) != null) {
+            _this.options.hasNext = body.hasNext;
+          }
+          _this.options.hasPrev = options.page !== 0;
+          _this.options.dates = Object.keys(dates);
+          _this.options.dates.sort(function(a, b) {
+            return -1 * a.localeCompare(b);
+          });
+          _this.options.photos = dates;
+        }
+        _this.$('.modal-body').html(_this.template_content(_this.getRenderData()));
+        _this.$('.modal-body').scrollTop(0);
+        showPreview = function(coords) {
+          var img_h, img_w, prev_h, prev_w, prev_x, prev_y, target_h, target_w;
+          target_h = 100;
+          target_w = 100;
+          img_w = 300;
+          img_h = 241;
+          prev_w = img_w / coords.w * target_w;
+          prev_h = img_h / coords.h * target_h;
+          prev_x = target_w / coords.w * coords.x;
+          prev_y = target_h / coords.h * coords.y;
+          return $('#img-preview').css({
+            width: Math.round(prev_w) + 'px',
+            height: Math.round(prev_h) + 'px',
+            marginLeft: '-' + Math.round(prev_x) + 'px',
+            marginTop: '-' + Math.round(prev_y) + 'px'
+          });
+        };
+        $('#img-to-crop').Jcrop({
+          onChange: showPreview,
+          onSelect: showPreview,
+          aspectRatio: 1,
+          setSelect: [10, 10, 150, 150]
+        });
+        _this.$('.cropping').hide();
+        if (_this.options.selected[_this.options.page] != null) {
+          _ref = _this.options.selected[_this.options.page];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            img = _ref[_i];
+            _results.push(_this.$("#" + img.id).toggleClass('selected'));
+          }
+          return _results;
+        }
+      };
+    })(this));
+  };
+
+  FilesBrowser.prototype.cb = function(confirmed) {
+    if (!confirmed) {
+      return;
+    }
+    return this.options.beforeUpload((function(_this) {
+      return function(attrs) {
+        var fileid, img, page, phototmp, tmp, _i, _len, _ref, _results;
+        tmp = [];
+        _this.options.selected[_this.options.page] = _this.$('.selected');
+        _ref = _this.options.selected;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          page = _ref[_i];
+          _results.push((function() {
+            var _j, _len1, _results1;
+            _results1 = [];
+            for (_j = 0, _len1 = page.length; _j < _len1; _j++) {
+              img = page[_j];
+              fileid = img.id;
+              attrs.title = img.name;
+              phototmp = new Photo(attrs);
+              phototmp.file = img;
+              tmp.push(phototmp);
+              this.collection.add(phototmp);
+              _results1.push(Photo.makeFromFile(fileid, attrs, (function(_this) {
+                return function(err, photo) {
+                  if (err) {
+                    return console.log(err);
+                  }
+                  phototmp = tmp.pop();
+                  _this.collection.remove(phototmp, {
+                    parse: true
+                  });
+                  return _this.collection.add(photo, {
+                    parse: true
+                  });
+                };
+              })(this)));
+            }
+            return _results1;
+          }).call(_this));
+        }
+        return _results;
+      };
+    })(this));
+  };
+
+  FilesBrowser.prototype.displayNextPage = function() {
+    var options;
+    this.options.selected[this.options.page] = this.$('.selected');
+    options = {
+      page: this.options.page + 1,
+      selected: this.options.selected
+    };
+    return this.initialize(options);
+  };
+
+  FilesBrowser.prototype.displayPrevPage = function() {
+    var options;
+    this.options.selected[this.options.page] = this.$('.selected');
+    options = {
+      page: this.options.page - 1,
+      selected: this.options.selected
+    };
+    return this.initialize(options);
+  };
+
+  FilesBrowser.prototype.showCropingTool = function() {
+    this.$('.files').hide();
+    return this.$('.croping').show();
+  };
+
+  return FilesBrowser;
+
+})(Modal);
 });
 
 ;require.register("widget", function(exports, require, module) {
