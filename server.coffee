@@ -1,5 +1,5 @@
-contactwatch = require './server/initializers/contactwatch'
 americano = require('americano')
+Realtimer = require 'cozy-realtime-adapter'
 
 
 start = (host, port, callback) ->
@@ -16,8 +16,9 @@ start = (host, port, callback) ->
 
             # start contact watch to upadte UI when new contact are added
             # or modified
-            contactwatch server, (err) ->
-                callback? null, app, server
+            realtime = Realtimer server: server, ['contact.*']
+            callback? null, app, server
+
 
 if not module.parent
     host = process.env.HOST or '127.0.0.1'
