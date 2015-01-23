@@ -53,10 +53,16 @@ runTests = (fileList) ->
     command += " --globals setImmediate,clearImmediate"
     command += " --reporter spec --compilers coffee:coffee-script/register --colors"
     exec command, (err, stdout, stderr) ->
-        if err
-            console.log "Running mocha caught exception: \n" + err
-        console.log stdout
-        process.exit if err then 1 else 0
+        console.log stdout if stdout? and stdout.length > 0
+        #console.log stderr if stderr? and stderr.length > 0
+        if err?
+            console.log "Running mocha caught exception:\n"
+            console.log err
+            console.log stderr
+            setTimeout (-> process.exit 1), 100
+        else
+            console.log "Tests succeeded!"
+            setTimeout (-> process.exit 0), 100
 
 task 'build', 'Build CoffeeScript to Javascript', ->
     logger.options.prefix = 'cake:build'

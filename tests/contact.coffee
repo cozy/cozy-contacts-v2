@@ -153,7 +153,6 @@ describe 'Contacts', ->
             stat1 = fs.statSync file
             stat2 = fs.statSync dest
             expect(stat1.size).to.equal stat2.size
-            process.exit 1
 
 
     describe 'Delete - DELETE /contacts/:id', ->
