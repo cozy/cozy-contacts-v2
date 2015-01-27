@@ -165,7 +165,7 @@ module.exports = class Contact extends Backbone.Model
 Contact.fromVCF = (vcf) ->
     ContactCollection = require 'collections/contact'
     parser = new VCardParser()
-    parser.read(vcf)
+    parser.read vcf
 
     imported = new ContactCollection parser.contacts, parse: true
     return imported

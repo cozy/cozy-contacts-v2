@@ -27,7 +27,6 @@ module.exports = class ContactView extends ViewCollection
         'click .addskype'   : @addClicked 'other', 'skype'
         'click #more-options': 'onMoreOptionsClicked'
         'click #name'       : 'toggleContactName'
-        'click #name-edit'  : 'showNameModal'
         'click #undo'       : 'undo'
         'click #delete'     : 'delete'
         'change #uploader'  : 'photoChanged'
@@ -76,7 +75,8 @@ module.exports = class ContactView extends ViewCollection
                 @doNeedSaving ev
 
             onBlur: (ev) =>
-                @changeOccured ev
+                @changeOccured()
+                @needSaving = true
 
 
         @contactName.render()
@@ -198,16 +198,6 @@ module.exports = class ContactView extends ViewCollection
     toggleContactName: ->
         @$('#name').hide()
         @$('#contact-name').show()
-
-    showNameModal: =>
-        modal = new NameModal
-            model: @model
-            onChange: =>
-                @needSaving = true
-                @save()
-
-        $('body').append modal.$el
-        modal.render()
 
     onMoreOptionsClicked: =>
         @$("#more-options").fadeOut =>

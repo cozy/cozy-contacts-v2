@@ -15,7 +15,6 @@ module.exports = class ContactName extends BaseView
         'click #toggle-name-fields': 'toggleFields'
 
     afterRender: ->
-        @listenTo @model, 'change', @setName
         @toggleFields()
 
     toggleFields: ->
