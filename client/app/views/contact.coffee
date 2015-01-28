@@ -286,15 +286,7 @@ module.exports = class ContactView extends ViewCollection
 
                 @picture.attr 'src', dataUrl
 
-                #transform into a blob
-                binary = atob dataUrl.split(',')[1]
-                array = []
-                for i in [0..binary.length]
-                    array.push binary.charCodeAt i
-
-                blob = new Blob [new Uint8Array(array)], type: 'image/jpeg'
-
-                @model.picture = blob
+                @model.photo = dataUrl.split(',')[1]
                 @model.savePicture()
 
     onTagInputKeyPress: (event) ->

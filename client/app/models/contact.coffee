@@ -62,6 +62,12 @@ module.exports = class Contact extends Backbone.Model
             @hasPicture = true
             delete attrs._attachments
 
+        # On VCF parsing, base64 encoded photo is putted in attrs.photo
+        if attrs.photo
+            @hasPicture = true
+            @photo = attrs.photo
+            delete attrs.photo
+
         if typeof attrs.n is 'string'
             attrs.n = attrs.n.split ';'
 
@@ -76,8 +82,16 @@ module.exports = class Contact extends Backbone.Model
                 success: =>
                     @savePicture()
         else
+            #transform into a blob
+            binary = atob @photo
+            array = []
+            for i in [0..binary.length]
+                array.push binary.charCodeAt i
+
+            blob = new Blob [new Uint8Array(array)], type: 'image/jpeg'
+
             data = new FormData()
-            data.append 'picture', @picture
+            data.append 'picture', blob
             data.append 'contact', JSON.stringify @toJSON()
 
             markChanged = (err, body) =>
@@ -86,7 +100,7 @@ module.exports = class Contact extends Backbone.Model
                 else
                     @hasPicture = true
                     @trigger 'change', this, {}
-                    delete @picture
+                    delete @photo
 
             path = "contacts/#{@get 'id'}/picture"
             request.put path, data, markChanged, false
@@ -118,7 +132,7 @@ module.exports = class Contact extends Backbone.Model
         json.datapoints = @dataPoints.toJSON()
         json.n = json.n.join(';') if Array.isArray json.n
         delete json.n unless json.n
-        delete json.picture
+        delete json.photo
         return json
 
     setFN: (value) ->
