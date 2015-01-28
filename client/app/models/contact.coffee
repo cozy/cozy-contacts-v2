@@ -77,10 +77,15 @@ module.exports = class Contact extends Backbone.Model
         return attrs
 
     savePicture: (callback) ->
-        unless @get('id')?
+        callback = callback or ->
+
+        unless @photo
+            return callback()
+
+        else unless @get('id')?
             @save {},
                 success: =>
-                    @savePicture()
+                    @savePicture callback
         else
             #transform into a blob
             binary = atob @photo
@@ -104,6 +109,7 @@ module.exports = class Contact extends Backbone.Model
 
             path = "contacts/#{@get 'id'}/picture"
             request.put path, data, markChanged, false
+            callback()
 
     getBest: (name) ->
         result = null
