@@ -33,7 +33,7 @@ module.exports =
         getImports (err, imports) ->
             return res.error 500, 'An error occured', err if err
 
-            res.render 'index.jade', imports: imports
+            res.render 'index.js', imports: imports
 
 
     setConfig: (req, res) ->

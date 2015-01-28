@@ -64,15 +64,22 @@ runTests = (fileList) ->
             console.log "Tests succeeded!"
             setTimeout (-> process.exit 0), 100
 
+buildJade = ->
+    jade = require 'jade'
+    for file in fs.readdirSync './server/views/'
+        filename = "./server/views/#{file}"
+        template = fs.readFileSync filename, 'utf8'
+        output = "var jade = require('jade/runtime');\n"
+        output += "module.exports = " + jade.compileClient template, {filename}
+        name = file.replace '.jade', '.js'
+        fs.writeFileSync "./build/server/views/#{name}", output
+
 task 'build', 'Build CoffeeScript to Javascript', ->
     logger.options.prefix = 'cake:build'
     logger.info "Start compilation..."
     command = "coffee -cb --output build/server server && " + \
               "coffee -cb --output build/ server.coffee && " + \
               "rm -rf build/client && mkdir build/client && " + \
-              # prepare the client build
-              "cp ./client/index.jade ./build/client/index.jade && " + \
-              "cp ./client/widget.jade ./build/client/widget.jade && " + \
               "cd client/ && brunch build --production && cd .."
 
     exec command, (err, stdout, stderr) ->
@@ -80,5 +87,6 @@ task 'build', 'Build CoffeeScript to Javascript', ->
             logger.error "An error has occurred while compiling:\n" + err
             process.exit 1
         else
+            buildJade()
             logger.info "Compilation succeeded."
             process.exit 0

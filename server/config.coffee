@@ -16,7 +16,11 @@ module.exports =
                 dumpExceptions: true
                 showStack: true
         set:
-            'views': './client/'
+            views: path.join __dirname, 'views'
+
+        engine:
+            js: (path, locales, callback) ->
+                callback null, require(path)(locales)
 
     development: [
         americano.logger 'dev'

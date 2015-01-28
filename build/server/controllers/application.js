@@ -41,7 +41,7 @@ module.exports = {
       if (err) {
         return res.error(500, 'An error occured', err);
       }
-      return res.render('index.jade', {
+      return res.render('index.js', {
         imports: imports
       });
     });
