@@ -190,25 +190,6 @@ module.exports = ContactCollection = (function(_super) {
 })(Backbone.Collection);
 });
 
-;require.register("collections/contactlog", function(exports, require, module) {
-var ContactLogCollection,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-module.exports = ContactLogCollection = (function(_super) {
-  __extends(ContactLogCollection, _super);
-
-  function ContactLogCollection() {
-    return ContactLogCollection.__super__.constructor.apply(this, arguments);
-  }
-
-  ContactLogCollection.prototype.model = require('models/contactlog');
-
-  return ContactLogCollection;
-
-})(Backbone.Collection);
-});
-
 ;require.register("collections/datapoint", function(exports, require, module) {
 var DataPointCollection,
   __hasProp = {}.hasOwnProperty,
@@ -1980,23 +1961,6 @@ Contact.fromVCF = function(vcf) {
 };
 });
 
-;require.register("models/contactlog", function(exports, require, module) {
-var ContactLog,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-module.exports = ContactLog = (function(_super) {
-  __extends(ContactLog, _super);
-
-  function ContactLog() {
-    return ContactLog.__super__.constructor.apply(this, arguments);
-  }
-
-  return ContactLog;
-
-})(Backbone.Model);
-});
-
 ;require.register("models/datapoint", function(exports, require, module) {
 var DataPoint,
   __hasProp = {}.hasOwnProperty,
@@ -3060,16 +3024,12 @@ module.exports = ContactView = (function(_super) {
 });
 
 ;require.register("views/contact_name", function(exports, require, module) {
-var BaseView, CallLogReader, ContactLogCollection, ContactName, app,
+var BaseView, ContactName, app,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('lib/base_view');
-
-CallLogReader = require('lib/call_log_reader');
-
-ContactLogCollection = require('collections/contactlog');
 
 app = require('application');
 
