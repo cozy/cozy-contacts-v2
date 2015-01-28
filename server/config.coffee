@@ -11,6 +11,7 @@ module.exports =
             require('./helpers/shortcut')
         ]
         afterStart: (app, server) ->
+            app.use (req, res) -> res.end()
             # move it here needed after express 4.4
             app.use americano.errorHandler
                 dumpExceptions: true

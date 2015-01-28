@@ -27,6 +27,8 @@ module.exports =
         model = if req.body.contact then JSON.parse req.body.contact
         else req.body
 
+        isImport = model.import
+        delete model.import
         toCreate = new Contact model
 
         create = ->
@@ -36,7 +38,7 @@ module.exports =
                 else
                     res.send contact, 201
 
-        if model.import
+        if isImport
             # If creation is related to an import, it checks first if the
             # contact doesn't exist already by comparing the names
             # or emails if name is not specified.
