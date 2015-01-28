@@ -139,7 +139,7 @@ module.exports = class Contact extends Backbone.Model
 
             when 'given-middleinitial-familly'
                 "#{given} #{initial(middle)} #{familly}"
-            else "#{familly}, #{given} #{middle}"
+            else "#{familly} #{given} #{middle}"
 
     initial =  (middle) ->
         if i = middle.split(/[ \,]/)[0][0]?.toUpperCase() then i + '.'
