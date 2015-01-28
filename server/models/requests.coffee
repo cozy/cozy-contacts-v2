@@ -17,16 +17,5 @@ module.exports =
     config:
         all: americano.defaultRequests.all
 
-    contact_log:
-        all: americano.defaultRequests.all
-        bySnippet : (doc) ->
-            remote = doc.remote.id or doc.remote.tel or doc.remote.mail
-            snippet = "#{doc.timestamp} : #{doc.type} "
-            snippet += "#{doc.direction} #{remote}"
-            emit snippet, doc
-        byRemote  : (doc) ->
-            remote = doc.remote.id or doc.remote.tel or doc.remote.mail
-            emit remote, doc
-
     webdavaccount:
         all: americano.defaultRequests.all

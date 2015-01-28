@@ -1,5 +1,4 @@
 contact = require './contact'
-contactLog = require './contact_log'
 application = require './application'
 
 module.exports =
@@ -7,17 +6,11 @@ module.exports =
     '':
         get: application.index
 
-    'widget':
-        get: application.widget
-
     'config':
         post: application.setConfig
 
     'contactid':
         param: contact.fetch
-
-    'logid':
-        param: contactLog.fetch
 
     'contacts.vcf':
         get: contact.vCard
@@ -38,15 +31,3 @@ module.exports =
 
     'contacts/:contactid/picture.png':
         get: contact.picture
-
-    'contacts/:contactid/logs':
-        get:  contactLog.byContact
-        post: contactLog.create
-
-    # do not fetch contact when we work only on a log
-    'contacts/:contactnotfetched/logs/:logid':
-        put:  contactLog.update
-        delete:  contactLog.delete
-
-    'logs':
-        post: contactLog.merge

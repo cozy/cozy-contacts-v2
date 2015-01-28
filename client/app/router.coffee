@@ -2,7 +2,6 @@ app              = require 'application'
 ContactView      = require 'views/contact'
 DocView          = require 'views/doc'
 ImporterView     = require 'views/importer'
-CallImporterView     = require 'views/callimporter'
 Contact          = require 'models/contact'
 
 module.exports = class Router extends Backbone.Router
@@ -10,7 +9,6 @@ module.exports = class Router extends Backbone.Router
         ''                    : 'list'
         'help'            : 'help'
         'import'              : 'import'
-        'callimport'          : 'callimport'
         'contact/new'         : 'newcontact'
         'contact/:id'         : 'showcontact'
 
@@ -35,10 +33,6 @@ module.exports = class Router extends Backbone.Router
         @importer = new ImporterView()
         $('body').append @importer.render().$el
 
-    callimport: ->
-        @help()
-        @importer = new CallImporterView()
-        $('body').append @importer.render().$el
 
     newcontact: ->
         $(".toggled").removeClass 'toggled'

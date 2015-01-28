@@ -1,6 +1,5 @@
 cozydb = require 'cozydb'
 async = require 'async'
-ContactLog = require './contact_log'
 VCardParser = require 'cozy-vcard'
 fs = require 'fs'
 log = require('printit')
@@ -46,16 +45,6 @@ Contact.afterInitialize = ->
         @fn = @getComputedFN()
 
     return @
-
-Contact::remoteKeys = ->
-    model = @toJSON()
-    out = [@id]
-    for dp in model.datapoints
-        if dp.name is 'tel'
-            out.push ContactLog.normalizeNumber dp.value
-        else if dp.name is 'email'
-            out.push dp.value?.toLowerCase()
-    return out
 
 # Save given file as contact picture then delete given file from disk.
 Contact::savePicture = (path, callback) ->

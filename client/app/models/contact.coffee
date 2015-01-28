@@ -1,7 +1,7 @@
 request = require 'lib/request'
 DataPoint = require 'models/datapoint'
 DataPointCollection  = require 'collections/datapoint'
-ContactLogCollection = require 'collections/contactlog'
+VCard = require 'lib/vcard_helper'
 
 ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child',
             'domestic partner', 'father', 'friend', 'manager', 'mother',
@@ -25,11 +25,6 @@ module.exports = class Contact extends Backbone.Model
             if dps
                 @dataPoints.reset dps
                 @set 'datapoints', null
-
-        @history = new ContactLogCollection
-        @history.url = @url() + '/logs'
-        @on 'change:id', =>
-            @history.url = @url() + '/logs'
 
     defaults: ->
         n: []

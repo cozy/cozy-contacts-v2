@@ -6,7 +6,6 @@ else
     prefix = path.join __dirname, '../'
 
 Contact = require "#{prefix}server/models/contact"
-ContactLog = require "#{prefix}server/models/contact_log"
 Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
 
@@ -28,7 +27,7 @@ module.exports =
     clearDb: (done) ->
         Config.requestDestroy "all", ->
             Contact.requestDestroy "all", ->
-                ContactLog.requestDestroy "all", done
+                done()
 
     createContact: (data) -> (done) ->
         baseContact = new Contact(data)
@@ -43,7 +42,7 @@ module.exports =
         store = this # this will be the common scope of tests
 
         callbackFactory = (done) -> (error, response, body) =>
-            throw error if(error)
+            return done error if error
             store.response = response
             store.body = body
             done()

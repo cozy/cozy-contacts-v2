@@ -36,13 +36,6 @@ module.exports =
             res.render 'index.jade', imports: imports
 
 
-    widget: (req, res) ->
-        getImports (err, imports) ->
-            return res.error 500, 'An error occured', err if err
-
-            res.render 'widget.jade', imports: imports
-
-
     setConfig: (req, res) ->
         Config.set req.body, (err, config) ->
             return res.error 500, 'An error occured', err if err

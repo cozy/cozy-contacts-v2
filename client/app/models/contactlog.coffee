@@ -1,1 +1,0 @@
-module.exports = class ContactLog extends Backbone.Model

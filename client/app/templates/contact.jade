@@ -25,13 +25,10 @@
       ul.nav.nav-tabs
         li: a#infotab(href="#info", data-toggle="tab")= t('info')
         li.active: a(href="#notes-zone", data-toggle="tab")= t('notes')
-        li: a.tab(href="#history", data-toggle="tab")= t('history')
 
       .tab-content
         #notes-zone.tab-pane.active
           textarea(rows="3", placeholder=t('notes placeholder'))#notes #{note}
-
-        #history.tab-pane
 
         #info.tab-pane
 
