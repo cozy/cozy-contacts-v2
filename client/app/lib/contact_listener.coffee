@@ -19,12 +19,3 @@ module.exports = class ContactListener extends CozySocketListener
 
     onRemoteDelete: (model) ->
         @collection.remove model
-
-    process: (event) ->
-        super event
-
-        # overrides to force a change event to update
-        # the currently opened contact if needed
-        if event.operation is 'update'
-            model = @collection.get event.id
-            model.trigger 'change', model

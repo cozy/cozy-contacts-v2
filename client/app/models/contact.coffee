@@ -32,6 +32,10 @@ module.exports = class Contact extends Backbone.Model
         note: ''
         tags: []
 
+    fetch: (options = {}) ->
+        options.parse = true
+        super options
+
     # Analyze given attribute list and transform them in datapoints, Datapoint
     # is structure that describes an object (fields: name, type, value) as an
     # attribute.  For each attribute, you can have several values of different
@@ -54,12 +58,14 @@ module.exports = class Contact extends Backbone.Model
             delete attrs.datapoints
 
         if attrs._attachments?.picture
-            @hasPicture = true
+            attrs.pictureRev = attrs._attachments.picture.revpos
             delete attrs._attachments
+        else
+            attrs.pictureRev = false
 
         # On VCF parsing, base64 encoded photo is putted in attrs.photo
         if attrs.photo
-            @hasPicture = true
+            attrs.pictureRev = true
             @photo = attrs.photo
             delete attrs.photo
 
@@ -98,8 +104,7 @@ module.exports = class Contact extends Backbone.Model
                 if err
                     console.log err
                 else
-                    @hasPicture = true
-                    @trigger 'change', this, {}
+                    @set 'pictureRev', true
                     delete @photo
 
             path = "contacts/#{@get 'id'}/picture"
@@ -134,6 +139,7 @@ module.exports = class Contact extends Backbone.Model
         json.n = json.n.join(';') if Array.isArray json.n
         delete json.n unless json.n
         delete json.photo
+        delete json.pictureRev
         return json
 
     setFN: (value) ->
