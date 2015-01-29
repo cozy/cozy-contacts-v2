@@ -24,8 +24,11 @@ exports.config =
                     'vendor/scripts/backbone.js',
                     # Twitter Bootstrap jquery plugins
                     'vendor/scripts/bootstrap.js',
+                    'vendor/scripts/utf8.js',
+                    'vendor/scripts/quoted-printable.js'
                 ]
                 after: [
+                    'vendor/scripts/cozy-vcard.js'
                 ]
         stylesheets:
             defaultExtension: 'styl'

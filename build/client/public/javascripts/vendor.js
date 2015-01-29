@@ -14394,6 +14394,396 @@ return jQuery;
 
 
 }(window.jQuery);
+/*! http://mths.be/utf8js v2.0.0 by @mathias */
+;(function(root) {
+
+	// Detect free variables `exports`
+	var freeExports = typeof exports == 'object' && exports;
+
+	// Detect free variable `module`
+	var freeModule = typeof module == 'object' && module &&
+		module.exports == freeExports && module;
+
+	// Detect free variable `global`, from Node.js or Browserified code,
+	// and use it as `root`
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var stringFromCharCode = String.fromCharCode;
+
+	// Taken from http://mths.be/punycode
+	function ucs2decode(string) {
+		var output = [];
+		var counter = 0;
+		var length = string.length;
+		var value;
+		var extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
+			} else {
+				output.push(value);
+			}
+		}
+		return output;
+	}
+
+	// Taken from http://mths.be/punycode
+	function ucs2encode(array) {
+		var length = array.length;
+		var index = -1;
+		var value;
+		var output = '';
+		while (++index < length) {
+			value = array[index];
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
+		}
+		return output;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	function createByte(codePoint, shift) {
+		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+	}
+
+	function encodeCodePoint(codePoint) {
+		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
+			return stringFromCharCode(codePoint);
+		}
+		var symbol = '';
+		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
+		}
+		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
+			symbol += createByte(codePoint, 6);
+		}
+		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
+			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
+			symbol += createByte(codePoint, 12);
+			symbol += createByte(codePoint, 6);
+		}
+		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+		return symbol;
+	}
+
+	function utf8encode(string) {
+		var codePoints = ucs2decode(string);
+		var length = codePoints.length;
+		var index = -1;
+		var codePoint;
+		var byteString = '';
+		while (++index < length) {
+			codePoint = codePoints[index];
+			byteString += encodeCodePoint(codePoint);
+		}
+		return byteString;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	function readContinuationByte() {
+		if (byteIndex >= byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		var continuationByte = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		if ((continuationByte & 0xC0) == 0x80) {
+			return continuationByte & 0x3F;
+		}
+
+		// If we end up here, it’s not a continuation byte
+		throw Error('Invalid continuation byte');
+	}
+
+	function decodeSymbol() {
+		var byte1;
+		var byte2;
+		var byte3;
+		var byte4;
+		var codePoint;
+
+		if (byteIndex > byteCount) {
+			throw Error('Invalid byte index');
+		}
+
+		if (byteIndex == byteCount) {
+			return false;
+		}
+
+		// Read first byte
+		byte1 = byteArray[byteIndex] & 0xFF;
+		byteIndex++;
+
+		// 1-byte sequence (no continuation bytes)
+		if ((byte1 & 0x80) == 0) {
+			return byte1;
+		}
+
+		// 2-byte sequence
+		if ((byte1 & 0xE0) == 0xC0) {
+			var byte2 = readContinuationByte();
+			codePoint = ((byte1 & 0x1F) << 6) | byte2;
+			if (codePoint >= 0x80) {
+				return codePoint;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 3-byte sequence (may include unpaired surrogates)
+		if ((byte1 & 0xF0) == 0xE0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
+			if (codePoint >= 0x0800) {
+				return codePoint;
+			} else {
+				throw Error('Invalid continuation byte');
+			}
+		}
+
+		// 4-byte sequence
+		if ((byte1 & 0xF8) == 0xF0) {
+			byte2 = readContinuationByte();
+			byte3 = readContinuationByte();
+			byte4 = readContinuationByte();
+			codePoint = ((byte1 & 0x0F) << 0x12) | (byte2 << 0x0C) |
+				(byte3 << 0x06) | byte4;
+			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
+				return codePoint;
+			}
+		}
+
+		throw Error('Invalid UTF-8 detected');
+	}
+
+	var byteArray;
+	var byteCount;
+	var byteIndex;
+	function utf8decode(byteString) {
+		byteArray = ucs2decode(byteString);
+		byteCount = byteArray.length;
+		byteIndex = 0;
+		var codePoints = [];
+		var tmp;
+		while ((tmp = decodeSymbol()) !== false) {
+			codePoints.push(tmp);
+		}
+		return ucs2encode(codePoints);
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var utf8 = {
+		'version': '2.0.0',
+		'encode': utf8encode,
+		'decode': utf8decode
+	};
+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return utf8;
+		});
+	}	else if (freeExports && !freeExports.nodeType) {
+		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+			freeModule.exports = utf8;
+		} else { // in Narwhal or RingoJS v0.7.0-
+			var object = {};
+			var hasOwnProperty = object.hasOwnProperty;
+			for (var key in utf8) {
+				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
+			}
+		}
+	} else { // in Rhino or a web browser
+		root.utf8 = utf8;
+	}
+
+}(this));
+
+/*! https://mths.be/quoted-printable v<%= version %> by @mathias | MIT license */
+;(function(root) {
+
+	// Detect free variables `exports`.
+	var freeExports = typeof exports == 'object' && exports;
+
+	// Detect free variable `module`.
+	var freeModule = typeof module == 'object' && module &&
+		module.exports == freeExports && module;
+
+	// Detect free variable `global`, from Node.js or Browserified code, and use
+	// it as `root`.
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	var stringFromCharCode = String.fromCharCode;
+	var decode = function(input) {
+		return input
+			// https://tools.ietf.org/html/rfc2045#section-6.7, rule 3:
+			// “Therefore, when decoding a `Quoted-Printable` body, any trailing white
+			// space on a line must be deleted, as it will necessarily have been added
+			// by intermediate transport agents.”
+			.replace(/[\t\x20]$/gm, '')
+			// Remove hard line breaks. Note: this includes `=` followed by a line
+			// break. Proper `Quoted-Printable`-encoded data only contains CRLF line
+			// endings, but for compatibility reasons we should support separate CR
+			// and LF too.
+			.replace(/=?(?:\r\n?|\n)/g, '')
+			// Decode escape sequences of the form `=XX` where `XX` is any
+			// combination of two hexidecimal digits. For optimal compatibility,
+			// lowercase hexadecimal digits are supported as well. See
+			// https://tools.ietf.org/html/rfc2045#section-6.7, note 1.
+			.replace(/=([a-fA-F0-9]{2})/g, function($0, $1) {
+				var codePoint = parseInt($1, 16);
+				return stringFromCharCode(codePoint);
+			});
+	};
+
+	var handleTrailingCharacters = function(string) {
+		return string
+			.replace(/\x20$/, '=20') // Handle trailing space.
+			.replace(/\t$/, '=09') // Handle trailing tab.
+	};
+
+	var regexUnsafeSymbols = /<%= unsafeSymbols %>/g;
+	var encode = function(string) {
+
+		// Encode symbols that are definitely unsafe (i.e. unsafe in any context).
+		var encoded = string.replace(regexUnsafeSymbols, function(symbol) {
+			if (symbol > '\xFF') {
+				throw RangeError(
+					'`quotedPrintable.encode()` expects extended ASCII input only. ' +
+					'Don\u2019t forget to encode the input first using a character ' +
+					'encoding like UTF-8.'
+				);
+			}
+			var codePoint = symbol.charCodeAt(0);
+			var hexadecimal = codePoint.toString(16).toUpperCase();
+			return '=' + ('0' + hexadecimal).slice(-2);
+		});
+
+		// Limit lines to 76 characters (not counting the CRLF line endings).
+		var lines = encoded.split(/\r\n?|\n/g);
+		var lineIndex = -1;
+		var lineCount = lines.length;
+		var result = [];
+		while (++lineIndex < lineCount) {
+			var line = lines[lineIndex];
+			// Leave room for the trailing `=` for soft line breaks.
+			var LINE_LENGTH = 75;
+			var index = 0;
+			var length = line.length;
+			while (index < length) {
+				var buffer = encoded.slice(index, index + LINE_LENGTH);
+				// If this line ends with `=`, optionally followed by a single uppercase
+				// hexadecimal digit, we broke an escape sequence in half. Fix it by
+				// moving these characters to the next line.
+				if (/=$/.test(buffer)) {
+					buffer = buffer.slice(0, LINE_LENGTH - 1);
+					index += LINE_LENGTH - 1;
+				} else if (/=[A-F0-9]$/.test(buffer)) {
+					buffer = buffer.slice(0, LINE_LENGTH - 2);
+					index += LINE_LENGTH - 2;
+				} else {
+					index += LINE_LENGTH;
+				}
+				result.push(buffer);
+			}
+		}
+
+		// Encode space and tab characters at the end of encoded lines. Note that
+		// with the current implementation, this can only occur at the very end of
+		// the encoded string — every other line ends with `=` anyway.
+		var lastLineLength = buffer.length;
+		if (/[\t\x20]$/.test(buffer)) {
+			// There’s a space or a tab at the end of the last encoded line. Remove
+			// this line from the `result` array, as it needs to change.
+			result.pop();
+			if (lastLineLength + 2 <= LINE_LENGTH + 1) {
+				// It’s possible to encode the character without exceeding the line
+				// length limit.
+				result.push(
+					handleTrailingCharacters(buffer)
+				);
+			} else {
+				// It’s not possible to encode the character without exceeding the line
+				// length limit. Remvoe the character from the line, and insert a new
+				// line that contains only the encoded character.
+				result.push(
+					buffer.slice(0, lastLineLength - 1),
+					handleTrailingCharacters(
+						buffer.slice(lastLineLength - 1, lastLineLength)
+					)
+				);
+			}
+		}
+
+		// `Quoted-Printable` uses CRLF.
+		return result.join('=\r\n');
+	};
+
+	var quotedPrintable = {
+		'encode': encode,
+		'decode': decode,
+		'version': '<%= version %>'
+	};
+
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define(function() {
+			return quotedPrintable;
+		});
+	}	else if (freeExports && !freeExports.nodeType) {
+		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+			freeModule.exports = quotedPrintable;
+		} else { // in Narwhal or RingoJS v0.7.0-
+			for (var key in quotedPrintable) {
+				quotedPrintable.hasOwnProperty(key) && (freeExports[key] = quotedPrintable[key]);
+			}
+		}
+	} else { // in Rhino or a web browser
+		root.quotedPrintable = quotedPrintable;
+	}
+
+}(this));
+
 /**
  * |-------------------|
  * | Backbone-Mediator |
@@ -22149,161 +22539,6 @@ $.effects.effect.highlight = function( o, done ) {
 
 }(this);
 
-
-/*! https://mths.be/quoted-printable v<%= version %> by @mathias | MIT license */
-;(function(root) {
-
-	// Detect free variables `exports`.
-	var freeExports = typeof exports == 'object' && exports;
-
-	// Detect free variable `module`.
-	var freeModule = typeof module == 'object' && module &&
-		module.exports == freeExports && module;
-
-	// Detect free variable `global`, from Node.js or Browserified code, and use
-	// it as `root`.
-	var freeGlobal = typeof global == 'object' && global;
-	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
-		root = freeGlobal;
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	var stringFromCharCode = String.fromCharCode;
-	var decode = function(input) {
-		return input
-			// https://tools.ietf.org/html/rfc2045#section-6.7, rule 3:
-			// “Therefore, when decoding a `Quoted-Printable` body, any trailing white
-			// space on a line must be deleted, as it will necessarily have been added
-			// by intermediate transport agents.”
-			.replace(/[\t\x20]$/gm, '')
-			// Remove hard line breaks. Note: this includes `=` followed by a line
-			// break. Proper `Quoted-Printable`-encoded data only contains CRLF line
-			// endings, but for compatibility reasons we should support separate CR
-			// and LF too.
-			.replace(/=?(?:\r\n?|\n)/g, '')
-			// Decode escape sequences of the form `=XX` where `XX` is any
-			// combination of two hexidecimal digits. For optimal compatibility,
-			// lowercase hexadecimal digits are supported as well. See
-			// https://tools.ietf.org/html/rfc2045#section-6.7, note 1.
-			.replace(/=([a-fA-F0-9]{2})/g, function($0, $1) {
-				var codePoint = parseInt($1, 16);
-				return stringFromCharCode(codePoint);
-			});
-	};
-
-	var handleTrailingCharacters = function(string) {
-		return string
-			.replace(/\x20$/, '=20') // Handle trailing space.
-			.replace(/\t$/, '=09') // Handle trailing tab.
-	};
-
-	var regexUnsafeSymbols = /<%= unsafeSymbols %>/g;
-	var encode = function(string) {
-
-		// Encode symbols that are definitely unsafe (i.e. unsafe in any context).
-		var encoded = string.replace(regexUnsafeSymbols, function(symbol) {
-			if (symbol > '\xFF') {
-				throw RangeError(
-					'`quotedPrintable.encode()` expects extended ASCII input only. ' +
-					'Don\u2019t forget to encode the input first using a character ' +
-					'encoding like UTF-8.'
-				);
-			}
-			var codePoint = symbol.charCodeAt(0);
-			var hexadecimal = codePoint.toString(16).toUpperCase();
-			return '=' + ('0' + hexadecimal).slice(-2);
-		});
-
-		// Limit lines to 76 characters (not counting the CRLF line endings).
-		var lines = encoded.split(/\r\n?|\n/g);
-		var lineIndex = -1;
-		var lineCount = lines.length;
-		var result = [];
-		while (++lineIndex < lineCount) {
-			var line = lines[lineIndex];
-			// Leave room for the trailing `=` for soft line breaks.
-			var LINE_LENGTH = 75;
-			var index = 0;
-			var length = line.length;
-			while (index < length) {
-				var buffer = encoded.slice(index, index + LINE_LENGTH);
-				// If this line ends with `=`, optionally followed by a single uppercase
-				// hexadecimal digit, we broke an escape sequence in half. Fix it by
-				// moving these characters to the next line.
-				if (/=$/.test(buffer)) {
-					buffer = buffer.slice(0, LINE_LENGTH - 1);
-					index += LINE_LENGTH - 1;
-				} else if (/=[A-F0-9]$/.test(buffer)) {
-					buffer = buffer.slice(0, LINE_LENGTH - 2);
-					index += LINE_LENGTH - 2;
-				} else {
-					index += LINE_LENGTH;
-				}
-				result.push(buffer);
-			}
-		}
-
-		// Encode space and tab characters at the end of encoded lines. Note that
-		// with the current implementation, this can only occur at the very end of
-		// the encoded string — every other line ends with `=` anyway.
-		var lastLineLength = buffer.length;
-		if (/[\t\x20]$/.test(buffer)) {
-			// There’s a space or a tab at the end of the last encoded line. Remove
-			// this line from the `result` array, as it needs to change.
-			result.pop();
-			if (lastLineLength + 2 <= LINE_LENGTH + 1) {
-				// It’s possible to encode the character without exceeding the line
-				// length limit.
-				result.push(
-					handleTrailingCharacters(buffer)
-				);
-			} else {
-				// It’s not possible to encode the character without exceeding the line
-				// length limit. Remvoe the character from the line, and insert a new
-				// line that contains only the encoded character.
-				result.push(
-					buffer.slice(0, lastLineLength - 1),
-					handleTrailingCharacters(
-						buffer.slice(lastLineLength - 1, lastLineLength)
-					)
-				);
-			}
-		}
-
-		// `Quoted-Printable` uses CRLF.
-		return result.join('=\r\n');
-	};
-
-	var quotedPrintable = {
-		'encode': encode,
-		'decode': decode,
-		'version': '<%= version %>'
-	};
-
-	// Some AMD build optimizers, like r.js, check for specific condition patterns
-	// like the following:
-	if (
-		typeof define == 'function' &&
-		typeof define.amd == 'object' &&
-		define.amd
-	) {
-		define(function() {
-			return quotedPrintable;
-		});
-	}	else if (freeExports && !freeExports.nodeType) {
-		if (freeModule) { // in Node.js or RingoJS v0.8.0+
-			freeModule.exports = quotedPrintable;
-		} else { // in Narwhal or RingoJS v0.7.0-
-			for (var key in quotedPrintable) {
-				quotedPrintable.hasOwnProperty(key) && (freeExports[key] = quotedPrintable[key]);
-			}
-		}
-	} else { // in Rhino or a web browser
-		root.quotedPrintable = quotedPrintable;
-	}
-
-}(this));
 
 /*! Socket.IO.js build:0.9.11, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
 
@@ -31319,241 +31554,6 @@ Date.addLocale('zh-TW', {
 })(jQuery);
 
 
-/*! http://mths.be/utf8js v2.0.0 by @mathias */
-;(function(root) {
-
-	// Detect free variables `exports`
-	var freeExports = typeof exports == 'object' && exports;
-
-	// Detect free variable `module`
-	var freeModule = typeof module == 'object' && module &&
-		module.exports == freeExports && module;
-
-	// Detect free variable `global`, from Node.js or Browserified code,
-	// and use it as `root`
-	var freeGlobal = typeof global == 'object' && global;
-	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
-		root = freeGlobal;
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	var stringFromCharCode = String.fromCharCode;
-
-	// Taken from http://mths.be/punycode
-	function ucs2decode(string) {
-		var output = [];
-		var counter = 0;
-		var length = string.length;
-		var value;
-		var extra;
-		while (counter < length) {
-			value = string.charCodeAt(counter++);
-			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-				// high surrogate, and there is a next character
-				extra = string.charCodeAt(counter++);
-				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
-					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
-				} else {
-					// unmatched surrogate; only append this code unit, in case the next
-					// code unit is the high surrogate of a surrogate pair
-					output.push(value);
-					counter--;
-				}
-			} else {
-				output.push(value);
-			}
-		}
-		return output;
-	}
-
-	// Taken from http://mths.be/punycode
-	function ucs2encode(array) {
-		var length = array.length;
-		var index = -1;
-		var value;
-		var output = '';
-		while (++index < length) {
-			value = array[index];
-			if (value > 0xFFFF) {
-				value -= 0x10000;
-				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-				value = 0xDC00 | value & 0x3FF;
-			}
-			output += stringFromCharCode(value);
-		}
-		return output;
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	function createByte(codePoint, shift) {
-		return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
-	}
-
-	function encodeCodePoint(codePoint) {
-		if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
-			return stringFromCharCode(codePoint);
-		}
-		var symbol = '';
-		if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
-			symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
-		}
-		else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
-			symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
-			symbol += createByte(codePoint, 6);
-		}
-		else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
-			symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
-			symbol += createByte(codePoint, 12);
-			symbol += createByte(codePoint, 6);
-		}
-		symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
-		return symbol;
-	}
-
-	function utf8encode(string) {
-		var codePoints = ucs2decode(string);
-		var length = codePoints.length;
-		var index = -1;
-		var codePoint;
-		var byteString = '';
-		while (++index < length) {
-			codePoint = codePoints[index];
-			byteString += encodeCodePoint(codePoint);
-		}
-		return byteString;
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	function readContinuationByte() {
-		if (byteIndex >= byteCount) {
-			throw Error('Invalid byte index');
-		}
-
-		var continuationByte = byteArray[byteIndex] & 0xFF;
-		byteIndex++;
-
-		if ((continuationByte & 0xC0) == 0x80) {
-			return continuationByte & 0x3F;
-		}
-
-		// If we end up here, it’s not a continuation byte
-		throw Error('Invalid continuation byte');
-	}
-
-	function decodeSymbol() {
-		var byte1;
-		var byte2;
-		var byte3;
-		var byte4;
-		var codePoint;
-
-		if (byteIndex > byteCount) {
-			throw Error('Invalid byte index');
-		}
-
-		if (byteIndex == byteCount) {
-			return false;
-		}
-
-		// Read first byte
-		byte1 = byteArray[byteIndex] & 0xFF;
-		byteIndex++;
-
-		// 1-byte sequence (no continuation bytes)
-		if ((byte1 & 0x80) == 0) {
-			return byte1;
-		}
-
-		// 2-byte sequence
-		if ((byte1 & 0xE0) == 0xC0) {
-			var byte2 = readContinuationByte();
-			codePoint = ((byte1 & 0x1F) << 6) | byte2;
-			if (codePoint >= 0x80) {
-				return codePoint;
-			} else {
-				throw Error('Invalid continuation byte');
-			}
-		}
-
-		// 3-byte sequence (may include unpaired surrogates)
-		if ((byte1 & 0xF0) == 0xE0) {
-			byte2 = readContinuationByte();
-			byte3 = readContinuationByte();
-			codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
-			if (codePoint >= 0x0800) {
-				return codePoint;
-			} else {
-				throw Error('Invalid continuation byte');
-			}
-		}
-
-		// 4-byte sequence
-		if ((byte1 & 0xF8) == 0xF0) {
-			byte2 = readContinuationByte();
-			byte3 = readContinuationByte();
-			byte4 = readContinuationByte();
-			codePoint = ((byte1 & 0x0F) << 0x12) | (byte2 << 0x0C) |
-				(byte3 << 0x06) | byte4;
-			if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
-				return codePoint;
-			}
-		}
-
-		throw Error('Invalid UTF-8 detected');
-	}
-
-	var byteArray;
-	var byteCount;
-	var byteIndex;
-	function utf8decode(byteString) {
-		byteArray = ucs2decode(byteString);
-		byteCount = byteArray.length;
-		byteIndex = 0;
-		var codePoints = [];
-		var tmp;
-		while ((tmp = decodeSymbol()) !== false) {
-			codePoints.push(tmp);
-		}
-		return ucs2encode(codePoints);
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	var utf8 = {
-		'version': '2.0.0',
-		'encode': utf8encode,
-		'decode': utf8decode
-	};
-
-	// Some AMD build optimizers, like r.js, check for specific condition patterns
-	// like the following:
-	if (
-		typeof define == 'function' &&
-		typeof define.amd == 'object' &&
-		define.amd
-	) {
-		define(function() {
-			return utf8;
-		});
-	}	else if (freeExports && !freeExports.nodeType) {
-		if (freeModule) { // in Node.js or RingoJS v0.8.0+
-			freeModule.exports = utf8;
-		} else { // in Narwhal or RingoJS v0.7.0-
-			var object = {};
-			var hasOwnProperty = object.hasOwnProperty;
-			for (var key in utf8) {
-				hasOwnProperty.call(utf8, key) && (freeExports[key] = utf8[key]);
-			}
-		}
-	} else { // in Rhino or a web browser
-		root.utf8 = utf8;
-	}
-
-}(this));
-
 !function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.jade=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -31764,5 +31764,467 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
 },{}]},{},[1])
 (1)
 });
+// Generated by CoffeeScript 1.8.0
+(function() {
+  var ANDROID_RELATION_TYPES, VCardParser, quotedPrintable, regexps, utf8,
+    __slice = [].slice;
+
+  if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
+    utf8 = require('utf8');
+    quotedPrintable = require('quoted-printable');
+  } else {
+    utf8 = window.utf8;
+    quotedPrintable = window.quotedPrintable;
+  }
+
+  regexps = {
+    begin: /^BEGIN:VCARD$/i,
+    end: /^END:VCARD$/i,
+    simple: /^(version|fn|n|title|org|note)(;CHARSET=UTF-8)?(;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
+    android: /^x-android-custom\:(.+)$/i,
+    composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/,
+    complex: /^([^\:\;]+);([^\:]+)\:(.+)$/,
+    property: /^(.+)=(.+)$/
+  };
+
+  ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child', 'domestic partner', 'father', 'friend', 'manager', 'mother', 'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'];
+
+  VCardParser = (function() {
+    function VCardParser(vcf) {
+      this.reset();
+      if (vcf) {
+        this.read(vcf);
+      }
+    }
+
+    VCardParser.prototype.reset = function() {
+      this.contacts = [];
+      this.currentContact = null;
+      this.currentDatapoint = null;
+      this.currentIndex = null;
+      return this.currentVersion = "3.0";
+    };
+
+    VCardParser.prototype.read = function(vcf) {
+      var line, _i, _len, _ref, _results;
+      _ref = this.splitLines(vcf);
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        line = _ref[_i];
+        _results.push(this.handleLine(line));
+      }
+      return _results;
+    };
+
+    VCardParser.prototype.splitLines = function(s) {
+      var inQuotedPrintable, lines, sourcelines;
+      sourcelines = s.split(/\r?\n/);
+      lines = [];
+      inQuotedPrintable = false;
+      sourcelines.forEach(function(line) {
+        var lineIndex;
+        if ((line == null) || line === '') {
+          return;
+        }
+        if (line[0] === ' ' || inQuotedPrintable) {
+          if (line[0] === ' ') {
+            line = line.slice(1);
+          }
+          if (inQuotedPrintable) {
+            if (line[line.length - 1] === '=') {
+              line = line.slice(0, -1);
+            } else {
+              inQuotedPrintable = false;
+            }
+          }
+          lineIndex = lines.length - 1;
+          if (lineIndex >= 0) {
+            return lines[lineIndex] = lines[lineIndex] + line;
+          } else {
+            return lines.push(line);
+          }
+        } else {
+          if (/^(.+)ENCODING=QUOTED-PRINTABLE(.+)=$/i.test(line)) {
+            inQuotedPrintable = true;
+            line = line.slice(0, -1);
+          }
+          return lines.push(line);
+        }
+      });
+      return lines;
+    };
+
+    VCardParser.prototype.handleLine = function(line) {
+      if (regexps.begin.test(line)) {
+        return this.currentContact = {
+          datapoints: []
+        };
+      } else if (regexps.end.test(line)) {
+        this.storeCurrentDatapoint();
+        return this.storeCurrentContact();
+      } else if (regexps.simple.test(line)) {
+        return this.handleSimpleLine(line);
+      } else if (regexps.android.test(line)) {
+        return this.handleAndroidLine(line);
+      } else if (regexps.composedkey.test(line)) {
+        return this.handleComposedLine(line);
+      } else if (regexps.complex.test(line)) {
+        return this.handleComplexLine(line);
+      }
+    };
+
+    VCardParser.prototype.storeCurrentDatapoint = function() {
+      if (this.currentDatapoint) {
+        this.currentContact.datapoints.push(this.currentDatapoint);
+        return this.currentDatapoint = null;
+      }
+    };
+
+    VCardParser.prototype.addDatapoint = function(name, type, value) {
+      this.storeCurrentDatapoint();
+      return this.currentContact.datapoints.push({
+        name: name,
+        type: type,
+        value: value
+      });
+    };
+
+    VCardParser.prototype.storeCurrentContact = function() {
+      var _ref;
+      if ((this.currentContact.n == null) && (this.currentContact.fn == null)) {
+        console.error('There should be at least a N field or a FN field');
+      }
+      if ((this.currentContact.n == null) || ((_ref = this.currentContact.n) === '' || _ref === ';;;;')) {
+        this.currentContact.n = VCardParser.fnToN(this.currentContact.fn).join(';');
+      }
+      if ((this.currentContact.fn == null) || this.currentContact.fn === '') {
+        this.currentContact.fn = VCardParser.nToFN(this.currentContact.n);
+      }
+      return this.contacts.push(this.currentContact);
+    };
+
+    VCardParser.prototype.handleSimpleLine = function(line) {
+      var all, key, quoted, utf, value, _ref;
+      _ref = line.match(regexps.simple), all = _ref[0], key = _ref[1], utf = _ref[2], quoted = _ref[3], value = _ref[4];
+      if (quoted != null) {
+        value = VCardParser.unquotePrintable(value);
+      }
+      value = VCardParser.unescapeText(value);
+      if (key === 'VERSION') {
+        return this.currentversion = value;
+      } else if (key === 'TITLE' || key === 'ORG' || key === 'FN' || key === 'NOTE' || key === 'N' || key === 'BDAY') {
+        return this.currentContact[key.toLowerCase()] = value;
+      }
+    };
+
+    VCardParser.prototype.handleAndroidLine = function(line) {
+      var all, parts, raw, type, value, _ref, _ref1;
+      _ref = line.match(regexps.android), all = _ref[0], raw = _ref[1];
+      parts = raw.split(';');
+      switch (parts[0].replace('vnd.android.cursor.item/', '')) {
+        case 'contact_event':
+          value = parts[1];
+          type = (_ref1 = parts[2]) === '0' || _ref1 === '2' ? parts[3] : parts[2] === '1' ? 'anniversary' : 'birthday';
+          return this.currentContact.datapoints.push({
+            name: 'about',
+            type: type,
+            value: value
+          });
+        case 'relation':
+          value = parts[1];
+          type = ANDROID_RELATION_TYPES[+parts[2]];
+          if (type === 'custom') {
+            type = parts[3];
+          }
+          return this.currentContact.datapoints.push({
+            name: 'other',
+            type: type,
+            value: value
+          });
+      }
+    };
+
+    VCardParser.prototype.handleComposedLine = function(line) {
+      var all, itemidx, key, part, properties, value, _ref;
+      _ref = line.match(regexps.composedkey), all = _ref[0], itemidx = _ref[1], part = _ref[2], value = _ref[3];
+      if (this.currentIndex === null || this.currentIndex !== itemidx) {
+        this.storeCurrentDatapoint();
+        this.currentDatapoint = {};
+      }
+      this.currentIndex = itemidx;
+      part = part.split(';');
+      key = part[0];
+      properties = part.splice(1);
+      value = value.split(';');
+      if (value.length === 1) {
+        value = value[0].replace('_$!<', '').replace('>!$_', '').replace('\\:', ':');
+      }
+      key = key.toLowerCase();
+      if (key === 'x-ablabel' || key === 'x-abadr') {
+        return this.addTypeProperty(this.currentDatapoint, value.toLowerCase());
+      } else {
+        this.handleProperties(this.currentDatapoint, properties);
+        if (key === 'x-abdate') {
+          key = 'about';
+        }
+        if (key === 'x-abrelatednames') {
+          key = 'other';
+        }
+        if (key === 'adr') {
+          if (Array.isArray(value)) {
+            value = value.map(VCardParser.unescapeText);
+          } else {
+            value = ['', '', VCardParser.unescapeText(value), '', '', '', ''];
+          }
+        }
+        this.currentDatapoint['name'] = key.toLowerCase();
+        return this.currentDatapoint['value'] = value;
+      }
+    };
+
+    VCardParser.prototype.handleComplexLine = function(line) {
+      var all, key, properties, value, _ref;
+      _ref = line.match(regexps.complex), all = _ref[0], key = _ref[1], properties = _ref[2], value = _ref[3];
+      this.storeCurrentDatapoint();
+      this.currentDatapoint = {};
+      value = value.split(';');
+      if (value.length === 1) {
+        value = value[0];
+      }
+      key = key.toLowerCase();
+      if (key === 'email' || key === 'tel' || key === 'adr' || key === 'url') {
+        this.currentDatapoint['name'] = key;
+        if (key === 'adr') {
+          if (Array.isArray(value)) {
+            value = value.map(VCardParser.unescapeText);
+          } else {
+            value = ['', '', VCardParser.unescapeText(value), '', '', '', ''];
+          }
+        }
+      } else if (key === 'bday') {
+        this.currentContact['bday'] = value;
+        this.currentDatapoint = null;
+        return;
+      } else if (key === 'photo') {
+        this.currentContact['photo'] = value;
+        this.currentDatapoint = null;
+        return;
+      } else {
+        this.currentDatapoint = null;
+        return;
+      }
+      this.handleProperties(this.currentDatapoint, properties.split(';'));
+      if (this.currentDatapoint.encoding === 'quoted-printable') {
+        if (Array.isArray(value)) {
+          value = value.map(VCardParser.unquotePrintable);
+        } else {
+          value = VCardParser.unquotePrintable(value);
+        }
+        delete this.currentDatapoint.encoding;
+      }
+      return this.currentDatapoint.value = value;
+    };
+
+    VCardParser.prototype.handleProperties = function(dp, properties) {
+      var all, match, pname, property, pvalue, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = properties.length; _i < _len; _i++) {
+        property = properties[_i];
+        if (match = property.match(regexps.property)) {
+          all = match[0], pname = match[1], pvalue = match[2];
+          pvalue = pvalue.toLowerCase();
+        } else if (property === 'PREF') {
+          pname = 'pref';
+          pvalue = true;
+        } else {
+          pname = 'type';
+          pvalue = property.toLowerCase();
+        }
+        if (pname === 'type' && pvalue === 'pref') {
+          pname = 'pref';
+          pvalue = true;
+        }
+        if (pname === 'type') {
+          _results.push(this.addTypeProperty(dp, pvalue));
+        } else {
+          _results.push(dp[pname.toLowerCase()] = pvalue);
+        }
+      }
+      return _results;
+    };
+
+    VCardParser.prototype.addTypeProperty = function(dp, pvalue) {
+      var oldTypeValue;
+      if ('type' in dp) {
+        dp.typesOther = dp.typesOther || [];
+        if (pvalue === 'home' || pvalue === 'work' || pvalue === 'cell') {
+          oldTypeValue = dp.type;
+          dp.type = pvalue;
+          return dp.typesOther.push(oldTypeValue);
+        } else {
+          return dp.typesOther.push(pvalue);
+        }
+      } else {
+        return dp['type'] = pvalue;
+      }
+    };
+
+    return VCardParser;
+
+  })();
+
+  VCardParser.unquotePrintable = function(s) {
+    var error;
+    s = s || '';
+    try {
+      return utf8.decode(quotedPrintable.decode(s));
+    } catch (_error) {
+      error = _error;
+      return s;
+    }
+  };
+
+  VCardParser.escapeText = function(s) {
+    var t;
+    if (s == null) {
+      return s;
+    }
+    t = s.replace(/([,;\\])/ig, "\\$1");
+    t = t.replace(/\n/g, '\\n');
+    return t;
+  };
+
+  VCardParser.unescapeText = function(t) {
+    var s;
+    if (t == null) {
+      return t;
+    }
+    s = t.replace(/\\n/ig, '\n');
+    s = s.replace(/\\([,;\\])/ig, "$1");
+    return s;
+  };
+
+  VCardParser.toVCF = function(model, picture) {
+    var dp, folded, formattedType, i, key, out, pictureString, prop, type, uid, uri, value, _i, _len, _ref, _ref1, _ref2;
+    if (picture == null) {
+      picture = null;
+    }
+    out = ["BEGIN:VCARD"];
+    out.push("VERSION:3.0");
+    uri = model.carddavuri;
+    uid = (uri != null ? uri.substring(0, uri.length - 4) : void 0) || model.id;
+    out.push("UID:" + uid);
+    _ref = ['fn', 'bday', 'org', 'title', 'note'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      prop = _ref[_i];
+      value = model[prop];
+      if (value) {
+        value = VCardParser.escapeText(value);
+      }
+      if (value) {
+        out.push("" + (prop.toUpperCase()) + ":" + value);
+      }
+    }
+    if (model.n != null) {
+      out.push("N:" + model.n);
+    }
+    _ref1 = model.datapoints;
+    for (i in _ref1) {
+      dp = _ref1[i];
+      key = dp.name.toUpperCase();
+      type = ((_ref2 = dp.type) != null ? _ref2.toUpperCase() : void 0) || null;
+      value = dp.value;
+      if (Array.isArray(value)) {
+        value = value.map(VCardParser.escapeText);
+      } else {
+        value = VCardParser.escapeText(value);
+      }
+      if (type != null) {
+        formattedType = ";TYPE=" + type;
+      } else {
+        formattedType = "";
+      }
+      switch (key) {
+        case 'ABOUT':
+          if (type === 'ORG' || type === 'TITLE' || type === 'BDAY') {
+            out.push("" + formattedType + ":" + value);
+          } else {
+            out.push("X-" + formattedType + ":" + value);
+          }
+          break;
+        case 'OTHER':
+          out.push("X-" + formattedType + ":" + value);
+          break;
+        case 'ADR':
+          out.push("" + key + formattedType + ":" + (value.join(';')));
+          break;
+        default:
+          out.push("" + key + formattedType + ":" + value);
+      }
+    }
+    if (picture != null) {
+      folded = picture.match(/.{1,75}/g).join('\n ');
+      pictureString = "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n " + folded;
+      out.push(pictureString);
+    }
+    out.push("END:VCARD");
+    return out.join("\n") + "\n";
+  };
+
+  VCardParser.nToFN = function(n) {
+    var familly, given, middle, parts, prefix, suffix;
+    n = n || [];
+    familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
+    parts = [prefix, given, middle, familly, suffix];
+    parts = parts.filter(function(part) {
+      return (part != null) && part !== '';
+    });
+    return parts.join(' ');
+  };
+
+  VCardParser.fnToN = function(fn) {
+    fn = fn || '';
+    return ['', fn, '', '', ''];
+  };
+
+  VCardParser.fnToNLastnameNFirstname = function(fn) {
+    var familly, given, middle, parts, _i, _ref;
+    fn = fn || '';
+    _ref = fn.split(' '), given = _ref[0], middle = 3 <= _ref.length ? __slice.call(_ref, 1, _i = _ref.length - 1) : (_i = 1, []), familly = _ref[_i++];
+    parts = [familly, given, middle.join(' '), '', ''];
+    return parts;
+  };
+
+  VCardParser.adrArrayToString = function(value) {
+    var countryPart, flat, streetPart, structuredToFlat;
+    value = value || [];
+    structuredToFlat = function(t) {
+      t = t.filter(function(part) {
+        return (part != null) && part !== '';
+      });
+      return t.join(', ');
+    };
+    streetPart = structuredToFlat(value.slice(0, 3));
+    countryPart = structuredToFlat(value.slice(3, 7));
+    flat = streetPart;
+    if (countryPart !== '') {
+      flat += '\n' + countryPart;
+    }
+    return flat;
+  };
+
+  VCardParser.adrStringToArray = function(s) {
+    s = s || '';
+    return ['', '', s, '', '', '', ''];
+  };
+
+  if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
+    module.exports = VCardParser;
+  } else {
+    window.VCardParser = VCardParser;
+  }
+
+}).call(this);
+
 
 //# sourceMappingURL=vendor.js.map

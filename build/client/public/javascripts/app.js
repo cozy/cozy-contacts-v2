@@ -1540,7 +1540,7 @@ module.exports = {
   "help": "Help",
   "name format info": "Select display name format",
   "format given familly": "Given Family (John Johnson)",
-  "format familly given": "Name, First name (Johnson John)",
+  "format familly given": "Name First name (Johnson John)",
   "format given mid familly": "Full (John J. Johnson)",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "sync title": "Mobile Synchronization (CardDav)",
@@ -1716,7 +1716,7 @@ module.exports = Config = (function(_super) {
 });
 
 ;require.register("models/contact", function(exports, require, module) {
-var ANDROID_RELATION_TYPES, AndroidToDP, Contact, ContactLogCollection, DataPoint, DataPointCollection, VCard, request,
+var ANDROID_RELATION_TYPES, Contact, ContactLogCollection, DataPoint, DataPointCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1728,8 +1728,6 @@ DataPoint = require('models/datapoint');
 DataPointCollection = require('collections/datapoint');
 
 ContactLogCollection = require('collections/contactlog');
-
-VCard = require('lib/vcard_helper');
 
 ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child', 'domestic partner', 'father', 'friend', 'manager', 'mother', 'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'];
 
@@ -1812,6 +1810,11 @@ module.exports = Contact = (function(_super) {
       this.hasPicture = true;
       delete attrs._attachments;
     }
+    if (attrs.photo) {
+      this.hasPicture = true;
+      this.photo = attrs.photo;
+      delete attrs.photo;
+    }
     if (typeof attrs.n === 'string') {
       attrs.n = attrs.n.split(';');
     }
@@ -1822,18 +1825,29 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.prototype.savePicture = function(callback) {
-    var data, markChanged, path;
-    if (this.get('id') == null) {
+    var array, binary, blob, data, i, markChanged, path, _i, _ref;
+    callback = callback || function() {};
+    if (!this.photo) {
+      return callback();
+    } else if (this.get('id') == null) {
       return this.save({}, {
         success: (function(_this) {
           return function() {
-            return _this.savePicture();
+            return _this.savePicture(callback);
           };
         })(this)
       });
     } else {
+      binary = atob(this.photo);
+      array = [];
+      for (i = _i = 0, _ref = binary.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        array.push(binary.charCodeAt(i));
+      }
+      blob = new Blob([new Uint8Array(array)], {
+        type: 'image/jpeg'
+      });
       data = new FormData();
-      data.append('picture', this.picture);
+      data.append('picture', blob);
       data.append('contact', JSON.stringify(this.toJSON()));
       markChanged = (function(_this) {
         return function(err, body) {
@@ -1842,12 +1856,13 @@ module.exports = Contact = (function(_super) {
           } else {
             _this.hasPicture = true;
             _this.trigger('change', _this, {});
-            return delete _this.picture;
+            return delete _this.photo;
           }
         };
       })(this);
       path = "contacts/" + (this.get('id')) + "/picture";
-      return request.put(path, data, markChanged, false);
+      request.put(path, data, markChanged, false);
+      return callback();
     }
   };
 
@@ -1888,7 +1903,7 @@ module.exports = Contact = (function(_super) {
     if (!json.n) {
       delete json.n;
     }
-    delete json.picture;
+    delete json.photo;
     return json;
   };
 
@@ -1900,14 +1915,6 @@ module.exports = Contact = (function(_super) {
   Contact.prototype.setN = function(value) {
     this.set('n', value);
     return this.set('fn', this.getComputedFN(value));
-  };
-
-  Contact.prototype.getFN = function() {
-    return this.get('fn') || this.getComputedFN();
-  };
-
-  Contact.prototype.getN = function() {
-    return this.get('n') || this.getComputedN();
   };
 
   Contact.prototype.getDisplayName = function() {
@@ -1923,7 +1930,7 @@ module.exports = Contact = (function(_super) {
       case 'given-middleinitial-familly':
         return "" + given + " " + (initial(middle)) + " " + familly;
       default:
-        return "" + familly + ", " + given + " " + middle;
+        return "" + familly + " " + given + " " + middle;
     }
   };
 
@@ -1943,14 +1950,14 @@ module.exports = Contact = (function(_super) {
     if (!(n && n.length > 0)) {
       return '';
     }
-    return VCard.nToFN(n);
+    return VCardParser.nToFN(n);
   };
 
   Contact.prototype.getComputedN = function(fn) {
     if (fn == null) {
       fn = this.get('fn');
     }
-    return VCard.fnToN(fn);
+    return VCardParser.fnToN(fn);
   };
 
   Contact.prototype.createTask = function(callback) {
@@ -1961,194 +1968,14 @@ module.exports = Contact = (function(_super) {
 
 })(Backbone.Model);
 
-AndroidToDP = function(contact, raw) {
-  var parts, type, value, _ref;
-  parts = raw.split(';');
-  switch (parts[0].replace('vnd.android.cursor.item/', '')) {
-    case 'contact_event':
-      value = parts[1];
-      type = (_ref = parts[2]) === '0' || _ref === '2' ? parts[3] : parts[2] === '1' ? 'anniversary' : 'birthday';
-      return contact.addDP('about', type, value);
-    case 'relation':
-      value = parts[1];
-      type = ANDROID_RELATION_TYPES[+parts[2]];
-      if (type === 'custom') {
-        type = parts[3];
-      }
-      return contact.addDP('other', type, value);
-  }
-};
-
 Contact.fromVCF = function(vcf) {
-  var ContactCollection, all, binary, blob, blobValue, buffer, current, currentdp, currentidx, currentversion, i, imported, itemidx, key, line, match, part, pname, properties, property, pvalue, quoted, regexps, unfolded, value, _i, _j, _k, _l, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
-  regexps = {
-    begin: /^BEGIN:VCARD$/i,
-    end: /^END:VCARD$/i,
-    simple: /^(version|fn|n|title|org|note)(;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
-    android: /^x-android-custom\:(.+)$/i,
-    composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/,
-    complex: /^([^\:\;]+);([^\:]+)\:(.+)$/,
-    property: /^(.+)=(.+)$/
-  };
+  var ContactCollection, imported, parser;
   ContactCollection = require('collections/contact');
-  imported = new ContactCollection();
-  currentversion = "3.0";
-  current = null;
-  currentidx = null;
-  currentdp = null;
-  unfolded = vcf.replace(/(\r?\n\s)/gm, '');
-  _ref = unfolded.split(/\r?\n/);
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    line = _ref[_i];
-    if (regexps.begin.test(line)) {
-      current = new Contact();
-    } else if (regexps.end.test(line)) {
-      if (currentdp) {
-        current.dataPoints.add(currentdp);
-      }
-      imported.add(current);
-      if (!current.has('n') && !current.has('fn')) {
-        console.error('There should be at least a N field or a FN field');
-      }
-      if (!current.has('n') || _.compact(current.get('n')).length === 0) {
-        current.set('n', current.getComputedN());
-      }
-      if (!current.has('fn')) {
-        current.set('fn', current.getComputedFN());
-      }
-      currentdp = null;
-      current = null;
-      currentidx = null;
-      currentversion = "3.0";
-    } else if (regexps.simple.test(line)) {
-      _ref1 = line.match(regexps.simple), all = _ref1[0], key = _ref1[1], quoted = _ref1[2], value = _ref1[3];
-      if (quoted != null) {
-        value = VCard.unquotePrintable(value);
-      }
-      key = key.toLowerCase();
-      switch (key) {
-        case 'version':
-          currentversion = value;
-          break;
-        case 'title':
-        case 'org':
-          current.addDP('about', key, value);
-          break;
-        case 'fn':
-        case 'note':
-          current.set(key, value);
-          break;
-        case 'n':
-          current.set(key, value.split(';'));
-          break;
-        case 'bday':
-          current.addDP('about', 'birthday', value);
-      }
-    } else if (regexps.android.test(line)) {
-      _ref2 = line.match(regexps.android), all = _ref2[0], value = _ref2[1];
-      AndroidToDP(current, value);
-    } else if (regexps.composedkey.test(line)) {
-      _ref3 = line.match(regexps.composedkey), all = _ref3[0], itemidx = _ref3[1], part = _ref3[2], value = _ref3[3];
-      if (currentidx === null || currentidx !== itemidx) {
-        if (currentdp) {
-          current.dataPoints.add(currentdp);
-        }
-        currentdp = new DataPoint();
-      }
-      currentidx = itemidx;
-      part = part.split(';');
-      key = part[0];
-      properties = part.splice(1);
-      value = value.split(';');
-      if (value.length === 1) {
-        value = value[0];
-      }
-      key = key.toLowerCase();
-      if (key === 'x-ablabel' || key === 'x-abadr') {
-        value = value.replace('_$!<', '');
-        value = value.replace('>!$_', '');
-        currentdp.set('type', value.toLowerCase());
-      } else {
-        for (_j = 0, _len1 = properties.length; _j < _len1; _j++) {
-          property = properties[_j];
-          _ref4 = property.match(regexps.property), all = _ref4[0], pname = _ref4[1], pvalue = _ref4[2];
-          currentdp.set(pname.toLowerCase(), pvalue.toLowerCase());
-        }
-        if (key === 'adr') {
-          if (value == null) {
-            value = [];
-          }
-          value = value.join("\n").replace(/\n+/g, "\n");
-        }
-        if (key === 'x-abdate') {
-          key = 'about';
-        }
-        if (key === 'x-abrelatednames') {
-          key = 'other';
-        }
-        currentdp.set('name', key.toLowerCase());
-        currentdp.set('value', value.replace("\\:", ":"));
-      }
-    } else if (regexps.complex.test(line)) {
-      _ref5 = line.match(regexps.complex), all = _ref5[0], key = _ref5[1], properties = _ref5[2], value = _ref5[3];
-      if (currentdp) {
-        current.dataPoints.add(currentdp);
-      }
-      currentdp = new DataPoint();
-      value = value.split(';');
-      if (value.length === 1) {
-        value = value[0];
-      }
-      key = key.toLowerCase();
-      if (key === 'email' || key === 'tel' || key === 'adr' || key === 'url') {
-        currentdp.set('name', key);
-        if (key === 'adr') {
-          if (value == null) {
-            value = [];
-          }
-          if (typeof value !== 'string') {
-            value = value.join('\n');
-          }
-          value = VCard.unescapeText(value);
-        }
-      } else if (key === 'photo') {
-        currentdp = null;
-        binary = atob(value);
-        buffer = [];
-        for (i = _k = 0, _ref6 = binary.length; 0 <= _ref6 ? _k <= _ref6 : _k >= _ref6; i = 0 <= _ref6 ? ++_k : --_k) {
-          buffer.push(binary.charCodeAt(i));
-        }
-        blobValue = [new Uint8Array(buffer)];
-        blob = new Blob(blobValue, {
-          type: 'image/jpeg'
-        });
-        current.picture = blob;
-        continue;
-      } else {
-        currentdp = null;
-        continue;
-      }
-      properties = properties.split(';');
-      for (_l = 0, _len2 = properties.length; _l < _len2; _l++) {
-        property = properties[_l];
-        match = property.match(regexps.property);
-        if (match) {
-          all = match[0], pname = match[1], pvalue = match[2];
-        } else {
-          pname = 'type';
-          pvalue = property;
-        }
-        if (pname === 'type' && pvalue === 'pref') {
-          currentdp.set('pref', 1);
-        } else if (pname === 'ENCODING' && pvalue === 'QUOTED-PRINTABLE') {
-          value = VCard.unquotePrintable(value);
-        } else {
-          currentdp.set(pname.toLowerCase(), pvalue.toLowerCase());
-        }
-      }
-      currentdp.set('value', value);
-    }
-  }
+  parser = new VCardParser();
+  parser.read(vcf);
+  imported = new ContactCollection(parser.contacts, {
+    parse: true
+  });
   return imported;
 };
 });
@@ -2186,6 +2013,25 @@ module.exports = DataPoint = (function(_super) {
     type: 'main',
     name: 'other',
     value: ''
+  };
+
+  DataPoint.prototype.toDisplayJSON = function() {
+    var json;
+    json = this.toJSON();
+    if (this.attributes.name === 'adr') {
+      json.value = VCardParser.adrArrayToString(this.attributes.value);
+    }
+    return json;
+  };
+
+  DataPoint.prototype.setTypeNValue = function(type, value) {
+    if (this.attributes.name === 'adr') {
+      value = VCardParser.adrStringToArray(value);
+    }
+    return this.set({
+      type: type,
+      value: value
+    });
   };
 
   return DataPoint;
@@ -2808,7 +2654,6 @@ module.exports = ContactView = (function(_super) {
       'click .addskype': this.addClicked('other', 'skype'),
       'click #more-options': 'onMoreOptionsClicked',
       'click #name': 'toggleContactName',
-      'click #name-edit': 'showNameModal',
       'click #undo': 'undo',
       'click #delete': 'delete',
       'change #uploader': 'photoChanged',
@@ -2829,7 +2674,6 @@ module.exports = ContactView = (function(_super) {
     this.modelChanged = __bind(this.modelChanged, this);
     this.undo = __bind(this.undo, this);
     this.onMoreOptionsClicked = __bind(this.onMoreOptionsClicked, this);
-    this.showNameModal = __bind(this.showNameModal, this);
     this.save = __bind(this.save, this);
     this.changeOccured = __bind(this.changeOccured, this);
     this.doNeedSaving = __bind(this.doNeedSaving, this);
@@ -2862,7 +2706,7 @@ module.exports = ContactView = (function(_super) {
   ContactView.prototype.getRenderData = function() {
     return _.extend({}, this.model.toJSON(), {
       hasPicture: this.model.hasPicture || false,
-      fn: this.model.getFN(),
+      fn: this.model.get('fn'),
       timestamp: Date.now()
     });
   };
@@ -2878,7 +2722,8 @@ module.exports = ContactView = (function(_super) {
       })(this),
       onBlur: (function(_this) {
         return function(ev) {
-          return _this.changeOccured(ev);
+          _this.changeOccured();
+          return _this.needSaving = true;
         };
       })(this)
     });
@@ -3048,21 +2893,6 @@ module.exports = ContactView = (function(_super) {
     return this.$('#contact-name').show();
   };
 
-  ContactView.prototype.showNameModal = function() {
-    var modal;
-    modal = new NameModal({
-      model: this.model,
-      onChange: (function(_this) {
-        return function() {
-          _this.needSaving = true;
-          return _this.save();
-        };
-      })(this)
-    });
-    $('body').append(modal.$el);
-    return modal.render();
-  };
-
   ContactView.prototype.onMoreOptionsClicked = function() {
     return this.$("#more-options").fadeOut((function(_this) {
       return function() {
@@ -3165,7 +2995,7 @@ module.exports = ContactView = (function(_super) {
       return function() {
         img.src = reader.result;
         return img.onload = function() {
-          var IMAGE_DIMENSION, array, binary, blob, canvas, ctx, dataUrl, i, ratio, ratiodim, _i, _ref;
+          var IMAGE_DIMENSION, canvas, ctx, dataUrl, ratio, ratiodim;
           IMAGE_DIMENSION = 600;
           ratiodim = img.width > img.height ? 'height' : 'width';
           ratio = IMAGE_DIMENSION / img[ratiodim];
@@ -3175,15 +3005,7 @@ module.exports = ContactView = (function(_super) {
           ctx.drawImage(img, 0, 0, ratio * img.width, ratio * img.height);
           dataUrl = canvas.toDataURL('image/jpeg');
           _this.picture.attr('src', dataUrl);
-          binary = atob(dataUrl.split(',')[1]);
-          array = [];
-          for (i = _i = 0, _ref = binary.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-            array.push(binary.charCodeAt(i));
-          }
-          blob = new Blob([new Uint8Array(array)], {
-            type: 'image/jpeg'
-          });
-          _this.model.picture = blob;
+          _this.model.photo = dataUrl.split(',')[1];
           return _this.model.savePicture();
         };
       };
@@ -3270,7 +3092,6 @@ module.exports = ContactName = (function(_super) {
   };
 
   ContactName.prototype.afterRender = function() {
-    this.listenTo(this.model, 'change', this.setName);
     return this.toggleFields();
   };
 
@@ -3324,8 +3145,8 @@ module.exports = ContactName = (function(_super) {
 
   ContactName.prototype.getRenderData = function() {
     return _.extend({}, this.model.attributes, {
-      fn: this.model.getFN(),
-      n: this.model.getN()
+      fn: this.model.get('fn'),
+      n: this.model.get('n')
     });
   };
 
@@ -3688,7 +3509,7 @@ module.exports = DataPointView = (function(_super) {
   };
 
   DataPointView.prototype.getRenderData = function() {
-    return _.extend(this.model.toJSON(), {
+    return _.extend(this.model.toDisplayJSON(), {
       placeholder: this.getPlaceHolder()
     });
   };
@@ -3810,10 +3631,7 @@ module.exports = DataPointView = (function(_super) {
   };
 
   DataPointView.prototype.store = function() {
-    return this.model.set({
-      value: this.valuefield.val(),
-      type: this.typefield.val()
-    });
+    return this.model.setTypeNValue(this.typefield.val(), this.valuefield.val());
   };
 
   DataPointView.prototype.onTypeKeyPress = function(event) {

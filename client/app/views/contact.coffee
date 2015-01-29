@@ -27,7 +27,6 @@ module.exports = class ContactView extends ViewCollection
         'click .addskype'   : @addClicked 'other', 'skype'
         'click #more-options': 'onMoreOptionsClicked'
         'click #name'       : 'toggleContactName'
-        'click #name-edit'  : 'showNameModal'
         'click #undo'       : 'undo'
         'click #delete'     : 'delete'
         'change #uploader'  : 'photoChanged'
@@ -66,7 +65,7 @@ module.exports = class ContactView extends ViewCollection
     getRenderData: ->
         _.extend {}, @model.toJSON(),
             hasPicture: @model.hasPicture or false
-            fn: @model.getFN()
+            fn: @model.get 'fn'
             timestamp: Date.now()
 
     afterRender: ->
@@ -76,7 +75,8 @@ module.exports = class ContactView extends ViewCollection
                 @doNeedSaving ev
 
             onBlur: (ev) =>
-                @changeOccured ev
+                @changeOccured()
+                @needSaving = true
 
 
         @contactName.render()
@@ -199,16 +199,6 @@ module.exports = class ContactView extends ViewCollection
         @$('#name').hide()
         @$('#contact-name').show()
 
-    showNameModal: =>
-        modal = new NameModal
-            model: @model
-            onChange: =>
-                @needSaving = true
-                @save()
-
-        $('body').append modal.$el
-        modal.render()
-
     onMoreOptionsClicked: =>
         @$("#more-options").fadeOut =>
             @$("#adder h2").show()
@@ -296,15 +286,7 @@ module.exports = class ContactView extends ViewCollection
 
                 @picture.attr 'src', dataUrl
 
-                #transform into a blob
-                binary = atob dataUrl.split(',')[1]
-                array = []
-                for i in [0..binary.length]
-                    array.push binary.charCodeAt i
-
-                blob = new Blob [new Uint8Array(array)], type: 'image/jpeg'
-
-                @model.picture = blob
+                @model.photo = dataUrl.split(',')[1]
                 @model.savePicture()
 
     onTagInputKeyPress: (event) ->

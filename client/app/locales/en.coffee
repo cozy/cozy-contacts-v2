@@ -123,7 +123,7 @@ module.exports =
   "help"                  : "Help"
   "name format info"      : "Select display name format"
   "format given familly"  : "Given Family (John Johnson)"
-  "format familly given"  : "Name, First name (Johnson John)"
+  "format familly given"  : "Name First name (Johnson John)"
   "format given mid familly": "Full (John J. Johnson)"
 
   "vcard export info"     : """

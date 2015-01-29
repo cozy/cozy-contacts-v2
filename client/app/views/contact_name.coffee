@@ -15,7 +15,6 @@ module.exports = class ContactName extends BaseView
         'click #toggle-name-fields': 'toggleFields'
 
     afterRender: ->
-        @listenTo @model, 'change', @setName
         @toggleFields()
 
     toggleFields: ->
@@ -52,8 +51,8 @@ module.exports = class ContactName extends BaseView
 
     getRenderData: ->
         _.extend {}, @model.attributes,
-            fn: @model.getFN()
-            n: @model.getN()
+            fn: @model.get 'fn'
+            n: @model.get 'n'
 
     getStructuredName: ->
         fields = ['last', 'first', 'middle', 'prefix', 'suffix']

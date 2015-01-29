@@ -1,15 +1,24 @@
 americano = require 'americano-cozy'
+async = require 'async'
 ContactLog = require './contact_log'
+VCardParser = require 'cozy-vcard'
 fs = require 'fs'
 log = require('printit')
     prefix: 'Contact Model'
 
 module.exports = Contact = americano.getModel 'Contact',
     id            : String
-    fn            : String # vCard FullName = display name
+    # vCard FullName = display name
     # (Prefix Given Middle Familly Suffix), or something else.
-    n             : String # vCard Name = splitted
+    fn            : String
+    # vCard Name = splitted
     # (Familly;Given;Middle;Prefix;Suffix)
+    n             : String
+    # Datapoints is an array of { name, type, value ...} objects,
+    # values are typically String. Particular case, adr :
+    # name: 'adr',
+    # type: 'home',
+    # value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
     datapoints    : (x) -> x
     note          : String
     tags          : (x) -> x # DAMN IT JUGGLING
@@ -24,7 +33,7 @@ Contact.afterInitialize = ->
         if not @fn?
             @fn = ''
 
-        @n = @getParsedN()
+        @n = @getComputedN()
 
     else if not @fn? or @fn is ''
         @fn = @getComputedFN()
@@ -54,81 +63,49 @@ Contact::savePicture = (path, callback) ->
                 callback()
 
 Contact::getComputedFN = ->
-    [familly, given, middle, prefix, suffix] = @n.split ';'
-    # order parts of name.
-    parts = [prefix, given, middle, familly, suffix]
-    # remove empty parts
-    parts = parts.filter (part) -> part? and part isnt ''
-
-    return parts.join ' '
+    return VCardParser.nToFN @n.split ';'
 
 # Parse n field (splitted) from fn (display).
-Contact::getParsedN = ->
-    return ";#{@fn};;;"
+Contact::getComputedN = ->
+    return VCardParser.fnToN @fn
+            .join ';'
 
 Contact::toVCF = (callback) ->
-
-    model = @toJSON()
-
-    getVCardOutput = (picture = null) =>
-        out = "BEGIN:VCARD\n"
-        out += "VERSION:3.0\n"
-        out += "NOTE:#{model.note}\n" if model.note
-
-        if model.n
-            out += "N:#{model.n}\n"
-            out += "FN:#{@getComputedFN()}\n"
-        else if model.fn
-            out += "N:#{@getParsedN()}\n"
-            out += "FN:#{model.fn}\n"
-        else
-            out += "N:;;;;\n"
-            out += "FN:\n"
-
-        for i, dp of model.datapoints
-
-            value = dp.value
-
-            key = dp.name.toUpperCase()
-            switch key
-
-                when 'ABOUT'
-                    if dp.type is 'org' or dp.type is 'title'
-                        out += "#{dp.type.toUpperCase()}:#{value}\n"
-                    else
-                        out += "X-#{dp.type.toUpperCase()}:#{value}\n"
-
-                when 'OTHER'
-                    out += "X-#{dp.type.toUpperCase()}:#{value}\n"
-
-                when 'ADR'
-                    # since a proper address management would be very
-                    # complicated we trick it a bit so it matched the standard
-                    value = value.replace /(\r\n|\n\r|\r|\n)/g, ";"
-                    content = "TYPE=home,postal:;;#{value};;;;"
-                    out += "ADR;#{content}\n"
-                else
-                    if dp.type?
-                        type = ";TYPE=#{dp.type.toUpperCase()}"
-                    else
-                        type = ""
-                    out += "#{key}#{type}:#{value}\n"
-
-        if picture?
-            # vCard 3.0 specifies that lines must be folded at 75 characters
-            # with "\n " as a delimiter
-            folded = picture.match(/.{1,75}/g).join '\n '
-            out += "PHOTO;ENCODING=B;TYPE=JPEG;VALUE=BINARY:\n #{folded}\n"
-
-
-        return out += "END:VCARD\n"
-
-    if model._attachments?.picture?
-        buffers = []
+    if @_attachments?.picture?
+        # we get a stream that we need to convert into a buffer
+        # so we can output a base64 version of the picture
         stream = @getFile 'picture', ->
+        buffers = []
         stream.on 'data', buffers.push.bind(buffers)
-        stream.on 'end', ->
+        stream.on 'end', =>
             picture = Buffer.concat(buffers).toString 'base64'
-            callback null, getVCardOutput picture
+            callback null, VCardParser.toVCF(@, picture)
     else
-        callback null, getVCardOutput()
+        callback null, VCardParser.toVCF(@)
+
+
+# Migration 2015-01 : datapoints.where 'name' is 'adr':
+# Simple string is replaced by an String[7] .
+Contact::migrateAdr = (callback) ->
+    hasMigrate = false
+    @?.datapoints?.forEach (dp) ->
+        if dp.name is 'adr'
+            if typeof dp.value is 'string' or dp.value instanceof String
+                dp.value = VCardParser.adrStringToArray dp.value
+                hasMigrate = true
+
+    if hasMigrate
+        @updateAttributes {}, callback
+    else
+        callback()
+
+
+Contact.migrateAll = (callback) ->
+    Contact.all {}, (err, contacts) ->
+        if err?
+            console.log err
+            callback()
+        else
+            async.eachLimit contacts, 10, (contact, done) ->
+                contact.migrateAdr done
+            , callback

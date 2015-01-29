@@ -10,10 +10,14 @@ start = (host, port, callback) ->
         host: host
     , (app, server) ->
 
-        # start contact watch to upadte UI when new contact are added
-        # or modified
-        contactwatch server, (err) ->
-            callback? null, app, server
+        # Migration scripts
+        Contact = require './server/models/contact'
+        Contact.migrateAll ->
+
+            # start contact watch to upadte UI when new contact are added
+            # or modified
+            contactwatch server, (err) ->
+                callback? null, app, server
 
 if not module.parent
     host = process.env.HOST or '127.0.0.1'

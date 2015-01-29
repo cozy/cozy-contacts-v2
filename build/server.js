@@ -12,8 +12,12 @@ start = function(host, port, callback) {
     root: __dirname,
     host: host
   }, function(app, server) {
-    return contactwatch(server, function(err) {
-      return typeof callback === "function" ? callback(null, app, server) : void 0;
+    var Contact;
+    Contact = require('./server/models/contact');
+    return Contact.migrateAll(function() {
+      return contactwatch(server, function(err) {
+        return typeof callback === "function" ? callback(null, app, server) : void 0;
+      });
     });
   });
 };

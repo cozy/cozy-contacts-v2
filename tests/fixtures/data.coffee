@@ -1,4 +1,6 @@
-sampleaddress = '14 Avenue de la République, 60200 Compiègne, Picardie, France'
+sampleaddress = ['','',
+    '14 Avenue de la République, 60200 Compiègne, Picardie, France',
+    '', '', '', '']
 
 
 makeLog = (tsp, dir, nb, dur) ->

@@ -17,7 +17,7 @@ module.exports = class DataPointView extends BaseView
         'click .dpremove': 'removeModel'
 
     getRenderData: ->
-        _.extend @model.toJSON(), placeholder: @getPlaceHolder()
+        _.extend @model.toDisplayJSON(), placeholder: @getPlaceHolder()
 
     afterRender: ->
         @valuefield = @$('.value')
@@ -91,9 +91,7 @@ module.exports = class DataPointView extends BaseView
         @model.collection.remove @model
 
     store: ->
-        @model.set
-            value: @valuefield.val()
-            type: @typefield.val()
+        @model.setTypeNValue @typefield.val(), @valuefield.val()
 
     # Put the focus on the previous visible input when user press tab on a type
     # field.
