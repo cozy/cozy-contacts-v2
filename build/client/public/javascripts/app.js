@@ -312,175 +312,6 @@ module.exports = BaseView = (function(_super) {
 })(Backbone.View);
 });
 
-;require.register("lib/call_log_reader", function(exports, require, module) {
-var directionAlias, isAndroidCallLogExport, isAndroidSMSExport, isIOSCallLogExport, normalizeNumber, parseCSV, parseDuration;
-
-normalizeNumber = require('lib/phone_number');
-
-isAndroidCallLogExport = function(firstline) {
-  return firstline === 'date,type,number,name,number type,duration';
-};
-
-isAndroidSMSExport = function(firstline) {
-  return firstline === 'Date,Time,Type,Number,Name,Message';
-};
-
-isIOSCallLogExport = function(firstline) {
-  return firstline.split("\t").length === 5;
-};
-
-parseDuration = function(duration) {
-  var hours, minutes, parts, seconds, _;
-  hours = minutes = seconds = 0;
-  if ((parts = duration.split(':')).length === 3) {
-    hours = parts[0], minutes = parts[1], seconds = parts[2];
-  } else {
-    switch ((parts = duration.split(' ')).length) {
-      case 2:
-        seconds = parts[0], _ = parts[1];
-        break;
-      case 4:
-        minutes = parts[0], _ = parts[1], seconds = parts[2], _ = parts[3];
-        break;
-      case 6:
-        hours = parts[0], _ = parts[1], minutes = parts[2], _ = parts[3], seconds = parts[4], _ = parts[5];
-    }
-  }
-  return duration = parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
-};
-
-parseCSV = function(csv, progress, callback, result, state) {
-  var c, field, i, limit, quoted, row;
-  if (result == null) {
-    result = [[]];
-  }
-  if (state == null) {
-    state = {};
-  }
-  i = state.i || -1;
-  field = state.field || '';
-  quoted = state.quoted || false;
-  limit = i + 10000;
-  row = result.length - 1;
-  while (true) {
-    i++;
-    if (i > limit) {
-      return setTimeout(function() {
-        progress(i, csv.length);
-        return parseCSV(csv, progress, callback, result, {
-          i: i - 1,
-          field: field,
-          quoted: quoted
-        });
-      }, 10);
-    }
-    c = csv[i];
-    if (c == null) {
-      return callback(null, result);
-    } else if (c === "\"") {
-      if (quoted) {
-        if (csv[i + 1] === "\"") {
-          field += c;
-          i++;
-        } else {
-          quoted = false;
-        }
-      } else {
-        quoted = true;
-      }
-    } else if (!quoted && c === ',') {
-      result[row].push(field);
-      field = '';
-    } else if (!quoted && (c === "\r" || c === "\n")) {
-      if (field !== '') {
-        result[row].push(field);
-        row++;
-        result[row] = [];
-        field = '';
-      }
-    } else {
-      field += c;
-    }
-  }
-};
-
-directionAlias = {
-  'in': 'INCOMING',
-  'Incoming': 'INCOMING',
-  'INCOMING': 'INCOMING',
-  'Missed': 'INCOMING',
-  'out': 'OUTGOING',
-  'Outgoing': 'OUTGOING',
-  'OUTGOING': 'OUTGOING'
-};
-
-module.exports.parse = function(log, context, callback, progress) {
-  var firstline;
-  firstline = log.split(/\r?\n/)[0];
-  if (isAndroidCallLogExport(firstline)) {
-    return parseCSV(log, progress, function(err, parsed) {
-      var out;
-      parsed.shift();
-      parsed.pop();
-      out = [];
-      parsed.forEach(function(line) {
-        var direction, duration, number, timestamp, _;
-        timestamp = line[0], direction = line[1], number = line[2], _ = line[3], _ = line[4], duration = line[5];
-        direction = directionAlias[direction];
-        return out.push({
-          type: 'VOICE',
-          direction: direction,
-          timestamp: Date.create(timestamp).toISOString(),
-          remote: {
-            tel: normalizeNumber(number, context)
-          },
-          content: {
-            duration: parseDuration(duration)
-          }
-        });
-      });
-      return callback(null, out);
-    });
-  } else if (isAndroidSMSExport(firstline)) {
-    return parseCSV(log, progress, function(err, parsed) {
-      var out;
-      parsed.shift();
-      parsed.pop();
-      out = [];
-      parsed.forEach(function(line) {
-        var date, direction, message, number, numbers, time, tstmp, _, _i, _len, _ref, _results;
-        date = line[0], time = line[1], direction = line[2], numbers = line[3], _ = line[4], message = line[5];
-        tstmp = Date.create(date + 'T' + time + '.000Z').toISOString();
-        direction = directionAlias[direction];
-        if (!direction) {
-          return null;
-        }
-        _ref = numbers.split(';');
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          number = _ref[_i];
-          _results.push(out.push({
-            type: 'SMS',
-            direction: direction,
-            timestamp: tstmp,
-            remote: {
-              tel: normalizeNumber(number, context)
-            },
-            content: {
-              message: message
-            }
-          }));
-        }
-        return _results;
-      });
-      return callback(null, out);
-    });
-  } else {
-    throw new Error("Format not parsable");
-  }
-};
-});
-
 ;require.register("lib/contact_listener", function(exports, require, module) {
 var Contact, ContactListener,
   __hasProp = {}.hasOwnProperty,
@@ -517,706 +348,9 @@ module.exports = ContactListener = (function(_super) {
     return this.collection.remove(model);
   };
 
-  ContactListener.prototype.process = function(event) {
-    var model;
-    ContactListener.__super__.process.call(this, event);
-    if (event.operation === 'update') {
-      model = this.collection.get(event.id);
-      return model.trigger('change', model);
-    }
-  };
-
   return ContactListener;
 
 })(CozySocketListener);
-});
-
-;require.register("lib/phone_number", function(exports, require, module) {
-var CODES, db, normalizeNumber;
-
-CODES = db = {};
-
-module.exports = normalizeNumber = function(value, defaultcode) {
-  var number;
-  number = value.replace(/[- \+]/g, '');
-  if (number[0] !== '0') {
-    return number;
-  } else if (number[1] === 0) {
-    return number.substring(2);
-  } else {
-    return defaultcode + number.substring(1);
-  }
-};
-
-module.exports.countries = db;
-
-db['Reserved'] = '0';
-
-db['American Samoa'] = '1';
-
-db['Anguilla'] = '1';
-
-db['Antigua and Barbuda'] = '1';
-
-db['Bahamas (Commonwealth of the)'] = '1';
-
-db['Barbados'] = '1';
-
-db['Bermuda'] = '1';
-
-db['British Virgin Islands'] = '1';
-
-db['Canada'] = '1';
-
-db['Cayman Islands'] = '1';
-
-db['Dominica (Commonwealth of)'] = '1';
-
-db['Dominican Republic'] = '1';
-
-db['Grenada'] = '1';
-
-db['Guam'] = '1';
-
-db['Jamaica'] = '1';
-
-db['Montserrat'] = '1';
-
-db['Northern Mariana Islands (Commonwealth of the)'] = '1';
-
-db['Puerto Rico'] = '1';
-
-db['Saint Kitts and Nevis'] = '1';
-
-db['Saint Lucia'] = '1';
-
-db['Saint Vincent and the Grenadines'] = '1';
-
-db['Trinidad and Tobago'] = '1';
-
-db['Turks and Caicos Islands'] = '1';
-
-db['United States of America'] = '1';
-
-db['United States Virgin Islands'] = '1';
-
-db['Egypt (Arab Republic of)'] = '20';
-
-db['Spare code'] = '210';
-
-db['Spare code'] = '211';
-
-db['Morocco (Kingdom of)'] = '212';
-
-db['Algeria (People\'s Democratic Republic of)'] = '213';
-
-db['Spare code'] = '214';
-
-db['Spare code'] = '215';
-
-db['Tunisia'] = '216';
-
-db['Spare code'] = '217';
-
-db['Libya (Socialist People\'s Libyan Arab Jamahiriya)'] = '218';
-
-db['Spare code'] = '219';
-
-db['Gambia (Republic of the)'] = '220';
-
-db['Senegal (Republic of)'] = '221';
-
-db['Mauritania (Islamic Republic of)'] = '222';
-
-db['Mali (Republic of)'] = '223';
-
-db['Guinea (Republic of)'] = '224';
-
-db['Côte d\'Ivoire (Republic of)'] = '225';
-
-db['Burkina Faso'] = '226';
-
-db['Niger (Republic of the)'] = '227';
-
-db['Togolese Republic'] = '228';
-
-db['Benin (Republic of)'] = '229';
-
-db['Mauritius (Republic of)'] = '230';
-
-db['Liberia (Republic of)'] = '231';
-
-db['Sierra Leone'] = '232';
-
-db['Ghana'] = '233';
-
-db['Nigeria (Federal Republic of)'] = '234';
-
-db['Chad (Republic of)'] = '235';
-
-db['Central African Republic'] = '236';
-
-db['Cameroon (Republic of)'] = '237';
-
-db['Cape Verde (Republic of)'] = '238';
-
-db['Sao Tome and Principe (Democratic Republic of)'] = '239';
-
-db['Equatorial Guinea (Republic of)'] = '240';
-
-db['Gabonese Republic'] = '241';
-
-db['Congo (Republic of the)'] = '242';
-
-db['Democratic Republic of the Congo'] = '243';
-
-db['Angola (Republic of)'] = '244';
-
-db['Guinea-Bissau (Republic of)'] = '245';
-
-db['Diego Garcia'] = '246';
-
-db['Ascension'] = '247';
-
-db['Seychelles (Republic of)'] = '248';
-
-db['Sudan (Republic of the)'] = '249';
-
-db['Rwanda (Republic of)'] = '250';
-
-db['Ethiopia (Federal Democratic Republic of)'] = '251';
-
-db['Somali Democratic Republic'] = '252';
-
-db['Djibouti (Republic of)'] = '253';
-
-db['Kenya (Republic of)'] = '254';
-
-db['Tanzania (United Republic of)'] = '255';
-
-db['Uganda (Republic of)'] = '256';
-
-db['Burundi (Republic of)'] = '257';
-
-db['Mozambique (Republic of)'] = '258';
-
-db['Spare code'] = '259';
-
-db['Zambia (Republic of)'] = '260';
-
-db['Madagascar (Republic of)'] = '261';
-
-db['French Departments and Territories in the Indian Ocean j'] = '262';
-
-db['Zimbabwe (Republic of)'] = '263';
-
-db['Namibia (Republic of)'] = '264';
-
-db['Malawi'] = '265';
-
-db['Lesotho (Kingdom of)'] = '266';
-
-db['Botswana (Republic of)'] = '267';
-
-db['Swaziland (Kingdom of)'] = '268';
-
-db['Comoros (Union of the)'] = '269';
-
-db['Mayotte'] = '269';
-
-db['South Africa (Republic of)'] = '27';
-
-db['Spare code'] = '280';
-
-db['Spare code'] = '281';
-
-db['Spare code'] = '282';
-
-db['Spare code'] = '283';
-
-db['Spare code'] = '284';
-
-db['Spare code'] = '285';
-
-db['Spare code'] = '286';
-
-db['Spare code'] = '287';
-
-db['Spare code'] = '288';
-
-db['Spare code'] = '289';
-
-db['Saint Helena'] = '290';
-
-db['Tristan da Cunha'] = '290';
-
-db['Eritrea'] = '291';
-
-db['Spare code'] = '292';
-
-db['Spare code'] = '293';
-
-db['Spare code'] = '294';
-
-db['Spare code'] = '295';
-
-db['Spare code'] = '296';
-
-db['Aruba'] = '297';
-
-db['Faroe Islands'] = '298';
-
-db['Greenland (Denmark)'] = '299';
-
-db['Greece'] = '30';
-
-db['Netherlands (Kingdom of the)'] = '31';
-
-db['Belgium'] = '32';
-
-db['France'] = '33';
-
-db['Spain'] = '34';
-
-db['Gibraltar'] = '350';
-
-db['Portugal'] = '351';
-
-db['Luxembourg'] = '352';
-
-db['Ireland'] = '353';
-
-db['Iceland'] = '354';
-
-db['Albania (Republic of)'] = '355';
-
-db['Malta'] = '356';
-
-db['Cyprus (Republic of)'] = '357';
-
-db['Finland'] = '358';
-
-db['Bulgaria (Republic of)'] = '359';
-
-db['Hungary (Republic of)'] = '36';
-
-db['Lithuania (Republic of)'] = '370';
-
-db['Latvia (Republic of)'] = '371';
-
-db['Estonia (Republic of)'] = '372';
-
-db['Moldova (Republic of)'] = '373';
-
-db['Armenia (Republic of)'] = '374';
-
-db['Belarus (Republic of)'] = '375';
-
-db['Andorra (Principality of)'] = '376';
-
-db['Monaco (Principality of)'] = '377';
-
-db['San Marino (Republic of)'] = '378';
-
-db['Vatican City State f'] = '379';
-
-db['Ukraine'] = '380';
-
-db['Serbia (Republic of)'] = '381';
-
-db['Montenegro (Republic of)'] = '382';
-
-db['Spare code'] = '383';
-
-db['Spare code'] = '384';
-
-db['Croatia (Republic of)'] = '385';
-
-db['Slovenia (Republic of)'] = '386';
-
-db['Bosnia and Herzegovina'] = '387';
-
-db['Group of countries, shared code'] = '388';
-
-db['The Former Yugoslav Republic of Macedonia'] = '389';
-
-db['Italy'] = '39';
-
-db['Vatican City State'] = '39';
-
-db['Romania'] = '40';
-
-db['Switzerland (Confederation of)'] = '41';
-
-db['Czech Republic'] = '420';
-
-db['Slovak Republic'] = '421';
-
-db['Spare code'] = '422';
-
-db['Liechtenstein (Principality of)'] = '423';
-
-db['Spare code'] = '424';
-
-db['Spare code'] = '425';
-
-db['Spare code'] = '426';
-
-db['Spare code'] = '427';
-
-db['Spare code'] = '428';
-
-db['Spare code'] = '429';
-
-db['Austria'] = '43';
-
-db['United Kingdom of Great Britain and Northern Ireland'] = '44';
-
-db['Denmark'] = '45';
-
-db['Sweden'] = '46';
-
-db['Norway'] = '47';
-
-db['Poland (Republic of)'] = '48';
-
-db['Germany (Federal Republic of)'] = '49';
-
-db['Falkland Islands (Malvinas)'] = '500';
-
-db['Belize'] = '501';
-
-db['Guatemala (Republic of)'] = '502';
-
-db['El Salvador (Republic of)'] = '503';
-
-db['Honduras (Republic of)'] = '504';
-
-db['Nicaragua'] = '505';
-
-db['Costa Rica'] = '506';
-
-db['Panama (Republic of)'] = '507';
-
-db['Saint Pierre and Miquelon'] = '508';
-
-db['Haiti (Republic of)'] = '509';
-
-db['Peru'] = '51';
-
-db['Mexico'] = '52';
-
-db['Cuba'] = '53';
-
-db['Argentine Republic'] = '54';
-
-db['Brazil (Federative Republic of)'] = '55';
-
-db['Chile'] = '56';
-
-db['Colombia (Republic of)'] = '57';
-
-db['Venezuela (Bolivarian Republic of)'] = '58';
-
-db['Guadeloupe (French Department of)'] = '590';
-
-db['Bolivia (Republic of)'] = '591';
-
-db['Guyana'] = '592';
-
-db['Ecuador'] = '593';
-
-db['French Guiana (French Department of)'] = '594';
-
-db['Paraguay (Republic of)'] = '595';
-
-db['Martinique (French Department of)'] = '596';
-
-db['Suriname (Republic of)'] = '597';
-
-db['Uruguay (Eastern Republic of)'] = '598';
-
-db['Netherlands Antilles'] = '599';
-
-db['Malaysia'] = '60';
-
-db['Australia i'] = '61';
-
-db['Indonesia (Republic of)'] = '62';
-
-db['Philippines (Republic of the)'] = '63';
-
-db['New Zealand'] = '64';
-
-db['Singapore (Republic of)'] = '65';
-
-db['Thailand'] = '66';
-
-db['Democratic Republic of Timor-Leste'] = '670';
-
-db['Spare code'] = '671';
-
-db['Australian External Territories g'] = '672';
-
-db['Brunei Darussalam'] = '673';
-
-db['Nauru (Republic of)'] = '674';
-
-db['Papua New Guinea'] = '675';
-
-db['Tonga (Kingdom of)'] = '676';
-
-db['Solomon Islands'] = '677';
-
-db['Vanuatu (Republic of)'] = '678';
-
-db['Fiji (Republic of)'] = '679';
-
-db['Palau (Republic of)'] = '680';
-
-db['Wallis and Futuna'] = '681';
-
-db['Cook Islands'] = '682';
-
-db['Niue'] = '683';
-
-db['Spare code'] = '684';
-
-db['Samoa (Independent State of)'] = '685';
-
-db['Kiribati (Republic of)'] = '686';
-
-db['New Caledonia'] = '687';
-
-db['Tuvalu'] = '688';
-
-db['French Polynesia'] = '689';
-
-db['Tokelau'] = '690';
-
-db['Micronesia (Federated States of)'] = '691';
-
-db['Marshall Islands (Republic of the)'] = '692';
-
-db['Spare code'] = '693';
-
-db['Spare code'] = '694';
-
-db['Spare code'] = '695';
-
-db['Spare code'] = '696';
-
-db['Spare code'] = '697';
-
-db['Spare code'] = '698';
-
-db['Spare code'] = '699';
-
-db['Kazakhstan (Republic of)'] = '7';
-
-db['Russian Federation'] = '7';
-
-db['International Freephone Service'] = '800';
-
-db['Spare code'] = '801';
-
-db['Spare code'] = '802';
-
-db['Spare code'] = '803';
-
-db['Spare code'] = '804';
-
-db['Spare code'] = '805';
-
-db['Spare code'] = '806';
-
-db['Spare code'] = '807';
-
-db['International Shared Cost Service (ISCS)'] = '808';
-
-db['Spare code'] = '809';
-
-db['Japan'] = '81';
-
-db['Korea (Republic of)'] = '82';
-
-db['Spare code'] = '830';
-
-db['Spare code'] = '831';
-
-db['Spare code'] = '832';
-
-db['Spare code'] = '833';
-
-db['Spare code'] = '834';
-
-db['Spare code'] = '835';
-
-db['Spare code'] = '836';
-
-db['Spare code'] = '837';
-
-db['Spare code'] = '838';
-
-db['Spare code'] = '839';
-
-db['Viet Nam (Socialist Republic of)'] = '84';
-
-db['Democratic People\'s Republic of Korea'] = '850';
-
-db['Spare code'] = '851';
-
-db['Hong Kong, China'] = '852';
-
-db['Macao, China'] = '853';
-
-db['Spare code'] = '854';
-
-db['Cambodia (Kingdom of)'] = '855';
-
-db['Lao People\'s Democratic Republic'] = '856';
-
-db['Spare code'] = '857';
-
-db['Spare code'] = '858';
-
-db['Spare code'] = '859';
-
-db['China (People\'s Republic of)'] = '86';
-
-db['Inmarsat SNAC'] = '870';
-
-db['Spare code'] = '871';
-
-db['Spare code'] = '872';
-
-db['Spare code'] = '873';
-
-db['Spare code'] = '874';
-
-db['Reserved - Maritime Mobile Service Applications'] = '875';
-
-db['Reserved - Maritime Mobile Service Applications'] = '876';
-
-db['Reserved - Maritime Mobile Service Applications'] = '877';
-
-db['Universal Personal Telecommunication Service (UPT) e'] = '878';
-
-db['Reserved for national non-commercial purposes'] = '879';
-
-db['Bangladesh (People\'s Republic of)'] = '880';
-
-db['Global Mobile Satellite System (GMSS), shared code n'] = '881';
-
-db['International Networks, shared code o'] = '882';
-
-db['International Networks, shared code p, q'] = '883';
-
-db['Spare code'] = '884';
-
-db['Spare code'] = '885';
-
-db['Taiwan, China'] = '886';
-
-db['Spare code'] = '887';
-
-db['Telecommunications for Disaster Relief (TDR) k'] = '888';
-
-db['Spare code'] = '889';
-
-db['Spare code'] = '890';
-
-db['Spare code'] = '891';
-
-db['Spare code'] = '892';
-
-db['Spare code'] = '893';
-
-db['Spare code'] = '894';
-
-db['Spare code'] = '895';
-
-db['Spare code'] = '896';
-
-db['Spare code'] = '897';
-
-db['Spare code'] = '898';
-
-db['Spare code'] = '899';
-
-db['Turkey'] = '90';
-
-db['India (Republic of)'] = '91';
-
-db['Pakistan (Islamic Republic of)'] = '92';
-
-db['Afghanistan'] = '93';
-
-db['Sri Lanka (Democratic Socialist Republic of)'] = '94';
-
-db['Myanmar (Union of)'] = '95';
-
-db['Maldives (Republic of)'] = '960';
-
-db['Lebanon'] = '961';
-
-db['Jordan (Hashemite Kingdom of)'] = '962';
-
-db['Syrian Arab Republic'] = '963';
-
-db['Iraq (Republic of)'] = '964';
-
-db['Kuwait (State of)'] = '965';
-
-db['Saudi Arabia (Kingdom of)'] = '966';
-
-db['Yemen (Republic of)'] = '967';
-
-db['Oman (Sultanate of)'] = '968';
-
-db['Reserved - reservation currently under investigation'] = '969';
-
-db['Reserved l'] = '970';
-
-db['United Arab Emirates h'] = '971';
-
-db['Israel (State of)'] = '972';
-
-db['Bahrain (Kingdom of)'] = '973';
-
-db['Qatar (State of)'] = '974';
-
-db['Bhutan (Kingdom of)'] = '975';
-
-db['Mongolia'] = '976';
-
-db['Nepal (Federal Democratic Republic of)'] = '977';
-
-db['Spare code'] = '978';
-
-db['International Premium Rate Service (IPRS)'] = '979';
-
-db['Iran (Islamic Republic of)'] = '98';
-
-db['Spare code'] = '990';
-
-db['Trial of a proposed new international telecommunication public'] = '991';
-
-db['Tajikistan (Republic of)'] = '992';
-
-db['Turkmenistan'] = '993';
-
-db['Azerbaijani Republic'] = '994';
-
-db['Georgia'] = '995';
-
-db['Kyrgyz Republic'] = '996';
-
-db['Spare code'] = '997';
-
-db['Uzbekistan (Republic of)'] = '998';
-
-db['Reserved for future global service'] = '999';
 });
 
 ;require.register("lib/request", function(exports, require, module) {
@@ -1461,12 +595,6 @@ module.exports = {
   "twitter": "Twitter",
   "add tags": "add tags",
   "add note": "Add a note",
-  "duration": "Duration",
-  "seconds": "s",
-  "minutes": "min",
-  "hours": "h",
-  "you called": "You called",
-  "you were called": "You were called",
   "create call task": "Create contact task",
   "creating...": "creating…",
   "edit name": "Edit Name",
@@ -1490,18 +618,10 @@ module.exports = {
   "is not a vcard": "is not a vCard",
   "cancel": "Cancel",
   "import": "Import",
-  "import call log help": "If you are a FING and Orange user, do not use this",
-  "choose log file": "Then upload your generated log file",
-  "import ios calls": "Support for iOS is not available yet. If you want to contribute, have a look at ",
   "import.ready-msg": "Ready to import %{smart_count} contact ||||\nReady to import %{smart_count} contacts",
-  "import android calls": "If you use an android phone, use the following application to import your calls: ",
-  "import android sms": "If you use an android phone, use the following application to import your sms: ",
   "dont close navigator import": "Do not close the navigator while importing contacts.",
   "choose phone country": "Choose the country of the phone",
   "ready to import": "Ready to import",
-  "log direction": "Direction",
-  "log number": "Number",
-  "log date": "Date",
   "importing this file": "We are importing this file",
   "may take a while": "It may take a while",
   "progress": "Progress",
@@ -1511,8 +631,6 @@ module.exports = {
   "fail to import": "Import failed",
   "click left to display": "Browse: Click on a contact in the left panel to display it.",
   "import export": "Import / Export",
-  "call log info": "Click here to import your mobile's call log:",
-  "import call log": "Import call Log",
   "vcard import info": "Click here to import a vCard file:",
   "import vcard": "Import vCard",
   "export all vcard": "Export vCard file",
@@ -1588,12 +706,6 @@ module.exports = {
   "twitter": "Twitter",
   "add tags": "Ajouter des tags",
   "add note": "Ajouter une note",
-  "duration": "Durée",
-  "seconds": "s",
-  "minutes": "min",
-  "hours": "h",
-  "you called": "Vous avez appelé",
-  "you were called": "Vous avez été appelé(e)",
   "create call task": "Créer une tâche de contact",
   "creating...": "création en cours…",
   "edit name": "Modifier le nom",
@@ -1617,18 +729,10 @@ module.exports = {
   "is not a vcard": "n'est pas un fichier vCard",
   "cancel": "Annuler",
   "import": "Importer",
-  "import call log help": "N'utilisez pas cette fonction si vous êtes un client FING/Orange",
-  "choose log file": "Puis uploadez le fichier que vous avez généré",
-  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez-vous sur ",
   "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
-  "import android calls": "Si vous avez un téléphone Android, utilisez cette application pour importer vos appels : ",
-  "import android sms": "Si vous avez un téléphone Android, utilisez cette application pour importer vos sms : ",
   "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
   "choose phone country": "Choisissez le pays de ce téléphone",
   "ready to import": "Prêt à l'importation",
-  "log direction": "Direction",
-  "log number": "Numéro",
-  "log date": "Date",
   "importing this file": "Nous importons ce fichier",
   "may take a while": "Cela peut prendre quelques minutes",
   "progress": "Progression",
@@ -1638,8 +742,6 @@ module.exports = {
   "fail to import": "Échec de l'importation",
   "click left to display": "Navigation : cliquez sur un contact dans le panneau de gauche pour l'afficher",
   "import export": "Importer / Exporter",
-  "call log info": "Cliquez ici pour importer votre historique mobile :",
-  "import call log": "Importer l'historique",
   "vcard import info": "Cliquez ici pour importer vos contacts :",
   "import vcard": "Importer vCard",
   "export all vcard": "Exporter un fichier vCard",
@@ -1697,7 +799,7 @@ module.exports = Config = (function(_super) {
 });
 
 ;require.register("models/contact", function(exports, require, module) {
-var ANDROID_RELATION_TYPES, Contact, ContactLogCollection, DataPoint, DataPointCollection, request,
+var ANDROID_RELATION_TYPES, Contact, DataPoint, DataPointCollection, VCard, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1708,7 +810,7 @@ DataPoint = require('models/datapoint');
 
 DataPointCollection = require('collections/datapoint');
 
-ContactLogCollection = require('collections/contactlog');
+VCard = require('lib/vcard_helper');
 
 ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child', 'domestic partner', 'father', 'friend', 'manager', 'mother', 'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'];
 
@@ -1727,7 +829,7 @@ module.exports = Contact = (function(_super) {
   }
 
   Contact.prototype.initialize = function() {
-    this.on('change:datapoints', (function(_this) {
+    return this.on('change:datapoints', (function(_this) {
       return function() {
         var dps;
         dps = _this.get('datapoints');
@@ -1735,13 +837,6 @@ module.exports = Contact = (function(_super) {
           _this.dataPoints.reset(dps);
           return _this.set('datapoints', null);
         }
-      };
-    })(this));
-    this.history = new ContactLogCollection;
-    this.history.url = this.url() + '/logs';
-    return this.on('change:id', (function(_this) {
-      return function() {
-        return _this.history.url = _this.url() + '/logs';
       };
     })(this));
   };
@@ -1753,6 +848,14 @@ module.exports = Contact = (function(_super) {
       note: '',
       tags: []
     };
+  };
+
+  Contact.prototype.fetch = function(options) {
+    if (options == null) {
+      options = {};
+    }
+    options.parse = true;
+    return Contact.__super__.fetch.call(this, options);
   };
 
   Contact.prototype.parse = function(attrs) {
@@ -1788,11 +891,13 @@ module.exports = Contact = (function(_super) {
       delete attrs.datapoints;
     }
     if ((_ref2 = attrs._attachments) != null ? _ref2.picture : void 0) {
-      this.hasPicture = true;
+      attrs.pictureRev = attrs._attachments.picture.revpos;
       delete attrs._attachments;
+    } else {
+      attrs.pictureRev = false;
     }
     if (attrs.photo) {
-      this.hasPicture = true;
+      attrs.pictureRev = true;
       this.photo = attrs.photo;
       delete attrs.photo;
     }
@@ -1835,8 +940,7 @@ module.exports = Contact = (function(_super) {
           if (err) {
             return console.log(err);
           } else {
-            _this.hasPicture = true;
-            _this.trigger('change', _this, {});
+            _this.set('pictureRev', true);
             return delete _this.photo;
           }
         };
@@ -1885,6 +989,7 @@ module.exports = Contact = (function(_super) {
       delete json.n;
     }
     delete json.photo;
+    delete json.pictureRev;
     return json;
   };
 
@@ -2004,7 +1109,7 @@ module.exports = DataPoint = (function(_super) {
 });
 
 ;require.register("router", function(exports, require, module) {
-var CallImporterView, Contact, ContactView, DocView, ImporterView, Router, app,
+var Contact, ContactView, DocView, ImporterView, Router, app,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2015,8 +1120,6 @@ ContactView = require('views/contact');
 DocView = require('views/doc');
 
 ImporterView = require('views/importer');
-
-CallImporterView = require('views/callimporter');
 
 Contact = require('models/contact');
 
@@ -2031,7 +1134,6 @@ module.exports = Router = (function(_super) {
     '': 'list',
     'help': 'help',
     'import': 'import',
-    'callimport': 'callimport',
     'contact/new': 'newcontact',
     'contact/:id': 'showcontact'
   };
@@ -2066,12 +1168,6 @@ module.exports = Router = (function(_super) {
   Router.prototype["import"] = function() {
     this.help();
     this.importer = new ImporterView();
-    return $('body').append(this.importer.render().$el);
-  };
-
-  Router.prototype.callimport = function() {
-    this.help();
-    this.importer = new CallImporterView();
     return $('body').append(this.importer.render().$el);
   };
 
@@ -2176,48 +1272,6 @@ module.exports = Router = (function(_super) {
 })(Backbone.Router);
 });
 
-;require.register("templates/callimporter", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-var locals_ = (locals || {}),countries = locals_.countries;
-buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("import call log")) ? "" : jade_interp)) + "</div><div id=\"import-file\" class=\"modal-body\"><p>" + (jade.escape(null == (jade_interp = t('import call log help')) ? "" : jade_interp)) + "</p><ul><li>" + (jade.escape(null == (jade_interp = t('import android calls')) ? "" : jade_interp)) + "<a href=\"https://play.google.com/store/apps/details?id=com.dukemdev\" target=\"_blank\">Call Log Export</a></li><li>" + (jade.escape(null == (jade_interp = t('import android sms')) ? "" : jade_interp)) + "<a href=\"https://play.google.com/store/apps/details?id=com.smeiti.smstotext\" target=\"_blank\">SMS To Text</a></li><li>" + (jade.escape(null == (jade_interp = t('import ios calls')) ? "" : jade_interp)) + "<a href=\"https://github.com/mycozycloud/cozy-contacts/blob/master/TODO.md#mobile\" target=\"_blank\">Github</a></li></ul><div class=\"control-group\"><label for=\"country\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("choose phone country")) ? "" : jade_interp)) + "</label><div class=\"controls\"><select id=\"phonecountry\">");
-// iterate countries
-;(function(){
-  var $$obj = countries;
-  if ('number' == typeof $$obj.length) {
-
-    for (var country = 0, $$l = $$obj.length; country < $$l; country++) {
-      var code = $$obj[country];
-
-buf.push("<option" + (jade.attr("value", code, true, false)) + ">" + (jade.escape(null == (jade_interp = code + ' ' + country) ? "" : jade_interp)) + "</option>");
-    }
-
-  } else {
-    var $$l = 0;
-    for (var country in $$obj) {
-      $$l++;      var code = $$obj[country];
-
-buf.push("<option" + (jade.attr("value", code, true, false)) + ">" + (jade.escape(null == (jade_interp = code + ' ' + country) ? "" : jade_interp)) + "</option>");
-    }
-
-  }
-}).call(this);
-
-buf.push("</select></div><label for=\"csvupload\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("choose log file")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"csvupload\" type=\"file\" accept=\"text/csv;text/plain\"/><span class=\"help-inline\"></span></div></div></div><div id=\"import-config\" class=\"modal-body\"><p>" + (jade.escape(null == (jade_interp = t('ready to import')) ? "" : jade_interp)) + "</p><table class=\"table stripped-table\"><thead><th>" + (jade.escape(null == (jade_interp = t('log direction')) ? "" : jade_interp)) + "</th><th>" + (jade.escape(null == (jade_interp = t('log number')) ? "" : jade_interp)) + "</th><th>" + (jade.escape(null == (jade_interp = t('log date')) ? "" : jade_interp)) + "</th></thead><tbody></tbody></table></div><div id=\"import-confirm\" class=\"modal-body\"><p>" + (jade.escape(null == (jade_interp = t('importing this file')) ? "" : jade_interp)) + "</p><p>" + (jade.escape(null == (jade_interp = t('may take a while')) ? "" : jade_interp)) + "</p></div><div class=\"modal-footer\"><a id=\"cancel-btn\" href=\"#\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button disabled\">" + (jade.escape(null == (jade_interp = t("import")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
 ;require.register("templates/contact", function(exports, require, module) {
 var __templateData = function template(locals) {
 var buf = [];
@@ -2233,7 +1287,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2354,26 +1408,7 @@ else
 {
 buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync headline with data')) ? "" : jade_interp)) + "</p><ul><li>" + (jade.escape((jade_interp = t('sync url')) == null ? '' : jade_interp)) + " https://" + (jade.escape((jade_interp = account.domain) == null ? '' : jade_interp)) + "/public/sync/principals/me</li><li>" + (jade.escape((jade_interp = t('sync login')) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = account.login) == null ? '' : jade_interp)) + "</li><li>" + (jade.escape((jade_interp = t('sync password')) == null ? '' : jade_interp)) + "<span id=\"placeholder\">" + (jade.escape(null == (jade_interp = account.placeholder) ? "" : jade_interp)) + "</span><button id=\"show-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('show')) ? "" : jade_interp)) + "</button><button id=\"hide-password\" class=\"button\">" + (jade.escape(null == (jade_interp = t('hide')) ? "" : jade_interp)) + "</button></li></ul>");
 }
-buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync help')) ? "" : jade_interp)) + "<a href=\"https://cozy.io/mobile/contacts.html\" target=\"_blank\">" + (jade.escape(null == (jade_interp = t('sync help link')) ? "" : jade_interp)) + "</a></p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><h2>" + (jade.escape(null == (jade_interp = t('import export')) ? "" : jade_interp)) + "</h2><p>" + (jade.escape(null == (jade_interp = t("call log info") + ' ') ? "" : jade_interp)) + "<a href=\"#callimport\">" + (jade.escape(null == (jade_interp = t('import call log')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
-;require.register("templates/history_item", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-var locals_ = (locals || {}),typeIcon = locals_.typeIcon,date = locals_.date,content = locals_.content;
-buf.push("<div class=\"wrap\"><div class=\"details\"><i" + (jade.cls([typeIcon], [true])) + "></i>" + (jade.escape((jade_interp = date) == null ? '' : jade_interp)) + "</div><div class=\"content\">" + (jade.escape(null == (jade_interp = content) ? "" : jade_interp)) + "</div></div>");;return buf.join("");
+buf.push("<p>" + (jade.escape(null == (jade_interp = t('sync help')) ? "" : jade_interp)) + "<a href=\"https://cozy.io/mobile/contacts.html\" target=\"_blank\">" + (jade.escape(null == (jade_interp = t('sync help link')) ? "" : jade_interp)) + "</a></p><h2>" + (jade.escape(null == (jade_interp = t('settings')) ? "" : jade_interp)) + "</h2><label for=\"nameFormat\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</label><div class=\"control\"><select id=\"nameFormat\" class=\"span5 large\"><option value=\"\">" + (jade.escape(null == (jade_interp = t('name format info')) ? "" : jade_interp)) + "</option><option value=\"given-familly\">" + (jade.escape(null == (jade_interp = t('format given familly')) ? "" : jade_interp)) + "</option><option value=\"familly-given\">" + (jade.escape(null == (jade_interp = t('format familly given')) ? "" : jade_interp)) + "</option><option value=\"given-middleinitial-familly\">" + (jade.escape(null == (jade_interp = t('format given mid familly')) ? "" : jade_interp)) + "</option></select><span class=\"help-inline\"></span></div><p>" + (jade.escape(null == (jade_interp = t('vcard export info') + ' ') ? "" : jade_interp)) + "<a href=\"contacts.vcf\" download=\"contacts.vcf\"" + (jade.attr("title", t("export vcard"), true, false)) + ">" + (jade.escape(null == (jade_interp = t('export all vcard')) ? "" : jade_interp)) + "</a></p><p>" + (jade.escape(null == (jade_interp = t("vcard import info") + ' ') ? "" : jade_interp)) + "<a href=\"#import\">" + (jade.escape(null == (jade_interp = t('import vcard')) ? "" : jade_interp)) + "</a></p>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2405,185 +1440,13 @@ if (typeof define === 'function' && define.amd) {
 }
 });
 
-;require.register("views/callimporter", function(exports, require, module) {
-var BaseView, CallImporterView, CallLogReader, ContactLogCollection, app,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BaseView = require('lib/base_view');
-
-CallLogReader = require('lib/call_log_reader');
-
-ContactLogCollection = require('collections/contactlog');
-
-app = require('application');
-
-module.exports = CallImporterView = (function(_super) {
-  __extends(CallImporterView, _super);
-
-  function CallImporterView() {
-    this.close = __bind(this.close, this);
-    this.showFaillure = __bind(this.showFaillure, this);
-    this.onLogFileParsed = __bind(this.onLogFileParsed, this);
-    this.onLogFileProgress = __bind(this.onLogFileProgress, this);
-    return CallImporterView.__super__.constructor.apply(this, arguments);
-  }
-
-  CallImporterView.prototype.template = require('templates/callimporter');
-
-  CallImporterView.prototype.id = 'callimporter';
-
-  CallImporterView.prototype.tagName = 'div';
-
-  CallImporterView.prototype.className = 'modal fade';
-
-  CallImporterView.prototype.events = function() {
-    return {
-      'change #csvupload': 'onUpload',
-      'click  #confirm-btn': 'doImport'
-    };
-  };
-
-  CallImporterView.prototype.getRenderData = function() {
-    return {
-      countries: require('lib/phone_number').countries
-    };
-  };
-
-  CallImporterView.prototype.afterRender = function() {
-    this.$el.modal('show');
-    this.upload = this.$('#csvupload')[0];
-    this.country = this.$('#phonecountry');
-    this.file_step = this.$('#import-file');
-    this.parse_step = this.$('#import-config').hide();
-    this.confirm_step = this.$('#import-confirm').hide();
-    return this.confirmBtn = this.$('#confirm-btn');
-  };
-
-  CallImporterView.prototype.onUpload = function() {
-    var country, file, reader;
-    file = this.upload.files[0];
-    country = this.country.val();
-    reader = new FileReader();
-    reader.readAsText(file);
-    reader.onloadend = (function(_this) {
-      return function() {
-        var error;
-        try {
-          return CallLogReader.parse(reader.result, country, _this.onLogFileParsed, _this.onLogFileProgress);
-        } catch (_error) {
-          error = _error;
-          console.log(error.stack);
-          _this.$('.control-group').addClass('error');
-          return _this.$('.help-inline').text(t('failed to parse'));
-        }
-      };
-    })(this);
-    return reader.onerror = (function(_this) {
-      return function() {
-        return console.log("ERROR READING", reader.result, reader.error);
-      };
-    })(this);
-  };
-
-  CallImporterView.prototype.onLogFileProgress = function(done, total) {
-    var p;
-    p = Math.round(100 * done / total);
-    return this.$('.help-inline').text(t('progress') + (": " + p + "%"));
-  };
-
-  CallImporterView.prototype.onLogFileParsed = function(err, toImport) {
-    var content, html, log, _i, _len;
-    if (err) {
-      console.log(error.stack);
-      this.$('.control-group').addClass('error');
-      this.$('.help-inline').text(t('failed to parse'));
-      return;
-    }
-    this.file_step.remove();
-    this.parse_step.show();
-    for (_i = 0, _len = toImport.length; _i < _len; _i++) {
-      log = toImport[_i];
-      content = log.content.message || this.formatDuration(log.content.duration);
-      html = '<tr>';
-      html += "<td> " + log.direction + " </td>";
-      html += "<td> " + log.remote.tel + " </td>";
-      html += "<td> " + (Date.create(log.timestamp).format()) + " </td>";
-      html += "<td> " + content + " </td>";
-      html += '</tr>';
-      this.$('tbody').append($(html));
-    }
-    this.toImport = toImport;
-    return this.confirmBtn.removeClass('disabled');
-  };
-
-  CallImporterView.prototype.formatDuration = function(duration) {
-    var hours, minutes, out, seconds;
-    seconds = duration % 60;
-    minutes = (duration - seconds) % 3600;
-    hours = duration - minutes - seconds;
-    out = seconds + t('seconds');
-    if (minutes) {
-      out = minutes / 60 + t('minutes') + ' ' + out;
-    }
-    if (hours) {
-      out = hours / 3600 + t('hours') + ' ' + out;
-    }
-    return out;
-  };
-
-  CallImporterView.prototype.doImport = function() {
-    var req;
-    if (this.confirmBtn.hasClass('disabled')) {
-      return;
-    }
-    this.parse_step.remove();
-    this.confirm_step.show();
-    this.confirmBtn.addClass('disabled');
-    req = $.ajax('logs', {
-      type: 'POST',
-      data: JSON.stringify(new ContactLogCollection(this.toImport).toJSON()),
-      contentType: 'application/json',
-      dataType: 'json'
-    });
-    req.done((function(_this) {
-      return function(data) {
-        if (data.success) {
-          return _this.close();
-        } else {
-          return _this.showFaillure();
-        }
-      };
-    })(this));
-    return req.fail(this.showFaillure);
-  };
-
-  CallImporterView.prototype.showFaillure = function() {
-    this.$('.modal-body').html('<p>' + t('import fail') + '</p>');
-    return this.confirmBtn.remove();
-  };
-
-  CallImporterView.prototype.close = function() {
-    this.$el.modal('hide');
-    app.router.navigate('');
-    return this.remove();
-  };
-
-  return CallImporterView;
-
-})(BaseView);
-});
-
 ;require.register("views/contact", function(exports, require, module) {
-var ContactName, ContactView, Datapoint, HistoryView, TagsView, ViewCollection, request,
+var ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 ViewCollection = require('lib/view_collection');
-
-HistoryView = require('views/history');
 
 TagsView = require('views/contact_tags');
 
@@ -2649,7 +1512,6 @@ module.exports = ContactView = (function(_super) {
     ContactView.__super__.initialize.apply(this, arguments);
     this.listenTo(this.model, 'change', this.modelChanged);
     this.listenTo(this.model, 'sync', this.onSuccess);
-    this.listenTo(this.model.history, 'add', this.resizeNiceScroll);
     this.listenTo(this.collection, 'change', (function(_this) {
       return function() {
         _this.needSaving = true;
@@ -2669,7 +1531,7 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.getRenderData = function() {
     return _.extend({}, this.model.toJSON(), {
-      hasPicture: this.model.hasPicture || false,
+      hasPicture: !!this.model.get('pictureRev'),
       fn: this.model.get('fn'),
       timestamp: Date.now()
     });
@@ -2718,12 +1580,6 @@ module.exports = ContactView = (function(_super) {
     this.$el.niceScroll();
     this.resizeNote();
     this.currentState = this.model.toJSON();
-    if (this.model.get('id') != null) {
-      this.history = new HistoryView({
-        collection: this.model.history
-      });
-      this.history.render().$el.appendTo(this.$('#history'));
-    }
     if ($(window).width() < 900) {
       this.$('a#infotab').tab('show');
     }
@@ -2900,16 +1756,17 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.modelChanged = function() {
-    var id, timestamp, url, _ref;
+    var id, timestamp, _ref;
     this.notesfield.val(this.model.get('note'));
     if ((_ref = this.tags) != null) {
       _ref.refresh();
     }
     id = this.model.get('id');
-    if (id != null) {
+    if (id && this.model.get('pictureRev')) {
       timestamp = Date.now();
-      url = "contacts/" + (this.model.get('id')) + "/picture.png?" + timestamp;
-      this.$('#picture img').attr('src', url);
+      this.$('.picture').prop('src', "contacts/" + id + "/picture.png?" + timestamp);
+    } else {
+      this.$('.picture').prop('src', "img/defaultpicture.png");
     }
     return this.resizeNote();
   };
@@ -3417,8 +2274,8 @@ module.exports = ContactsListItemView = (function(_super) {
   };
 
   ContactsListItemView.prototype.getRenderData = function() {
-    return _.extend({}, this.model.attributes, {
-      hasPicture: this.model.hasPicture || false,
+    return _.extend({}, this.model.toJSON(), {
+      hasPicture: !!this.model.get('pictureRev'),
       bestmail: this.model.getBest('email'),
       besttel: this.model.getBest('tel'),
       displayName: this.model.getDisplayName(),
@@ -3755,200 +2612,6 @@ module.exports = DocView = (function(_super) {
 })(BaseView);
 });
 
-;require.register("views/history", function(exports, require, module) {
-var ContactLog, HistoryView, ViewCollection,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-ViewCollection = require('lib/view_collection');
-
-ContactLog = require('models/contactlog');
-
-module.exports = HistoryView = (function(_super) {
-  __extends(HistoryView, _super);
-
-  function HistoryView() {
-    return HistoryView.__super__.constructor.apply(this, arguments);
-  }
-
-  HistoryView.prototype.tagName = 'div';
-
-  HistoryView.prototype.itemView = require('views/history_item');
-
-  HistoryView.prototype.events = function() {
-    return {
-      'mouseenter': 'showInjector',
-      'mouseleave': 'hideInjector',
-      'mouseover td': 'moveInjector',
-      'click #inject-note': 'injectNote'
-    };
-  };
-
-  HistoryView.prototype.afterRender = function() {
-    HistoryView.__super__.afterRender.apply(this, arguments);
-    this.collection.fetch();
-    return this.injector = this.$('.injector').hide();
-  };
-
-  HistoryView.prototype.showInjector = function() {
-    return this.injector.show();
-  };
-
-  HistoryView.prototype.hideInjector = function() {
-    return this.injector.hide();
-  };
-
-  HistoryView.prototype.moveInjector = function(event) {
-    var tr;
-    tr = $(event.target).parents('tr');
-    if (tr.hasClass('injector')) {
-      return;
-    }
-    if (this.injector.parent()) {
-      this.injector.detach();
-    }
-    if (tr.hasClass('annotable')) {
-      return tr.after(this.injector);
-    }
-  };
-
-  HistoryView.prototype.injectNote = function() {
-    var afterLog;
-    afterLog = this.collection.at(this.injector.index() - 1);
-    this.note = new ContactLog({
-      type: 'NOTE',
-      direction: 'NA',
-      content: '',
-      timestamp: afterLog.get('timestamp')
-    });
-    this.collection.add(this.note);
-    this.injector.after(this.views[this.note.cid].$el.detach());
-    return this.injector.detach();
-  };
-
-  HistoryView.prototype.formComplete = function() {
-    return this.injector = this.clone;
-  };
-
-  return HistoryView;
-
-})(ViewCollection);
-});
-
-;require.register("views/history_item", function(exports, require, module) {
-var BaseView, HistoryItemView,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BaseView = require('lib/base_view');
-
-module.exports = HistoryItemView = (function(_super) {
-  __extends(HistoryItemView, _super);
-
-  function HistoryItemView() {
-    return HistoryItemView.__super__.constructor.apply(this, arguments);
-  }
-
-  HistoryItemView.prototype.template = require('templates/history_item');
-
-  HistoryItemView.prototype.className = function() {
-    var classes;
-    classes = ['history_item'];
-    classes.push(this.model.get('direction').toLowerCase());
-    classes.push(this.model.get('type').toLowerCase());
-    if (this.isAnnotable()) {
-      classes.push('annotable');
-    }
-    return classes.join(' ');
-  };
-
-  HistoryItemView.prototype.events = {
-    'blur .editor': 'save',
-    'click .notedelete': 'delete'
-  };
-
-  HistoryItemView.prototype.getRenderData = function() {
-    var format;
-    format = '{Mon} {d}, {h}:{m} : ';
-    return {
-      typeIcon: this.getTypeIcon(),
-      content: this.getContent(),
-      date: Date.create(this.model.get('timestamp')).format(format)
-    };
-  };
-
-  HistoryItemView.prototype.isAnnotable = function() {
-    return this.model.get('type') === 'VOICE';
-  };
-
-  HistoryItemView.prototype.save = function() {
-    return this.model.save({
-      content: this.editor.val()
-    });
-  };
-
-  HistoryItemView.prototype["delete"] = function() {
-    return this.model.destroy();
-  };
-
-  HistoryItemView.prototype.getDirectionIcon = function() {
-    switch (this.model.get('direction')) {
-      case 'INCOMING':
-        return 'icon-forward';
-      case 'OUTGOING':
-        return 'icon-backward';
-      default:
-        return false;
-    }
-  };
-
-  HistoryItemView.prototype.getTypeIcon = function() {
-    switch (this.model.get('type')) {
-      case 'VOICE':
-        return 'icon-voice';
-      case 'MAIL':
-        return 'icon-mail';
-      case 'SMS':
-        return 'icon-sms';
-      default:
-        return 'icon-stop';
-    }
-  };
-
-  HistoryItemView.prototype.getContent = function() {
-    var content, details;
-    details = this.model.get('content');
-    switch (this.model.get('type')) {
-      case 'VOICE':
-        content = this.model.get('direction') === 'OUTGOING' ? t('you called') : t('you were called');
-        return content + (" (" + (this.formatDuration(details.duration)) + ")");
-      case 'SMS':
-        return details.message;
-      default:
-        return '???';
-    }
-  };
-
-  HistoryItemView.prototype.formatDuration = function(duration) {
-    var hours, minutes, out, seconds;
-    seconds = duration % 60;
-    minutes = (duration - seconds) % 3600;
-    hours = duration - minutes - seconds;
-    out = seconds + t('seconds');
-    if (minutes) {
-      out = minutes / 60 + t('minutes') + ' ' + out;
-    }
-    if (hours) {
-      out = hours / 3600 + t('hours') + ' ' + out;
-    }
-    return out;
-  };
-
-  return HistoryItemView;
-
-})(BaseView);
-});
-
 ;require.register("views/importer", function(exports, require, module) {
 var BaseView, Contact, ImporterView, app,
   __hasProp = {}.hasOwnProperty,
@@ -4081,76 +2744,6 @@ module.exports = ImporterView = (function(_super) {
   return ImporterView;
 
 })(BaseView);
-});
-
-;require.register("widget", function(exports, require, module) {
-var __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-module.exports = {
-  initialize: function() {
-    var Config, ContactsCollection, ContactsList, Router, e, homeGoTo, locales, router;
-    window.app = this;
-    homeGoTo = function(url) {
-      var intent;
-      intent = {
-        action: 'goto',
-        params: url
-      };
-      return window.parent.postMessage(intent, window.location.origin);
-    };
-    this.locale = window.locale;
-    delete window.locale;
-    this.polyglot = new Polyglot();
-    try {
-      locales = require('locales/' + this.locale);
-    } catch (_error) {
-      e = _error;
-      locales = require('locales/en');
-    }
-    this.polyglot.extend(locales);
-    window.t = this.polyglot.t.bind(this.polyglot);
-    Router = (function(_super) {
-      __extends(Router, _super);
-
-      function Router() {
-        return Router.__super__.constructor.apply(this, arguments);
-      }
-
-      Router.prototype.routes = {
-        '': function() {},
-        '*redirect': 'redirect'
-      };
-
-      Router.prototype.redirect = function(path) {
-        this.navigate('#', {
-          trigger: true
-        });
-        return homeGoTo('contacts/' + path);
-      };
-
-      return Router;
-
-    })(Backbone.Router);
-    Config = require('models/config');
-    this.config = new Config(window.config || {});
-    ContactsCollection = require('collections/contact');
-    ContactsList = require('views/contactslist');
-    this.contacts = new ContactsCollection();
-    this.contactslist = new ContactsList({
-      collection: this.contacts
-    });
-    this.contactslist.$el.addClass('contact-widget');
-    this.contactslist.$el.appendTo($('body'));
-    this.contactslist.render();
-    this.contacts.reset(window.initcontacts, {
-      parse: true
-    });
-    delete window.initcontacts;
-    router = new Router();
-    return Backbone.history.start();
-  }
-};
 });
 
 ;
