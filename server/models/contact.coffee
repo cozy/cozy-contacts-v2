@@ -14,8 +14,8 @@ log = require('printit')
 class DataPoint extends cozydb.Model
     @schema:
         name: String
-        value: String
-        type: cozydb.NoSchema
+        value: cozydb.NoSchema
+        type: String
 
 module.exports = Contact = cozydb.getModel 'Contact',
     id            : String
@@ -84,14 +84,16 @@ Contact::toVCF = (callback) ->
 # Simple string is replaced by an String[7] .
 Contact::migrateAdr = (callback) ->
     hasMigrate = false
-    @?.datapoints?.forEach (dp) ->
+
+    datapoints = this?.datapoints or []
+    datapoints?.forEach (dp) ->
         if dp.name is 'adr'
             if typeof dp.value is 'string' or dp.value instanceof String
                 dp.value = VCardParser.adrStringToArray dp.value
                 hasMigrate = true
 
     if hasMigrate
-        @updateAttributes {}, callback
+        @updateAttributes {datapoints}, callback
     else
         callback()
 
