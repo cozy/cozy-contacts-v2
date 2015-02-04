@@ -34,7 +34,7 @@ module.exports = class Contact extends cozydb.CozyModel
         _attachments  : Object
 
     @cast: (attributes, target) ->
-        super
+        target = super attributes, target
         # Cleanup the model,
         # Defensive against data from DataSystem
 

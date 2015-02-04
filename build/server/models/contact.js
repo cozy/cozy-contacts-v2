@@ -52,7 +52,7 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.cast = function(attributes, target) {
-    Contact.__super__.constructor.cast.apply(this, arguments);
+    target = Contact.__super__.constructor.cast.call(this, attributes, target);
     if ((target.n == null) || target.n === '') {
       if (target.fn == null) {
         target.fn = '';
