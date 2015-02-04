@@ -8,6 +8,7 @@ else
 Contact = require "#{prefix}server/models/contact"
 Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
+ds = require 'cozydb/lib/client'
 
 TESTPORT = process.env.PORT or 8013
 
@@ -33,6 +34,11 @@ module.exports =
         baseContact = new Contact(data)
         Contact.create baseContact, (err, contact) =>
             @contact = contact
+            done err
+
+    createRaw: (data) -> (done) ->
+        ds.post '/data/', data, (err, res, body) =>
+            @created = body
             done err
 
     makeTestClient: (done) ->
