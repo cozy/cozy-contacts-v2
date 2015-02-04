@@ -30,21 +30,22 @@ module.exports = Contact = cozydb.getModel 'Contact',
     tags          : [String]
     _attachments  : Object
 
-Contact.afterInitialize = ->
+Contact.cast = (attributes, target) ->
+    super
     # Cleanup the model,
     # Defensive against data from DataSystem
 
     # n and fn MUST be valid.
-    if not @n? or @n is ''
-        if not @fn?
-            @fn = ''
+    if not target.n? or target.n is ''
+        if not target.fn?
+            target.fn = ''
 
-        @n = @getComputedN()
+        target.n = target.getComputedN()
 
-    else if not @fn? or @fn is ''
-        @fn = @getComputedFN()
+    else if not target.fn? or target.fn is ''
+        target.fn = target.getComputedFN()
 
-    return @
+    return target
 
 # Save given file as contact picture then delete given file from disk.
 Contact::savePicture = (path, callback) ->
