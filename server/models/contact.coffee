@@ -17,35 +17,38 @@ class DataPoint extends cozydb.Model
         value: cozydb.NoSchema
         type: String
 
-module.exports = Contact = cozydb.getModel 'Contact',
-    id            : String
-    # vCard FullName = display name
-    # (Prefix Given Middle Familly Suffix), or something else.
-    fn            : String
-    # vCard Name = splitted
-    # (Familly;Given;Middle;Prefix;Suffix)
-    n             : String
-    datapoints    : [DataPoint]
-    note          : String
-    tags          : [String]
-    _attachments  : Object
 
-Contact.cast = (attributes, target) ->
-    super
-    # Cleanup the model,
-    # Defensive against data from DataSystem
+module.exports = class Contact extends cozydb.CozyModel
+    @docType: 'contact'
+    @schema:
+        id            : String
+        # vCard FullName = display name
+        # (Prefix Given Middle Familly Suffix), or something else.
+        fn            : String
+        # vCard Name = splitted
+        # (Familly;Given;Middle;Prefix;Suffix)
+        n             : String
+        datapoints    : [DataPoint]
+        note          : String
+        tags          : [String]
+        _attachments  : Object
 
-    # n and fn MUST be valid.
-    if not target.n? or target.n is ''
-        if not target.fn?
-            target.fn = ''
+    @cast: (attributes, target) ->
+        super
+        # Cleanup the model,
+        # Defensive against data from DataSystem
 
-        target.n = target.getComputedN()
+        # n and fn MUST be valid.
+        if not target.n? or target.n is ''
+            if not target.fn?
+                target.fn = ''
 
-    else if not target.fn? or target.fn is ''
-        target.fn = target.getComputedFN()
+            target.n = target.getComputedN()
 
-    return target
+        else if not target.fn? or target.fn is ''
+            target.fn = target.getComputedFN()
+
+        return target
 
 # Save given file as contact picture then delete given file from disk.
 Contact::savePicture = (path, callback) ->
