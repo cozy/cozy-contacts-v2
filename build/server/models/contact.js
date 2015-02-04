@@ -32,27 +32,41 @@ DataPoint = (function(_super) {
 
 })(cozydb.Model);
 
-module.exports = Contact = cozydb.getModel('Contact', {
-  id: String,
-  fn: String,
-  n: String,
-  datapoints: [DataPoint],
-  note: String,
-  tags: [String],
-  _attachments: Object
-});
+module.exports = Contact = (function(_super) {
+  __extends(Contact, _super);
 
-Contact.afterInitialize = function() {
-  if ((this.n == null) || this.n === '') {
-    if (this.fn == null) {
-      this.fn = '';
-    }
-    this.n = this.getComputedN();
-  } else if ((this.fn == null) || this.fn === '') {
-    this.fn = this.getComputedFN();
+  function Contact() {
+    return Contact.__super__.constructor.apply(this, arguments);
   }
-  return this;
-};
+
+  Contact.docType = 'contact';
+
+  Contact.schema = {
+    id: String,
+    fn: String,
+    n: String,
+    datapoints: [DataPoint],
+    note: String,
+    tags: [String],
+    _attachments: Object
+  };
+
+  Contact.cast = function(attributes, target) {
+    Contact.__super__.constructor.cast.apply(this, arguments);
+    if ((target.n == null) || target.n === '') {
+      if (target.fn == null) {
+        target.fn = '';
+      }
+      target.n = target.getComputedN();
+    } else if ((target.fn == null) || target.fn === '') {
+      target.fn = target.getComputedFN();
+    }
+    return target;
+  };
+
+  return Contact;
+
+})(cozydb.CozyModel);
 
 Contact.prototype.savePicture = function(path, callback) {
   var data;
