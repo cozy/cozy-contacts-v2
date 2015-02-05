@@ -1,5 +1,5 @@
 ViewCollection = require 'lib/view_collection'
-TagsView = require 'views/contact_tags'
+TagsView = require 'widgets/tags'
 ContactName = require 'views/contact_name'
 Datapoint = require 'models/datapoint'
 request = require '../lib/request'
@@ -90,11 +90,15 @@ module.exports = class ContactView extends ViewCollection
         @uploader = @$('#uploader')[0]
         @picture  = @$('#picture .picture')
         @tags = new TagsView
-            el: @$('#tags')
+            el: @$ '.tags'
             model: @model
-            onChange: =>
-                @needSaving = true
-                @changeOccured true
+
+        @tags.render()
+        @tags.on 'tagClicked', (tag) =>
+            $("#filterfield").val tag
+            $("#filterfield").trigger 'keyup'
+            $(".dropdown-menu").hide()
+
         super
         @$el.niceScroll()
         @resizeNote()

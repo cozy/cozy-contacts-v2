@@ -177,6 +177,9 @@ module.exports = class Contact extends Backbone.Model
 
         return VCardParser.fnToN fn
 
+    getTags: ->
+        @get('tags').map (tagName) ->
+            return app.tags.getOrCreateByName tagName
 
     # Ask to server to create a new task that says to call back current
     # contact.

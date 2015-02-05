@@ -15,6 +15,7 @@ module.exports = class ContactsListItemView extends BaseView
           bestmail:   @model.getBest 'email'
           besttel:    @model.getBest 'tel'
           displayName:       @model.getDisplayName()
+          tags: @model.getTags()
           timestamp: Date.now()
 
     template: require 'templates/contactslist_item'
