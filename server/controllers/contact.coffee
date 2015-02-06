@@ -2,24 +2,24 @@ path    = require 'path'
 multiparty = require 'multiparty'
 async = require 'async'
 Contact = require '../models/contact'
-Todolist = require '../models/todolist'
-Task = require '../models/task'
+helpers = require '../helpers/helpers'
+americano = require 'cozydb'
+
+
+baseController = new americano.SimpleController
+    model: Contact
+    reqParamID: 'contactid'
+    reqProp: 'contact'
 
 module.exports =
+    fetch: baseController.fetch
+    list: baseController.listAll
+    read: baseController.send
+    delete: baseController.destroy
+    picture: baseController.sendAttachment
+        filename: 'picture'
+        default: path.resolve __dirname, '../assets/defaultpicture.png'
 
-
-    fetch: (req, res, next, id) ->
-        Contact.find id, (err, contact) ->
-            return res.error 500, 'An error occured', err if err
-            return res.error 404, 'Contact not found' if not contact
-
-            req.contact = contact
-            next()
-
-    list: (req, res) ->
-        Contact.request 'all', (err, contacts) ->
-            return res.error 500, 'An error occured', err if err
-            res.send contacts
 
     create: (req, res) ->
 
@@ -27,6 +27,8 @@ module.exports =
         model = if req.body.contact then JSON.parse req.body.contact
         else req.body
 
+        isImport = model.import
+        delete model.import
         toCreate = new Contact model
 
         create = ->
@@ -36,7 +38,7 @@ module.exports =
                 else
                     res.send contact, 201
 
-        if model.import
+        if isImport
             # If creation is related to an import, it checks first if the
             # contact doesn't exist already by comparing the names
             # or emails if name is not specified.
@@ -58,8 +60,6 @@ module.exports =
         else
             create()
 
-    read: (req, res) ->
-        res.send req.contact
 
     update: (req, res) ->
         model = if req.body.contact then JSON.parse req.body.contact
@@ -88,21 +88,6 @@ module.exports =
             else
                 next new Error 'Can\'t change picture, no file is attached.'
 
-    delete: (req, res) ->
-        req.contact.destroy (err) ->
-            return res.error 500, "Deletion failed.", err if err
-
-            res.send "Deletion succeded.", 204
-
-    picture: (req, res, next) ->
-        if req.contact._attachments?.picture
-            stream = req.contact.getFile 'picture', (err) ->
-                next err if err
-
-            stream.pipe res
-        else
-            res.sendfile path.resolve __dirname, '../assets/defaultpicture.png'
-
     # Export contacts to a vcard file.
     vCard: (req, res, next) ->
         Contact.request 'all', (err, contacts) ->
@@ -112,11 +97,7 @@ module.exports =
                 return next err if err?
 
                 vCardOutput = outputs.join ''
-                date = new Date()
-                year = date.getYear()
-                month = date.getMonth()
-                day = date.getDay()
-                date = "#{year}-#{month}-#{day}"
+                date = helpers.makeDateStamp()
                 res.attachment "cozy-contacts-#{date}.vcf"
                 res.set 'Content-Type', 'text/x-vcard'
                 res.send vCardOutput

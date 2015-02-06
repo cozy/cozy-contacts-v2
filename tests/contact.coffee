@@ -4,9 +4,9 @@ expect = require('chai').expect
 fixtures = require './fixtures/data'
 helpers = require './helpers'
 
-Task = require "#{helpers.prefix}server/models/task"
 Contact = require "#{helpers.prefix}server/models/contact"
 
+_global = {}
 
 describe 'Contacts', ->
 
@@ -38,12 +38,12 @@ describe 'Contacts', ->
             expect(@body).to.have.length 1
             expect(@body[0].id).to.exist
             expect(@body[0].fn).to.equal fixtures.contact1.fn
-            @id = @body[0].id
+            _global.id = @body[0].id
 
     describe 'Read - GET /contacts/:id', ->
 
         it 'should allow requests', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'should reply with one contact', ->
             expect(@body.fn).to.equal fixtures.contact1.fn
@@ -61,7 +61,7 @@ describe 'Contacts', ->
         it 'should reply with the created contact', ->
             expect(@body.fn).to.equal contact.fn
             expect(@body.id).to.exist
-            @id = @body.id
+            _global.id = @body.id
 
         it 'When you create the same contact with import flag', (done) ->
             contact =
@@ -100,27 +100,71 @@ describe 'Contacts', ->
             note: 'funny guy'
 
         it 'should allow requests', (done) ->
-            @client.put "contacts/#{@id}", update, done
+            @client.put "contacts/#{_global.id}", update, done
 
         it 'should reply with the updated album', ->
             expect(@body.note).to.equal update.note
 
         it 'when I GET the contact', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'then it is changed', ->
             expect(@body.note).to.equal update.note
 
+    describe 'Add picture - PUT /contacts/:id/picture ', ->
+
+        file = __dirname + '/fixtures/thumb.jpg'
+        dest = './picture.jpg'
+
+        it 'should allow request', (done) ->
+            # request-json doesnt allow PUT form.
+            # do it manually
+            stream = require('http').request
+                port: process.env.PORT or 8013
+                method: 'PUT'
+                path: "/contacts/#{_global.id}/picture"
+
+            , (res) =>
+                res.setEncoding 'utf8'
+                @body = ''
+                res.on 'data', (data) => @body += data
+                res.on 'end', -> done null
+
+            stream.on 'error', done
+            stream.setHeader 'Content-Type', 'multipart/form-data; ' + \
+                                'boundary=randomBoundary'
+            stream.write "--randomBoundary\r\n"
+            stream.write 'Content-Disposition: form-data; name="picture"; ' + \
+                                '; filename="thumb.jpg"'
+            stream.write "\r\nContent-Type: image/jpeg"
+            stream.write "\r\n\r\n"
+            stream.write fs.readFileSync file
+            stream.write "\r\n--randomBoundary--"
+            stream.end()
+
+        it 'should return the contact', ->
+            expect(JSON.parse(@body).fn).to.equal 'Jane Smith'
+
+        it 'when i GET the picture', (done) ->
+            path = "contacts/#{_global.id}/picture.png"
+            @client.saveFile path, dest, done
+
+        it 'the file has not been corrupted', ->
+            stat1 = fs.statSync file
+            stat2 = fs.statSync dest
+            expect(stat1.size).to.equal stat2.size
+
+
     describe 'Delete - DELETE /contacts/:id', ->
 
         it 'should allow requests', (done) ->
-            @client.del "contacts/#{@id}", done
+            @client.del "contacts/#{_global.id}", done
 
         it 'should reply with 204 status', ->
             expect(@response.statusCode).to.equal 204
 
         it 'when I GET the contact', (done) ->
-            @client.get "contacts/#{@id}", done
+            @client.get "contacts/#{_global.id}", done
 
         it 'then i get an error', ->
             expect(@response.statusCode).to.equal 404

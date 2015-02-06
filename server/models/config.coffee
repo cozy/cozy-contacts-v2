@@ -1,5 +1,4 @@
-americano = require 'americano-cozy'
-ContactLog = require './contact_log'
+americano = require 'cozydb'
 
 module.exports = Config = americano.getModel 'ContactConfig',
     nameOrder: type: String, default: 'not-set'

@@ -39,11 +39,6 @@ label.control-label(for="nameFormat")= t('name format info')
         option(value="given-middleinitial-familly")= t('format given mid familly')
     span.help-inline
 
-
-h2= t('import export')
-p= t("call log info") + ' '
-    a(href="#callimport")= t('import call log')
-
 p= t('vcard export info') + ' '
     a(href="contacts.vcf", download="contacts.vcf", title=t("export vcard"))= t('export all vcard')
 

@@ -11,18 +11,17 @@
   "description": "A cozy application to manage your contacts.",
   "main": "server.coffee",
   "dependencies": {
-    "cozy-i18n-helper": "0.0.4",
     "async": "0.9.0",
-    "jade": "0.32.0",
+    "jade": "1.3.1",
     "americano": "0.3.11",
-    "americano-cozy": "0.2.9",
+    "cozydb": "0.0.2",
     "cozy-realtime-adapter": "0.11.3",
-    "request-json": "0.4.13",
     "printit": "0.1.3",
-    "multiparty": "^4.0.0",
+    "multiparty": "4.0.0",
     "cozy-vcard": "0.2.0"
   },
   "devDependencies": {
+    "request-json": "0.4.13",
     "chai": "~1.5.0",
     "mocha": "~1.9.0",
     "sinon": "~1.6.0",
@@ -44,27 +43,8 @@
     "ContactConfig": {
       "description": "Store your settings for contacts"
     },
-    "PhoneCommunicationLog": {
-      "description": "FING/Orange retrieve calls log from your invoice"
-    },
-    "ContactLog": {
-      "description": "Log your history with a contact"
-    },
-    "Mail": {
-      "description": "Display last emails for a contact"
-    },
-    "Task": {
-      "description": "Create call tasks from a contact"
-    },
-    "TodoList": {
-      "description": "Create the \"inbox\" TodoList"
-    },
-    "Tree": {
-      "description": "Find the Inbox TodoList"
-    },
     "WebDAVAccount": {
       "description": "Store webDAV password and sync informations"
     }
-  },
-  "cozy-widget": "/apps/contacts/widget"
+  }
 }

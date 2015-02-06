@@ -9,12 +9,19 @@ module.exports =
                 maxAge: 86400000
             americano.bodyParser keepExtensions: true
             require('./helpers/shortcut')
-            americano.errorHandler
+        ]
+        afterStart: (app, server) ->
+            app.use (req, res) -> res.end()
+            # move it here needed after express 4.4
+            app.use americano.errorHandler
                 dumpExceptions: true
                 showStack: true
-        ]
         set:
-            'views': './client/'
+            views: path.join __dirname, 'views'
+
+        engine:
+            js: (path, locales, callback) ->
+                callback null, require(path)(locales)
 
     development: [
         americano.logger 'dev'
@@ -25,5 +32,5 @@ module.exports =
     ]
 
     plugins: [
-        'americano-cozy'
+        'cozydb'
     ]

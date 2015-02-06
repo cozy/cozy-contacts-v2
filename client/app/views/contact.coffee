@@ -1,5 +1,4 @@
 ViewCollection = require 'lib/view_collection'
-HistoryView = require 'views/history'
 TagsView = require 'views/contact_tags'
 ContactName = require 'views/contact_name'
 Datapoint = require 'models/datapoint'
@@ -50,7 +49,6 @@ module.exports = class ContactView extends ViewCollection
         super
         @listenTo @model     , 'change' , @modelChanged
         @listenTo @model     , 'sync'   , @onSuccess
-        @listenTo @model.history, 'add',  @resizeNiceScroll
         @listenTo @collection, 'change' , =>
             @needSaving = true
             @changeOccured()
@@ -64,7 +62,7 @@ module.exports = class ContactView extends ViewCollection
 
     getRenderData: ->
         _.extend {}, @model.toJSON(),
-            hasPicture: @model.hasPicture or false
+            hasPicture: not not @model.get('pictureRev')
             fn: @model.get 'fn'
             timestamp: Date.now()
 
@@ -102,15 +100,8 @@ module.exports = class ContactView extends ViewCollection
         @resizeNote()
         @currentState = @model.toJSON()
 
-        # don't try to display history of newly created contact
-        # before it is created
-        if @model.get('id')?
-            @history = new HistoryView
-                collection: @model.history
-            @history.render().$el.appendTo @$('#history')
-
         @$('a#infotab').tab('show') if $(window).width() < 900
-        # resize nice scroll when we switch to history tab
+        # resize nice scroll when we switch to note tab
         @$('a[data-toggle="tab"]').on 'shown', =>
             @$('#left').hide() if $(window).width() < 900
             @resizeNiceScroll()
@@ -230,11 +221,11 @@ module.exports = class ContactView extends ViewCollection
         @notesfield.val @model.get 'note'
         @tags?.refresh()
         id = @model.get 'id'
-        if id?
-            # don't update picture of newly created contact
+        if id and @model.get('pictureRev')
             timestamp = Date.now()
-            url = "contacts/#{@model.get 'id'}/picture.png?#{timestamp}"
-            @$('#picture img').attr 'src', url
+            @$('.picture').prop 'src', "contacts/#{id}/picture.png?#{timestamp}"
+        else
+            @$('.picture').prop 'src', "img/defaultpicture.png"
         @resizeNote()
 
     addBelowIfEnter: (event) ->

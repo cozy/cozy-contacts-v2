@@ -1,6 +1,4 @@
 BaseView       = require 'lib/base_view'
-CallLogReader  = require 'lib/call_log_reader'
-ContactLogCollection = require 'collections/contactlog'
 app            = require 'application'
 
 module.exports = class ContactName extends BaseView

@@ -6,11 +6,9 @@ else
     prefix = path.join __dirname, '../'
 
 Contact = require "#{prefix}server/models/contact"
-Task = require "#{prefix}server/models/task"
-PCLog = require "#{prefix}server/models/phone_communication_log"
-ContactLog = require "#{prefix}server/models/contact_log"
 Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
+ds = require 'cozydb/lib/client'
 
 TESTPORT = process.env.PORT or 8013
 
@@ -30,9 +28,7 @@ module.exports =
     clearDb: (done) ->
         Config.requestDestroy "all", ->
             Contact.requestDestroy "all", ->
-                PCLog.requestDestroy "all", ->
-                    Task.requestDestroy "all", ->
-                        ContactLog.requestDestroy "all", done
+                done()
 
     createContact: (data) -> (done) ->
         baseContact = new Contact(data)
@@ -40,13 +36,19 @@ module.exports =
             @contact = contact
             done err
 
+    createRaw: (data) -> (done) ->
+        ds.post '/data/', data, (err, res, body) =>
+            @created = body
+            done err
+
     makeTestClient: (done) ->
         old = new Client "http://localhost:#{TESTPORT}/"
+        old.headers['accept'] = 'application/json'
 
         store = this # this will be the common scope of tests
 
         callbackFactory = (done) -> (error, response, body) =>
-            throw error if(error)
+            return done error if error
             store.response = response
             store.body = body
             done()

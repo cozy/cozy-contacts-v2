@@ -1,54 +1,54 @@
-americano = require 'americano-cozy'
+cozydb = require 'cozydb'
 async = require 'async'
-ContactLog = require './contact_log'
 VCardParser = require 'cozy-vcard'
 fs = require 'fs'
 log = require('printit')
     prefix: 'Contact Model'
 
-module.exports = Contact = americano.getModel 'Contact',
-    id            : String
-    # vCard FullName = display name
-    # (Prefix Given Middle Familly Suffix), or something else.
-    fn            : String
-    # vCard Name = splitted
-    # (Familly;Given;Middle;Prefix;Suffix)
-    n             : String
-    # Datapoints is an array of { name, type, value ...} objects,
-    # values are typically String. Particular case, adr :
-    # name: 'adr',
-    # type: 'home',
-    # value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
-    datapoints    : (x) -> x
-    note          : String
-    tags          : (x) -> x # DAMN IT JUGGLING
-    _attachments  : Object
 
-Contact.afterInitialize = ->
-    # Cleanup the model,
-    # Defensive against data from DataSystem
+# Datapoints is an array of { name, type, value ...} objects,
+# values are typically String. Particular case, adr :
+# name: 'adr',
+# type: 'home',
+# value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
+class DataPoint extends cozydb.Model
+    @schema:
+        name: String
+        value: cozydb.NoSchema
+        type: String
 
-    # n and fn MUST be valid.
-    if not @n? or @n is ''
-        if not @fn?
-            @fn = ''
 
-        @n = @getComputedN()
+module.exports = class Contact extends cozydb.CozyModel
+    @docType: 'contact'
+    @schema:
+        id            : String
+        # vCard FullName = display name
+        # (Prefix Given Middle Familly Suffix), or something else.
+        fn            : String
+        # vCard Name = splitted
+        # (Familly;Given;Middle;Prefix;Suffix)
+        n             : String
+        datapoints    : [DataPoint]
+        note          : String
+        tags          : [String]
+        _attachments  : Object
 
-    else if not @fn? or @fn is ''
-        @fn = @getComputedFN()
+    @cast: (attributes, target) ->
+        target = super attributes, target
+        # Cleanup the model,
+        # Defensive against data from DataSystem
 
-    return @
+        # n and fn MUST be valid.
+        if not target.n? or target.n is ''
+            if not target.fn?
+                target.fn = ''
 
-Contact::remoteKeys = ->
-    model = @toJSON()
-    out = [@id]
-    for dp in model.datapoints
-        if dp.name is 'tel'
-            out.push ContactLog.normalizeNumber dp.value
-        else if dp.name is 'email'
-            out.push dp.value?.toLowerCase()
-    return out
+            target.n = target.getComputedN()
+
+        else if not target.fn? or target.fn is ''
+            target.fn = target.getComputedFN()
+
+        return target
 
 # Save given file as contact picture then delete given file from disk.
 Contact::savePicture = (path, callback) ->
@@ -88,14 +88,16 @@ Contact::toVCF = (callback) ->
 # Simple string is replaced by an String[7] .
 Contact::migrateAdr = (callback) ->
     hasMigrate = false
-    @?.datapoints?.forEach (dp) ->
+
+    datapoints = this?.datapoints or []
+    datapoints?.forEach (dp) ->
         if dp.name is 'adr'
             if typeof dp.value is 'string' or dp.value instanceof String
                 dp.value = VCardParser.adrStringToArray dp.value
                 hasMigrate = true
 
     if hasMigrate
-        @updateAttributes {}, callback
+        @updateAttributes {datapoints}, callback
     else
         callback()
 

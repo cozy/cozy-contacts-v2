@@ -12,16 +12,27 @@ module.exports = {
         maxAge: 86400000
       }), americano.bodyParser({
         keepExtensions: true
-      }), require('./helpers/shortcut'), americano.errorHandler({
+      }), require('./helpers/shortcut')
+    ],
+    afterStart: function(app, server) {
+      app.use(function(req, res) {
+        return res.end();
+      });
+      return app.use(americano.errorHandler({
         dumpExceptions: true,
         showStack: true
-      })
-    ],
+      }));
+    },
     set: {
-      'views': './client/'
+      views: path.join(__dirname, 'views')
+    },
+    engine: {
+      js: function(path, locales, callback) {
+        return callback(null, require(path)(locales));
+      }
     }
   },
   development: [americano.logger('dev')],
   production: [americano.logger('short')],
-  plugins: ['americano-cozy']
+  plugins: ['cozydb']
 };

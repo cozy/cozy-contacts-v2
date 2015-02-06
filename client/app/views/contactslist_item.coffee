@@ -10,8 +10,8 @@ module.exports = class ContactsListItemView extends BaseView
         @listenTo @model, 'change', @render
 
     getRenderData: ->
-        _.extend {},  @model.attributes,
-          hasPicture: @model.hasPicture or false
+        _.extend {},  @model.toJSON(),
+          hasPicture: not not @model.get('pictureRev')
           bestmail:   @model.getBest 'email'
           besttel:    @model.getBest 'tel'
           displayName:       @model.getDisplayName()
