@@ -14,8 +14,9 @@ module.exports = class TagsView extends BaseView
         <input type="text" placeholder="#{t('add tags')}">
     """
 
-    initialize: ->
-        @tags = @model.get 'tags'
+    initialize: (options)->
+        @options = options
+        @refresh()
         @listenTo @model, 'change:tags', =>
             @refresh()
 
@@ -80,7 +81,11 @@ module.exports = class TagsView extends BaseView
     setTags: (newTags) =>
         @tags = newTags
         @tags ?= []
-        @model.save tags: @tags
+        @model.attributes.tags = newTags
+        if @options.onBlur?
+            @options.onBlur()
+        else
+            @model.save tags: @tags
 
     deleteTag: (e) =>
         tag = e.target.parentNode.dataset.value
@@ -93,7 +98,7 @@ module.exports = class TagsView extends BaseView
         @input = @$('input')
 
     refresh: =>
-        @tags = @model.get 'tags'
+        @tags = _.clone @model.get 'tags'
         @$('.tag').remove()
         html = ("""
                 <li class="tag" data-value="#{tag.get 'name' }" style="background: #{tag.get 'color' };">
