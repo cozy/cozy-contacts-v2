@@ -1,10 +1,11 @@
-americano = require 'americano-cozy'
+cozydb = require 'cozydb'
 log = require('printit')
     prefix: 'tag:model'
 
-module.exports = Tag = americano.getModel 'Tag',
-    name : type: String
-    color : type: String
+module.exports = class Tag extends cozydb.CozyModel
+    @schema:
+        name: type: String
+        color: type: String
 
 Tag.all = (callback) ->
     Tag.request 'all', callback

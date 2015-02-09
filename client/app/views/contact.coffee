@@ -73,8 +73,8 @@ module.exports = class ContactView extends ViewCollection
                 @doNeedSaving ev
 
             onBlur: (ev) =>
-                @changeOccured()
                 @needSaving = true
+                @changeOccured()
 
 
         @contactName.render()
@@ -92,6 +92,10 @@ module.exports = class ContactView extends ViewCollection
         @tags = new TagsView
             el: @$ '.tags'
             model: @model
+            onBlur: (ev) =>
+                @needSaving = true
+                @changeOccured true
+
 
         @tags.render()
         @tags.on 'tagClicked', (tag) =>
