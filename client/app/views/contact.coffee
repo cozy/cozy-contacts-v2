@@ -75,8 +75,7 @@ module.exports = class ContactView extends ViewCollection
             onBlur: (ev) =>
                 @changeOccured()
                 @needSaving = true
-
-
+            contactWidget: @
         @contactName.render()
 
         @zones = {}
@@ -187,8 +186,14 @@ module.exports = class ContactView extends ViewCollection
                 @collection.trigger 'change', @model
 
     toggleContactName: ->
-        @$('#name').hide()
-        @$('#contact-name').show()
+        if @$('#name').is ':visible'
+            @$('#name').hide()
+            @$('#contact-name').show()
+            @$('#first').focus()
+        else
+            @$('#name').show()
+            @$('#contact-name').hide()
+            @$('#name').blur()
 
     onMoreOptionsClicked: =>
         @$("#more-options").fadeOut =>

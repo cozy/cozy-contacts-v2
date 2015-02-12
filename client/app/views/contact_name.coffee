@@ -11,6 +11,11 @@ module.exports = class ContactName extends BaseView
         'keyup input': 'onKeyup'
         'blur input': 'onBlur'
         'click #toggle-name-fields': 'toggleFields'
+        'click #toggle-name': 'toggleName'
+
+    constructor: (options) ->
+        super options
+        @contactWidget = options.contactWidget
 
     afterRender: ->
         @toggleFields()
@@ -61,3 +66,6 @@ module.exports = class ContactName extends BaseView
 
     onBlur: (ev) ->
         @options.onBlur ev
+
+    toggleName: ->
+        @contactWidget.toggleContactName()
