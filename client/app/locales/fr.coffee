@@ -69,6 +69,12 @@ module.exports =
   "full name"             : "Nom complet"
   "save"                  : "Enregister"
 
+# photo modal
+  "pick from files"         : "Choisir une photo"
+  "photo-modal chooseAgain" : "Changer de photo"
+  "modal ok"                : "OK"
+  "modal cancel"            : "Annuler"
+
 # ContactList
   "search placeholder"    : "Recherche…"
   "new contact"           : "Nouveau Contact"

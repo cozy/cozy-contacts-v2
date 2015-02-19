@@ -4,7 +4,8 @@ async = require 'async'
 fs = require 'fs'
 im = require 'imagemagick'
 onThumbCreation = require('../../init').onThumbCreation
-fileByPage = 5 * 12
+fileByPage = 7
+# fileByPage = 5 * 12
 
 # Get given file, returns 404 if photo is not found.
 module.exports.fetch = (req, res, next, id) ->
@@ -62,12 +63,15 @@ module.exports.list = (req, res, next) ->
 
 # Return thumb for given file.
 module.exports.thumb = (req, res, next) ->
-    console.log 'taratata'
-    # console.log req
-    console.log req.file
     which = if req.file.binary.thumb then 'thumb' else 'file'
-    console.log which
+    stream = req.file.getBinary which, (err) ->
+        return next err if err
+    stream.pipe res
 
+
+# Return screen for given file.
+module.exports.screen = (req, res, next) ->
+    which = if req.file.binary.screen then 'screen' else 'file'
     stream = req.file.getBinary which, (err) ->
         return next err if err
     stream.pipe res
