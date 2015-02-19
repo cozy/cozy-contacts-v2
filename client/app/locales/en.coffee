@@ -10,6 +10,9 @@ module.exports =
   "show"                  : "Show"
   "hide"                  : "Hide"
 
+  "contact name expand"   : "Show contact name details"
+  "contact name check"    : "Close contact name edition"
+
   "company"               : "Company"
   "title"                 : "Title"
   "birthday"              : "Birthday"

@@ -313,10 +313,18 @@ textarea
       display none
       float right
 
-    #toggle-name-fields
-      display inline-block
-      vertical-align top
-      margin 10px
+    .button-wrapper
+      margin-bottom: 15px
+
+      a:hover
+        color: orange
+
+      a
+        padding-right: 10px
+
+      #toggle-name-fields
+        display inline-block
+        vertical-align top
 
     &:hover
       #name-edit
@@ -629,6 +637,11 @@ textarea
         textarea
             margin-top: 10px
 
+    #contact-name
+        .control-group
+            .control-label
+                text-align left
+
 #more-options
     width: 100%
     padding: 5px
@@ -685,68 +698,88 @@ textarea
           display block
 
     #contact
-      background: white
+        background white
+        box-shadow none
 
-      .nav-tabs
-      .tab-content
-          width: 94%
+        h2
+            font-size 20px
 
-      #right
-        left 3%
-        top 160px
-        width 97%
-        box-sizing: border-box
+        .nav-tabs
+        .tab-content
+            width: 94%
 
-      #infotab
-        display block
+        .nav-tabs
+            margin-left 2%
+            margin-bottom 10px
 
-      #left
-        width 100%
+            li
+                a
+                    font-size 20px
 
-      #abouts.zone h2
-        visibility hidden
-        height 10px
+        #right
+            left 3%
+            top 160px
+            width 97%
+            box-sizing border-box
+
+        #infotab
+            display block
+
+        #left
+            width 100%
+
+        #abouts.zone h2
+            visibility hidden
+            height 10px
 
 
-      #left
-        width 98%
-        box-sizing: border-box
-        top 220px
+        #left
+            width 98%
+            box-sizing border-box
+            top 220px
 
-      #left
-        .zone
-          a.btn.add
-            display: none
+        #left
+            .zone
+                a.btn.add
+                    display none
 
-      #adder
-        display: none
+        #adder
+            display none
 
-@media (max-width: 600px)
-    #contact
+
         #name
             padding-left 0
 
         #picture
             display none
 
+        #notes-zone
+            margin-left 2%
+
         #wrap-name-notes
-            padding-left 10px
+            padding-left 0
 
         #wrap-name-notes:hover
             #name-edit
                 display none
+
+        #top
+            margin-top 15px
+
+            #name
+                font-size 24px
+                margin-bottom 5px
+                width 90%
+
     #contact-name
         .control-group
             margin-bottom 0
 
-@media (max-width: 480px)
-
-    #contact-name
-        .control-group
             .control-label
                 float left
                 padding-top 5px
-                text-align right
+                text-align left
+
 
 // Widget
 #contacts-list.contact-widget

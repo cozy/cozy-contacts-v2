@@ -28,7 +28,8 @@ module.exports = class ContactsList extends ViewCollection
         @filterfield = @$ '#filterfield'
         @filterClean = @$ '#filterClean'
         @filterClean.hide()
-        @filterfield.focus()
+        if $(window).width() > 900 # not a mobile/tabler
+            @filterfield.focus()
         @list.niceScroll()
         # fucking bootstrap
         @filterfield.keyup @keyUpCallback

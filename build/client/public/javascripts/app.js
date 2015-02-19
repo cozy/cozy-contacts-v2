@@ -558,6 +558,8 @@ module.exports = {
   "add contact": "Create a new contact",
   "show": "Show",
   "hide": "Hide",
+  "contact name expand": "Show contact name details",
+  "contact name check": "Close contact name edition",
   "company": "Company",
   "title": "Title",
   "birthday": "Birthday",
@@ -669,6 +671,8 @@ module.exports = {
   "add contact": "Créer un contact",
   "show": "Montrer",
   "hide": "Cacher",
+  "contact name expand": "Afficher les détails sur le nom",
+  "contact name check": "Fermet l'édition du nom",
   "company": "Société",
   "title": "Titre",
   "birthday": "Anniversaire",
@@ -1278,7 +1282,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,tags = locals_.tags,note = locals_.note;
-buf.push("<div id=\"contact-container\"><a id=\"close\" href=\"#\">&lt;</a><div id=\"top\"><div id=\"picture\">");
+buf.push("<div id=\"contact-container\"><div id=\"top\"><div id=\"picture\">");
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png", true, false)) + " class=\"picture\"/>");
@@ -1287,7 +1291,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<input id=\"uploader\" type=\"file\"/><div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><a id=\"close\" href=\"#\">&lt;</a></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1306,7 +1310,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 var locals_ = (locals || {}),n = locals_.n;
-buf.push("<form class=\"form-horizontal\"><div class=\"control-group prefix\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group first\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group middle\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group last\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group suffix\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div></form><a id=\"toggle-name-fields\" class=\"icon-black icon-minus\"></a>");;return buf.join("");
+buf.push("<form class=\"form-horizontal\"><div class=\"control-group prefix\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group first\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group middle\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group last\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group suffix\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div></form><div class=\"button-wrapper\"><a id=\"toggle-name-fields\"" + (jade.attr("title", t("contact name expand"), true, false)) + " class=\"icon-black icon-minus\"></a><a id=\"toggle-name\"" + (jade.attr("title", t("contact name check"), true, false)) + " class=\"icon-black icon-check\"></a></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1551,7 +1555,8 @@ module.exports = ContactView = (function(_super) {
           _this.changeOccured();
           return _this.needSaving = true;
         };
-      })(this)
+      })(this),
+      contactWidget: this
     });
     this.contactName.render();
     this.zones = {};
@@ -1709,8 +1714,15 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.toggleContactName = function() {
-    this.$('#name').hide();
-    return this.$('#contact-name').show();
+    if (this.$('#name').is(':visible')) {
+      this.$('#name').hide();
+      this.$('#contact-name').show();
+      return this.$('#first').focus();
+    } else {
+      this.$('#name').show();
+      this.$('#contact-name').hide();
+      return this.$('#name').blur();
+    }
   };
 
   ContactView.prototype.onMoreOptionsClicked = function() {
@@ -1893,11 +1905,6 @@ app = require('application');
 module.exports = ContactName = (function(_super) {
   __extends(ContactName, _super);
 
-  function ContactName() {
-    this.setName = __bind(this.setName, this);
-    return ContactName.__super__.constructor.apply(this, arguments);
-  }
-
   ContactName.prototype.template = require('templates/contact_name');
 
   ContactName.prototype.el = '#contact-name';
@@ -1905,8 +1912,15 @@ module.exports = ContactName = (function(_super) {
   ContactName.prototype.events = {
     'keyup input': 'onKeyup',
     'blur input': 'onBlur',
-    'click #toggle-name-fields': 'toggleFields'
+    'click #toggle-name-fields': 'toggleFields',
+    'click #toggle-name': 'toggleName'
   };
+
+  function ContactName(options) {
+    this.setName = __bind(this.setName, this);
+    ContactName.__super__.constructor.call(this, options);
+    this.contactWidget = options.contactWidget;
+  }
 
   ContactName.prototype.afterRender = function() {
     return this.toggleFields();
@@ -1981,6 +1995,10 @@ module.exports = ContactName = (function(_super) {
 
   ContactName.prototype.onBlur = function(ev) {
     return this.options.onBlur(ev);
+  };
+
+  ContactName.prototype.toggleName = function() {
+    return this.contactWidget.toggleContactName();
   };
 
   return ContactName;
@@ -2113,7 +2131,9 @@ module.exports = ContactsList = (function(_super) {
     this.filterfield = this.$('#filterfield');
     this.filterClean = this.$('#filterClean');
     this.filterClean.hide();
-    this.filterfield.focus();
+    if ($(window).width() > 900) {
+      this.filterfield.focus();
+    }
     this.list.niceScroll();
     this.filterfield.keyup(this.keyUpCallback);
     return this.filterfield.typeahead({
