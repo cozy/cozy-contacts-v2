@@ -19,11 +19,13 @@ module.exports =
         window.t = @polyglot.t.bind @polyglot
 
         ContactsCollection = require('collections/contact')
+        TagCollection = require 'collections/tags'
         ContactsList = require('views/contactslist')
         Config = require('models/config')
         Router = require('router')
 
         @contacts = new ContactsCollection()
+        @tags = new TagCollection()
         @contactslist = new ContactsList collection: @contacts
         @contactslist.$el.appendTo $('body')
         @contactslist.render()
@@ -39,6 +41,11 @@ module.exports =
             delete window.initcontacts
         else
             @contacts.fetch()
+
+        if window.inittags?
+            @tags.reset window.inittags, parse: true
+        else
+            @tags.fetch()
 
         @router = new Router()
 

@@ -134,6 +134,8 @@ textarea
       box-sizing border-box
       background-color basecolor + 50%
       color almostblack
+      height 60px
+      overflow hidden
 
       img
         float left
@@ -151,9 +153,13 @@ textarea
         overflow hidden
         font-weight: normal
 
+      .infos
+        overflow: hidden
+        height: 20px
+
       span
-        display block
-        float left
+        // display block
+        // float left
         margin-left 12px
         font-size: 13px
 
@@ -330,52 +336,6 @@ textarea
       #name-edit
         display: inline-block
 
-
-  ul.tagit
-    border 0px
-    padding-left: 0px
-
-    .tagit-choice
-      border-radius 0px
-      background-color buttoncolor
-      border-color buttoncolor
-      border: 0
-      box-shadow: none
-      text-shadow: none
-      border-radius: 0
-      font-family: styled
-      background: #ebf6ff
-      color: #0067b8
-
-      .tagit-label, .tagit-close .text-icon
-          color: #0067b8
-          font-size: 12px
-
-    .tagit-choice:hover
-        background: orange
-        border: 0
-        cursor: pointer
-
-    .tagit-choice:hover .tagit-label
-    .tagit-choice:hover .tagit-close .text-icon
-          color: white
-
-    .tagit-choice:active
-        background: orange - 3%
-        border: 0
-        box-shadow: 1px 3px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.0)
-
-       .tagit-label, .tagit-close .text-icon
-          color: white
-
-    input
-      &:focus
-        background-color transparent
-        outline none
-
-  #tags
-    display none
-
   #name
     display block
     line-height 1em
@@ -435,6 +395,78 @@ textarea
 
     &:after
       clear none
+
+
+ul.tags
+  margin: 0
+  padding: 0
+  margin-top: 5px
+  display: inline-block
+  border: none
+
+  input
+    padding-left: 5px
+    width: 100px
+
+  li.tag
+    display: inline-block
+    border: 1px solid lightgray
+    border-radius: 6px
+    padding: 0.2em 0.5em 0.2em 0.5em
+    line-height: 1em
+    margin-top: 0px
+    margin-right: 5px
+    border: 1px solid transparent
+    border-radius: 0
+    background-color: blue + 90%
+    
+    font-family: styled
+    color: white
+    user-select: none
+
+
+#wrap-name-notes ul.tags
+  font-size: 13px
+
+  li.tag
+    cursor: pointer
+
+    .deleter
+      cursor: pointer
+      &:hover
+        color: orange - 40%
+
+    &:hover
+      border: 1px solid orange
+      background-color: orange !important
+
+    &:focus
+    &:active
+      border: 1px solid blue
+      box-shadow: 1px 3px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.0)
+
+.contact-thumb ul.tags
+  margin-left: 12px
+  font-size: 9px
+
+#tagsAutocomplete
+  background-color: white
+  border: 1px solid blue
+  position: absolute
+  width: 150px
+  list-style-type: none
+  padding-left: 0px
+  margin: 0
+  z-index: 1000
+
+  &.empty
+    border 0
+
+  li
+    padding-left: 5px
+
+    &.selected, &:hover
+      background-color orange + 40%
 
 #right, #left
   width 47%
@@ -790,20 +822,3 @@ textarea
 
         input#filterfield
             width: 100%
-
-// overrides tagit styles
-#contact
-    ul.tagit input[type="text"]
-        padding-left: 5px
-
-.tagit-autocomplete.ui-widget-content
-  padding 0 0 0 0
-  border 1px solid orange
-
-  .ui-state-focus
-    border-radius 0
-    background blue
-    color #fff
-    border none
-    margin 0 !important
-
