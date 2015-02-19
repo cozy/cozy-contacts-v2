@@ -27,7 +27,7 @@ getImports = function(callback) {
   ], function(err, results) {
     var config, contacts, instance, locale, tagInstances, tags, webDavAccount;
     contacts = results[0], config = results[1], instance = results[2], tags = results[3], webDavAccount = results[4], tagInstances = results[5];
-    tags.filter(function(value) {
+    tags = tags.filter(function(value) {
       return Boolean(value);
     });
     locale = (instance != null ? instance.locale : void 0) || 'en';

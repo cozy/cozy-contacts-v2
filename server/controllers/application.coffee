@@ -18,7 +18,7 @@ getImports = (callback) ->
 
         # Remove this fix once cozydb is fixed:
         # https://github.com/cozy/cozydb/issues/6
-        tags.filter (value) ->
+        tags = tags.filter (value) ->
             Boolean(value)
 
         locale = instance?.locale or 'en'
