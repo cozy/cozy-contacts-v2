@@ -18,7 +18,7 @@
     "cozy-realtime-adapter": "0.11.3",
     "printit": "0.1.3",
     "multiparty": "4.0.0",
-    "cozy-vcard": "0.2.0"
+    "cozy-vcard": "0.2.1"
   },
   "devDependencies": {
     "request-json": "0.4.13",
@@ -42,6 +42,9 @@
     },
     "ContactConfig": {
       "description": "Store your settings for contacts"
+    },
+    "Tag": {
+      "description": "Create new tags and change their color"
     },
     "WebDAVAccount": {
       "description": "Store webDAV password and sync informations"

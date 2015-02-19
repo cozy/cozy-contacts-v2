@@ -97,7 +97,7 @@ ContactListener = require('./lib/contact_listener');
 
 module.exports = {
   initialize: function() {
-    var Config, ContactsCollection, ContactsList, Router, e, locales;
+    var Config, ContactsCollection, ContactsList, Router, TagCollection, e, locales;
     window.app = this;
     this.locale = window.locale;
     delete window.locale;
@@ -111,10 +111,12 @@ module.exports = {
     this.polyglot.extend(locales);
     window.t = this.polyglot.t.bind(this.polyglot);
     ContactsCollection = require('collections/contact');
+    TagCollection = require('collections/tags');
     ContactsList = require('views/contactslist');
     Config = require('models/config');
     Router = require('router');
     this.contacts = new ContactsCollection();
+    this.tags = new TagCollection();
     this.contactslist = new ContactsList({
       collection: this.contacts
     });
@@ -131,6 +133,13 @@ module.exports = {
       delete window.initcontacts;
     } else {
       this.contacts.fetch();
+    }
+    if (window.inittags != null) {
+      this.tags.reset(window.inittags, {
+        parse: true
+      });
+    } else {
+      this.tags.fetch();
     }
     this.router = new Router();
     return Backbone.history.start();
@@ -253,6 +262,68 @@ module.exports = DataPointCollection = (function(_super) {
 })(Backbone.Collection);
 });
 
+;require.register("collections/tags", function(exports, require, module) {
+var Tag, TagCollection, colorhash,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Tag = require('../models/tag');
+
+colorhash = require('lib/colorhash');
+
+module.exports = TagCollection = (function(_super) {
+  __extends(TagCollection, _super);
+
+  function TagCollection() {
+    return TagCollection.__super__.constructor.apply(this, arguments);
+  }
+
+  TagCollection.prototype.model = Tag;
+
+  TagCollection.prototype.url = 'tags';
+
+  TagCollection.prototype.add = function(models, options) {
+    if (_.isArray(models)) {
+      models = _.clone(models);
+    } else {
+      models = models ? [models] : [];
+    }
+    models = models.filter((function(_this) {
+      return function(model) {
+        return !_this.some(function(collectionModel) {
+          var name;
+          name = (model != null ? model.name : void 0) ? model.name : model.get('name');
+          return collectionModel.get('name') === name;
+        });
+      };
+    })(this));
+    return TagCollection.__super__.add.call(this, models, options);
+  };
+
+  TagCollection.prototype.getByName = function(name) {
+    return this.find(function(item) {
+      return item.get('name') === name;
+    });
+  };
+
+  TagCollection.prototype.getOrCreateByName = function(name) {
+    var tag;
+    tag = this.getByName(name);
+    if (!tag) {
+      tag = new Tag({
+        name: name,
+        color: colorhash(name)
+      });
+      tag.save();
+    }
+    return tag;
+  };
+
+  return TagCollection;
+
+})(Backbone.Collection);
+});
+
 ;require.register("initialize", function(exports, require, module) {
 var app;
 
@@ -310,6 +381,61 @@ module.exports = BaseView = (function(_super) {
   return BaseView;
 
 })(Backbone.View);
+});
+
+;require.register("lib/colorhash", function(exports, require, module) {
+var hslToRgb, hue2rgb;
+
+hue2rgb = function(p, q, t) {
+  if (t < 0) {
+    t += 1;
+  }
+  if (t > 1) {
+    t -= 1;
+  }
+  if (t < 1 / 6) {
+    return p + (q - p) * 6 * t;
+  }
+  if (t < 1 / 2) {
+    return q;
+  }
+  if (t < 2 / 3) {
+    return p + (q - p) * (2 / 3 - t) * 6;
+  }
+  return p;
+};
+
+hslToRgb = function(h, s, l) {
+  var b, color, g, p, q, r;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  color = (1 << 24) + (r * 255 << 16) + (g * 255 << 8) + parseInt(b * 255);
+  return "#" + (color.toString(16).slice(1));
+};
+
+module.exports = function(tag) {
+  var colour, h, hash, i, l, s, _i, _ref;
+  if (tag !== "my calendar") {
+    hash = 0;
+    for (i = _i = 0, _ref = tag.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      hash = tag.charCodeAt(i) + (hash << 5) - hash;
+    }
+    h = (hash % 100) / 100;
+    s = (hash % 1000) / 1000;
+    l = 0.5 + 0.2 * (hash % 2) / 2;
+    colour = hslToRgb(h, s, l);
+    return colour;
+  } else {
+    return '#008AF6';
+  }
+};
 });
 
 ;require.register("lib/contact_listener", function(exports, require, module) {
@@ -1050,6 +1176,12 @@ module.exports = Contact = (function(_super) {
     return VCardParser.fnToN(fn);
   };
 
+  Contact.prototype.getTags = function() {
+    return this.get('tags').map(function(tagName) {
+      return app.tags.getOrCreateByName(tagName);
+    });
+  };
+
   Contact.prototype.createTask = function(callback) {
     return request.post("contacts/" + this.id + "/new-call-task", {}, callback);
   };
@@ -1108,6 +1240,31 @@ module.exports = DataPoint = (function(_super) {
   };
 
   return DataPoint;
+
+})(Backbone.Model);
+});
+
+;require.register("models/tag", function(exports, require, module) {
+var Tag, colorhash,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+colorhash = require('lib/colorhash');
+
+module.exports = Tag = (function(_super) {
+  __extends(Tag, _super);
+
+  function Tag() {
+    return Tag.__super__.constructor.apply(this, arguments);
+  }
+
+  Tag.prototype.urlRoot = 'tags';
+
+  Tag.prototype.toString = function() {
+    return this.get('name');
+  };
+
+  return Tag;
 
 })(Backbone.Model);
 });
@@ -1281,7 +1438,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,tags = locals_.tags,note = locals_.note;
+var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,note = locals_.note;
 buf.push("<div id=\"contact-container\"><div id=\"top\"><div id=\"picture\">");
 if ( hasPicture)
 {
@@ -1291,7 +1448,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<input id=\"uploader\" type=\"file\"/><div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><a id=\"close\" href=\"#\">&lt;</a></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<input id=\"uploader\" type=\"file\"/><div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><a id=\"close\" href=\"#\">&lt;</a></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1347,7 +1504,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,displayName = locals_.displayName,bestmail = locals_.bestmail,besttel = locals_.besttel;
+var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,displayName = locals_.displayName,tags = locals_.tags,bestmail = locals_.bestmail,besttel = locals_.besttel;
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png?" + (timestamp) + "", true, false)) + "/>");
@@ -1356,7 +1513,30 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\"/>");
 }
-buf.push("<h2>" + (jade.escape((jade_interp = displayName) == null ? '' : jade_interp)) + "</h2><div class=\"infos\"><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
+buf.push("<h2>" + (jade.escape((jade_interp = displayName) == null ? '' : jade_interp)) + "</h2><div class=\"infos\">     <ul class=\"tags\">");
+// iterate tags || []
+;(function(){
+  var $$obj = tags || [];
+  if ('number' == typeof $$obj.length) {
+
+    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+      var tag = $$obj[$index];
+
+buf.push("<li" + (jade.attr("style", "background: " + (tag.get('color')) + ";", true, false)) + " class=\"tag\">" + (jade.escape((jade_interp = tag.get('name')) == null ? '' : jade_interp)) + "</li>");
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in $$obj) {
+      $$l++;      var tag = $$obj[$index];
+
+buf.push("<li" + (jade.attr("style", "background: " + (tag.get('color')) + ";", true, false)) + " class=\"tag\">" + (jade.escape((jade_interp = tag.get('name')) == null ? '' : jade_interp)) + "</li>");
+    }
+
+  }
+}).call(this);
+
+buf.push("</ul><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1452,7 +1632,7 @@ var ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
 
 ViewCollection = require('lib/view_collection');
 
-TagsView = require('views/contact_tags');
+TagsView = require('widgets/tags');
 
 ContactName = require('views/contact_name');
 
@@ -1552,8 +1732,8 @@ module.exports = ContactView = (function(_super) {
       })(this),
       onBlur: (function(_this) {
         return function(ev) {
-          _this.changeOccured();
-          return _this.needSaving = true;
+          _this.needSaving = true;
+          return _this.changeOccured();
         };
       })(this),
       contactWidget: this
@@ -1572,15 +1752,23 @@ module.exports = ContactView = (function(_super) {
     this.uploader = this.$('#uploader')[0];
     this.picture = this.$('#picture .picture');
     this.tags = new TagsView({
-      el: this.$('#tags'),
+      el: this.$('.tags'),
       model: this.model,
-      onChange: (function(_this) {
-        return function() {
+      onBlur: (function(_this) {
+        return function(ev) {
           _this.needSaving = true;
           return _this.changeOccured(true);
         };
       })(this)
     });
+    this.tags.render();
+    this.tags.on('tagClicked', (function(_this) {
+      return function(tag) {
+        $("#filterfield").val(tag);
+        $("#filterfield").trigger('keyup');
+        return $(".dropdown-menu").hide();
+      };
+    })(this));
     ContactView.__super__.afterRender.apply(this, arguments);
     this.$el.niceScroll();
     this.resizeNote();
@@ -2006,83 +2194,6 @@ module.exports = ContactName = (function(_super) {
 })(BaseView);
 });
 
-;require.register("views/contact_tags", function(exports, require, module) {
-var BaseView, TagsView,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BaseView = require('lib/base_view');
-
-module.exports = TagsView = (function(_super) {
-  __extends(TagsView, _super);
-
-  function TagsView() {
-    this.refresh = __bind(this.refresh, this);
-    this.tagRemoved = __bind(this.tagRemoved, this);
-    this.tagAdded = __bind(this.tagAdded, this);
-    return TagsView.__super__.constructor.apply(this, arguments);
-  }
-
-  TagsView.prototype.initialize = function() {
-    TagsView.__super__.initialize.apply(this, arguments);
-    this.$el.tagit({
-      availableTags: app.contacts.getTags() || [],
-      placeholderText: t('add tags'),
-      afterTagAdded: this.tagAdded,
-      afterTagRemoved: this.tagRemoved
-    });
-    this.duringRefresh = false;
-    $('.ui-widget-content .ui-autocomplete-input').keypress(function(event) {
-      var keyCode;
-      keyCode = event.keyCode || event.which;
-      if (keyCode === 9) {
-        return $('.zone .type').first().select();
-      }
-    });
-    return this;
-  };
-
-  TagsView.prototype.tagAdded = function(e, ui) {
-    if (!(this.duringRefresh || ui.duringInitialization)) {
-      this.model.set('tags', this.$el.tagit('assignedTags'));
-      this.options.onChange();
-    }
-    return ui.tag.click((function(_this) {
-      return function() {
-        var tagLabel;
-        tagLabel = ui.tag.find('.tagit-label').text();
-        $("#filterfield").val(tagLabel);
-        $("#filterfield").trigger('keyup');
-        return $(".dropdown-menu").hide();
-      };
-    })(this));
-  };
-
-  TagsView.prototype.tagRemoved = function(er, ui) {
-    if (!(this.duringRefresh || ui.duringInitialization)) {
-      this.model.set('tags', this.$el.tagit('assignedTags'));
-      return this.options.onChange();
-    }
-  };
-
-  TagsView.prototype.refresh = function() {
-    var tag, _i, _len, _ref;
-    this.duringRefresh = true;
-    this.$el.tagit('removeAll');
-    _ref = this.model.get('tags');
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      tag = _ref[_i];
-      this.$el.tagit('createTag', tag);
-    }
-    return this.duringRefresh = false;
-  };
-
-  return TagsView;
-
-})(BaseView);
-});
-
 ;require.register("views/contactslist", function(exports, require, module) {
 var App, Contact, ContactsList, ViewCollection,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2299,6 +2410,7 @@ module.exports = ContactsListItemView = (function(_super) {
       bestmail: this.model.getBest('email'),
       besttel: this.model.getBest('tel'),
       displayName: this.model.getDisplayName(),
+      tags: this.model.getTags(),
       timestamp: Date.now()
     });
   };
@@ -2764,6 +2876,369 @@ module.exports = ImporterView = (function(_super) {
   return ImporterView;
 
 })(BaseView);
+});
+
+;require.register("widgets/autocomplete", function(exports, require, module) {
+var ARROW_DOWN_KEY, ARROW_UP_KEY, Autocomplete, BaseView, ENTER_KEY, ESCAPE_KEY,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+BaseView = require('../lib/base_view');
+
+ENTER_KEY = 13;
+
+ARROW_UP_KEY = 38;
+
+ARROW_DOWN_KEY = 40;
+
+ESCAPE_KEY = 27;
+
+module.exports = Autocomplete = (function(_super) {
+  __extends(Autocomplete, _super);
+
+  function Autocomplete() {
+    this.unbind = __bind(this.unbind, this);
+    this.delayedUnbind = __bind(this.delayedUnbind, this);
+    this.onInputKeyDown = __bind(this.onInputKeyDown, this);
+    return Autocomplete.__super__.constructor.apply(this, arguments);
+  }
+
+  Autocomplete.prototype.className = 'autocomplete';
+
+  Autocomplete.prototype.tagName = 'ul';
+
+  Autocomplete.prototype.events = function() {
+    return {
+      'click li': 'onClick'
+    };
+  };
+
+  Autocomplete.prototype.onInputKeyDown = function(e) {
+    var delta, _ref;
+    if ((_ref = e.keyCode) === ARROW_UP_KEY || _ref === ARROW_DOWN_KEY) {
+      delta = e.keyCode - 39;
+      this.select(this.selectedIndex + delta);
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.keyCode === ESCAPE_KEY) {
+      return this.unbind();
+    }
+  };
+
+  Autocomplete.prototype.onClick = function(e) {
+    var event;
+    this.input.val(e.target.dataset.value);
+    event = $.Event('keydown');
+    event.keyCode = ENTER_KEY;
+    this.input.trigger(event);
+    e.preventDefault();
+    e.stopPropagation();
+    this.unbindCancel = true;
+    this.input.parents('.folder-row').addClass('pseudohover');
+    return this.input.focus();
+  };
+
+  Autocomplete.prototype.initialize = function(options) {
+    if (options == null) {
+      options = {};
+    }
+    this.limit = options.limit || 10;
+    if (window.tags == null) {
+      window.tags = [];
+    }
+    return this.tags = window.tags.map(function(value, idx) {
+      var el, lc;
+      el = document.createElement('li');
+      el.textContent = value;
+      el.dataset.value = value;
+      el.dataset.index = idx;
+      lc = value.toLowerCase();
+      return {
+        value: value,
+        el: el,
+        lc: lc
+      };
+    });
+  };
+
+  Autocomplete.prototype.position = function() {
+    var pos;
+    pos = this.input.offset();
+    pos.top += this.input.outerHeight() - 1;
+    pos.width = this.input.width();
+    return this.$el.appendTo($('body')).css(pos).show();
+  };
+
+  Autocomplete.prototype.refresh = function(search, existings) {
+    var selected, tag, _i, _len, _ref, _ref1;
+    search = this.input.val();
+    selected = (_ref = this.visible) != null ? _ref[this.selectedIndex] : void 0;
+    if (existings == null) {
+      existings = [];
+    }
+    _ref1 = this.tags;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      tag = _ref1[_i];
+      tag.el.classList.remove('selected');
+    }
+    this.visible = this.tags.filter((function(_this) {
+      return function(tag, index) {
+        var _ref2;
+        return (_ref2 = tag.value, __indexOf.call(existings, _ref2) < 0) && (tag.lc != null) && ~tag.lc.indexOf(search.toLowerCase()) && index < _this.limit;
+      };
+    })(this));
+    if (selected && __indexOf.call(this.visible, selected) >= 0) {
+      this.selectedIndex = this.visible.indexOf(selected);
+    } else {
+      this.selectedIndex = -1;
+    }
+    this.$el.empty().append(_.pluck(this.visible, 'el'));
+    return this.$el.toggleClass('empty', this.visible.length === 0);
+  };
+
+  Autocomplete.prototype.select = function(index) {
+    var tag, visibleElement, _i, _len, _ref;
+    _ref = this.tags;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      tag = _ref[_i];
+      tag.el.classList.remove('selected');
+    }
+    index = (index + this.visible.length) % this.visible.length;
+    this.selectedIndex = index;
+    visibleElement = this.visible[this.selectedIndex];
+    if (visibleElement != null) {
+      visibleElement.el.classList.add('selected');
+      return this.input.val(visibleElement.value);
+    }
+  };
+
+  Autocomplete.prototype.bind = function($target) {
+    if ($target === this.$target) {
+      return;
+    }
+    if (this.$target) {
+      this.unbind();
+    }
+    this.$target = $target;
+    this.input = this.$target.find('input');
+    this.position();
+    this.input.on('keydown', this.onInputKeyDown);
+    this.input.on('blur', this.delayedUnbind);
+    return this.selectedIndex = -1;
+  };
+
+  Autocomplete.prototype.delayedUnbind = function() {
+    this.unbindCancel = false;
+    if (this.delayedUnbindTimeout) {
+      clearTimeout(this.delayedUnbindTimeout);
+    }
+    return this.delayedUnbindTimeout = setTimeout(this.unbind, 100);
+  };
+
+  Autocomplete.prototype.unbind = function() {
+    if (this.unbindCancel || !this.input) {
+      return;
+    }
+    this.input.off('keydown', this.onInputKeyDown);
+    this.input.off('blur', this.delayedUnbind);
+    this.input.parents('.folder-row').removeClass('pseudohover');
+    this.input.val('');
+    this.$target = null;
+    this.$el.hide();
+    this.$el.detach();
+    return this.selectedIndex = -1;
+  };
+
+  return Autocomplete;
+
+})(BaseView);
+});
+
+;require.register("widgets/tags", function(exports, require, module) {
+var Autocomplete, BaseView, TagsView,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+BaseView = require('../lib/base_view');
+
+Autocomplete = require('./autocomplete');
+
+module.exports = TagsView = (function(_super) {
+  __extends(TagsView, _super);
+
+  function TagsView() {
+    this.hideInput = __bind(this.hideInput, this);
+    this.toggleInput = __bind(this.toggleInput, this);
+    this.refresh = __bind(this.refresh, this);
+    this.deleteTag = __bind(this.deleteTag, this);
+    this.setTags = __bind(this.setTags, this);
+    this.tagClicked = __bind(this.tagClicked, this);
+    this.refreshAutocomplete = __bind(this.refreshAutocomplete, this);
+    this.onKeyDown = __bind(this.onKeyDown, this);
+    return TagsView.__super__.constructor.apply(this, arguments);
+  }
+
+  TagsView.prototype.events = function() {
+    return {
+      'click .tag': 'tagClicked',
+      'click .tag .deleter': 'deleteTag',
+      'focus input': 'onFocus',
+      'keydown input': 'onKeyDown',
+      'keyup input': 'refreshAutocomplete'
+    };
+  };
+
+  TagsView.prototype.template = function() {
+    return "<input type=\"text\" placeholder=\"" + (t('add tags')) + "\">";
+  };
+
+  TagsView.prototype.initialize = function(options) {
+    this.options = options;
+    this.refresh();
+    return this.listenTo(this.model, 'change:tags', (function(_this) {
+      return function() {
+        return _this.refresh();
+      };
+    })(this));
+  };
+
+  TagsView.prototype.onFocus = function(e) {
+    TagsView.autocomplete.bind(this.$el);
+    TagsView.autocomplete.refresh('', this.tags);
+    if (this.input.val() === '') {
+      return TagsView.autocomplete.$el.hide();
+    } else {
+      return TagsView.autocomplete.$el.show();
+    }
+  };
+
+  TagsView.prototype.onKeyDown = function(e) {
+    var val, _ref, _ref1, _ref2;
+    val = this.input.val();
+    if (val === '' && e.keyCode === 8) {
+      this.setTags(this.tags.slice(0, -1));
+      TagsView.autocomplete.refresh('', this.tags);
+      TagsView.autocomplete.position();
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if (val && ((_ref = e.keyCode) === 188 || _ref === 32 || _ref === 9 || _ref === 13)) {
+      if (this.tags == null) {
+        this.tags = [];
+      }
+      if (__indexOf.call(this.tags, val) < 0) {
+        this.tags.push(val);
+      }
+      this.setTags(this.tags);
+      this.input.val('');
+      TagsView.autocomplete.refresh('', this.tags);
+      TagsView.autocomplete.position();
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if ((_ref1 = e.keyCode) === 188 || _ref1 === 32 || _ref1 === 9 || _ref1 === 13) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if ((_ref2 = e.keyCode) === 40 || _ref2 === 38) {
+      return true;
+    }
+    if (val && e.keyCode !== 8) {
+      this.refreshAutocomplete();
+      return true;
+    }
+  };
+
+  TagsView.prototype.refreshAutocomplete = function(e) {
+    var _ref;
+    if (this.input.val() !== '') {
+      TagsView.autocomplete.$el.show();
+    }
+    if ((_ref = e != null ? e.keyCode : void 0) === 40 || _ref === 38 || _ref === 8) {
+      return;
+    }
+    return TagsView.autocomplete.refresh(this.input.val(), this.tags);
+  };
+
+  TagsView.prototype.tagClicked = function(e) {
+    var tag;
+    tag = e.target.dataset.value;
+    return this.trigger('tagClicked', tag);
+  };
+
+  TagsView.prototype.setTags = function(newTags) {
+    this.tags = newTags;
+    if (this.tags == null) {
+      this.tags = [];
+    }
+    this.model.attributes.tags = newTags;
+    if (this.options.onBlur != null) {
+      return this.options.onBlur();
+    } else {
+      return this.model.save({
+        tags: this.tags
+      });
+    }
+  };
+
+  TagsView.prototype.deleteTag = function(e) {
+    var tag;
+    tag = e.target.parentNode.dataset.value;
+    this.setTags(_.without(this.tags, tag));
+    e.stopPropagation();
+    return e.preventDefault();
+  };
+
+  TagsView.prototype.afterRender = function() {
+    this.refresh();
+    return this.input = this.$('input');
+  };
+
+  TagsView.prototype.refresh = function() {
+    var html, tag;
+    this.tags = _.clone(this.model.get('tags'));
+    this.$('.tag').remove();
+    html = ((function() {
+      var _i, _len, _ref, _results;
+      _ref = this.model.getTags() || [];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        tag = _ref[_i];
+        _results.push("<li class=\"tag\" data-value=\"" + (tag.get('name')) + "\" style=\"background: " + (tag.get('color')) + ";\">\n    " + (tag.get('name')) + "\n    <span class=\"deleter\"> &times; </span>\n</li>");
+      }
+      return _results;
+    }).call(this)).join('');
+    return this.$el.prepend(html);
+  };
+
+  TagsView.prototype.toggleInput = function() {
+    this.$('input').toggle();
+    if (this.$('input').is(':visible')) {
+      return this.$('input').focus();
+    }
+  };
+
+  TagsView.prototype.hideInput = function() {
+    return this.$('input').hide();
+  };
+
+  return TagsView;
+
+})(BaseView);
+
+TagsView.autocomplete = new Autocomplete({
+  id: 'tagsAutocomplete'
+});
+
+TagsView.autocomplete.render();
 });
 
 ;

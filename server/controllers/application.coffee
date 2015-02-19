@@ -1,5 +1,6 @@
 Contact = require '../models/contact'
 Config  = require '../models/config'
+Tag = require '../models/tag'
 WebDavAccount = require '../models/webdavaccount'
 async   = require 'async'
 cozydb = require 'cozydb'
@@ -9,10 +10,11 @@ getImports = (callback) ->
         (cb) -> Contact.all cb
         Config.getInstance
         (cb) -> cozydb.api.getCozyInstance cb
-        (cb) -> cozydb.api.getCozyTags cb
+        (cb) -> cozydb.api.getCozyTags cb # All tags values in cozy.
         (cb) -> WebDavAccount.first cb
+        Tag.all # tags instances (with color).
     ], (err, results) ->
-        [contacts, config, instance, tags, webDavAccount] = results
+        [contacts, config, instance, tags, webDavAccount, tagInstances] = results
 
         # Remove this fix once cozydb is fixed:
         # https://github.com/cozy/cozydb/issues/6
@@ -29,6 +31,7 @@ getImports = (callback) ->
             window.initcontacts = #{JSON.stringify(contacts)};
             window.tags = #{JSON.stringify(tags)};
             window.webDavAccount = #{JSON.stringify webDavAccount};
+            window.inittags = #{JSON.stringify(tagInstances)}
         """
 
 

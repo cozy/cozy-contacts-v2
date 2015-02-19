@@ -1,5 +1,6 @@
 contact = require './contact'
 application = require './application'
+tags = require './tags'
 
 module.exports =
 
@@ -31,3 +32,14 @@ module.exports =
 
     'contacts/:contactid/picture.png':
         get: contact.picture
+
+     # Tag management
+    'tags':
+        get: tags.all
+        post: tags.create
+    'tagid':
+        param: tags.fetch
+    'tags/:tagid':
+        get: tags.read
+        put: tags.update
+        delete: tags.delete

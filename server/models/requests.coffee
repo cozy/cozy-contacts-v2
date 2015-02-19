@@ -17,5 +17,8 @@ module.exports =
     config:
         all: americano.defaultRequests.all
 
+    tag:
+        all: (doc) -> emit doc.name, doc
+
     webdavaccount:
         all: americano.defaultRequests.all

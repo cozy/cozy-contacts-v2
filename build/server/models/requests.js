@@ -30,6 +30,11 @@ module.exports = {
   config: {
     all: americano.defaultRequests.all
   },
+  tag: {
+    all: function(doc) {
+      return emit(doc.name, doc);
+    }
+  },
   webdavaccount: {
     all: americano.defaultRequests.all
   }
