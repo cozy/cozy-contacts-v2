@@ -1,17 +1,5 @@
 @import '_cozy'
 
-.icon-sms, .icon-voice, .icon-mail
-  background-position 0px 0px
-  width 16px
-  height 16px
-  margin-right 3px
-.icon-sms
-  background-image url('../img/sms.png')
-.icon-voice
-  background-image url('../img/voice.png')
-.icon-mail
-  background-image url('../img/mail.png')
-
 box-sizing(n)
   -webkit-box-sizing n
   -moz-box-sizing n
@@ -66,6 +54,13 @@ textarea
     padding 10px
     box-sizing border-box
 
+    .fa
+      color #fff
+      font-size 16px
+
+      &.fa-remove
+        margin 4px
+
     input:focus
       box-shadow none
       border 1px solid highlightcolor
@@ -105,9 +100,6 @@ textarea
       border 0px
       border-radius 13px
       z-index 2
-
-      .icon-remove
-        margin-top: 0
 
     #new, #gohelp
       padding: 0

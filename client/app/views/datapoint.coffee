@@ -49,20 +49,20 @@ module.exports = class DataPointView extends BaseView
             @actionLink.attr {title, href}
             if noblank then @actionLink.removeAttr 'target'
             else @actionLink.attr 'target', '_blank'
-            @actionLink.find('i').addClass 'icon-' + icon
+            @actionLink.find('i').addClass 'fa-' + icon
 
         value = @model.get 'value'
         switch @model.get 'name'
             when 'email'
-                action 'envelope', 'send mail', "mailto:#{value}", true
+                action 'envelope-o', 'send mail', "mailto:#{value}", true
             when 'tel'
                 href = @callProtocol() + ':+' + value
-                action 'headphones', 'call', href, true
+                action 'phone', 'call', href, true
             when 'url'
-                action 'share', 'go to this url', "#{value}", false
+                action 'link', 'go to this url', "#{value}", false
             when 'other'
                 if @model.get('type') is 'skype'
-                    action 'headphones', 'call', "callto:#{value}"
+                    action 'skype', 'call', "callto:#{value}"
             else @actionLink.detach()
 
     callProtocol: ->
