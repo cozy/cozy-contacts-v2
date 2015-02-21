@@ -59,6 +59,8 @@ module.exports =
         get: file.list
     'files/thumbs/:fileid':
         get: file.thumb
+    'files/screens/:fileid':
+        get: file.screen
     'files/:fileid/toPhoto':
         post: file.createPhoto
 

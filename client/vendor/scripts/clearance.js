@@ -72,7 +72,7 @@ require.register("cozy-clearance/contact_autocomplete", function(exports, requir
   });
 };
 
-  
+
 });
 
 require.register("cozy-clearance/contact_collection", function(exports, require, module){
@@ -105,7 +105,7 @@ collection.fetch();
 
 module.exports = collection;
 
-  
+
 });
 
 require.register("cozy-clearance/modal", function(exports, require, module){
@@ -150,13 +150,16 @@ Modal = (function(_super) {
     this.render();
     this.saving = false;
     this.$el.modal('show');
+    this.el.tabIndex=0;
+    this.el.focus();
     this.$('button.close').click((function(_this) {
       return function(event) {
         event.stopPropagation();
         return _this.onNo();
       };
     })(this));
-    return $(document).on('keyup', this.closeOnEscape);
+    // return $(document).on('keyup', this.closeOnEscape);
+    return this.$el.on('keyup', this.closeOnEscape);
   };
 
   Modal.prototype.events = function() {
@@ -191,13 +194,21 @@ Modal = (function(_super) {
   };
 
   Modal.prototype.closeOnEscape = function(e) {
+    e.stopPropagation();
+    // e.preventDefault();
     if (e.which === 27) {
-      return this.onNo();
+      this.onNo();
+      return false;
     }
+    if (e.which=== 9){
+      // event.target = this.el;
+    }
+    return false;
   };
 
   Modal.prototype.remove = function() {
-    $(document).off('keyup', this.closeOnEscape);
+    this.$el.off('keyup', this.closeOnEscape);
+    // $(document).off('keyup', this.closeOnEscape);
     return Modal.__super__.remove.apply(this, arguments);
   };
 
@@ -263,7 +274,7 @@ Modal.error = function(text, cb) {
 
 module.exports = Modal;
 
-  
+
 });
 
 require.register("cozy-clearance/modal_share_template", function(exports, require, module){
@@ -424,7 +435,7 @@ buf.push("</ul>");
 }}("t" in locals_for_with?locals_for_with.t:typeof t!=="undefined"?t:undefined,"type" in locals_for_with?locals_for_with.type:typeof type!=="undefined"?type:undefined,"model" in locals_for_with?locals_for_with.model:typeof model!=="undefined"?model:undefined,"JSON" in locals_for_with?locals_for_with.JSON:typeof JSON!=="undefined"?JSON:undefined,"clearance" in locals_for_with?locals_for_with.clearance:typeof clearance!=="undefined"?clearance:undefined,"makeURL" in locals_for_with?locals_for_with.makeURL:typeof makeURL!=="undefined"?makeURL:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"Object" in locals_for_with?locals_for_with.Object:typeof Object!=="undefined"?Object:undefined,"possible_permissions" in locals_for_with?locals_for_with.possible_permissions:typeof possible_permissions!=="undefined"?possible_permissions:undefined));;return buf.join("");
 }
 module.exports = template;
-  
+
 });
 
 require.register("cozy-clearance/modal_share_view", function(exports, require, module){
@@ -836,5 +847,5 @@ module.exports = CozyClearanceModal = (function(_super) {
 
 })(Modal);
 
-  
+
 });
