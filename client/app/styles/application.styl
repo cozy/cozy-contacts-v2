@@ -1,17 +1,5 @@
 @import '_cozy'
 
-.icon-sms, .icon-voice, .icon-mail
-  background-position 0px 0px
-  width 16px
-  height 16px
-  margin-right 3px
-.icon-sms
-  background-image url('../img/sms.png')
-.icon-voice
-  background-image url('../img/voice.png')
-.icon-mail
-  background-image url('../img/mail.png')
-
 box-sizing(n)
   -webkit-box-sizing n
   -moz-box-sizing n
@@ -37,16 +25,16 @@ html
 body
   height 100%
   background-color bgcolor
-  font-family main
+  font-family 'Source Sans Pro', sans-serif
 
 h1, h2, h3, h4
-  font-family styled
+  font-family 'Maven Pro', sans-serif
 
 a
     cursor: pointer
 
 textarea
-  ont-family main
+  font-family 'Source Sans Pro', sans-serif
 
 // CONTACT LIST
 
@@ -65,6 +53,13 @@ textarea
     overflow hidden
     padding 10px
     box-sizing border-box
+
+    .fa
+      color #fff
+      font-size 16px
+
+      &.fa-remove
+        margin 4px
 
     input:focus
       box-shadow none
@@ -85,7 +80,7 @@ textarea
         margin-top 2px
 
     #filterfield
-      font-family: styled
+      font-family: 'Maven Pro', sans-serif
 
     #filterfield:active
     #filterfield:focus
@@ -105,9 +100,6 @@ textarea
       border 0px
       border-radius 13px
       z-index 2
-
-      .icon-remove
-        margin-top: 0
 
     #new, #gohelp
       padding: 0
@@ -148,14 +140,10 @@ textarea
         margin 0px
         margin-left 70px
         font-size 20px
-        font-family main
+        font-family 'Source Sans Pro', sans-serif
         line-height: 28px
         overflow hidden
         font-weight: normal
-
-      .infos
-        overflow: hidden
-        height: 20px
 
       span
         // display block
@@ -241,7 +229,7 @@ textarea
 #contact
 
   h2
-    font-family styled
+    font-family 'Maven Pro', sans-serif
 
   #picture
     display block
@@ -341,7 +329,7 @@ textarea
     line-height 1em
     box-sizing border-box
     width auto
-    font-family main
+    font-family 'Source Sans Pro', sans-serif
     font-size 30px
     margin-bottom 2px
     padding-top: 0
@@ -381,7 +369,7 @@ textarea
     margin-bottom 10px
 
     label
-      font-family styled
+      font-family 'Maven Pro', sans-serif
       font-size 17px
       width 120px
 
@@ -389,7 +377,7 @@ textarea
       margin-left 140px
 
     input
-      font-family main
+      font-family 'Source Sans Pro', sans-serif
       font-size 17px
       width 150px
 
@@ -419,8 +407,8 @@ ul.tags
     border: 1px solid transparent
     border-radius: 0
     background-color: blue + 90%
-    
-    font-family: styled
+
+    font-family: 'Maven Pro', sans-serif
     color: white
     user-select: none
 
@@ -433,6 +421,8 @@ ul.tags
 
     .deleter
       cursor: pointer
+      vertical-align top
+
       &:hover
         color: orange - 40%
 
@@ -446,8 +436,11 @@ ul.tags
       box-shadow: 1px 3px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.0)
 
 .contact-thumb ul.tags
-  margin-left: 12px
-  font-size: 9px
+  margin: 0 0 0 12px
+  font-size: 10px
+
+  li.tags
+    line-height 1.5em
 
 #tagsAutocomplete
   background-color: white
@@ -472,7 +465,7 @@ ul.tags
   width 47%
 
   h2, .nav-tabs li a
-    font-family main
+    font-family 'Source Sans Pro', sans-serif
     color inherit
     font-size 24px
     line-height 40px
@@ -625,12 +618,12 @@ ul.tags
 
         .type
           width 25%
-          font-family styled
+          font-family 'Maven Pro', sans-serif
           font-size: 17px
 
         .value
           width 55%
-          font-family main
+          font-family 'Source Sans Pro', sans-serif
           font-size: 17px
 
 
@@ -655,11 +648,11 @@ ul.tags
             display: none
 
     h2
-        font-family: styled
+        font-family: 'Maven Pro', sans-serif
 
     #right
         .nav-tabs li a
-            font-family: styled
+            font-family: 'Maven Pro', sans-serif
 
     #name
         padding: 0px 10px 0px 3px
