@@ -103,7 +103,7 @@ module.exports = class TagsView extends BaseView
         html = ("""
                 <li class="tag" data-value="#{tag.get 'name' }" style="background: #{tag.get 'color' };">
                     #{tag.get 'name'}
-                    <span class="deleter"> &times; </span>
+                    <span class="deleter fa fa-remove"/>
                 </li>
             """ for tag in @model.getTags() or []).join ''
         @$el.prepend html

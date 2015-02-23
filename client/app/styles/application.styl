@@ -145,10 +145,6 @@ textarea
         overflow hidden
         font-weight: normal
 
-      .infos
-        overflow: hidden
-        height: 20px
-
       span
         // display block
         // float left
@@ -425,6 +421,8 @@ ul.tags
 
     .deleter
       cursor: pointer
+      vertical-align top
+
       &:hover
         color: orange - 40%
 
@@ -438,8 +436,11 @@ ul.tags
       box-shadow: 1px 3px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.0)
 
 .contact-thumb ul.tags
-  margin-left: 12px
-  font-size: 9px
+  margin: 0 0 0 12px
+  font-size: 10px
+
+  li.tags
+    line-height 1.5em
 
 #tagsAutocomplete
   background-color: white
