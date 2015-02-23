@@ -1486,7 +1486,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<form id=\"toolbar\" class=\"form-search\"><div class=\"input-append input-prepend\"><span class=\"add-on\"><i class=\"icon-search icon-white\"></i></span><input id=\"filterfield\" type=\"text\"" + (jade.attr("placeholder", t("search placeholder"), true, false)) + " class=\"search-query input-large\"/><a id=\"filterClean\" class=\"button\"><i class=\"icon-remove icon-white\"></i></a></div><a id=\"new\" href=\"#contact/new\"" + (jade.attr("title", t("add contact"), true, false)) + " class=\"button\"><i class=\"icon-plus icon-white\"></i></a><a id=\"gohelp\" href=\"#help\"" + (jade.attr("title", t("go to settings"), true, false)) + " class=\"button\"><i class=\"icon-cog icon-white\"></i></a></form><div id=\"contacts\"></div>");;return buf.join("");
+buf.push("<form id=\"toolbar\" class=\"form-search\"><div class=\"input-append input-prepend\"><span class=\"add-on\"><i class=\"fa fa-search\"></i></span><input id=\"filterfield\" type=\"text\"" + (jade.attr("placeholder", t("search placeholder"), true, false)) + " class=\"search-query input-large\"/><a id=\"filterClean\" class=\"button\"><i class=\"fa fa-remove\"></i></a></div><a id=\"new\" href=\"#contact/new\"" + (jade.attr("title", t("add contact"), true, false)) + " class=\"button\"><i class=\"fa fa-plus\"></i></a><a id=\"gohelp\" href=\"#help\"" + (jade.attr("title", t("go to settings"), true, false)) + " class=\"button\"><i class=\"fa fa-cog\"></i></a></form><div id=\"contacts\"></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1564,7 +1564,7 @@ else
 {
 buf.push("<input type=\"text\"" + (jade.attr("placeholder", "" + (placeholder) + "", true, false)) + (jade.attr("value", "" + (value) + "", true, false)) + " class=\"value\"/>");
 }
-buf.push("<a class=\"dpaction\"><i class=\"icon\"></i></a><a" + (jade.attr("title", t('remove datapoint'), true, false)) + " class=\"dpremove\"><i class=\"icon-trash\"></i></a>");;return buf.join("");
+buf.push("<a class=\"dpaction\"><i class=\"fa\"></i></a><a" + (jade.attr("title", t('remove datapoint'), true, false)) + " class=\"dpremove\"><i class=\"fa fa-trash\"></i></a>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2518,21 +2518,21 @@ module.exports = DataPointView = (function(_super) {
         } else {
           _this.actionLink.attr('target', '_blank');
         }
-        return _this.actionLink.find('i').addClass('icon-' + icon);
+        return _this.actionLink.find('i').addClass('fa-' + icon);
       };
     })(this);
     value = this.model.get('value');
     switch (this.model.get('name')) {
       case 'email':
-        return action('envelope', 'send mail', "mailto:" + value, true);
+        return action('envelope-o', 'send mail', "mailto:" + value, true);
       case 'tel':
         href = this.callProtocol() + ':+' + value;
-        return action('headphones', 'call', href, true);
+        return action('phone', 'call', href, true);
       case 'url':
-        return action('share', 'go to this url', "" + value, false);
+        return action('link', 'go to this url', "" + value, false);
       case 'other':
         if (this.model.get('type') === 'skype') {
-          return action('headphones', 'call', "callto:" + value);
+          return action('skype', 'call', "callto:" + value);
         }
         break;
       default:
@@ -3212,7 +3212,7 @@ module.exports = TagsView = (function(_super) {
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tag = _ref[_i];
-        _results.push("<li class=\"tag\" data-value=\"" + (tag.get('name')) + "\" style=\"background: " + (tag.get('color')) + ";\">\n    " + (tag.get('name')) + "\n    <span class=\"deleter\"> &times; </span>\n</li>");
+        _results.push("<li class=\"tag\" data-value=\"" + (tag.get('name')) + "\" style=\"background: " + (tag.get('color')) + ";\">\n    " + (tag.get('name')) + "\n    <span class=\"deleter fa fa-remove\"/>\n</li>");
       }
       return _results;
     }).call(this)).join('');

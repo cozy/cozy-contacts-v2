@@ -31922,11 +31922,8 @@ Date.addLocale('zh-TW', {
             } else {
                 tag.addClass('tagit-choice-editable');
                 // Button for removing the tag.
-                var removeTagIcon = $('<span></span>')
-                    .addClass('ui-icon ui-icon-close');
-                var removeTag = $('<a><span class="text-icon">\xd7</span></a>') // \xd7 is an X
+                var removeTag = $('<a><i class="fa fa-remove"></i></a>')
                     .addClass('tagit-close')
-                    .append(removeTagIcon)
                     .click(function(e) {
                         // Removes a tag when the little 'x' is clicked.
                         that.removeTag(tag);
