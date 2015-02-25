@@ -3,6 +3,7 @@
 @import '_cozy'
 @import '_vars'
 @import '_layouts'
+@import '_tabs'
 
 
 *
@@ -450,32 +451,11 @@ ul.tags
 
 
 #contact-container
-    h2, .nav-tabs a
+    h2
         color inherit
         font: 24px/40px 'Maven Pro', sans-serif
         border-bottom 1px solid lightgrey
 
-    .nav-tabs
-        margin-top: 0px
-        margin-bottom 0px
-
-    .nav-tabs li
-        a
-            padding 0 5px
-
-            &:hover
-                background-color: orange + 40%
-
-            &:focus
-            &:active
-                  outline: none
-
-        &.active a
-            background-color: #EEE
-
-
-#infotab
-    display none
 
 #notes
     height 200px
@@ -529,11 +509,6 @@ ul.tags
 
 
 .zone
-    width 93%
-    margin 0% 1%
-    padding 0px
-    float left
-
     &:hover a.btn.add
         opacity 1
 
@@ -648,7 +623,7 @@ ul.tags
         border-radius: 3px
 
 
-@media (max-width: 900px)
+@media (max-width: mobile-bp)
     body
         padding: 0
 
@@ -671,22 +646,8 @@ ul.tags
         box-shadow none
 
         h2
+        [role=tab]
             font-size 20px
-
-        .nav-tabs
-        .tab-content
-            width: 94%
-
-        .nav-tabs
-            margin-left 2%
-            margin-bottom 10px
-
-            li
-                a
-                    font-size 20px
-
-        #infotab
-            display block
 
         #abouts.zone h2
             visibility hidden
@@ -710,9 +671,6 @@ ul.tags
 
         #picture
             display none
-
-        #notes-zone
-            margin-left 2%
 
         #wrap-name-notes
             padding-left 0

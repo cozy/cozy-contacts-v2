@@ -1,17 +1,38 @@
+[aria-hidden=true]
+    @media (max-width: mobile-bp)
+        display none
+
+
 // Contact Sheet Positions
 #contact-container
     display flex
     flex-wrap wrap
     justify-content space-around
 
-    header
-    section
+    .ui-flex
         box-sizing border-box
         padding 0 15px
+
+    .ui-flex-half
         width 50%
 
-    header
+        @media (max-width: mobile-bp)
+            width 100%
+
+    .ui-flex-full
         width 100%
+
+    header
         margin: 1em 0
+
+    nav
+        display none
+
+        @media (max-width: mobile-bp)
+            display block
+
+    @media (max-width: mobile-bp)
+        .tab-title
+            display none
 
 

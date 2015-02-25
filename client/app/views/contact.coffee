@@ -109,14 +109,7 @@ module.exports = class ContactView extends ViewCollection
         @resizeNote()
         @currentState = @model.toJSON()
 
-        @$('a#infotab').tab('show') if $(window).width() < 900
-        # resize nice scroll when we switch to note tab
-        @$('a[data-toggle="tab"]').on 'shown', =>
-            @$('#left').hide() if $(window).width() < 900
-            @resizeNiceScroll()
-        @$('a#infotab').on 'shown', =>
-            @$('#left').show()
-            @resizeNiceScroll()
+        @bindTabs()
 
         if @model.isNew()
             @toggleContactName()
@@ -266,6 +259,17 @@ module.exports = class ContactView extends ViewCollection
 
     resizeNiceScroll: (event) =>
         @$el.getNiceScroll().resize()
+
+    bindTabs: ->
+        @$('nav').on 'click', '[role=tab]', (event) =>
+            $panel = @$ "##{event.target.getAttribute 'aria-controls'}"
+
+            @$('[role=tabpanel]').not($panel).attr 'aria-hidden', true
+            $panel.attr 'aria-hidden', false
+
+            @$('nav [role=tab]').attr 'aria-selected', false
+            $(event.target).attr 'aria-selected', true
+
 
     photoChanged: =>
         file = @uploader.files[0]
