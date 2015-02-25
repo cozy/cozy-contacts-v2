@@ -1,14 +1,14 @@
 #contact-container
 
-    #top
+    header
         #picture
             if hasPicture
                 img.picture(src="contacts/#{id}/picture.png")
             else
                 img.picture(src="img/defaultpicture.png")
 
-            input#uploader(type="file")
             #uploadnotice= t("change")
+            input#uploader(type="file")
 
         #wrap-name-notes
             #contact-name(style="display: none;")
@@ -20,21 +20,7 @@
         a#close(href="#") &lt;
 
 
-    #right
-
-      ul.nav.nav-tabs
-        li: a#infotab(href="#info", data-toggle="tab")= t('info')
-        li.active: a(href="#notes-zone", data-toggle="tab")= t('notes')
-
-      .tab-content
-        #notes-zone.tab-pane.active
-          textarea(rows="3", placeholder=t('notes placeholder'))#notes #{note}
-
-        #info.tab-pane
-
-    #left
-
-
+    section
       #abouts.zone
         h2= t("about")
         ul
@@ -88,3 +74,15 @@
         a.button#export(href='contacts/#{id}/#{fn}.vcf' title= t("export contact"))= t('export contact')
         h3= t("delete")
         a.button#delete(title= t("delete contact"))= t('delete contact')
+
+
+    section
+      ul.nav.nav-tabs
+        li: a#infotab(href="#info", data-toggle="tab")= t('info')
+        li.active: a(href="#notes-zone", data-toggle="tab")= t('notes')
+
+      .tab-content
+        #notes-zone.tab-pane.active
+          textarea(rows="3", placeholder=t('notes placeholder'))#notes #{note}
+
+        #info.tab-pane
