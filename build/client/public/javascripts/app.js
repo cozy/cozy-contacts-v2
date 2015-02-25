@@ -1504,7 +1504,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,displayName = locals_.displayName,tags = locals_.tags,bestmail = locals_.bestmail,besttel = locals_.besttel;
+var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,timestamp = locals_.timestamp,displayName = locals_.displayName,bestmail = locals_.bestmail,besttel = locals_.besttel;
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png?" + (timestamp) + "", true, false)) + "/>");
@@ -1513,30 +1513,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\"/>");
 }
-buf.push("<h2>" + (jade.escape((jade_interp = displayName) == null ? '' : jade_interp)) + "</h2><div class=\"infos\">     <ul class=\"tags\">");
-// iterate tags || []
-;(function(){
-  var $$obj = tags || [];
-  if ('number' == typeof $$obj.length) {
-
-    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-      var tag = $$obj[$index];
-
-buf.push("<li" + (jade.attr("style", "background: " + (tag.get('color')) + ";", true, false)) + " class=\"tag\">" + (jade.escape((jade_interp = tag.get('name')) == null ? '' : jade_interp)) + "</li>");
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in $$obj) {
-      $$l++;      var tag = $$obj[$index];
-
-buf.push("<li" + (jade.attr("style", "background: " + (tag.get('color')) + ";", true, false)) + " class=\"tag\">" + (jade.escape((jade_interp = tag.get('name')) == null ? '' : jade_interp)) + "</li>");
-    }
-
-  }
-}).call(this);
-
-buf.push("</ul><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
+buf.push("<h2>" + (jade.escape((jade_interp = displayName) == null ? '' : jade_interp)) + "</h2><div class=\"infos\"><span class=\"email\">" + (jade.escape((jade_interp = bestmail) == null ? '' : jade_interp)) + "</span><span class=\"tel\">  " + (jade.escape((jade_interp = besttel) == null ? '' : jade_interp)) + "</span></div><div class=\"clearfix\"></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -2410,7 +2387,6 @@ module.exports = ContactsListItemView = (function(_super) {
       bestmail: this.model.getBest('email'),
       besttel: this.model.getBest('tel'),
       displayName: this.model.getDisplayName(),
-      tags: this.model.getTags(),
       timestamp: Date.now()
     });
   };

@@ -1,9 +1,19 @@
+fs = require 'fs'
+path = require 'path'
 Contact = require '../models/contact'
 Config  = require '../models/config'
 Tag = require '../models/tag'
 WebDavAccount = require '../models/webdavaccount'
 async   = require 'async'
 cozydb = require 'cozydb'
+
+getTemplateExtension = ->
+    # If run from build/, templates are compiled to JS
+    # otherwise, they are in jade
+    filePath = path.resolve __dirname, '../views/index.js'
+    runFromBuild = fs.existsSync filePath
+    extension = if runFromBuild then 'js' else 'jade'
+    return extension
 
 getImports = (callback) ->
     async.parallel [
@@ -36,7 +46,9 @@ module.exports =
         getImports (err, imports) ->
             return res.error 500, 'An error occured', err if err
 
-            res.render 'index.js', imports: imports
+            extension = getTemplateExtension()
+
+            res.render "index.#{extension}", imports: imports
 
 
     setConfig: (req, res) ->
