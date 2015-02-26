@@ -13,7 +13,7 @@ module.exports = class ContactView extends ViewCollection
     itemView: require 'views/datapoint'
 
     events: ->
-        'click #picture': 'choosePhoto'
+        'click #picture'    : 'choosePhoto'
         'click .addbirthday': @addClicked 'about', 'birthday'
         'click .addorg'     : @addClicked 'about', 'company'
         'click .addtitle'   : @addClicked 'about', 'title'
@@ -182,7 +182,6 @@ module.exports = class ContactView extends ViewCollection
                @collection.trigger 'change', @model
 
     choosePhoto: =>
-        # alert 'tretre'
         new PhotoBrowser
             model: @album
             collection: @collection
@@ -259,7 +258,6 @@ module.exports = class ContactView extends ViewCollection
         @$el.getNiceScroll().resize()
 
     photoChanged: =>
-        console.log 'trotro'
         file = @uploader.files[0]
 
         unless file.type.match /image\/.*/

@@ -74,6 +74,7 @@ module.exports =
   "photo-modal chooseAgain" : "Changer de photo"
   "modal ok"                : "OK"
   "modal cancel"            : "Annuler"
+  "no image"                : "Il n'y a pas d'image sur votre Cozy"
 
 # ContactList
   "search placeholder"    : "Recherche…"

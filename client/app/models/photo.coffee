@@ -27,5 +27,8 @@ module.exports = class Photo extends Backbone.Model
 Photo.listFromFiles = (page, callback)->
     client.get "files/#{page}", callback
 
+Photo.cropResizeFromFile = (fileid, attrs, callback)->
+    client.get "files/#{fileid}/cropandresize", attrs, callback
+
 Photo.makeFromFile = (fileid, attr, callback) ->
     client.post "files/#{fileid}/toPhoto", attr, callback

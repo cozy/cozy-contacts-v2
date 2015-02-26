@@ -69,6 +69,13 @@ module.exports =
   "full name"             : "Full name"
   "save"                  : "Save"
 
+# photo modal
+  "pick from files"         : "Choose one photo"
+  "photo-modal chooseAgain" : "Choose another photo"
+  "modal ok"                : "OK"
+  "modal cancel"            : "Cancel"
+  "no image"                : "There is no image on your Cozy"
+
 # ContactList
   "search placeholder"    : "Search…"
   "new contact"           : "New Contact"

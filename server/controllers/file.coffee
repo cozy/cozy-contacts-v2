@@ -105,6 +105,16 @@ resize = (raw, photo, name, callback) ->
                         callback err
 
 
+module.exports.cropAndResize = (req, res, next) ->
+    console.log req.file
+    # write the binary of the image on the fs
+    # crop
+    # resize
+    # return image
+    res.
+    next()
+
+
 module.exports.createPhoto = (req, res, next) ->
     file = req.file
 
