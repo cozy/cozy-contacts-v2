@@ -350,25 +350,33 @@ textarea
     .form-horizontal
         display inline-block
         margin 0px
+        width 100%
 
     .control-group
         margin-bottom 10px
 
-        &:after
-          clear none
+        .control-label
+            width 100%
+            padding 0
+            border 1px solid transparent
+            border-top-color #ddd
+            color #ddd
+            text-align left
+            font-size 1em
+            transition color 350ms
 
-        label
-            font-family 'Maven Pro', sans-serif
-            font-size 17px
-            width 120px
+        input:focus + .control-label
+            color blue
 
         .controls
-            margin-left 140px
+            margin-left 0
 
         input
+            box-sizing border-box
+            width 100%
+            height 2em
             font-family 'Source Sans Pro', sans-serif
             font-size 17px
-            width 150px
 
 
 ul.tags
@@ -575,11 +583,6 @@ ul.tags
     #name
         padding: 0px 10px 0px 3px
         font-size: 26px
-
-    #contact-name
-        .control-group
-            .control-label
-                text-align left
 
 
 #more-options

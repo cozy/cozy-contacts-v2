@@ -66,7 +66,7 @@ module.exports =
   "last name"             : "Nom"
   "placeholder last"      : "Dupont"
   "suffix"                : "Suffixe"
-  "placeholder suffix"    : "III"
+  "placeholder suffix"    : " "
   "full name"             : "Nom complet"
   "save"                  : "Enregister"
 

@@ -1,25 +1,20 @@
 
 form.form-horizontal
-    .control-group.prefix
-        label.control-label(for="prefix")= t("prefix")
-        .controls
-            input#prefix(type="text", value=n[3], placeholder=t("placeholder prefix"))
-    .control-group.first
-        label.control-label(for="first")= t("first name")
-        .controls
-            input#first(type="text", value=n[1], placeholder=t("placeholder first"))
-    .control-group.middle
-        label.control-label(for="middle")= t("middle name")
-        .controls
-            input#middle(type="text", value=n[2], placeholder=t("placeholder middle"))
-    .control-group.last
-        label.control-label(for="last")= t("last name")
-        .controls
-            input#last(type="text", value=n[0], placeholder=t("placeholder last"))
-    .control-group.suffix
-        label.control-label(for="suffix")= t("suffix")
-        .controls
-            input#suffix(type="text", value=n[4], placeholder=t("placeholder suffix"))
+    label.control-group.prefix
+        input#prefix(type="text", value=n[3], placeholder=t("placeholder prefix"))
+        .control-label(for="prefix")= t("prefix")
+    label.control-group.first
+        input#first(type="text", value=n[1], placeholder=t("placeholder first"))
+        .control-label(for="first")= t("first name")
+    label.control-group.middle
+        input#middle(type="text", value=n[2], placeholder=t("placeholder middle"))
+        .control-label(for="middle")= t("middle name")
+    label.control-group.last
+        input#last(type="text", value=n[0], placeholder=t("placeholder last"))
+        .control-label(for="last")= t("last name")
+    label.control-group.suffix
+        input#suffix(type="text", value=n[4], placeholder=t("placeholder suffix"))
+        .control-label(for="suffix")= t("suffix")
 
 .button-wrapper
     a#toggle-name-fields(title=t("contact name expand")).icon-black.icon-minus
