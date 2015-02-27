@@ -16,9 +16,7 @@ start = function(host, port, callback) {
     Contact = require('./server/models/contact');
     return Contact.migrateAll(function() {
       var realtime;
-      realtime = Realtimer({
-        server: server
-      }, ['contact.*']);
+      realtime = Realtimer(server, ['contact.*']);
       return typeof callback === "function" ? callback(null, app, server) : void 0;
     });
   });
