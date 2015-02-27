@@ -6,7 +6,9 @@ module.exports =
 
     makeDateStamp: ->
         date = new Date()
-        year = date.getYear()
-        month = date.getMonth()
-        day = date.getDay()
+        year = date.getFullYear()
+        month = date.getMonth() + 1
+        day = date.getDate()
+        month = "0#{month}" if month < 10
+        day = "0#{month}" if day < 10
         date = "#{year}-#{month}-#{day}"
