@@ -25,13 +25,39 @@
     header
         margin: 1em 0
 
-    nav
+    [role=tablist]
         display none
 
         @media (max-width: mobile-bp)
             display block
 
+    #close
+        display none
+        @media (max-width: mobile-bp)
+            display block
+
+        padding 0.5em
+        border none
+
+        i
+            margin 0 0.5em
+
+
     @media (max-width: mobile-bp)
+        .ui-menubar
+            display flex
+            justify-content space-between
+            padding 0
+
+            #menu-actions
+                position relative
+                top 0
+                right 0
+
+            [aria-controls] span
+                display inline
+
+
         .tab-title
             display none
 
@@ -39,3 +65,26 @@
             margin-top: 10px
 
 
+#menu-actions
+    position absolute
+    top      1em
+    right    15px      // ui-flex padding-right
+
+    [aria-controls]
+        i
+            margin 0 0.5em
+
+        span
+            display none
+
+    .ui-menulist
+        left  initial
+        right 0
+
+
+#menu-addmore
+    margin 1em 0
+
+    .ui-menulist
+        top initial
+        bottom 100%

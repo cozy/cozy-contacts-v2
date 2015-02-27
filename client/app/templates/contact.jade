@@ -7,6 +7,23 @@ mixin zone(slug, label)
 
 
 #contact-container
+    nav.ui-menubar.ui-flex.ui-flex-full
+        a#close(role="button", href="#")
+            i.fa.fa-chevron-left
+            span= t('contacts')
+
+        #menu-actions.ui-menu(role="menu", aria-expanded="false")
+            button(role="button", aria-controls="menu-actions")
+                i.fa.fa-cog
+                span= t('more options')
+            ul.ui-menulist
+                li(role="menuitem"): a#export(role="button", href='contacts/#{id}/#{fn}.vcf')
+                    i.fa.fa-download
+                    span= t('export contact')
+                li(role="menuitem"): button#delete(role="button")
+                    i.fa.fa-trash
+                    span= t('delete contact')
+
     div.ui-flex.ui-flex-full
         header
             #picture
@@ -25,11 +42,9 @@ mixin zone(slug, label)
 
                 span#save-info= t('changes saved') + ' '
                     a#undo=t('undo')
-            a#close(href="#") &lt;
 
-
-        nav.nav-tabs
-            ul(role='tablist')
+        nav.nav-tabs(role="tablist")
+            ul(role='presentation')
                 li(role='tab', aria-controls='infos-panel', aria-selected='true')= t('info')
                 li(role='tab', aria-controls='notes-panel', aria-selected='false')= t('notes')
 
@@ -41,27 +56,21 @@ mixin zone(slug, label)
         +zone('url', 'links')
         +zone('other', 'others')
 
-        .zone
-            a#more-options.button= t('more options')
-
-            #adder.zone
-                h2= t("actions")
-                h3= t("add fields")
-                a.button.addbirthday= t("birthday") + ' '
-                a.button.addorg=      t("company") + ' '
-                a.button.addtitle=    t("title") + ' '
-                a.button.addcozy=     t("cozy url") + ' '
-                a.button.addtwitter=  t("twitter") + ' '
-                a.button.addtel=      t("phone") + ' '
-                a.button.addemail=    t("email") + ' '
-                a.button.addadr=      t("postal") + ' '
-                a.button.addurl=      t("url") + ' '
-                a.button.addskype=    t("skype") + ' '
-                a.button.addother=    t("other")
-                h3= t("export")
-                a.button#export(href='contacts/#{id}/#{fn}.vcf' title= t("export contact"))= t('export contact')
-                h3= t("delete")
-                a.button#delete(title= t("delete contact"))= t('delete contact')
+        #menu-addmore.ui-menu(role="menu", aria-expanded="false")
+            button.fa.fa-angle-down(role="button", aria-controls="menu-addmore")
+                span= t("add fields")
+            ul.ui-menulist
+                li(role="menutiem"): button(role="button").addemail= t("email")
+                li(role="menutiem"): button(role="button").addtel= t("phone")
+                li.ui-line(role="menutiem"): button(role="button").addadr= t("postal")
+                li(role="menutiem"): button(role="button").addorg= t("company")
+                li.ui-line(role="menutiem"): button(role="button").addtitle= t("title")
+                li.ui-line(role="menutiem"): button(role="button").addbirthday= t("birthday")
+                li(role="menutiem"): button(role="button").addcozy= t("cozy url")
+                li(role="menutiem"): button(role="button").addtwitter= t("twitter")
+                li(role="menutiem"): button(role="button").addskype= t("skype")
+                li(role="menutiem"): button(role="button").addurl= t("url")
+                li(role="menutiem"): button(role="button").addother= t("other")
 
 
     section#notes-panel.ui-flex.ui-flex-half(role='tabpanel', aria-hidden='true')

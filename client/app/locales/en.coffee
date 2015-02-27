@@ -1,6 +1,7 @@
 module.exports =
 
 # ContactView
+  "contacts"              : "Contacts"
   "saving"                : "Saving…"
   "saved"                 : "Saved"
   "delete"                : "Delete"

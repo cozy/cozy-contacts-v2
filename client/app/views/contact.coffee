@@ -110,6 +110,7 @@ module.exports = class ContactView extends ViewCollection
         @currentState = @model.toJSON()
 
         @bindTabs()
+        @bindMenus()
 
         if @model.isNew()
             @toggleContactName()
@@ -261,7 +262,7 @@ module.exports = class ContactView extends ViewCollection
         @$el.getNiceScroll().resize()
 
     bindTabs: ->
-        @$('nav').on 'click', '[role=tab]', (event) =>
+        @$('[role=tablist]').on 'click', '[role=tab]', (event) =>
             $panel = @$ "##{event.target.getAttribute 'aria-controls'}"
 
             @$('[role=tabpanel]').not($panel).attr 'aria-hidden', true
@@ -270,6 +271,20 @@ module.exports = class ContactView extends ViewCollection
             @$('nav [role=tab]').attr 'aria-selected', false
             $(event.target).attr 'aria-selected', true
 
+    bindMenus: ->
+        toggleMenu = (event) =>
+            if event?.delegateTarget.getAttribute('role') is 'menu'
+                event.stopPropagation()
+                menu = event.delegateTarget
+                expanded = menu.getAttribute('aria-expanded') is 'true'
+                menu.setAttribute 'aria-expanded', !expanded
+            else
+                @$('[role=menu]').attr 'aria-expanded', false
+
+        @$ '[role=menu]'
+            .on 'click', '[aria-controls]', toggleMenu
+        @$el
+            .on 'click', toggleMenu
 
     photoChanged: =>
         file = @uploader.files[0]
