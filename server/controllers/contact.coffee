@@ -98,7 +98,7 @@ module.exports =
 
                 vCardOutput = outputs.join ''
                 date = helpers.makeDateStamp()
-                res.attachment "cozy-contacts-#{date}.vcf"
+                res.attachment "#{date}-cozy-contacts.vcf"
                 res.set 'Content-Type', 'text/x-vcard'
                 res.send vCardOutput
 
@@ -107,6 +107,7 @@ module.exports =
         req.contact.toVCF (err, vCardOutput) ->
             return next err if err?
 
-            res.attachment "#{req.params.fn}.vcf"
+            date = helpers.makeDateStamp()
+            res.attachment "#{date}-#{req.params.fn.replace(/ /g, '-')}.vcf"
             res.set 'Content-Type', 'text/x-vcard'
             res.send vCardOutput

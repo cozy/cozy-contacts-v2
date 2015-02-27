@@ -26,6 +26,11 @@ getImports = (callback) ->
     ], (err, results) ->
         [contacts, config, instance, tags, webDavAccount, tagInstances] = results
 
+        # Remove this fix once cozydb is fixed:
+        # https://github.com/cozy/cozydb/issues/6
+        tags = tags.filter (value) ->
+            Boolean(value)
+
         locale = instance?.locale or 'en'
         if webDavAccount?
                 webDavAccount.domain = instance?.domain or ''

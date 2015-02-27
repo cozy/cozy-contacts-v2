@@ -97,16 +97,19 @@ Contact.prototype.getComputedN = function() {
 };
 
 Contact.prototype.toVCF = function(callback) {
-  var buffers, stream, _ref;
+  var laterStream, _ref;
   if (((_ref = this._attachments) != null ? _ref.picture : void 0) != null) {
-    stream = this.getFile('picture', function() {});
-    buffers = [];
-    stream.on('data', buffers.push.bind(buffers));
-    return stream.on('end', (function(_this) {
-      return function() {
-        var picture;
-        picture = Buffer.concat(buffers).toString('base64');
-        return callback(null, VCardParser.toVCF(_this, picture));
+    laterStream = this.getFile('picture', function() {});
+    return laterStream.on('ready', (function(_this) {
+      return function(stream) {
+        var buffers;
+        buffers = [];
+        stream.on('data', buffers.push.bind(buffers));
+        return stream.on('end', function() {
+          var picture;
+          picture = Buffer.concat(buffers).toString('base64');
+          return callback(null, VCardParser.toVCF(_this, picture));
+        });
       };
     })(this));
   } else {

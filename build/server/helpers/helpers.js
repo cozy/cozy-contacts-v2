@@ -6,9 +6,15 @@ module.exports = {
   makeDateStamp: function() {
     var date, day, month, year;
     date = new Date();
-    year = date.getYear();
-    month = date.getMonth();
-    day = date.getDay();
+    year = date.getFullYear();
+    month = date.getMonth() + 1;
+    day = date.getDate();
+    if (month < 10) {
+      month = "0" + month;
+    }
+    if (day < 10) {
+      day = "0" + month;
+    }
     return date = year + "-" + month + "-" + day;
   }
 };

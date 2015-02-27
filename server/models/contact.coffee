@@ -74,12 +74,13 @@ Contact::toVCF = (callback) ->
     if @_attachments?.picture?
         # we get a stream that we need to convert into a buffer
         # so we can output a base64 version of the picture
-        stream = @getFile 'picture', ->
-        buffers = []
-        stream.on 'data', buffers.push.bind(buffers)
-        stream.on 'end', =>
-            picture = Buffer.concat(buffers).toString 'base64'
-            callback null, VCardParser.toVCF(@, picture)
+        laterStream = @getFile 'picture', ->
+        laterStream.on 'ready', (stream) =>
+            buffers = []
+            stream.on 'data', buffers.push.bind(buffers)
+            stream.on 'end', =>
+                picture = Buffer.concat(buffers).toString 'base64'
+                callback null, VCardParser.toVCF(@, picture)
     else
         callback null, VCardParser.toVCF(@)
 
