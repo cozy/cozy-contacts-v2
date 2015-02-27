@@ -677,6 +677,7 @@ module.exports = ViewCollection = (function(_super) {
 
 ;require.register("locales/en", function(exports, require, module) {
 module.exports = {
+  "contacts": "Contacts",
   "saving": "Saving…",
   "saved": "Saved",
   "delete": "Delete",
@@ -736,7 +737,7 @@ module.exports = {
   "last name": "Family Name",
   "placeholder last": "Doe",
   "suffix": "Suffix",
-  "placeholder suffix": "III",
+  "placeholder suffix": " ",
   "full name": "Full name",
   "save": "Save",
   "search placeholder": "Search…",
@@ -790,6 +791,7 @@ module.exports = {
 
 ;require.register("locales/fr", function(exports, require, module) {
 module.exports = {
+  "contacts": "Contacts",
   "saving": "Sauvegarde…",
   "saved": "Sauvegardé",
   "delete": "Supprimer",
@@ -849,7 +851,7 @@ module.exports = {
   "last name": "Nom",
   "placeholder last": "Dupont",
   "suffix": "Suffixe",
-  "placeholder suffix": "III",
+  "placeholder suffix": " ",
   "full name": "Nom complet",
   "save": "Enregister",
   "search placeholder": "Recherche…",
@@ -1438,8 +1440,13 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,note = locals_.note;
-buf.push("<div id=\"contact-container\"><div id=\"top\"><div id=\"picture\">");
+var locals_ = (locals || {}),id = locals_.id,fn = locals_.fn,hasPicture = locals_.hasPicture,note = locals_.note;
+jade_mixins["zone"] = function(slug, label){
+var block = (this && this.block), attributes = (this && this.attributes) || {};
+label = label || slug
+buf.push("<div" + (jade.attr("id", "" + (slug) + "s", true, false)) + " class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t(label)) ? "" : jade_interp)) + "</h2><ul></ul><a" + (jade.cls(["btn add add" + (slug) + ""], [true])) + ">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div>");
+};
+buf.push("<div id=\"contact-container\"><nav class=\"ui-menubar ui-flex ui-flex-full\"><a id=\"close\" role=\"button\" href=\"#\"><i class=\"fa fa-chevron-left\"></i><span>" + (jade.escape(null == (jade_interp = t('contacts')) ? "" : jade_interp)) + "</span></a><div id=\"menu-actions\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-actions\"><i class=\"fa fa-cog\"></i><span>" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menuitem\"><a id=\"export\" role=\"button\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + "><i class=\"fa fa-download\"></i><span>" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</span></a></li><li role=\"menuitem\"><button id=\"delete\" role=\"button\"><i class=\"fa fa-trash\"></i><span>" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</span></button></li></ul></div></nav><div class=\"ui-flex ui-flex-full\"><header><div id=\"picture\">");
 if ( hasPicture)
 {
 buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png", true, false)) + " class=\"picture\"/>");
@@ -1448,7 +1455,14 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<input id=\"uploader\" type=\"file\"/><div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><input id=\"name\"" + (jade.attr("placeholder", t("firstname lastname"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div><a id=\"close\" href=\"#\">&lt;</a></div><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><div id=\"name\">" + (jade.escape(null == (jade_interp = fn) ? "" : jade_interp)) + "</div><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div></header><nav role=\"tablist\" class=\"nav-tabs\"><ul role=\"presentation\"><li role=\"tab\" aria-controls=\"infos-panel\" aria-selected=\"true\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</li><li role=\"tab\" aria-controls=\"notes-panel\" aria-selected=\"false\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</li></ul></nav></div><section id=\"infos-panel\" role=\"tabpanel\" aria-hidden=\"false\" class=\"ui-flex ui-flex-half\">");
+jade_mixins["zone"]('about');
+jade_mixins["zone"]('tel', 'phones');
+jade_mixins["zone"]('email', 'emails');
+jade_mixins["zone"]('adr', 'postal');
+jade_mixins["zone"]('url', 'links');
+jade_mixins["zone"]('other', 'others');
+buf.push("<div id=\"menu-addmore\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-addmore\" class=\"fa fa-angle-down\"><span>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menutiem\"><button role=\"button\" class=\"addemail\">" + (jade.escape(null == (jade_interp = t("email")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtel\">" + (jade.escape(null == (jade_interp = t("phone")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addadr\">" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addorg\">" + (jade.escape(null == (jade_interp = t("company")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addtitle\">" + (jade.escape(null == (jade_interp = t("title")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addskype\">" + (jade.escape(null == (jade_interp = t("skype")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addurl\">" + (jade.escape(null == (jade_interp = t("url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</button></li></ul></div></section><section id=\"notes-panel\" role=\"tabpanel\" aria-hidden=\"true\" class=\"ui-flex ui-flex-half\"><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("notes")) ? "" : jade_interp)) + "</h2><div id=\"notes-zone\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div></section></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1467,7 +1481,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 var locals_ = (locals || {}),n = locals_.n;
-buf.push("<form class=\"form-horizontal\"><div class=\"control-group prefix\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group first\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group middle\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group last\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group suffix\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div></form><div class=\"button-wrapper\"><a id=\"toggle-name-fields\"" + (jade.attr("title", t("contact name expand"), true, false)) + " class=\"icon-black icon-minus\"></a><a id=\"toggle-name\"" + (jade.attr("title", t("contact name check"), true, false)) + " class=\"icon-black icon-check\"></a></div>");;return buf.join("");
+buf.push("<form class=\"form-horizontal\"><label class=\"control-group prefix\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/><div for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</div></label><label class=\"control-group first\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/><div for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group middle\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/><div for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group last\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/><div for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group suffix\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/><div for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</div></label></form><div class=\"button-wrapper\"><a id=\"toggle-name-fields\"" + (jade.attr("title", t("contact name expand"), true, false)) + " class=\"fa fa-minus\"></a><a id=\"toggle-name\"" + (jade.attr("title", t("contact name check"), true, false)) + " class=\"fa fa-check\"></a></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1750,23 +1764,8 @@ module.exports = ContactView = (function(_super) {
     this.$el.niceScroll();
     this.resizeNote();
     this.currentState = this.model.toJSON();
-    if ($(window).width() < 900) {
-      this.$('a#infotab').tab('show');
-    }
-    this.$('a[data-toggle="tab"]').on('shown', (function(_this) {
-      return function() {
-        if ($(window).width() < 900) {
-          _this.$('#left').hide();
-        }
-        return _this.resizeNiceScroll();
-      };
-    })(this));
-    this.$('a#infotab').on('shown', (function(_this) {
-      return function() {
-        _this.$('#left').show();
-        return _this.resizeNiceScroll();
-      };
-    })(this));
+    this.bindTabs();
+    this.bindMenus();
     if (this.model.isNew()) {
       return this.toggleContactName();
     }
@@ -1934,6 +1933,7 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.modelChanged = function() {
     var id, timestamp, _ref;
+    this.$('#name').text(this.model.get('fn'));
     this.notesfield.val(this.model.get('note'));
     if ((_ref = this.tags) != null) {
       _ref.refresh();
@@ -1978,6 +1978,38 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.resizeNiceScroll = function(event) {
     return this.$el.getNiceScroll().resize();
+  };
+
+  ContactView.prototype.bindTabs = function() {
+    return this.$('[role=tablist]').on('click', '[role=tab]', (function(_this) {
+      return function(event) {
+        var $panel;
+        $panel = _this.$("#" + (event.target.getAttribute('aria-controls')));
+        _this.$('[role=tabpanel]').not($panel).attr('aria-hidden', true);
+        $panel.attr('aria-hidden', false);
+        _this.$('nav [role=tab]').attr('aria-selected', false);
+        return $(event.target).attr('aria-selected', true);
+      };
+    })(this));
+  };
+
+  ContactView.prototype.bindMenus = function() {
+    var toggleMenu;
+    toggleMenu = (function(_this) {
+      return function(event) {
+        var expanded, menu;
+        if ((event != null ? event.delegateTarget.getAttribute('role') : void 0) === 'menu') {
+          event.stopPropagation();
+          menu = event.delegateTarget;
+          expanded = menu.getAttribute('aria-expanded') === 'true';
+          return menu.setAttribute('aria-expanded', !expanded);
+        } else {
+          return _this.$('[role=menu]').attr('aria-expanded', false);
+        }
+      };
+    })(this);
+    this.$('[role=menu]').on('click', '[aria-controls]', toggleMenu);
+    return this.$el.on('click', toggleMenu);
   };
 
   ContactView.prototype.photoChanged = function() {
@@ -2092,14 +2124,17 @@ module.exports = ContactName = (function(_super) {
   };
 
   ContactName.prototype.toggleFields = function() {
-    var toggleButton;
+    var full, nparts, toggleButton;
+    nparts = this.model.get('n');
+    full = _.reject(nparts, _.isEmpty).length === nparts.length;
     toggleButton = this.$('#toggle-name-fields');
-    if (toggleButton.hasClass('icon-minus')) {
+    if (toggleButton.hasClass('fa-minus') && !full) {
       this.showFew();
-    } else {
+      return toggleButton.toggleClass('fa-plus fa-minus');
+    } else if (toggleButton.hasClass('fa-plus')) {
       this.showAll();
+      return toggleButton.toggleClass('fa-plus fa-minus');
     }
-    return toggleButton.toggleClass('icon-plus icon-minus');
   };
 
   ContactName.prototype.showFew = function() {
