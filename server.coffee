@@ -16,7 +16,7 @@ start = (host, port, callback) ->
 
             # start contact watch to upadte UI when new contact are added
             # or modified
-            realtime = Realtimer server: server, ['contact.*']
+            realtime = Realtimer server, ['contact.*']
             callback? null, app, server
 
 
