@@ -330,52 +330,32 @@ textarea
         color: red
 
 
-ul.tags
-    margin: 0
-    padding: 0
-    margin-top: 5px
-    display: inline-block
-    border: none
-
-    input
-        padding-left: 5px
-        width: 100px
-
-    li.tag
-        display: inline-block
-        border: 1px solid lightgray
-        border-radius: 6px
-        padding: 0.2em 0.5em 0.2em 0.5em
-        line-height: 1em
-        margin-top: 0px
-        margin-right: 5px
-        border: 1px solid transparent
-        border-radius: 0
-        background-color: blue + 90%
-
-        font-family: 'Maven Pro', sans-serif
-        color: white
-        user-select: none
-
-
-#wrap-name-notes ul.tags
+.tags
+    margin 5px 0 0
+    padding 0
+    list-style-type none
     font-size: 13px
 
+    input
+        padding-left 5px
+        width 100px
+
     li.tag
-        cursor: pointer
+        margin-right 5px
+        padding 0.2em 0.5em
+        border 1px solid transparent
+        border-radius 2px
+        font-family 'Maven Pro', sans-serif
+        color white
+        cursor pointer
+        user-select none
 
         &:hover
             border: 1px solid orange
             background-color: orange !important
 
-        &:focus
-        &:active
-            border: 1px solid blue
-            box-shadow: 1px 3px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.0)
-
     .deleter
         cursor: pointer
-        vertical-align top
 
         &:hover
             color: orange - 40%
