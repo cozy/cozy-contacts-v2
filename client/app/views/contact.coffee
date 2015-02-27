@@ -227,6 +227,7 @@ module.exports = class ContactView extends ViewCollection
         @currentState = @model.toJSON()
 
     modelChanged: =>
+        @$('#name').text @model.get 'fn'
         @notesfield.val @model.get 'note'
         @tags?.refresh()
         id = @model.get 'id'

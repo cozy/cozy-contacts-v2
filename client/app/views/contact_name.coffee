@@ -21,13 +21,16 @@ module.exports = class ContactName extends BaseView
         @toggleFields()
 
     toggleFields: ->
+        nparts = @model.get 'n'
+        full = _.reject(nparts, _.isEmpty).length is nparts.length
         toggleButton = @$('#toggle-name-fields')
-        if toggleButton.hasClass 'icon-minus'
+        if toggleButton.hasClass('fa-minus') and not full
             @showFew()
-        else
+            toggleButton.toggleClass 'fa-plus fa-minus'
+        else if toggleButton.hasClass('fa-plus')
             @showAll()
+            toggleButton.toggleClass 'fa-plus fa-minus'
 
-        toggleButton.toggleClass 'icon-plus icon-minus'
 
     showFew: ->
         nameParts = _.object ['last', 'first', 'middle', 'prefix', 'suffix'],
