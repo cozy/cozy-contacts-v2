@@ -3,6 +3,18 @@
         display none
 
 
+#close
+    display none
+    @media (max-width: mobile-bp)
+        display block
+
+    padding 0.5em
+    border none
+
+    i
+        margin 0 0.5em
+
+
 // Contact Sheet Positions
 #contact-container
     display flex
@@ -23,6 +35,7 @@
         width 100%
 
     header
+        display flex
         margin: 1em 0
 
     [role=tablist]
@@ -30,18 +43,6 @@
 
         @media (max-width: mobile-bp)
             display block
-
-    #close
-        display none
-        @media (max-width: mobile-bp)
-            display block
-
-        padding 0.5em
-        border none
-
-        i
-            margin 0 0.5em
-
 
     @media (max-width: mobile-bp)
         .ui-menubar
@@ -63,6 +64,41 @@
 
         #notes-zone
             margin-top: 10px
+
+
+#picture
+    position relative
+    width 90px
+    height 90px
+    margin-right 1em
+    overflow hidden
+
+    .picture
+        position absolute
+        display block
+        width 100%
+        height 100%
+
+#uploader
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    margin 0px
+
+#uploadnotice
+    position absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
+    box-sizing border-box
+    line-height 90px
+
+
+#wrap-name-notes
+    flex 1
 
 
 #menu-actions
