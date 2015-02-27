@@ -20,7 +20,7 @@ mixin zone(slug, label)
 
             #wrap-name-notes
                 #contact-name(style="display: none;")
-                input#name(placeholder=t("firstname lastname"), value="#{fn}")
+                #name= fn
                 ul.tags
 
                 span#save-info= t('changes saved') + ' '
