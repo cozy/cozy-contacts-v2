@@ -3,9 +3,12 @@ DataPoint = require 'models/datapoint'
 DataPointCollection  = require 'collections/datapoint'
 VCard = require 'lib/vcard_helper'
 
-ANDROID_RELATION_TYPES = ['custom', 'assistant', 'brother', 'child',
-            'domestic partner', 'father', 'friend', 'manager', 'mother',
-            'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse']
+ANDROID_RELATION_TYPES = [
+    'custom', 'assistant', 'brother', 'child',
+    'domestic partner', 'father', 'friend', 'manager', 'mother',
+    'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'
+]
+
 
 # A contact
 # Properties :
@@ -15,9 +18,11 @@ module.exports = class Contact extends Backbone.Model
 
     urlRoot: 'contacts'
 
+
     constructor: ->
         @dataPoints = new DataPointCollection()
         super
+
 
     initialize: ->
         @on 'change:datapoints', =>
@@ -26,21 +31,27 @@ module.exports = class Contact extends Backbone.Model
                 @dataPoints.reset dps
                 @set 'datapoints', null
 
+
     defaults: ->
         n: []
         fn: ''
         note: ''
         tags: []
 
+
     fetch: (options = {}) ->
         options.parse = true
         super options
+
 
     # Analyze given attribute list and transform them in datapoints, Datapoint
     # is structure that describes an object (fields: name, type, value) as an
     # attribute.  For each attribute, you can have several values of different
     # type.  That's why this structure is required.
     parse: (attrs) ->
+        attrs ?= {}
+        attrs.datapoints ?= []
+
         if _.where(attrs?.datapoints, name: 'tel').length is 0
             attrs?.datapoints?.push
                 name: 'tel'
@@ -77,6 +88,7 @@ module.exports = class Contact extends Backbone.Model
 
         return attrs
 
+
     savePicture: (callback) ->
         callback = callback or ->
 
@@ -111,6 +123,7 @@ module.exports = class Contact extends Backbone.Model
             request.put path, data, markChanged, false
             callback()
 
+
     getBest: (name) ->
         result = null
         @dataPoints.each (dp) ->
@@ -120,11 +133,13 @@ module.exports = class Contact extends Backbone.Model
 
         return result
 
+
     addDP: (name, type, value)=>
         @dataPoints.add
             type: type
             name: name
             value: value
+
 
     match: (filter) =>
         filter.test(@get('n')) or
@@ -132,6 +147,7 @@ module.exports = class Contact extends Backbone.Model
         filter.test(@get('note')) or
         filter.test(@get('tags').join ' ') or
         @dataPoints.match filter
+
 
     toJSON: () ->
         json = super
@@ -142,13 +158,16 @@ module.exports = class Contact extends Backbone.Model
         delete json.pictureRev
         return json
 
+
     setFN: (value) ->
         @set 'fn', value
         @set 'n', @getComputedN value
 
+
     setN: (value) ->
         @set 'n', value
         @set 'fn', @getComputedFN value
+
 
     getDisplayName: ->
         n = @get 'n'
@@ -166,25 +185,24 @@ module.exports = class Contact extends Backbone.Model
         if i = middle.split(/[ \,]/)[0][0]?.toUpperCase() then i + '.'
         else ''
 
+
     getComputedFN: (n) ->
         n ?= @get 'n'
         return '' unless n and n.length > 0
 
         return VCardParser.nToFN n
 
+
     getComputedN: (fn) ->
         fn ?= @get 'fn'
 
         return VCardParser.fnToN fn
 
+
     getTags: ->
         @get('tags').map (tagName) ->
             return app.tags.getOrCreateByName tagName
 
-    # Ask to server to create a new task that says to call back current
-    # contact.
-    createTask: (callback) ->
-        request.post "contacts/#{@id}/new-call-task", {}, callback
 
 Contact.fromVCF = (vcf) ->
     ContactCollection = require 'collections/contact'
