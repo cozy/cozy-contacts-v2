@@ -75,11 +75,15 @@ module.exports =
     # system and delete it from disk.
     updatePicture: (req, res, next) ->
         form = new multiparty.Form()
+
+        res.on 'close', -> req.abort()
+
         form.parse req, (err, fields, files) ->
             if err
                 next err
             else if files? and files.picture? and files.picture.length > 0
                 file = files.picture[0]
+
                 req.contact.savePicture file.path, (err) ->
                     if err
                         next err
