@@ -28,6 +28,14 @@ module.exports = class Contact extends cozydb.CozyModel
         # vCard Name = splitted
         # (Familly;Given;Middle;Prefix;Suffix)
         n             : String
+        org           : String
+        title         : String
+        department    : String
+        bday          : String
+        nickname      : String
+        url           : String
+        import        : Boolean
+        rev           : Date
         datapoints    : [DataPoint]
         note          : String
         tags          : [String]
