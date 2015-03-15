@@ -13,7 +13,7 @@ module.exports = class ContactView extends ViewCollection
 
     events: ->
         'click .addcozy'    : @addClicked 'about', 'cozy'
-        'click .addtwitter' : @addClicked 'about', 'twitter'
+        'click .addtwitter' : @addClicked 'social', 'twitter'
         'click .addabout'   : @addClicked 'about'
         'click .addtel'     : @addClicked 'tel'
         'click .addemail'   : @addClicked 'email'
