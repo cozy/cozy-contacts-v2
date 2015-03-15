@@ -171,6 +171,7 @@ module.exports = class ContactView extends ViewCollection
             @model.set 'bday', @$('.bday-input').val()
             @model.set 'org', @$('.org-input').val()
             @model.set 'title', @$('.title-input').val()
+            @model.set 'department', @$('.department-input').val()
             @model.set 'url', @$('.url-input').val()
 
             # no need to save in this case
