@@ -211,3 +211,10 @@ Contact.fromVCF = (vcf) ->
 
     imported = new ContactCollection parser.contacts, parse: true
     return imported
+
+
+Contact.DATAPOINT_TYPES = [
+    'about', 'email', 'adr', 'tel', 'url', 'other', 'relation', 'chat',
+    'social'
+]
+

@@ -60,12 +60,14 @@ module.exports = class ContactView extends ViewCollection
         # the main page
         @listenTo @model, 'remove', -> window.app.router.navigate '', true
 
+    # Generate some metadata for template: say if a picture is set, look
+    # for the full name, and set a first timestamp (useful to detect changes).
     getRenderData: ->
-        attrs = _.extend {}, @model.toJSON(),
+        templateData = _.extend {}, @model.toJSON(),
             hasPicture: not not @model.get('pictureRev')
             fn: @model.get 'fn'
             timestamp: Date.now()
-        attrs
+        return templateData
 
     afterRender: ->
         @contactName = new ContactName
@@ -82,12 +84,8 @@ module.exports = class ContactView extends ViewCollection
         @contactName.render()
 
         @zones = {}
-        types = [
-            'about', 'email', 'adr', 'tel', 'url', 'other', 'relation', 'chat',
-            'social'
-        ]
-
-        @zones[type] = @$('#' + type + 's ul') for type in types
+        for type in Contact.DATAPOINT_TYPES
+            @zones[type] = @$ "##{type}s ul"
 
         @hideEmptyZones()
         @savedInfo = @$('#save-info').hide()
