@@ -34,7 +34,6 @@ module.exports = class Contact extends cozydb.CozyModel
         bday          : String
         nickname      : String
         url           : String
-        import        : Boolean
         rev           : Date
         datapoints    : [DataPoint]
         note          : String
@@ -58,6 +57,7 @@ module.exports = class Contact extends cozydb.CozyModel
 
         return target
 
+
 # Save given file as contact picture then delete given file from disk.
 Contact::savePicture = (path, callback) ->
     data = name: 'picture'
@@ -70,13 +70,16 @@ Contact::savePicture = (path, callback) ->
                 log.error "failed to purge #{file.path}" if err
                 callback()
 
+
 Contact::getComputedFN = ->
     return VCardParser.nToFN @n.split ';'
+
 
 # Parse n field (splitted) from fn (display).
 Contact::getComputedN = ->
     return VCardParser.fnToN @fn
             .join ';'
+
 
 Contact::toVCF = (callback) ->
     if @_attachments?.picture?
