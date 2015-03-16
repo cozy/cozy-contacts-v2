@@ -32,6 +32,7 @@ module.exports =
         toCreate = new Contact model
 
         create = ->
+            toCreate.rev = Date.now().toISOString()
             Contact.create toCreate, (err, contact) ->
                 if err
                     next err
