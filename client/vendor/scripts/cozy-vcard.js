@@ -536,9 +536,9 @@
     }
     if (model.rev != null) {
       if (typeof model.rev === Date) {
-        out.push("F:" + (model.rev.toISOString()));
+        out.push("REV:" + (model.rev.toISOString()));
       } else {
-        out.push("F:" + model.rev);
+        out.push("REV:" + model.rev);
       }
     }
     _ref = model.datapoints;
