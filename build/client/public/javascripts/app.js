@@ -689,8 +689,12 @@ module.exports = {
   "contact name check": "Close contact name edition",
   "company": "Company",
   "title": "Title",
+  "org": "Company",
+  "department": "Department",
+  "bday": "Birthday",
   "birthday": "Birthday",
   "phone": "Phone",
+  "social": "Social Profile",
   "skype": "Skype",
   "email": "Email",
   "postal": "Postal",
@@ -705,8 +709,13 @@ module.exports = {
   "notes placeholder": "Take notes here",
   "type here": "Type here",
   "phones": "Phones",
+  "socials": "Social Profiles",
   "emails": "Emails",
   "postal": "Postal",
+  "profile": "Profile",
+  "instant messaging": "Instant Messaging",
+  "relations": "Relations",
+  "information": "Information",
   "links": "Links",
   "others": "Others",
   "actions": "Actions",
@@ -802,9 +811,13 @@ module.exports = {
   "contact name expand": "Afficher les détails sur le nom",
   "contact name check": "Fermet l'édition du nom",
   "company": "Société",
+  "org": "Société",
+  "department": "Département",
   "title": "Titre",
   "birthday": "Anniversaire",
+  "bday": "Anniversaire",
   "phone": "Téléphone",
+  "social": "Profil (réseau social)",
   "skype": "Skype",
   "email": "Email",
   "postal": "Adresse",
@@ -819,8 +832,13 @@ module.exports = {
   "notes placeholder": "Prenez des notes ici",
   "type here": "Écrivez ici",
   "phones": "Téléphones",
+  "socials": "Profils (réseaux sociaux)",
   "emails": "Emails",
   "postal": "Adresses",
+  "profile": "Profil",
+  "instant messaging": "Messageries instantanées",
+  "relations": "Relation",
+  "information": "Information",
   "links": "Liens",
   "others": "Autres",
   "actions": "Actions",
@@ -1204,6 +1222,8 @@ Contact.fromVCF = function(vcf) {
   });
   return imported;
 };
+
+Contact.DATAPOINT_TYPES = ['about', 'email', 'adr', 'tel', 'url', 'other', 'relation', 'chat', 'social'];
 });
 
 ;require.register("models/datapoint", function(exports, require, module) {
@@ -1442,7 +1462,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),id = locals_.id,fn = locals_.fn,hasPicture = locals_.hasPicture,org = locals_.org,title = locals_.title,bday = locals_.bday,url = locals_.url,note = locals_.note;
+var locals_ = (locals || {}),id = locals_.id,fn = locals_.fn,hasPicture = locals_.hasPicture,org = locals_.org,title = locals_.title,department = locals_.department,bday = locals_.bday,url = locals_.url,note = locals_.note;
 jade_mixins["zone"] = function(slug, label){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
 label = label || slug
@@ -1457,16 +1477,17 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><div id=\"name\">" + (jade.escape(null == (jade_interp = fn) ? "" : jade_interp)) + "</div><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div></header><nav role=\"tablist\" class=\"nav-tabs\"><ul role=\"presentation\"><li role=\"tab\" aria-controls=\"infos-panel\" aria-selected=\"true\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</li><li role=\"tab\" aria-controls=\"notes-panel\" aria-selected=\"false\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</li></ul></nav></div><section id=\"infos-panel\" role=\"tabpanel\" aria-hidden=\"false\" class=\"ui-flex ui-flex-half\">");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div><input id=\"uploader\" type=\"file\"/></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><div id=\"name\">" + (jade.escape(null == (jade_interp = fn) ? "" : jade_interp)) + "</div><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div></header><nav role=\"tablist\" class=\"nav-tabs\"><ul role=\"presentation\"><li role=\"tab\" aria-controls=\"infos-panel\" aria-selected=\"true\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</li><li role=\"tab\" aria-controls=\"notes-panel\" aria-selected=\"false\">" + (jade.escape(null == (jade_interp = t('profile')) ? "" : jade_interp)) + "</li></ul></nav></div><section id=\"infos-panel\" role=\"tabpanel\" aria-hidden=\"false\" class=\"ui-flex ui-flex-half\">");
 jade_mixins["zone"]('about');
 jade_mixins["zone"]('tel', 'phones');
 jade_mixins["zone"]('email', 'emails');
 jade_mixins["zone"]('adr', 'postal');
 jade_mixins["zone"]('url', 'links');
 jade_mixins["zone"]('chat', 'instant messaging');
-jade_mixins["zone"]('relations', 'relations');
+jade_mixins["zone"]('relation', 'relations');
+jade_mixins["zone"]('social', 'socials');
 jade_mixins["zone"]('other', 'others');
-buf.push("<div id=\"menu-addmore\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-addmore\" class=\"fa fa-angle-down\"><span>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menutiem\"><button role=\"button\" class=\"addemail\">" + (jade.escape(null == (jade_interp = t("email")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtel\">" + (jade.escape(null == (jade_interp = t("phone")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addadr\">" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addorg\">" + (jade.escape(null == (jade_interp = t("company")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addtitle\">" + (jade.escape(null == (jade_interp = t("title")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addskype\">" + (jade.escape(null == (jade_interp = t("skype")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addurl\">" + (jade.escape(null == (jade_interp = t("url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</button></li></ul></div></section><section id=\"notes-panel\" role=\"tabpanel\" aria-hidden=\"true\" class=\"ui-flex ui-flex-half\"><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("Information")) ? "" : jade_interp)) + "</h2><ul class=\"info-fields\"><li class=\"datapoint org-field\"><input" + (jade.attr("value", "" + (t('org')) + "", true, false)) + " class=\"type org-label\"/><input" + (jade.attr("value", "" + (org) + "", true, false)) + " class=\"value org-input\"/></li><li class=\"datapoint title-field\"><input" + (jade.attr("value", "" + (t('title')) + "", true, false)) + " class=\"type title-label\"/><input" + (jade.attr("value", "" + (title) + "", true, false)) + " class=\"value title-input\"/></li><li class=\"datapoint bday-field\"><input" + (jade.attr("value", "" + (t('bday')) + "", true, false)) + " class=\"type bday-label\"/><input" + (jade.attr("value", "" + (bday) + "", true, false)) + " class=\"value bday-input\"/></li><li class=\"datapoint url-field\"><input" + (jade.attr("value", "" + (t('url')) + "", true, false)) + " class=\"type url-label disable\"/><input" + (jade.attr("value", "" + (url) + "", true, false)) + " class=\"value url-input\"/></li></ul><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("notes")) ? "" : jade_interp)) + "</h2><div id=\"notes-zone\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div></section></div>");;return buf.join("");
+buf.push("<div id=\"menu-addmore\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-addmore\" class=\"fa fa-angle-down\"><span>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menutiem\"><button role=\"button\" class=\"addemail\">" + (jade.escape(null == (jade_interp = t("email")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtel\">" + (jade.escape(null == (jade_interp = t("phone")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addadr\">" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addskype\">" + (jade.escape(null == (jade_interp = t("skype")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addurl\">" + (jade.escape(null == (jade_interp = t("url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</button></li></ul></div></section><section id=\"notes-panel\" role=\"tabpanel\" aria-hidden=\"true\" class=\"ui-flex ui-flex-half\"><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("information")) ? "" : jade_interp)) + "</h2><div class=\"zone\"><ul class=\"info-fields\"><li class=\"datapoint org-field\"><input type=\"text\" disabled=\"\"" + (jade.attr("value", "" + (t('org')) + "", true, false)) + " class=\"type org-label\"/><input type=\"text\"" + (jade.attr("value", "" + (org || '') + "", true, false)) + " class=\"value org-input\"/></li><li class=\"datapoint title-field\"><input type=\"text\" disabled=\"\"" + (jade.attr("value", "" + (t('title')) + "", true, false)) + " class=\"type title-label\"/><input type=\"text\"" + (jade.attr("value", "" + (title || '') + "", true, false)) + " class=\"value title-input\"/></li><li class=\"datapoint department-field\"><input type=\"text\" disabled=\"\"" + (jade.attr("value", "" + (t('department')) + "", true, false)) + " class=\"type department-label\"/><input type=\"text\"" + (jade.attr("value", "" + (department || '') + "", true, false)) + " class=\"value department-input\"/></li><li class=\"datapoint bday-field\"><input type=\"text\" disabled=\"\"" + (jade.attr("value", "" + (t('bday')) + "", true, false)) + " class=\"type bday-label\"/><input type=\"text\"" + (jade.attr("value", "" + (bday || '') + "", true, false)) + " class=\"value bday-input\"/></li><li class=\"datapoint url-field\"><input type=\"text\" disabled=\"\"" + (jade.attr("value", "" + (t('url')) + "", true, false)) + " class=\"type url-label disable\"/><input type=\"text\"" + (jade.attr("value", "" + (url || '') + "", true, false)) + " class=\"value url-input\"/></li></ul></div><div id=\"notes-zone\"><h2>" + (jade.escape(null == (jade_interp = t("notes")) ? "" : jade_interp)) + "</h2><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note || '') == null ? '' : jade_interp)) + "</textarea></div></section></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1646,18 +1667,17 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.events = function() {
     return {
-      'click .addbirthday': this.addClicked('about', 'birthday'),
-      'click .addorg': this.addClicked('about', 'company'),
-      'click .addtitle': this.addClicked('about', 'title'),
       'click .addcozy': this.addClicked('about', 'cozy'),
-      'click .addtwitter': this.addClicked('about', 'twitter'),
+      'click .addtwitter': this.addClicked('social', 'twitter'),
       'click .addabout': this.addClicked('about'),
       'click .addtel': this.addClicked('tel'),
       'click .addemail': this.addClicked('email'),
       'click .addadr': this.addClicked('adr'),
       'click .addother': this.addClicked('other'),
       'click .addurl': this.addClicked('url'),
-      'click .addskype': this.addClicked('other', 'skype'),
+      'click .addrelation': this.addClicked('relation'),
+      'click .addchat': this.addClicked('chat'),
+      'click .addskype': this.addClicked('chat', 'skype'),
       'click #more-options': 'onMoreOptionsClicked',
       'click #name': 'toggleContactName',
       'click #undo': 'undo',
@@ -1670,7 +1690,8 @@ module.exports = ContactView = (function(_super) {
       'keydown #name': 'onNameKeyPress',
       'keydown textarea#notes': 'onNoteKeyPress',
       'keydown .ui-widget-content': 'onTagInputKeyPress',
-      'blur #notes': 'changeOccured'
+      'blur #notes': 'changeOccured',
+      'blur .datapoint input.value': 'changeOccured'
     };
   };
 
@@ -1709,18 +1730,17 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.getRenderData = function() {
-    var attrs;
-    attrs = _.extend({}, this.model.toJSON(), {
+    var templateData;
+    templateData = _.extend({}, this.model.toJSON(), {
       hasPicture: !!this.model.get('pictureRev'),
       fn: this.model.get('fn'),
       timestamp: Date.now()
     });
-    console.log(attrs);
-    return attrs;
+    return templateData;
   };
 
   ContactView.prototype.afterRender = function() {
-    var type, types, _i, _len;
+    var type, _i, _len, _ref;
     this.contactName = new ContactName({
       model: this.model,
       onKeyup: (function(_this) {
@@ -1738,10 +1758,10 @@ module.exports = ContactView = (function(_super) {
     });
     this.contactName.render();
     this.zones = {};
-    types = ['about', 'email', 'adr', 'tel', 'url', 'other', 'relations', 'chat'];
-    for (_i = 0, _len = types.length; _i < _len; _i++) {
-      type = types[_i];
-      this.zones[type] = this.$('#' + type + 's ul');
+    _ref = Contact.DATAPOINT_TYPES;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      type = _ref[_i];
+      this.zones[type] = this.$("#" + type + "s ul");
     }
     this.hideEmptyZones();
     this.savedInfo = this.$('#save-info').hide();
@@ -1797,12 +1817,14 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.appendView = function(dataPointView) {
-    var type;
+    var type, _ref;
     if (!this.zones) {
       return;
     }
     type = dataPointView.model.get('name');
-    this.zones[type].append(dataPointView.el);
+    if ((_ref = this.zones[type]) != null) {
+      _ref.append(dataPointView.el);
+    }
     return this.hideEmptyZones();
   };
 
@@ -1847,7 +1869,18 @@ module.exports = ContactView = (function(_super) {
         _this.model.set({
           note: _this.notesfield.val()
         });
-        return _this.model.set('bday', _.isEqual(_this.currentState, _this.model.toJSON()) ? _this.needSaving = false : (_this.savedInfo.hide(), _this.save()));
+        _this.model.set('bday', _this.$('.bday-input').val());
+        _this.model.set('org', _this.$('.org-input').val());
+        _this.model.set('title', _this.$('.title-input').val());
+        _this.model.set('department', _this.$('.department-input').val());
+        _this.model.set('url', _this.$('.url-input').val());
+        if (_.isEqual(_this.currentState, _this.model.toJSON())) {
+          return _this.needSaving = false;
+        } else {
+          _this.needSaving = true;
+          _this.savedInfo.hide();
+          return _this.save();
+        }
       };
     })(this), 10);
   };

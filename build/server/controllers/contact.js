@@ -34,8 +34,8 @@ module.exports = {
     isImport = model["import"];
     delete model["import"];
     toCreate = new Contact(model);
-    console.log(toCreate);
     create = function() {
+      toCreate.rev = Date.now().toISOString();
       return Contact.create(toCreate, function(err, contact) {
         if (err) {
           return next(err);

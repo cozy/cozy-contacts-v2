@@ -47,7 +47,9 @@ module.exports = Contact = (function(_super) {
     n: String,
     org: String,
     title: String,
+    department: String,
     bday: String,
+    nickname: String,
     url: String,
     rev: Date,
     datapoints: [DataPoint],
@@ -72,6 +74,16 @@ module.exports = Contact = (function(_super) {
   return Contact;
 
 })(cozydb.CozyModel);
+
+Contact.prototype.updateAttributes = function(changes, callback) {
+  changes.rev = Date.now().toISOString();
+  return Contact.__super__.updateAttributes.apply(this, arguments);
+};
+
+Contact.prototype.save = function(callback) {
+  changes.rev = Date.now().toISOString();
+  return Contact.__super__.save.apply(this, arguments);
+};
 
 Contact.prototype.savePicture = function(path, callback) {
   var data;
