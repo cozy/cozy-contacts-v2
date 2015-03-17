@@ -992,6 +992,12 @@ module.exports = Contact = (function(_super) {
 
   Contact.prototype.parse = function(attrs) {
     var _ref, _ref1, _ref2;
+    if (attrs == null) {
+      attrs = {};
+    }
+    if (attrs.datapoints == null) {
+      attrs.datapoints = [];
+    }
     if (_.where(attrs != null ? attrs.datapoints : void 0, {
       name: 'tel'
     }).length === 0) {
@@ -1182,10 +1188,6 @@ module.exports = Contact = (function(_super) {
     return this.get('tags').map(function(tagName) {
       return app.tags.getOrCreateByName(tagName);
     });
-  };
-
-  Contact.prototype.createTask = function(callback) {
-    return request.post("contacts/" + this.id + "/new-call-task", {}, callback);
   };
 
   return Contact;
@@ -1440,7 +1442,7 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-var locals_ = (locals || {}),id = locals_.id,fn = locals_.fn,hasPicture = locals_.hasPicture,note = locals_.note;
+var locals_ = (locals || {}),id = locals_.id,fn = locals_.fn,hasPicture = locals_.hasPicture,org = locals_.org,title = locals_.title,bday = locals_.bday,url = locals_.url,note = locals_.note;
 jade_mixins["zone"] = function(slug, label){
 var block = (this && this.block), attributes = (this && this.attributes) || {};
 label = label || slug
@@ -1461,8 +1463,10 @@ jade_mixins["zone"]('tel', 'phones');
 jade_mixins["zone"]('email', 'emails');
 jade_mixins["zone"]('adr', 'postal');
 jade_mixins["zone"]('url', 'links');
+jade_mixins["zone"]('chat', 'instant messaging');
+jade_mixins["zone"]('relations', 'relations');
 jade_mixins["zone"]('other', 'others');
-buf.push("<div id=\"menu-addmore\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-addmore\" class=\"fa fa-angle-down\"><span>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menutiem\"><button role=\"button\" class=\"addemail\">" + (jade.escape(null == (jade_interp = t("email")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtel\">" + (jade.escape(null == (jade_interp = t("phone")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addadr\">" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addorg\">" + (jade.escape(null == (jade_interp = t("company")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addtitle\">" + (jade.escape(null == (jade_interp = t("title")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addskype\">" + (jade.escape(null == (jade_interp = t("skype")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addurl\">" + (jade.escape(null == (jade_interp = t("url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</button></li></ul></div></section><section id=\"notes-panel\" role=\"tabpanel\" aria-hidden=\"true\" class=\"ui-flex ui-flex-half\"><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("notes")) ? "" : jade_interp)) + "</h2><div id=\"notes-zone\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div></section></div>");;return buf.join("");
+buf.push("<div id=\"menu-addmore\" role=\"menu\" aria-expanded=\"false\" class=\"ui-menu\"><button role=\"button\" aria-controls=\"menu-addmore\" class=\"fa fa-angle-down\"><span>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</span></button><ul class=\"ui-menulist\"><li role=\"menutiem\"><button role=\"button\" class=\"addemail\">" + (jade.escape(null == (jade_interp = t("email")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtel\">" + (jade.escape(null == (jade_interp = t("phone")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addadr\">" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addorg\">" + (jade.escape(null == (jade_interp = t("company")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addtitle\">" + (jade.escape(null == (jade_interp = t("title")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\" class=\"ui-line\"><button role=\"button\" class=\"addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addskype\">" + (jade.escape(null == (jade_interp = t("skype")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addurl\">" + (jade.escape(null == (jade_interp = t("url")) ? "" : jade_interp)) + "</button></li><li role=\"menutiem\"><button role=\"button\" class=\"addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</button></li></ul></div></section><section id=\"notes-panel\" role=\"tabpanel\" aria-hidden=\"true\" class=\"ui-flex ui-flex-half\"><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("Information")) ? "" : jade_interp)) + "</h2><ul class=\"info-fields\"><li class=\"datapoint org-field\"><input" + (jade.attr("value", "" + (t('org')) + "", true, false)) + " class=\"type org-label\"/><input" + (jade.attr("value", "" + (org) + "", true, false)) + " class=\"value org-input\"/></li><li class=\"datapoint title-field\"><input" + (jade.attr("value", "" + (t('title')) + "", true, false)) + " class=\"type title-label\"/><input" + (jade.attr("value", "" + (title) + "", true, false)) + " class=\"value title-input\"/></li><li class=\"datapoint bday-field\"><input" + (jade.attr("value", "" + (t('bday')) + "", true, false)) + " class=\"type bday-label\"/><input" + (jade.attr("value", "" + (bday) + "", true, false)) + " class=\"value bday-input\"/></li><li class=\"datapoint url-field\"><input" + (jade.attr("value", "" + (t('url')) + "", true, false)) + " class=\"type url-label disable\"/><input" + (jade.attr("value", "" + (url) + "", true, false)) + " class=\"value url-input\"/></li></ul><h2 class=\"tab-title\">" + (jade.escape(null == (jade_interp = t("notes")) ? "" : jade_interp)) + "</h2><div id=\"notes-zone\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div></section></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1705,15 +1709,18 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.getRenderData = function() {
-    return _.extend({}, this.model.toJSON(), {
+    var attrs;
+    attrs = _.extend({}, this.model.toJSON(), {
       hasPicture: !!this.model.get('pictureRev'),
       fn: this.model.get('fn'),
       timestamp: Date.now()
     });
+    console.log(attrs);
+    return attrs;
   };
 
   ContactView.prototype.afterRender = function() {
-    var type, _i, _len, _ref;
+    var type, types, _i, _len;
     this.contactName = new ContactName({
       model: this.model,
       onKeyup: (function(_this) {
@@ -1731,9 +1738,9 @@ module.exports = ContactView = (function(_super) {
     });
     this.contactName.render();
     this.zones = {};
-    _ref = ['about', 'email', 'adr', 'tel', 'url', 'other'];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      type = _ref[_i];
+    types = ['about', 'email', 'adr', 'tel', 'url', 'other', 'relations', 'chat'];
+    for (_i = 0, _len = types.length; _i < _len; _i++) {
+      type = types[_i];
       this.zones[type] = this.$('#' + type + 's ul');
     }
     this.hideEmptyZones();
@@ -1777,19 +1784,13 @@ module.exports = ContactView = (function(_super) {
   };
 
   ContactView.prototype.hideEmptyZones = function() {
-    var hasOne, name, type, zone, _i, _len, _ref, _ref1;
+    var hasOne, type, zone, _ref;
     _ref = this.zones;
     for (type in _ref) {
       zone = _ref[type];
       hasOne = this.model.dataPoints.hasOne(type);
       zone.parent().toggle(hasOne);
       this.$("#adder .add" + type).toggle(!hasOne);
-    }
-    _ref1 = ['birthday', 'org', 'title', 'cozy'];
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      name = _ref1[_i];
-      hasOne = this.model.dataPoints.hasOne('about', name);
-      this.$("#adder .add" + name).toggle(!hasOne);
     }
     this.$('#adder h2').toggle(this.$('#adder a:visible').length !== 0);
     return this.resizeNiceScroll();
@@ -1846,12 +1847,7 @@ module.exports = ContactView = (function(_super) {
         _this.model.set({
           note: _this.notesfield.val()
         });
-        if (_.isEqual(_this.currentState, _this.model.toJSON())) {
-          return _this.needSaving = false;
-        } else {
-          _this.savedInfo.hide();
-          return _this.save();
-        }
+        return _this.model.set('bday', _.isEqual(_this.currentState, _this.model.toJSON()) ? _this.needSaving = false : (_this.savedInfo.hide(), _this.save()));
       };
     })(this), 10);
   };

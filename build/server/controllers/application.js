@@ -39,9 +39,13 @@ getImports = function(callback) {
   ], function(err, results) {
     var config, contacts, instance, locale, tagInstances, tags, webDavAccount;
     contacts = results[0], config = results[1], instance = results[2], tags = results[3], webDavAccount = results[4], tagInstances = results[5];
-    tags = tags.filter(function(value) {
-      return Boolean(value);
-    });
+    if (tags != null) {
+      tags = tags.filter(function(value) {
+        return Boolean(value);
+      });
+    } else {
+      tags = [];
+    }
     locale = (instance != null ? instance.locale : void 0) || 'en';
     if (webDavAccount != null) {
       webDavAccount.domain = (instance != null ? instance.domain : void 0) || '';
