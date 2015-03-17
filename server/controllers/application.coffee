@@ -28,12 +28,15 @@ getImports = (callback) ->
 
         # Remove this fix once cozydb is fixed:
         # https://github.com/cozy/cozydb/issues/6
-        tags = tags.filter (value) ->
-            Boolean(value)
+        if tags?
+            tags = tags.filter (value) ->
+                Boolean(value)
+        else
+            tags = []
 
         locale = instance?.locale or 'en'
         if webDavAccount?
-                webDavAccount.domain = instance?.domain or ''
+            webDavAccount.domain = instance?.domain or ''
 
         callback null, """
             window.config = #{JSON.stringify(config)};

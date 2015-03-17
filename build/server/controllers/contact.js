@@ -34,6 +34,7 @@ module.exports = {
     isImport = model["import"];
     delete model["import"];
     toCreate = new Contact(model);
+    console.log(toCreate);
     create = function() {
       return Contact.create(toCreate, function(err, contact) {
         if (err) {
@@ -85,6 +86,9 @@ module.exports = {
   updatePicture: function(req, res, next) {
     var form;
     form = new multiparty.Form();
+    res.on('close', function() {
+      return req.abort();
+    });
     return form.parse(req, function(err, fields, files) {
       var file;
       if (err) {

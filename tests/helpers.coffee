@@ -8,7 +8,7 @@ else
 Contact = require "#{prefix}server/models/contact"
 Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
-ds = require 'cozydb/lib/client'
+ds = require 'cozydb/lib/utils/client'
 
 TESTPORT = process.env.PORT or 8013
 

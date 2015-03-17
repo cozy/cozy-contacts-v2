@@ -12,34 +12,34 @@ module.exports = class ContactView extends ViewCollection
     itemView: require 'views/datapoint'
 
     events: ->
-        'click .addbirthday': @addClicked 'about', 'birthday'
-        'click .addorg'     : @addClicked 'about', 'company'
-        'click .addtitle'   : @addClicked 'about', 'title'
         'click .addcozy'    : @addClicked 'about', 'cozy'
-        'click .addtwitter' : @addClicked 'about', 'twitter'
+        'click .addtwitter' : @addClicked 'social', 'twitter'
         'click .addabout'   : @addClicked 'about'
         'click .addtel'     : @addClicked 'tel'
         'click .addemail'   : @addClicked 'email'
         'click .addadr'     : @addClicked 'adr'
         'click .addother'   : @addClicked 'other'
         'click .addurl'     : @addClicked 'url'
-        'click .addskype'   : @addClicked 'other', 'skype'
+        'click .addrelation': @addClicked 'relation'
+        'click .addchat'    : @addClicked 'chat'
+        'click .addskype'   : @addClicked 'chat', 'skype'
         'click #more-options': 'onMoreOptionsClicked'
         'click #name'       : 'toggleContactName'
         'click #undo'       : 'undo'
         'click #delete'     : 'delete'
         'change #uploader'  : 'photoChanged'
 
-        'keyup input.value'    : 'addBelowIfEnter'
-        'keydown #notes'       : 'resizeNote'
-        'keypress #notes'      : 'resizeNote'
+        'keyup input.value': 'addBelowIfEnter'
+        'keydown #notes': 'resizeNote'
+        'keypress #notes': 'resizeNote'
 
-        'keyup #notes'     : 'doNeedSaving'
-        'keydown #name'   : 'onNameKeyPress'
+        'keyup #notes': 'doNeedSaving'
+        'keydown #name': 'onNameKeyPress'
         'keydown textarea#notes': 'onNoteKeyPress'
         'keydown .ui-widget-content': 'onTagInputKeyPress'
 
-        'blur #notes'     : 'changeOccured'
+        'blur #notes': 'changeOccured'
+        'blur .datapoint input.value': 'changeOccured'
 
     constructor: (options) ->
         options.collection = options.model.dataPoints
@@ -47,8 +47,8 @@ module.exports = class ContactView extends ViewCollection
 
     initialize: ->
         super
-        @listenTo @model     , 'change' , @modelChanged
-        @listenTo @model     , 'sync'   , @onSuccess
+        @listenTo @model, 'change', @modelChanged
+        @listenTo @model, 'sync', @onSuccess
         @listenTo @collection, 'change' , =>
             @needSaving = true
             @changeOccured()
@@ -60,11 +60,14 @@ module.exports = class ContactView extends ViewCollection
         # the main page
         @listenTo @model, 'remove', -> window.app.router.navigate '', true
 
+    # Generate some metadata for template: say if a picture is set, look
+    # for the full name, and set a first timestamp (useful to detect changes).
     getRenderData: ->
-        _.extend {}, @model.toJSON(),
+        templateData = _.extend {}, @model.toJSON(),
             hasPicture: not not @model.get('pictureRev')
             fn: @model.get 'fn'
             timestamp: Date.now()
+        return templateData
 
     afterRender: ->
         @contactName = new ContactName
@@ -81,8 +84,8 @@ module.exports = class ContactView extends ViewCollection
         @contactName.render()
 
         @zones = {}
-        for type in ['about', 'email', 'adr', 'tel', 'url', 'other']
-            @zones[type] = @$('#' + type + 's ul')
+        for type in Contact.DATAPOINT_TYPES
+            @zones[type] = @$ "##{type}s ul"
 
         @hideEmptyZones()
         @savedInfo = @$('#save-info').hide()
@@ -125,10 +128,6 @@ module.exports = class ContactView extends ViewCollection
             zone.parent().toggle hasOne
             @$("#adder .add#{type}").toggle not hasOne
 
-        for name in ['birthday', 'org', 'title', 'cozy']
-            hasOne = @model.dataPoints.hasOne 'about', name
-            @$("#adder .add#{name}").toggle not hasOne
-
         # hide the adder if it is empty
         @$('#adder h2').toggle @$('#adder a:visible').length isnt 0
         @resizeNiceScroll()
@@ -136,7 +135,7 @@ module.exports = class ContactView extends ViewCollection
     appendView: (dataPointView) ->
         return unless @zones
         type = dataPointView.model.get 'name'
-        @zones[type].append dataPointView.el
+        @zones[type]?.append dataPointView.el
         @hideEmptyZones()
 
     addClicked: (name, type) -> (event) ->
@@ -167,11 +166,17 @@ module.exports = class ContactView extends ViewCollection
 
             @model.setN @contactName.getStructuredName()
             @model.set note: @notesfield.val()
+            @model.set 'bday', @$('.bday-input').val()
+            @model.set 'org', @$('.org-input').val()
+            @model.set 'title', @$('.title-input').val()
+            @model.set 'department', @$('.department-input').val()
+            @model.set 'url', @$('.url-input').val()
 
             # no need to save in this case
             if _.isEqual @currentState, @model.toJSON()
                 @needSaving = false
             else
+                @needSaving = true
                 @savedInfo.hide()
                 @save()
         , 10
