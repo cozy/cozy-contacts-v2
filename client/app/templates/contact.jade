@@ -83,23 +83,31 @@ mixin zone(slug, label)
                 li.datapoint.org-field
                     input.type.org-label(type="text", disabled="", 
                                          value="#{t('org')}")
-                    input.value.org-input(type="text", value="#{org || ''}")
+                    input.value.org-input(type="text", value="#{org || ''}",
+                                          placeholder="#{t('org')}")
                 li.datapoint.title-field
                     input.type.title-label(type="text", disabled="", 
                                            value="#{t('title')}")
-                    input.value.title-input(type="text", value="#{title || ''}")
+                    input.value.title-input(type="text", 
+                                            value="#{title || ''}",
+                                            placeholder="#{t('title')}")
                 li.datapoint.department-field
                     input.type.department-label(type="text", disabled="", 
                                            value="#{t('department')}")
-                    input.value.department-input(type="text", value="#{department || ''}")
+                    input.value.department-input(type="text",
+                                                 value="#{department || ''}",
+                                                 placeholder="#{t('department')}")
                 li.datapoint.bday-field
                     input.type.bday-label(type="text", disabled="", 
                                           value="#{t('bday')}")
-                    input.value.bday-input(type="text", value="#{bday || ''}")
+                    input.value.bday-input(type="text", 
+                                           value="#{bday || ''}",
+                                           placeholder="#{t('bday')}")
                 li.datapoint.url-field
                     input.type.url-label.disable(type="text", disabled="", 
                                                  value="#{t('url')}")
-                    input.value.url-input(type="text", value="#{url || ''}")
+                    input.value.url-input(type="text", value="#{url || ''}",
+                                          placeholder="#{t('url')}")
         #notes-zone
             h2= t("notes")
             textarea(rows="3", placeholder=t('notes placeholder'))#notes #{note || ''}
