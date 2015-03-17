@@ -1641,7 +1641,7 @@ if (typeof define === 'function' && define.amd) {
 });
 
 ;require.register("views/contact", function(exports, require, module) {
-var ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
+var Contact, ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1653,6 +1653,8 @@ TagsView = require('widgets/tags');
 ContactName = require('views/contact_name');
 
 Datapoint = require('models/datapoint');
+
+Contact = require('models/contact');
 
 request = require('../lib/request');
 

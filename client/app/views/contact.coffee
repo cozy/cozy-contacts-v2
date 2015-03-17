@@ -2,6 +2,7 @@ ViewCollection = require 'lib/view_collection'
 TagsView = require 'widgets/tags'
 ContactName = require 'views/contact_name'
 Datapoint = require 'models/datapoint'
+Contact = require 'models/contact'
 request = require '../lib/request'
 
 
