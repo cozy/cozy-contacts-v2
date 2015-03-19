@@ -756,6 +756,7 @@ module.exports = {
   "is not a vcard": "is not a vCard",
   "cancel": "Cancel",
   "import": "Import",
+  "import count": "Amount of contacts to import:",
   "import.ready-msg": "Ready to import %{smart_count} contact ||||\nReady to import %{smart_count} contacts",
   "dont close navigator import": "Do not close the navigator while importing contacts.",
   "choose phone country": "Choose the country of the phone",
@@ -879,6 +880,7 @@ module.exports = {
   "is not a vcard": "n'est pas un fichier vCard",
   "cancel": "Annuler",
   "import": "Importer",
+  "import count": "Nombre de contacts à importer :",
   "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
   "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
   "choose phone country": "Choisissez le pays de ce téléphone",
@@ -2850,9 +2852,7 @@ module.exports = ImporterView = (function(_super) {
     var addCard, amount, cards, txt;
     cards = vcardText.split('END:VCARD');
     this.toImport = [];
-    txt = "<p>import count: <span class=\"contact-amount\">0</span></p>";
-    txt += "<ul class=\"import-list\">";
-    txt += '</ul>';
+    txt = "<p>" + (t('import count')) + " <span class=\"contact-amount\">0</span></p>\"\n<ul class=\"import-list\"></ul>";
     this.content.html(txt);
     amount = 0;
     cards.pop();
