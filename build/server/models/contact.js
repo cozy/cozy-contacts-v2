@@ -77,13 +77,11 @@ module.exports = Contact = (function(_super) {
 
 Contact.prototype.updateAttributes = function(changes, callback) {
   changes.revision = new Date().toISOString();
-  changes.rev = null;
   return Contact.__super__.updateAttributes.apply(this, arguments);
 };
 
 Contact.prototype.save = function(callback) {
   changes.revision = new Date().toISOString();
-  changes.rev = null;
   return Contact.__super__.save.apply(this, arguments);
 };
 
