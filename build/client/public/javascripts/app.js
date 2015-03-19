@@ -2841,28 +2841,48 @@ module.exports = ImporterView = (function(_super) {
     reader.readAsText(file);
     return reader.onloadend = (function(_this) {
       return function() {
-        var txt;
-        _this.toImport = Contact.fromVCF(reader.result);
-        txt = t('import.ready-msg', {
-          smart_count: _this.toImport
-        });
-        txt = "<p>" + txt + " :</p><ul>";
-        _this.toImport.each(function(contact) {
-          var name;
-          name = contact.get('fn') || contact.getComputedFN();
-          if ((name == null) || name.trim() === '') {
-            name = contact.getBest('email');
-          }
-          if ((name == null) || name.trim() === '') {
-            name = contact.getBest('tel');
-          }
-          return txt += "<li>" + name + "</li>";
-        });
-        txt += '</ul>';
-        _this.content.html(txt);
-        return _this.confirmBtn.removeClass('disabled');
+        return _this.prepareImport(reader.result);
       };
     })(this);
+  };
+
+  ImporterView.prototype.prepareImport = function(vcardText) {
+    var addCard, amount, cards, txt;
+    cards = vcardText.split('END:VCARD');
+    this.toImport = [];
+    txt = "<p>import count: <span class=\"contact-amount\">0</span></p>";
+    txt += "<ul class=\"import-list\">";
+    txt += '</ul>';
+    this.content.html(txt);
+    amount = 0;
+    cards.pop();
+    return (addCard = (function(_this) {
+      return function() {
+        var card, contact, name, parsedCards;
+        if (cards.length > 0) {
+          card = cards.shift();
+          card += '\nEND:VCARD';
+          parsedCards = Contact.fromVCF(card);
+          if (parsedCards.models.length > 0) {
+            contact = parsedCards.models[0];
+            _this.toImport.push(contact);
+            name = contact.get('fn') || contact.getComputedFN();
+            if ((name == null) || name.trim() === '') {
+              name = contact.getBest('email');
+            }
+            if ((name == null) || name.trim() === '') {
+              name = contact.getBest('tel');
+            }
+            amount++;
+            $('.contact-amount').html(amount);
+            $('.import-list').append("<li>" + name + "</li>");
+          }
+          return setTimeout(addCard, 1);
+        } else {
+          return _this.confirmBtn.removeClass('disabled');
+        }
+      };
+    })(this))();
   };
 
   ImporterView.prototype.updateProgress = function(number, total) {
@@ -2870,12 +2890,12 @@ module.exports = ImporterView = (function(_super) {
   };
 
   ImporterView.prototype.addcontacts = function() {
-    var importContact, total;
+    var currentSize, importContact, total;
     if (!this.toImport) {
       return true;
     }
     this.content.html("<p>" + (t('dont close navigator import')) + "</p>\n<p>\n    " + (t('import progress')) + ":&nbsp;<span class=\"import-progress\"></span>\n</p>\n<p class=\"errors\">\n</p>");
-    total = this.toImport.length;
+    currentSize = total = this.toImport.length;
     this.importing = true;
     this.updateProgress(0, total);
     return (importContact = (function(_this) {
@@ -2887,13 +2907,14 @@ module.exports = ImporterView = (function(_super) {
           return _this.close();
         } else {
           contact = _this.toImport.pop();
+          currentSize--;
           contact.set('import', true);
           return contact.save(null, {
             success: function() {
-              _this.updateProgress(total - _this.toImport.size(), total);
+              _this.updateProgress(total - currentSize, total);
               app.contacts.add(contact);
               contact.savePicture();
-              return importContact();
+              return setTimeout(importContact, 10);
             },
             error: function() {
               $(".errors").append("<p>" + (t('fail to import')) + ": " + (contact.getComputedFN()) + "</p>");
