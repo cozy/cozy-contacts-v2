@@ -51,9 +51,10 @@ module.exports = class ImporterView extends BaseView
         @toImport = []
 
         # Prepare information displaying.
-        txt = "<p>import count: <span class=\"contact-amount\">0</span></p>"
-        txt += "<ul class=\"import-list\">"
-        txt += '</ul>'
+        txt = """
+            <p>#{t 'import count'} <span class=\"contact-amount\">0</span></p>"
+            <ul class=\"import-list\"></ul>
+        """
         @content.html txt
 
         amount = 0
@@ -62,7 +63,7 @@ module.exports = class ImporterView extends BaseView
         # Recursive function that makes pause between each card import.
         # That's useful to not block the browser while parsing the vcard
         # file.
-        (addCard = =>
+        do addCard = =>
             if cards.length > 0
                 card = cards.shift()
                 card += '\nEND:VCARD'
@@ -89,7 +90,6 @@ module.exports = class ImporterView extends BaseView
 
             else
                 @confirmBtn.removeClass 'disabled'
-        )()
 
 
     # Update progress count.
@@ -113,7 +113,7 @@ module.exports = class ImporterView extends BaseView
         @importing = true
         @updateProgress 0, total
 
-        (importContact = =>
+        do importContact = =>
             if @toImport.length is 0
                 alert t 'import succeeded'
                 @importing = false
@@ -132,13 +132,14 @@ module.exports = class ImporterView extends BaseView
                         # too many successive request. This aims to let it
                         # breath. But we should handle import on the server
                         # side and make bulk creations to make it much faster.
+                        # (Write leads to reindexation, so one write at at time
+                        # is really inefficient).
                         setTimeout importContact, 10
                     error: =>
                         $(".errors").append """
                         <p>#{t 'fail to import'}: #{contact.getComputedFN()}</p>
                         """
                         importContact()
-        )()
 
 
     close: ->
