@@ -51,7 +51,7 @@ module.exports = Contact = (function(_super) {
     bday: String,
     nickname: String,
     url: String,
-    rev: Date,
+    revision: Date,
     datapoints: [DataPoint],
     note: String,
     tags: [String],

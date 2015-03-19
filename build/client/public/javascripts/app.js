@@ -2852,7 +2852,7 @@ module.exports = ImporterView = (function(_super) {
     var addCard, amount, cards, txt;
     cards = vcardText.split('END:VCARD');
     this.toImport = [];
-    txt = "<p>" + (t('import count')) + " <span class=\"contact-amount\">0</span></p>\"\n<ul class=\"import-list\"></ul>";
+    txt = "<p>" + (t('import count')) + " <span class=\"contact-amount\">0</span></p>\n<ul class=\"import-list\"></ul>";
     this.content.html(txt);
     amount = 0;
     cards.pop();
