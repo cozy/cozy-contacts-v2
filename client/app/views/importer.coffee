@@ -52,7 +52,7 @@ module.exports = class ImporterView extends BaseView
 
         # Prepare information displaying.
         txt = """
-            <p>#{t 'import count'} <span class=\"contact-amount\">0</span></p>"
+            <p>#{t 'import count'} <span class=\"contact-amount\">0</span></p>
             <ul class=\"import-list\"></ul>
         """
         @content.html txt
