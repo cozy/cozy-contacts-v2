@@ -72,6 +72,7 @@ module.exports =
             else
                 res.send req.contact, 201
 
+
     # Extract and save picture in a temporary folder, then save it to data
     # system and delete it from disk.
     updatePicture: (req, res, next) ->
@@ -93,6 +94,7 @@ module.exports =
             else
                 next new Error 'Can\'t change picture, no file is attached.'
 
+
     # Export contacts to a vcard file.
     vCard: (req, res, next) ->
         Contact.request 'all', (err, contacts) ->
@@ -106,6 +108,7 @@ module.exports =
                 res.attachment "#{date}-cozy-contacts.vcf"
                 res.set 'Content-Type', 'text/x-vcard'
                 res.send vCardOutput
+
 
     # Export a single contact to a VCard file.
     vCardContact: (req, res, next) ->
