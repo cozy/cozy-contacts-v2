@@ -271,6 +271,8 @@
       key = key.toLowerCase();
       if (key === 'version') {
         return this.currentversion = value;
+      } else if (key === 'rev') {
+        return this.currentContact.revision = value;
       } else if (key === 'categories') {
         return this.currentContact.tags = value.split(/(?!\\),/).map(VCardParser.unescapeText);
       } else if (key === 'n') {
@@ -390,7 +392,7 @@
           }
         }
       }
-      if (dp.name === 'impp') {
+      if ((dp != null ? dp.name : void 0) === 'impp') {
         dp.name = 'chat';
         return dp.value = dp.value.split(':')[1];
       }
@@ -558,7 +560,7 @@
     out = ["BEGIN:VCARD"];
     out.push("VERSION:3.0");
     exportUid(out, model);
-    if (model.rev != null) {
+    if (model.revision != null) {
       exportRev(out, model);
     }
     if (model.n != null) {
@@ -670,10 +672,10 @@
   };
 
   exportRev = function(out, model) {
-    if (typeof model.rev === Date) {
-      return out.push("REV:" + (model.rev.toISOString()));
+    if (typeof model.revision === 'date') {
+      return out.push("REV:" + (model.revision.toISOString()));
     } else {
-      return out.push("REV:" + model.rev);
+      return out.push("REV:" + model.revision);
     }
   };
 
@@ -744,19 +746,23 @@
   exportUrl = function(options) {
     var formattedType, itemCounter, mode, out, type, value;
     out = options.out, type = options.type, formattedType = options.formattedType, value = options.value, mode = options.mode, itemCounter = options.itemCounter;
-    itemCounter++;
-    out.push("item" + itemCounter + ".URL:" + value);
-    if (type !== 'PROFILE' && type !== 'BLOG') {
-      formattedType = capitalizeFirstLetter(type.toLowerCase());
-      if ((mode === 'ios') && (type === 'HOME' || type === 'WORK' || type === 'OTHER')) {
-        out.push("item" + itemCounter + ".X-ABLabel:_$!<" + formattedType + ">!$_");
-      } else if (mode === 'ios') {
-        out.push("item" + itemCounter + ".X-ABLabel:" + formattedType);
+    if (type != null) {
+      itemCounter++;
+      out.push("item" + itemCounter + ".URL:" + value);
+      if (type !== 'PROFILE' && type !== 'BLOG') {
+        formattedType = capitalizeFirstLetter(type.toLowerCase());
+        if ((mode === 'ios') && (type === 'HOME' || type === 'WORK' || type === 'OTHER')) {
+          out.push("item" + itemCounter + ".X-ABLabel:_$!<" + formattedType + ">!$_");
+        } else if (mode === 'ios') {
+          out.push("item" + itemCounter + ".X-ABLabel:" + formattedType);
+        } else {
+          out.push("item" + itemCounter + ".X-ABLabel:_$!<" + formattedType + ">!$_");
+        }
       } else {
-        out.push("item" + itemCounter + ".X-ABLabel:_$!<" + formattedType + ">!$_");
+        out.push("item" + itemCounter + ".X-ABLabel:" + type);
       }
     } else {
-      out.push("item" + itemCounter + ".X-ABLabel:" + type);
+      out.push("URL:" + value);
     }
     return itemCounter;
   };
@@ -804,12 +810,10 @@
   exportAlerts = function(options) {
     var formattedType, itemCounter, key, mode, out, res, type, value;
     out = options.out, type = options.type, formattedType = options.formattedType, value = options.value, mode = options.mode, itemCounter = options.itemCounter, key = options.key;
-    if (mode === 'ios') {
-      type = type.toLowerCase();
-      value = value.replace(/\\\\\\/g, "\\");
-      res = "X-ACTIVITY-ALERT:type=" + type + "\\," + value;
-      out.push(res);
-    }
+    type = type.toLowerCase();
+    value = value.replace(/\\\\\\/g, "\\");
+    res = "X-ACTIVITY-ALERT:type=" + type + "\\," + value;
+    out.push(res);
     return itemCounter;
   };
 
