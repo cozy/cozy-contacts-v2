@@ -90,6 +90,7 @@ module.exports =
   "is not a vcard"        : "is not a vCard"
   "cancel"                : "Cancel"
   "import"                : "Import"
+  "import count"          : "Amount of contacts to import:"
 
   "import.ready-msg"      : """
     Ready to import %{smart_count} contact ||||
