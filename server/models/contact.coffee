@@ -34,7 +34,7 @@ module.exports = class Contact extends cozydb.CozyModel
         bday          : String
         nickname      : String
         url           : String
-        revision      : Date
+        #revision      : Date
         datapoints    : [DataPoint]
         note          : String
         tags          : [String]
@@ -59,13 +59,15 @@ module.exports = class Contact extends cozydb.CozyModel
 
 # Update revision each time a change occurs
 Contact::updateAttributes = (changes, callback) ->
-    changes.rev = new Date().toISOString()
+    changes.revision = new Date().toISOString()
+    changes.rev = null
     super
 
 
 # Update revision each time a change occurs
 Contact::save = (callback) ->
-    changes.rev = new Date().toISOString()
+    changes.revision = new Date().toISOString()
+    changes.rev = null
     super
 
 
