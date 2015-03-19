@@ -34,7 +34,7 @@ module.exports = class Contact extends cozydb.CozyModel
         bday          : String
         nickname      : String
         url           : String
-        #revision      : Date
+        revision      : Date
         datapoints    : [DataPoint]
         note          : String
         tags          : [String]
