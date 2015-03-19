@@ -76,12 +76,14 @@ module.exports = Contact = (function(_super) {
 })(cozydb.CozyModel);
 
 Contact.prototype.updateAttributes = function(changes, callback) {
-  changes.rev = new Date().toISOString();
+  changes.revision = new Date().toISOString();
+  changes.rev = null;
   return Contact.__super__.updateAttributes.apply(this, arguments);
 };
 
 Contact.prototype.save = function(callback) {
-  changes.rev = new Date().toISOString();
+  changes.revision = new Date().toISOString();
+  changes.rev = null;
   return Contact.__super__.save.apply(this, arguments);
 };
 
