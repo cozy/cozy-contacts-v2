@@ -60,14 +60,12 @@ module.exports = class Contact extends cozydb.CozyModel
 # Update revision each time a change occurs
 Contact::updateAttributes = (changes, callback) ->
     changes.revision = new Date().toISOString()
-    changes.rev = null
     super
 
 
 # Update revision each time a change occurs
 Contact::save = (callback) ->
     changes.revision = new Date().toISOString()
-    changes.rev = null
     super
 
 
