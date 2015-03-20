@@ -216,6 +216,7 @@ textarea
         font-family 'Maven Pro', sans-serif
 
     #picture
+        position relative
         cursor pointer
         border 1px solid transparent
 
@@ -226,12 +227,18 @@ textarea
         border-radius 50%
 
     #uploader
+        z-index 10
+        position absolute
         opacity 0.01
         cursor pointer
         border 0px
         font-size 100px
 
     #uploadnotice
+        z-index 0
+        position absolute
+        top 0
+        left 0
         opacity 0
         border-radius 50%
         border 1px solid orange
@@ -465,8 +472,10 @@ textarea
 
 
 .zone
-    &:hover a.btn.add
-        opacity 1
+    &:hover
+    &:focus
+        a.btn.add
+            opacity 1
 
     a.btn.add
         display inline-block
