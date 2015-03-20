@@ -11,7 +11,7 @@ module.exports = class TagsView extends BaseView
         'keyup input': 'refreshAutocomplete'
 
     template: -> """
-        <input type="text" placeholder="#{t('add tags')}">
+        <input type="text" placeholder="#{t('add tags')}" tabindex="-1">
     """
 
     initialize: (options)->

@@ -3,7 +3,7 @@ mixin zone(slug, label)
     .zone(id="#{slug}s")
         h2= t(label)
         ul
-        a(class="btn add add#{slug}")= t('add')
+        a(class="btn add add#{slug}", tabindex="0")= t('add')
 
 
 #contact-container
@@ -32,8 +32,8 @@ mixin zone(slug, label)
                 else
                     img.picture(src="img/defaultpicture.png")
 
+                input#uploader(type="file", tabindex="-1")
                 #uploadnotice= t("change")
-                input#uploader(type="file")
 
             #wrap-name-notes
                 #contact-name(style="display: none;")
