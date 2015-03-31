@@ -2791,8 +2791,7 @@ module.exports = DocView = (function(_super) {
 ;require.register("views/importer", function(exports, require, module) {
 var BaseView, Contact, ImporterView, app,
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('lib/base_view');
 
@@ -2830,15 +2829,15 @@ module.exports = ImporterView = (function(_super) {
   };
 
   ImporterView.prototype.onupload = function() {
-    var file, reader, validMimeTypes, _ref;
-    $(".loading").show();
+    var extension, file, reader;
     file = this.upload.files[0];
-    validMimeTypes = ['text/vcard', 'text/x-vcard', 'text/directory', 'text/directory;profile=vcard'];
-    if (_ref = file.type.toLowerCase(), __indexOf.call(validMimeTypes, _ref) < 0) {
+    extension = file.name.substring(file.name.lastIndexOf('.'));
+    if (extension !== '.vcf') {
       this.$('.control-group').addClass('error');
-      this.$('.help-inline').text(t('is not a vCard'));
+      this.$('.help-inline').text(t('is not a vcard'));
       return;
     }
+    $(".loading").show();
     reader = new FileReader();
     reader.readAsText(file);
     return reader.onloadend = (function(_this) {
