@@ -2832,7 +2832,7 @@ module.exports = ImporterView = (function(_super) {
     var extension, file, reader;
     file = this.upload.files[0];
     extension = file.name.substring(file.name.lastIndexOf('.'));
-    if (extension !== '.vcf') {
+    if (extension !== '.vcf' && extension !== '.vcard') {
       this.$('.control-group').addClass('error');
       this.$('.help-inline').text(t('is not a vcard'));
       return;

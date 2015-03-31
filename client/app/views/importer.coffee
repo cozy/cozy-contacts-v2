@@ -26,7 +26,7 @@ module.exports = class ImporterView extends BaseView
     onupload: ->
         file = @upload.files[0]
         extension = file.name.substring file.name.lastIndexOf('.')
-        if extension isnt '.vcf'
+        if extension not in ['.vcf', '.vcard']
             @$('.control-group').addClass 'error'
             @$('.help-inline').text t 'is not a vcard'
             return
