@@ -24,16 +24,14 @@ module.exports = class ImporterView extends BaseView
 
     # Handle upload of vcard file: check type and make it a string.
     onupload: ->
-        $(".loading").show()
-
         file = @upload.files[0]
-        validMimeTypes = ['text/vcard', 'text/x-vcard', 'text/directory',
-                          'text/directory;profile=vcard']
-        if file.type.toLowerCase() not in validMimeTypes
+        extension = file.name.substring file.name.lastIndexOf('.')
+        if extension not in ['.vcf', '.vcard']
             @$('.control-group').addClass 'error'
-            @$('.help-inline').text t 'is not a vCard'
+            @$('.help-inline').text t 'is not a vcard'
             return
 
+        $(".loading").show()
         # Read the uploaded filed and make it a simple string.
         reader = new FileReader()
         reader.readAsText file
