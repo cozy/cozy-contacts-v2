@@ -20,3 +20,4 @@ npm-debug.log
 client/public
 server/views/*.js
 picture.jpg
+*.transifex.coffee
