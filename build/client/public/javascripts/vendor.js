@@ -1,42 +1,59 @@
-(function(/*! Brunch !*/) {
+(function() {
   'use strict';
 
-  var globals = typeof window !== 'undefined' ? window : global;
+  var globals = typeof window === 'undefined' ? global : window;
   if (typeof globals.require === 'function') return;
 
   var modules = {};
   var cache = {};
+  var has = ({}).hasOwnProperty;
 
-  var has = function(object, name) {
-    return ({}).hasOwnProperty.call(object, name);
+  var aliases = {};
+
+  var endsWith = function(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
   };
 
-  var expand = function(root, name) {
-    var results = [], parts, part;
-    if (/^\.\.?(\/|$)/.test(name)) {
-      parts = [root, name].join('/').split('/');
-    } else {
-      parts = name.split('/');
-    }
-    for (var i = 0, length = parts.length; i < length; i++) {
-      part = parts[i];
-      if (part === '..') {
-        results.pop();
-      } else if (part !== '.' && part !== '') {
-        results.push(part);
+  var unalias = function(alias, loaderPath) {
+    var start = 0;
+    if (loaderPath) {
+      if (loaderPath.indexOf('components/' === 0)) {
+        start = 'components/'.length;
+      }
+      if (loaderPath.indexOf('/', start) > 0) {
+        loaderPath = loaderPath.substring(start, loaderPath.indexOf('/', start));
       }
     }
-    return results.join('/');
+    var result = aliases[alias + '/index.js'] || aliases[loaderPath + '/deps/' + alias + '/index.js'];
+    if (result) {
+      return 'components/' + result.substring(0, result.length - '.js'.length);
+    }
+    return alias;
   };
 
+  var expand = (function() {
+    var reg = /^\.\.?(\/|$)/;
+    return function(root, name) {
+      var results = [], parts, part;
+      parts = (reg.test(name) ? root + '/' + name : name).split('/');
+      for (var i = 0, length = parts.length; i < length; i++) {
+        part = parts[i];
+        if (part === '..') {
+          results.pop();
+        } else if (part !== '.' && part !== '') {
+          results.push(part);
+        }
+      }
+      return results.join('/');
+    };
+  })();
   var dirname = function(path) {
     return path.split('/').slice(0, -1).join('/');
   };
 
   var localRequire = function(path) {
     return function(name) {
-      var dir = dirname(path);
-      var absolute = expand(dir, name);
+      var absolute = expand(dirname(path), name);
       return globals.require(absolute, path);
     };
   };
@@ -51,21 +68,26 @@
   var require = function(name, loaderPath) {
     var path = expand(name, '.');
     if (loaderPath == null) loaderPath = '/';
+    path = unalias(name, loaderPath);
 
-    if (has(cache, path)) return cache[path].exports;
-    if (has(modules, path)) return initModule(path, modules[path]);
+    if (has.call(cache, path)) return cache[path].exports;
+    if (has.call(modules, path)) return initModule(path, modules[path]);
 
     var dirIndex = expand(path, './index');
-    if (has(cache, dirIndex)) return cache[dirIndex].exports;
-    if (has(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
+    if (has.call(cache, dirIndex)) return cache[dirIndex].exports;
+    if (has.call(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
 
     throw new Error('Cannot find module "' + name + '" from '+ '"' + loaderPath + '"');
   };
 
-  var define = function(bundle, fn) {
+  require.alias = function(from, to) {
+    aliases[to] = from;
+  };
+
+  require.register = require.define = function(bundle, fn) {
     if (typeof bundle === 'object') {
       for (var key in bundle) {
-        if (has(bundle, key)) {
+        if (has.call(bundle, key)) {
           modules[key] = bundle[key];
         }
       }
@@ -74,21 +96,18 @@
     }
   };
 
-  var list = function() {
+  require.list = function() {
     var result = [];
     for (var item in modules) {
-      if (has(modules, item)) {
+      if (has.call(modules, item)) {
         result.push(item);
       }
     }
     return result;
   };
 
+  require.brunch = true;
   globals.require = require;
-  globals.require.define = define;
-  globals.require.register = define;
-  globals.require.list = list;
-  globals.require.brunch = true;
 })();
 /*!
  * jQuery JavaScript Library v2.1.1
@@ -14416,8 +14435,7 @@ b==="api")return a(this).data("Jcrop");a(this).data("Jcrop").setOptions(b)}else 
 
 
 }(window.jQuery);
-<<<<<<< HEAD
-;/*! http://mths.be/utf8js v2.0.0 by @mathias */
+/*! http://mths.be/utf8js v2.0.0 by @mathias */
 ;(function(root) {
 
 	// Detect free variables `exports`
@@ -14652,7 +14670,7 @@ b==="api")return a(this).data("Jcrop");a(this).data("Jcrop").setOptions(b)}else 
 
 }(this));
 
-;/*! https://mths.be/quoted-printable v<%= version %> by @mathias | MIT license */
+/*! https://mths.be/quoted-printable v<%= version %> by @mathias | MIT license */
 ;(function(root) {
 
 	// Detect free variables `exports`.
@@ -14807,10 +14825,7 @@ b==="api")return a(this).data("Jcrop");a(this).data("Jcrop").setOptions(b)}else 
 
 }(this));
 
-;/**
-=======
 /**
->>>>>>> use home photo picker for avatar
  * |-------------------|
  * | Backbone-Mediator |
  * |-------------------|
@@ -15011,9 +15026,6 @@ b==="api")return a(this).data("Jcrop");a(this).data("Jcrop").setOptions(b)}else 
   return Backbone;
 
 });
-<<<<<<< HEAD
-;// Generated by CoffeeScript 1.9.1
-=======
 require.register("cozy-clearance/contact_autocomplete", function(exports, require, module){
   module.exports = function(input, onGuestAdded, extrafilter) {
   var contactCollection;
@@ -15088,7 +15100,7 @@ require.register("cozy-clearance/contact_autocomplete", function(exports, requir
   });
 };
 
-  
+
 });
 
 require.register("cozy-clearance/contact_collection", function(exports, require, module){
@@ -15121,7 +15133,7 @@ collection.fetch();
 
 module.exports = collection;
 
-  
+
 });
 
 require.register("cozy-clearance/modal", function(exports, require, module){
@@ -15166,13 +15178,16 @@ Modal = (function(_super) {
     this.render();
     this.saving = false;
     this.$el.modal('show');
+    this.el.tabIndex=0;
+    this.el.focus();
     this.$('button.close').click((function(_this) {
       return function(event) {
         event.stopPropagation();
         return _this.onNo();
       };
     })(this));
-    return $(document).on('keyup', this.closeOnEscape);
+    // return $(document).on('keyup', this.closeOnEscape);
+    return this.$el.on('keyup', this.closeOnEscape);
   };
 
   Modal.prototype.events = function() {
@@ -15207,13 +15222,21 @@ Modal = (function(_super) {
   };
 
   Modal.prototype.closeOnEscape = function(e) {
+    e.stopPropagation();
+    // e.preventDefault();
     if (e.which === 27) {
-      return this.onNo();
+      this.onNo();
+      return false;
     }
+    if (e.which=== 9){
+      // event.target = this.el;
+    }
+    return false;
   };
 
   Modal.prototype.remove = function() {
-    $(document).off('keyup', this.closeOnEscape);
+    this.$el.off('keyup', this.closeOnEscape);
+    // $(document).off('keyup', this.closeOnEscape);
     return Modal.__super__.remove.apply(this, arguments);
   };
 
@@ -15279,7 +15302,7 @@ Modal.error = function(text, cb) {
 
 module.exports = Modal;
 
-  
+
 });
 
 require.register("cozy-clearance/modal_share_template", function(exports, require, module){
@@ -15440,7 +15463,7 @@ buf.push("</ul>");
 }}("t" in locals_for_with?locals_for_with.t:typeof t!=="undefined"?t:undefined,"type" in locals_for_with?locals_for_with.type:typeof type!=="undefined"?type:undefined,"model" in locals_for_with?locals_for_with.model:typeof model!=="undefined"?model:undefined,"JSON" in locals_for_with?locals_for_with.JSON:typeof JSON!=="undefined"?JSON:undefined,"clearance" in locals_for_with?locals_for_with.clearance:typeof clearance!=="undefined"?clearance:undefined,"makeURL" in locals_for_with?locals_for_with.makeURL:typeof makeURL!=="undefined"?makeURL:undefined,"undefined" in locals_for_with?locals_for_with.undefined:typeof undefined!=="undefined"?undefined:undefined,"Object" in locals_for_with?locals_for_with.Object:typeof Object!=="undefined"?Object:undefined,"possible_permissions" in locals_for_with?locals_for_with.possible_permissions:typeof possible_permissions!=="undefined"?possible_permissions:undefined));;return buf.join("");
 }
 module.exports = template;
-  
+
 });
 
 require.register("cozy-clearance/modal_share_view", function(exports, require, module){
@@ -15852,11 +15875,10 @@ module.exports = CozyClearanceModal = (function(_super) {
 
 })(Modal);
 
-  
+
 });
 
-// Generated by CoffeeScript 1.7.1
->>>>>>> use home photo picker for avatar
+// Generated by CoffeeScript 1.9.1
 (function() {
   var CozySocketListener, global,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -20004,15 +20026,9 @@ $.effects.effect.highlight = function( o, done ) {
 
 })(jQuery);
 
-<<<<<<< HEAD
-;/* jquery.nicescroll
+/* jquery.nicescroll
 -- version 3.6.0
 -- copyright 2014-11-21 InuYaksa*2014
-=======
-/* jquery.nicescroll
--- version 3.4.0
--- copyright 2011-12-13 InuYaksa*2013
->>>>>>> use home photo picker for avatar
 -- licensed under the MIT
 --
 -- http://nicescroll.areaaperta.com/
@@ -23643,14 +23659,8 @@ $.effects.effect.highlight = function( o, done ) {
     $.nicescroll.options = _globaloptions;
   }
 
-<<<<<<< HEAD
 }));
-;//     (c) 2012 Airbnb, Inc.
-=======
-})( jQuery );
-
 //     (c) 2012 Airbnb, Inc.
->>>>>>> use home photo picker for avatar
 //
 //     polyglot.js may be freely distributed under the terms of the BSD
 //     license. For all licensing information, details, and documention:
@@ -23904,11 +23914,7 @@ $.effects.effect.highlight = function( o, done ) {
 }(this);
 
 
-<<<<<<< HEAD
-;!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.io=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-=======
-/*! Socket.IO.js build:0.9.11, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
->>>>>>> use home photo picker for avatar
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.io=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 
 module.exports = _dereq_('./lib/');
 
@@ -30847,15 +30853,7 @@ function toArray(list, index) {
 (1)
 });
 
-<<<<<<< HEAD
-;/*
-=======
-if (typeof define === "function" && define.amd) {
-  define([], function () { return io; });
-}
-})();
 /*
->>>>>>> use home photo picker for avatar
  *  Sugar Library v1.3.9
  *
  *  Freely distributable and licensed under the MIT-style license.
@@ -35995,7 +35993,397 @@ Date.addLocale('zh-TW', {
 })(jQuery);
 
 
-!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.jade=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+ * © 2014 Second Street, MIT License <http://opensource.org/licenses/MIT>
+ * Talker.js 1.0.1 <http://github.com/secondstreet/talker.js>
+ */
+//region Constants
+var TALKER_TYPE = 'application/x-talkerjs-v1+json';
+var TALKER_ERR_TIMEOUT = 'timeout';
+//endregion Constants
+
+//region Third-Party Libraries
+/*
+ * PinkySwear.js 2.1 - Minimalistic implementation of the Promises/A+ spec
+ * Modified slightly for embedding in Talker.js
+ *
+ * Public Domain. Use, modify and distribute it any way you like. No attribution required.
+ *
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ *
+ * PinkySwear is a very small implementation of the Promises/A+ specification. After compilation with the
+ * Google Closure Compiler and gzipping it weighs less than 500 bytes. It is based on the implementation for
+ * Minified.js and should be perfect for embedding.
+ *
+ * https://github.com/timjansen/PinkySwear.js
+ */
+var pinkySwearPromise = (function() {
+  var undef;
+
+  function isFunction(f) {
+    return typeof f == 'function';
+  }
+  function isObject(f) {
+    return typeof f == 'object';
+  }
+  function defer(callback) {
+    if (typeof setImmediate != 'undefined')
+  setImmediate(callback);
+    else if (typeof process != 'undefined' && process['nextTick'])
+  process['nextTick'](callback);
+    else
+  setTimeout(callback, 0);
+  }
+
+  return function pinkySwear() {
+    var state;           // undefined/null = pending, true = fulfilled, false = rejected
+    var values = [];     // an array of values as arguments for the then() handlers
+    var deferred = [];   // functions to call when set() is invoked
+
+    var set = function(newState, newValues) {
+      if (state == null && newState != null) {
+        state = newState;
+        values = newValues;
+        if (deferred.length)
+          defer(function() {
+            for (var i = 0; i < deferred.length; i++)
+            deferred[i]();
+          });
+      }
+      return state;
+    };
+
+    set['then'] = function (onFulfilled, onRejected) {
+      var promise2 = pinkySwear();
+      var callCallbacks = function() {
+        try {
+          var f = (state ? onFulfilled : onRejected);
+          if (isFunction(f)) {
+            function resolve(x) {
+              var then, cbCalled = 0;
+              try {
+                if (x && (isObject(x) || isFunction(x)) && isFunction(then = x['then'])) {
+                  if (x === promise2)
+                    throw new TypeError();
+                  then['call'](x,
+                      function() { if (!cbCalled++) resolve.apply(undef,arguments); } ,
+                      function(value){ if (!cbCalled++) promise2(false,[value]);});
+                }
+                else
+                  promise2(true, arguments);
+              }
+              catch(e) {
+                if (!cbCalled++)
+                  promise2(false, [e]);
+              }
+            }
+            resolve(f.apply(undef, values || []));
+          }
+          else
+            promise2(state, values);
+        }
+        catch (e) {
+          promise2(false, [e]);
+        }
+      };
+      if (state != null)
+        defer(callCallbacks);
+      else
+        deferred.push(callCallbacks);
+      return promise2;
+    };
+    return set;
+  };
+})();
+/**
+ * Object Create
+ */
+var objectCreate = function(proto) {
+    function ctor () { }
+    ctor.prototype = proto;
+    return new ctor();
+};
+//endregion
+
+//region Public Methods
+/**
+ * Talker
+ * Used to open a communication line between this window and a remote window via postMessage.
+ * @param remoteWindow - The remote `window` object to post/receive messages to/from.
+ * @property {Window} remoteWindow - The remote window object this Talker is communicating with
+ * @property {string} remoteOrigin - The protocol, host, and port you expect the remote to be
+ * @property {number} timeout - The number of milliseconds to wait before assuming no response will be received.
+ * @property {boolean} handshaken - Whether we've received a handshake from the remote window
+ * @property {function(Talker.Message)} onMessage - Will be called with every non-handshake, non-response message from the remote window
+ * @property {Promise} handshake - Will be resolved when a handshake is newly established with the remote window.
+ * @returns {Talker}
+ * @constructor
+ */
+var Talker = function(remoteWindow, remoteOrigin) {
+    this.remoteWindow = remoteWindow;
+    this.remoteOrigin = remoteOrigin;
+    this.timeout = 3000;
+
+    this.handshaken = false;
+    this.handshake = pinkySwearPromise();
+    this._id = 0;
+    this._queue = [];
+    this._sent = {};
+
+    var _this = this;
+    window.addEventListener('message', function(messageEvent) { _this._receiveMessage(messageEvent) }, false);
+    this._sendHandshake();
+
+    return this;
+};
+
+/**
+ * Send
+ * Sends a message and returns a promise
+ * @param namespace - The namespace the message is in
+ * @param data - The data to send, must be a JSON.stringify-able object
+ * @param [responseToId=null] - If this is a response to a previous message, its ID.
+ * @public
+ * @returns {Promise} - May resolve with a {@link Talker.IncomingMessage}, or rejects with an Error
+ */
+Talker.prototype.send = function(namespace, data, responseToId) {
+    var message = new Talker.OutgoingMessage(this, namespace, data, responseToId);
+
+    var promise = pinkySwearPromise();
+    this._sent[message.id] = promise;
+
+    this._queue.push(message);
+    this._flushQueue();
+
+    setTimeout(function() {
+        promise(false, [new Error(TALKER_ERR_TIMEOUT)]); // Reject the promise
+    }, this.timeout);
+
+    return promise;
+};
+//endregion Public Methods
+
+//region Private Methods
+/**
+ * Handles receipt of a message via postMessage
+ * @param {MessageEvent} messageEvent
+ * @private
+ */
+Talker.prototype._receiveMessage = function(messageEvent) {
+    var object, isHandshake;
+
+    try {
+        object = JSON.parse(messageEvent.data);
+    }
+    catch (e) {
+        object = {};
+    }
+    if (!this._isSafeMessage(messageEvent.source, messageEvent.origin, object.type)) { return false; }
+
+    isHandshake = object.handshake || object.handshakeConfirmation;
+    return isHandshake ? this._handleHandshake(object) : this._handleMessage(object);
+};
+
+/**
+ * Determines whether it is safe and appropriate to parse a postMessage messageEvent
+ * @param {Window} source - Source window object
+ * @param {string} origin - Protocol, host, and port
+ * @param {string} type - Internet Media Type
+ * @returns {boolean}
+ * @private
+ */
+Talker.prototype._isSafeMessage = function(source, origin, type) {
+    var safeSource, safeOrigin, safeType;
+
+    safeSource = source === this.remoteWindow;
+    safeOrigin = (this.remoteOrigin === '*') || (origin === this.remoteOrigin);
+    safeType = type === TALKER_TYPE;
+
+    return safeSource && safeOrigin && safeType;
+};
+
+/**
+ * Handle a handshake message
+ * @param {Object} object - The postMessage content, parsed into an Object
+ * @private
+ */
+Talker.prototype._handleHandshake = function(object) {
+    if (object.handshake) { this._sendHandshake(this.handshaken); } // One last handshake in case the remote window (which we now know is ready) hasn't seen ours yet
+    this.handshaken = true;
+    this.handshake(true, [this.handshaken]);
+    this._flushQueue();
+};
+
+/**
+ * Handle a non-handshake message
+ * @param {Object} rawObject - The postMessage content, parsed into an Object
+ * @private
+ */
+Talker.prototype._handleMessage = function(rawObject) {
+    var message = new Talker.IncomingMessage(this, rawObject.namespace, rawObject.data, rawObject.id);
+    var responseId = rawObject.responseToId;
+    return responseId ? this._respondToMessage(responseId, message) : this._broadcastMessage(message);
+};
+
+/**
+ * Send a response message back to an awaiting promise
+ * @param {number} id - Message ID of the waiting promise
+ * @param {Talker.Message} message - Message that is responding to that ID
+ * @private
+ */
+Talker.prototype._respondToMessage = function(id, message) {
+    if (this._sent[id]) {
+        this._sent[id](true, [message]); // Resolve the promise
+        delete this._sent[id];
+    }
+};
+
+/**
+ * Send a non-response message to awaiting hooks/callbacks
+ * @param {Talker.Message} message - Message that arrived
+ * @private
+ */
+Talker.prototype._broadcastMessage = function(message) {
+    if (this.onMessage) { this.onMessage.call(this, message); }
+};
+
+/**
+ * Send a handshake message to the remote window
+ * @param {boolean} [confirmation] - Is this a confirmation handshake?
+ * @private
+ */
+Talker.prototype._sendHandshake = function(confirmation) {
+    var message = { type: TALKER_TYPE };
+    var handshakeType = confirmation ? 'handshakeConfirmation' : 'handshake';
+    message[handshakeType] = true;
+    this._postMessage(message);
+};
+
+/**
+ * Increment the internal ID and return a new one.
+ * @returns {number}
+ * @private
+ */
+Talker.prototype._nextId = function() {
+    return this._id += 1;
+};
+
+/**
+ * Wrapper around window.postMessage to only send if we have the necessary objects
+ * @param {Object} data - A JSON.stringify'able object
+ * @private
+ */
+Talker.prototype._postMessage = function(data) {
+    if (this.remoteWindow && this.remoteOrigin) {
+        this.remoteWindow.postMessage(JSON.stringify(data), this.remoteOrigin);
+    }
+};
+
+/**
+ * Flushes the internal queue of outgoing messages, sending each one.
+ * @returns {Array} - Returns the queue for recursion
+ * @private
+ */
+Talker.prototype._flushQueue = function() {
+    if (this.handshaken) {
+        var message = this._queue.shift();
+        if (!message) { return this._queue; }
+        this._postMessage(message);
+        if (this._queue.length > 0) { return this._flushQueue(); }
+    }
+    return this._queue;
+};
+//endregion Private Methods
+
+//region Talker Message
+/**
+ * Talker Message
+ * Used to wrap a message for Talker with some extra metadata and methods
+ * @param {Talker} talker - A {@link Talker} instance that will be used to send responses
+ * @param {string} namespace - A namespace to with which to categorize messages
+ * @param {Object} data - A JSON.stringify-able object
+ * @property {number} id
+ * @property {number} responseToId
+ * @property {string} namespace
+ * @property {Object} data
+ * @property {string} type
+ * @property {Talker} talker
+ * @returns {Talker.Message}
+ * @constructor
+ */
+Talker.Message = function(talker, namespace, data) {
+    this.talker = talker;
+    this.namespace = namespace;
+    this.data = data;
+    this.type = TALKER_TYPE;
+
+    return this;
+};
+//endregion Talker Message
+
+//region Talker Outgoing Message
+/**
+ * Talker Outgoing Message
+ * @extends Talker.Message
+ * @param {Talker} talker - A {@link Talker} instance that will be used to send responses
+ * @param {string} namespace - A namespace to with which to categorize messages
+ * @param {Object} data - A JSON.stringify-able object
+ * @param [responseToId=null] - If this is a response to a previous message, its ID.
+ * @constructor
+ */
+Talker.OutgoingMessage = function(talker, namespace, data, responseToId) {
+    Talker.Message.call(this, talker, namespace, data);
+    this.responseToId = responseToId || null;
+    this.id = this.talker._nextId();
+};
+Talker.OutgoingMessage.prototype = objectCreate(Talker.Message.prototype);
+Talker.OutgoingMessage.prototype.constructor = Talker.Message;
+
+/**
+ * @returns {Object}
+ * @public
+ */
+Talker.OutgoingMessage.prototype.toJSON = function() {
+    return {
+        id: this.id,
+        responseToId: this.responseToId,
+        namespace: this.namespace,
+        data: this.data,
+        type: this.type
+    };
+};
+//endregion Talker Outgoing Message
+
+//region Talker Incoming Message
+/**
+ * Talker Incoming Message
+ * @extends Talker.Message
+ * @param {Talker} talker - A {@link Talker} instance that will be used to send responses
+ * @param {string} namespace - A namespace to with which to categorize messages
+ * @param {Object} data - A JSON.stringify-able object
+ * @param {number} id - The ID received from the other side
+ * @constructor
+ */
+Talker.IncomingMessage = function(talker, namespace, data, id) {
+    Talker.Message.call(this, talker, namespace, data);
+    this.id = id;
+};
+Talker.IncomingMessage.prototype = objectCreate(Talker.Message.prototype);
+Talker.IncomingMessage.prototype.constructor = Talker.Message;
+
+/**
+ * Respond
+ * Responds to a message
+ * @param {Object} data - A JSON.stringify-able object
+ * @public
+ * @returns {Promise} - Resolves with a {@link Talker.IncomingMessage}, or rejects with an Error
+ */
+Talker.IncomingMessage.prototype.respond = function(data) {
+    return this.talker.send(null, data, this.id);
+};
+//endregion Talker Incoming Message
+
+;!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.jade=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
 /**
@@ -36205,8 +36593,7 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
 },{}]},{},[1])
 (1)
 });
-<<<<<<< HEAD
-;// Generated by CoffeeScript 1.8.0
+// Generated by CoffeeScript 1.8.0
 (function() {
   var ANDROID_RELATIONS, BASE_FIELDS, IM_VENDORS, IOS_IM_VENDORS, IOS_SERVICE_LABELS, IOS_SERVICE_TYPES, PHONETIC_FIELDS, SOCIAL_URLS, VCardParser, capitalizeFirstLetter, exportAbout, exportAdr, exportAlerts, exportBaseFields, exportChat, exportDefault, exportName, exportOther, exportPicture, exportRelation, exportRev, exportSocial, exportTags, exportUid, exportUrl, getAndroidItem, isValidDate, quotedPrintable, regexps, utf8,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
@@ -37094,8 +37481,5 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
 
 }).call(this);
 
-;
-=======
 
->>>>>>> use home photo picker for avatar
 //# sourceMappingURL=vendor.js.map

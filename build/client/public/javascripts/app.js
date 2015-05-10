@@ -1,42 +1,59 @@
-(function(/*! Brunch !*/) {
+(function() {
   'use strict';
 
-  var globals = typeof window !== 'undefined' ? window : global;
+  var globals = typeof window === 'undefined' ? global : window;
   if (typeof globals.require === 'function') return;
 
   var modules = {};
   var cache = {};
+  var has = ({}).hasOwnProperty;
 
-  var has = function(object, name) {
-    return ({}).hasOwnProperty.call(object, name);
+  var aliases = {};
+
+  var endsWith = function(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
   };
 
-  var expand = function(root, name) {
-    var results = [], parts, part;
-    if (/^\.\.?(\/|$)/.test(name)) {
-      parts = [root, name].join('/').split('/');
-    } else {
-      parts = name.split('/');
-    }
-    for (var i = 0, length = parts.length; i < length; i++) {
-      part = parts[i];
-      if (part === '..') {
-        results.pop();
-      } else if (part !== '.' && part !== '') {
-        results.push(part);
+  var unalias = function(alias, loaderPath) {
+    var start = 0;
+    if (loaderPath) {
+      if (loaderPath.indexOf('components/' === 0)) {
+        start = 'components/'.length;
+      }
+      if (loaderPath.indexOf('/', start) > 0) {
+        loaderPath = loaderPath.substring(start, loaderPath.indexOf('/', start));
       }
     }
-    return results.join('/');
+    var result = aliases[alias + '/index.js'] || aliases[loaderPath + '/deps/' + alias + '/index.js'];
+    if (result) {
+      return 'components/' + result.substring(0, result.length - '.js'.length);
+    }
+    return alias;
   };
 
+  var expand = (function() {
+    var reg = /^\.\.?(\/|$)/;
+    return function(root, name) {
+      var results = [], parts, part;
+      parts = (reg.test(name) ? root + '/' + name : name).split('/');
+      for (var i = 0, length = parts.length; i < length; i++) {
+        part = parts[i];
+        if (part === '..') {
+          results.pop();
+        } else if (part !== '.' && part !== '') {
+          results.push(part);
+        }
+      }
+      return results.join('/');
+    };
+  })();
   var dirname = function(path) {
     return path.split('/').slice(0, -1).join('/');
   };
 
   var localRequire = function(path) {
     return function(name) {
-      var dir = dirname(path);
-      var absolute = expand(dir, name);
+      var absolute = expand(dirname(path), name);
       return globals.require(absolute, path);
     };
   };
@@ -51,21 +68,26 @@
   var require = function(name, loaderPath) {
     var path = expand(name, '.');
     if (loaderPath == null) loaderPath = '/';
+    path = unalias(name, loaderPath);
 
-    if (has(cache, path)) return cache[path].exports;
-    if (has(modules, path)) return initModule(path, modules[path]);
+    if (has.call(cache, path)) return cache[path].exports;
+    if (has.call(modules, path)) return initModule(path, modules[path]);
 
     var dirIndex = expand(path, './index');
-    if (has(cache, dirIndex)) return cache[dirIndex].exports;
-    if (has(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
+    if (has.call(cache, dirIndex)) return cache[dirIndex].exports;
+    if (has.call(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
 
     throw new Error('Cannot find module "' + name + '" from '+ '"' + loaderPath + '"');
   };
 
-  var define = function(bundle, fn) {
+  require.alias = function(from, to) {
+    aliases[to] = from;
+  };
+
+  require.register = require.define = function(bundle, fn) {
     if (typeof bundle === 'object') {
       for (var key in bundle) {
-        if (has(bundle, key)) {
+        if (has.call(bundle, key)) {
           modules[key] = bundle[key];
         }
       }
@@ -74,26 +96,25 @@
     }
   };
 
-  var list = function() {
+  require.list = function() {
     var result = [];
     for (var item in modules) {
-      if (has(modules, item)) {
+      if (has.call(modules, item)) {
         result.push(item);
       }
     }
     return result;
   };
 
+  require.brunch = true;
   globals.require = require;
-  globals.require.define = define;
-  globals.require.register = define;
-  globals.require.list = list;
-  globals.require.brunch = true;
 })();
 require.register("application", function(exports, require, module) {
-var ContactListener;
+var ContactListener, IntentManager;
 
-ContactListener = require('./lib/contact_listener');
+ContactListener = require('lib/contact_listener');
+
+IntentManager = require('lib/intent_manager');
 
 module.exports = {
   initialize: function() {
@@ -142,7 +163,8 @@ module.exports = {
       this.tags.fetch();
     }
     this.router = new Router();
-    return Backbone.history.start();
+    Backbone.history.start();
+    return this.intentManager = new IntentManager();
   }
 };
 });
@@ -383,6 +405,41 @@ module.exports = BaseView = (function(_super) {
 })(Backbone.View);
 });
 
+;require.register("lib/client", function(exports, require, module) {
+exports.request = function(type, url, data, callbacks) {
+  var error, success;
+  success = callbacks.success || function(res) {
+    return callbacks(null, res);
+  };
+  error = callbacks.error || function(err) {
+    return callbacks(err);
+  };
+  return $.ajax({
+    type: type,
+    url: url,
+    data: data,
+    success: success,
+    error: error
+  });
+};
+
+exports.get = function(url, callbacks) {
+  return exports.request("GET", url, null, callbacks);
+};
+
+exports.post = function(url, data, callbacks) {
+  return exports.request("POST", url, data, callbacks);
+};
+
+exports.put = function(url, data, callbacks) {
+  return exports.request("PUT", url, data, callbacks);
+};
+
+exports.del = function(url, callbacks) {
+  return exports.request("DELETE", url, null, callbacks);
+};
+});
+
 ;require.register("lib/colorhash", function(exports, require, module) {
 var hslToRgb, hue2rgb;
 
@@ -438,41 +495,6 @@ module.exports = function(tag) {
 };
 });
 
-;require.register("lib/client", function(exports, require, module) {
-exports.request = function(type, url, data, callbacks) {
-  var error, success;
-  success = callbacks.success || function(res) {
-    return callbacks(null, res);
-  };
-  error = callbacks.error || function(err) {
-    return callbacks(err);
-  };
-  return $.ajax({
-    type: type,
-    url: url,
-    data: data,
-    success: success,
-    error: error
-  });
-};
-
-exports.get = function(url, callbacks) {
-  return exports.request("GET", url, null, callbacks);
-};
-
-exports.post = function(url, data, callbacks) {
-  return exports.request("POST", url, data, callbacks);
-};
-
-exports.put = function(url, data, callbacks) {
-  return exports.request("PUT", url, data, callbacks);
-};
-
-exports.del = function(url, callbacks) {
-  return exports.request("DELETE", url, null, callbacks);
-};
-});
-
 ;require.register("lib/contact_listener", function(exports, require, module) {
 var Contact, ContactListener,
   __hasProp = {}.hasOwnProperty,
@@ -512,6 +534,26 @@ module.exports = ContactListener = (function(_super) {
   return ContactListener;
 
 })(CozySocketListener);
+});
+
+;require.register("lib/intent_manager", function(exports, require, module) {
+var IntentManager, TIMEOUT;
+
+TIMEOUT = 3000;
+
+module.exports = IntentManager = (function() {
+  function IntentManager() {
+    this.talker = new Talker(window.parent, '*');
+  }
+
+  IntentManager.prototype.send = function(nameSpace, intent, timeout) {
+    this.talker.timeout = timeout ? timeout : TIMEOUT;
+    return this.talker.send('nameSpace', intent);
+  };
+
+  return IntentManager;
+
+})();
 });
 
 ;require.register("lib/request", function(exports, require, module) {
@@ -836,10 +878,7 @@ module.exports = {
 
 ;require.register("locales/en", function(exports, require, module) {
 module.exports = {
-<<<<<<< HEAD
   "contacts": "Contacts",
-=======
->>>>>>> use home photo picker for avatar
   "saving": "Saving…",
   "saved": "Saved",
   "delete": "Delete",
@@ -911,6 +950,14 @@ module.exports = {
   "placeholder suffix": " ",
   "full name": "Full name",
   "save": "Save",
+  "more thumbs": "More photos",
+  "pick from files": "Choose one photo",
+  "photo-modal chooseAgain": "Choose another photo",
+  "modal ok": "OK",
+  "modal cancel": "Cancel",
+  "no image": "There is no image on your Cozy",
+  "ObjPicker upload btn": "Upload a local file",
+  "drop a file": "Drag & drop a file",
   "search placeholder": "Search…",
   "new contact": "New Contact",
   "go to settings": "Settings",
@@ -938,18 +985,10 @@ module.exports = {
   "export vcard": "Export vCard file",
   "settings": "Settings",
   "help": "Help",
-<<<<<<< HEAD
   "name format info": "Select display name format",
   "format given familly": "Given Family (John Johnson)",
   "format familly given": "Name First name (Johnson John)",
   "format given mid familly": "Full (John J. Johnson)",
-=======
-  "name format info": "Select display name format (will not change already imported contacts)",
-  "format given familly": "Given Family (John Johnson)",
-  "format familly given": "Name, First name (Johnson John)",
-  "format given mid familly": "Full (John J. Johnson)",
-  "do this now": "Select the current format of your contacts.",
->>>>>>> use home photo picker for avatar
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "sync title": "Mobile Synchronization (CardDav)",
   "sync headline no data": "To synchronize your calendar with your devices, you must follow two steps",
@@ -971,10 +1010,7 @@ module.exports = {
 
 ;require.register("locales/fr", function(exports, require, module) {
 module.exports = {
-<<<<<<< HEAD
   "contacts": "Contacts",
-=======
->>>>>>> use home photo picker for avatar
   "saving": "Sauvegarde…",
   "saved": "Sauvegardé",
   "delete": "Supprimer",
@@ -989,13 +1025,9 @@ module.exports = {
   "department": "Département",
   "title": "Titre",
   "birthday": "Anniversaire",
-<<<<<<< HEAD
   "bday": "Anniversaire",
   "phone": "Téléphone",
   "social": "Profil (réseau social)",
-=======
-  "phone": "Téléphone",
->>>>>>> use home photo picker for avatar
   "skype": "Skype",
   "email": "Email",
   "postal": "Adresse",
@@ -1008,14 +1040,9 @@ module.exports = {
   "firstname lastname": "Prénom Nom",
   "change": "Changer",
   "notes placeholder": "Prenez des notes ici",
-<<<<<<< HEAD
   "type here": "Écrivez ici",
   "phones": "Téléphones",
   "socials": "Profils (réseaux sociaux)",
-=======
-  "type here": "Tapez ici",
-  "phones": "Téléphones",
->>>>>>> use home photo picker for avatar
   "emails": "Emails",
   "postal": "Adresses",
   "profile": "Profil",
@@ -1038,17 +1065,7 @@ module.exports = {
   "cozy url": "Cozy",
   "twitter": "Twitter",
   "add tags": "Ajouter des tags",
-<<<<<<< HEAD
   "add note": "Ajouter une note",
-=======
-  "add note": "Ajouter une une note",
-  "duration": "Durée",
-  "seconds": "s",
-  "minutes": "min",
-  "hours": "h",
-  "you called": "Vous avez appelé",
-  "you were called": "Vous avez été appelé(e)",
->>>>>>> use home photo picker for avatar
   "create call task": "Créer une tâche de contact",
   "creating...": "création en cours…",
   "edit name": "Modifier le nom",
@@ -1065,6 +1082,14 @@ module.exports = {
   "placeholder suffix": " ",
   "full name": "Nom complet",
   "save": "Enregister",
+  "pick from files": "Choisir une photo",
+  "photo-modal chooseAgain": "Changer de photo",
+  "modal ok": "OK",
+  "modal cancel": "Annuler",
+  "no image": "Il n'y a pas d'image sur votre Cozy",
+  "ObjPicker upload btn": "Sélectionnez un fichier local",
+  "more thumbs": "Plus de photo",
+  "drop a file": "Glissez et déposez un fichier",
   "search placeholder": "Recherche…",
   "new contact": "Nouveau Contact",
   "go to settings": "Paramètres",
@@ -1072,26 +1097,11 @@ module.exports = {
   "is not a vcard": "n'est pas un fichier vCard",
   "cancel": "Annuler",
   "import": "Importer",
-<<<<<<< HEAD
   "import count": "Nombre de contacts à importer :",
   "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
   "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
   "choose phone country": "Choisissez le pays de ce téléphone",
   "ready to import": "Prêt à l'importation",
-=======
-  "import call log help": "N'utilisez pas cette fonction si vous êtes un client FING/Orange",
-  "choose log file": "Puis uploadez le fichier que vous avez généré",
-  "import ios calls": "Pas de support pour iOS pour le moment. Pour contribuer, rendez-vous sur ",
-  "import.ready-msg": "Prêt à importer %{smart_count} contact ||||\nPrêt à importer %{smart_count} contacts",
-  "import android calls": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos appels : ",
-  "import android sms": "Si vous utilisez un téléphone Android, utilisez cette application pour importer vos sms : ",
-  "dont close navigator import": "Ne fermez pas le navigateur durant l'importation des contacts.",
-  "choose phone country": "Choisissez le pays de ce téléphone",
-  "ready to import": "Prêt à l'importation",
-  "log direction": "Direction",
-  "log number": "Numéro",
-  "log date": "Date",
->>>>>>> use home photo picker for avatar
   "importing this file": "Nous importons ce fichier",
   "may take a while": "Cela peut prendre quelques minutes",
   "progress": "Progression",
@@ -1101,27 +1111,17 @@ module.exports = {
   "fail to import": "Échec de l'importation",
   "click left to display": "Navigation : cliquez sur un contact dans le panneau de gauche pour l'afficher",
   "import export": "Importer / Exporter",
-<<<<<<< HEAD
-=======
-  "call log info": "Cliquez ici pour importer votre historique mobile :",
-  "import call log": "Importer l'historique",
->>>>>>> use home photo picker for avatar
   "vcard import info": "Cliquez ici pour importer vos contacts :",
   "import vcard": "Importer vCard",
   "export all vcard": "Exporter un fichier vCard",
   "export vcard": "Exporter un fichier vCard",
   "settings": "Paramètres",
   "help": "Aide",
-<<<<<<< HEAD
   "name format info": "Sélectionnez le format d'affichage des noms.",
-=======
-  "name format info": "Sélectionnez le format d'affichage des noms (Cela n'influera pas les contacts déjà importés)",
->>>>>>> use home photo picker for avatar
   "format given familly": "Prénom Nom (Pierre Dupont)",
   "format familly given": "Nom Prénom (Dupont Pierre)",
   "format given mid familly": "Format américain (John J. Johnson)",
   "vcard export info": "Cliquez ici pour exporter tous vos contacts dans un fichier vCard :",
-<<<<<<< HEAD
   "sync title": "Synchronisation mobile (CardDav)",
   "sync headline no data": "Pour synchroniser votre agenda avec votre mobile vous devez :",
   "sync headline with data": "Pour synchroniser votre agenda, utilisez les identifiants suivant :",
@@ -1134,11 +1134,6 @@ module.exports = {
   "connect to it and follow": "Vous connecter et suivre les instructions relatives à CalDAV.",
   "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,\nil affichera tous les contacts tagués avec celui-ci.",
   "creation info": "Création : cliquez sur le bouton « + » situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
-=======
-  "carddav info": "Synchronization : Pour synchroniser vos contacts sur votre mobile,\ninstallez l'application Webdav depuis le market place.",
-  "search info": "Recherche : utilisez le champ situé en haut à gauche pour effectuer\nune recherche sur tous les champs de contacts. Si vous saisissez un nom de tag,\nil affichera tous les contacts tagués avec celui-ci.",
-  "creation info": "Création : Cliquez sur le bouton « + » situé à côté du champ de recherche\npour afficher une nouvelle page de contact. Donnez un nom au contact pour\nqu'il soit sauvegardé.",
->>>>>>> use home photo picker for avatar
   "export": "Exporter",
   "export contact": "Exporter contact",
   "are you sure": "Le voulez-vous vraiment ?"
@@ -1492,31 +1487,6 @@ module.exports = DataPoint = (function(_super) {
 })(Backbone.Model);
 });
 
-<<<<<<< HEAD
-;require.register("models/tag", function(exports, require, module) {
-var Tag, colorhash,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-colorhash = require('lib/colorhash');
-
-module.exports = Tag = (function(_super) {
-  __extends(Tag, _super);
-
-  function Tag() {
-    return Tag.__super__.constructor.apply(this, arguments);
-  }
-
-  Tag.prototype.urlRoot = 'tags';
-
-  Tag.prototype.toString = function() {
-    return this.get('name');
-  };
-
-  return Tag;
-
-})(Backbone.Model);
-=======
 ;require.register("models/photo", function(exports, require, module) {
 var Photo, client,
   __hasProp = {}.hasOwnProperty,
@@ -1563,14 +1533,38 @@ module.exports = Photo = (function(_super) {
 
 })(Backbone.Model);
 
-Photo.listFromFiles = function(page, callback) {
-  return client.get("files/" + page, callback);
+Photo.listFromFiles = function(skip, limit, callback) {
+  return client.get("files/range/" + skip + "/" + limit, callback);
 };
 
 Photo.makeFromFile = function(fileid, attr, callback) {
   return client.post("files/" + fileid + "/toPhoto", attr, callback);
 };
->>>>>>> use home photo picker for avatar
+});
+
+;require.register("models/tag", function(exports, require, module) {
+var Tag, colorhash,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+colorhash = require('lib/colorhash');
+
+module.exports = Tag = (function(_super) {
+  __extends(Tag, _super);
+
+  function Tag() {
+    return Tag.__super__.constructor.apply(this, arguments);
+  }
+
+  Tag.prototype.urlRoot = 'tags';
+
+  Tag.prototype.toString = function() {
+    return this.get('name');
+  };
+
+  return Tag;
+
+})(Backbone.Model);
 });
 
 ;require.register("router", function(exports, require, module) {
@@ -1757,7 +1751,7 @@ else
 {
 buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
 }
-buf.push("<input id=\"uploader\" type=\"file\" tabindex=\"-1\"/><div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><div id=\"name\">" + (jade.escape(null == (jade_interp = fn) ? "" : jade_interp)) + "</div><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div></header><nav role=\"tablist\" class=\"nav-tabs\"><ul role=\"presentation\"><li role=\"tab\" aria-controls=\"infos-panel\" aria-selected=\"true\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</li><li role=\"tab\" aria-controls=\"notes-panel\" aria-selected=\"false\">" + (jade.escape(null == (jade_interp = t('profile')) ? "" : jade_interp)) + "</li></ul></nav></div><section id=\"infos-panel\" role=\"tabpanel\" aria-hidden=\"false\" class=\"ui-flex ui-flex-half\">");
+buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><div id=\"contact-name\" style=\"display: none;\"></div><div id=\"name\">" + (jade.escape(null == (jade_interp = fn) ? "" : jade_interp)) + "</div><ul class=\"tags\"></ul><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span></div></header><nav role=\"tablist\" class=\"nav-tabs\"><ul role=\"presentation\"><li role=\"tab\" aria-controls=\"infos-panel\" aria-selected=\"true\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</li><li role=\"tab\" aria-controls=\"notes-panel\" aria-selected=\"false\">" + (jade.escape(null == (jade_interp = t('profile')) ? "" : jade_interp)) + "</li></ul></nav></div><section id=\"infos-panel\" role=\"tabpanel\" aria-hidden=\"false\" class=\"ui-flex ui-flex-half\">");
 jade_mixins["zone"]('about');
 jade_mixins["zone"]('tel', 'phones');
 jade_mixins["zone"]('email', 'emails');
@@ -1785,22 +1779,8 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-<<<<<<< HEAD
 var locals_ = (locals || {}),n = locals_.n;
 buf.push("<form class=\"form-horizontal\"><label class=\"control-group prefix\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/><div for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</div></label><label class=\"control-group first\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/><div for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group middle\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/><div for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group last\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/><div for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</div></label><label class=\"control-group suffix\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/><div for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</div></label></form><div class=\"button-wrapper\"><a id=\"toggle-name-fields\"" + (jade.attr("title", t("contact name expand"), true, false)) + " tabindex=\"0\" class=\"fa fa-minus\"></a><a id=\"toggle-name\"" + (jade.attr("title", t("contact name check"), true, false)) + " tabindex=\"0\" class=\"fa fa-check\"></a></div>");;return buf.join("");
-=======
-var locals_ = (locals || {}),hasPicture = locals_.hasPicture,id = locals_.id,fn = locals_.fn,tags = locals_.tags,note = locals_.note;
-buf.push("<div id=\"contact-container\"><a id=\"close\" href=\"#\">&lt;</a><div id=\"picture\">");
-if ( hasPicture)
-{
-buf.push("<img" + (jade.attr("src", "contacts/" + (id) + "/picture.png", true, false)) + " class=\"picture\"/>");
-}
-else
-{
-buf.push("<img src=\"img/defaultpicture.png\" class=\"picture\"/>");
-}
-buf.push("<div id=\"uploadnotice\">" + (jade.escape(null == (jade_interp = t("change")) ? "" : jade_interp)) + "</div></div><div id=\"wrap-name-notes\"><input id=\"name\"" + (jade.attr("placeholder", t("name"), true, false)) + (jade.attr("value", "" + (fn) + "", true, false)) + "/><a id=\"name-edit\">" + (jade.escape(null == (jade_interp = t('edit name')) ? "" : jade_interp)) + "</a><input id=\"tags\"" + (jade.attr("value", tags.join(','), true, false)) + " class=\"tagit\"/></div><span id=\"save-info\">" + (jade.escape(null == (jade_interp = t('changes saved') + ' ') ? "" : jade_interp)) + "<a id=\"undo\">" + (jade.escape(null == (jade_interp = t('undo')) ? "" : jade_interp)) + "</a></span><div id=\"right\"><ul class=\"nav nav-tabs\"><li><a id=\"infotab\" href=\"#info\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('info')) ? "" : jade_interp)) + "</a></li><li class=\"active\"><a href=\"#notes-zone\" data-toggle=\"tab\">" + (jade.escape(null == (jade_interp = t('notes')) ? "" : jade_interp)) + "</a></li><li><a href=\"#history\" data-toggle=\"tab\" class=\"tab\">" + (jade.escape(null == (jade_interp = t('history')) ? "" : jade_interp)) + "</a></li></ul><div class=\"tab-content\"><div id=\"notes-zone\" class=\"tab-pane active\"><textarea rows=\"3\"" + (jade.attr("placeholder", t('notes placeholder'), true, false)) + " id=\"notes\">" + (jade.escape((jade_interp = note) == null ? '' : jade_interp)) + "</textarea></div><div id=\"history\" class=\"tab-pane\"></div><div id=\"info\" class=\"tab-pane\"></div></div></div><div id=\"left\"><div id=\"abouts\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("about")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addabout\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"tels\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("phones")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addtel\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"emails\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("emails")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addemail\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"adrs\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("postal")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addadr\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"urls\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("links")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addurl\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div id=\"others\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("others")) ? "" : jade_interp)) + "</h2><ul></ul><a class=\"btn add addother\">" + (jade.escape(null == (jade_interp = t('add')) ? "" : jade_interp)) + "</a></div><div class=\"zone clearfix\">&nbsp;</div><div class=\"zone\"><a id=\"more-options\" class=\"button\">" + (jade.escape(null == (jade_interp = t('more options')) ? "" : jade_interp)) + "</a></div><div id=\"adder\" class=\"zone\"><h2>" + (jade.escape(null == (jade_interp = t("actions")) ? "" : jade_interp)) + "</h2><h3>" + (jade.escape(null == (jade_interp = t("add fields")) ? "" : jade_interp)) + "</h3><a class=\"button addbirthday\">" + (jade.escape(null == (jade_interp = t("birthday") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addorg\">" + (jade.escape(null == (jade_interp = t("company") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtitle\">" + (jade.escape(null == (jade_interp = t("title") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addcozy\">" + (jade.escape(null == (jade_interp = t("cozy url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtwitter\">" + (jade.escape(null == (jade_interp = t("twitter") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addtel\">" + (jade.escape(null == (jade_interp = t("phone") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addemail\">" + (jade.escape(null == (jade_interp = t("email") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addadr\">" + (jade.escape(null == (jade_interp = t("postal") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addurl\">" + (jade.escape(null == (jade_interp = t("url") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addskype\">" + (jade.escape(null == (jade_interp = t("skype") + ' ') ? "" : jade_interp)) + "</a><a class=\"button addother\">" + (jade.escape(null == (jade_interp = t("other")) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("export")) ? "" : jade_interp)) + "</h3><a id=\"export\"" + (jade.attr("href", 'contacts/' + (id) + '/' + (fn) + '.vcf', true, false)) + (jade.attr("title", t("export contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('export contact')) ? "" : jade_interp)) + "</a><h3>" + (jade.escape(null == (jade_interp = t("delete")) ? "" : jade_interp)) + "</h3><a id=\"delete\"" + (jade.attr("title", t("delete contact"), true, false)) + " class=\"button\">" + (jade.escape(null == (jade_interp = t('delete contact')) ? "" : jade_interp)) + "</a></div></div></div>");;return buf.join("");
->>>>>>> use home photo picker for avatar
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -1932,334 +1912,44 @@ if (typeof define === 'function' && define.amd) {
 } else {
   __templateData;
 }
-<<<<<<< HEAD
+});
+
+;require.register("templates/photo-picker-croper", function(exports, require, module) {
+var __templateData = function template(locals) {
+var buf = [];
+var jade_mixins = {};
+var jade_interp;
+
+buf.push("<input id=\"uploader\" type=\"file\" style=\"display:none\"/><div class=\"objectPickerCont\"><nav role=\"tablist\" aria-controls=\"objectPickerCont\" class=\"fp-nav-tabs\"><div role=\"tabMarginTop\"></div><div><div role=\"tab\" aria-controls=\"thumbPicker\" aria-selected=\"true\">photo</div><div role=\"tab\" aria-controls=\"photoUpload\" aria-selected=\"false\">upload</div><div role=\"tab\" aria-controls=\"urlPhotoUpload\" aria-selected=\"false\">url</div></div><div role=\"tabMarginBottom\"></div></nav><section role=\"tabpanel\" aria-hidden=\"false\" class=\"thumbPicker\"><div class=\"thumbsContainer\"></div><a class=\"btn btn-cozy right next\"><p>" + (jade.escape((jade_interp = t('more thumbs')) == null ? '' : jade_interp)) + " &nbsp;&#12297</p></a></section><section role=\"tabpanel\" aria-hidden=\"true\" class=\"photoUpload\"><button class=\"modal-uploadBtn\">" + (jade.escape((jade_interp = t('ObjPicker upload btn')) == null ? '' : jade_interp)) + "</button><div class=\"modal-file-drop-zone\"><p>" + (jade.escape((jade_interp = t('drop a file')) == null ? '' : jade_interp)) + "</p><div></div></div></section><section role=\"tabpanel\" aria-hidden=\"true\" class=\"urlPhotoUpload\"><div><div class=\"url-preview\"></div></div><input placeholder=\"url\" value=\"\" class=\"modal-url-input\"/></section></div><div class=\"croperCont\"><table><tbody><tr><td><img id=\"img-to-crop\"/></td><td><div id=\"frame-img-preview\"><img id=\"img-preview\"/></div></td></tr></tbody></table><a class=\"chooseAgain\">" + (jade.escape((jade_interp = t('photo-modal chooseAgain')) == null ? '' : jade_interp)) + "</a></div>");;return buf.join("");
+};
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
 });
 
 ;require.register("views/contact", function(exports, require, module) {
 var Contact, ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
-=======
-});
-
-;require.register("templates/name_modal", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-var locals_ = (locals || {}),n = locals_.n,fn = locals_.fn;
-buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("name editor")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><form class=\"form-horizontal\"><div class=\"control-group\"><label for=\"prefix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("prefix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"prefix\" type=\"text\"" + (jade.attr("value", n[3], true, false)) + (jade.attr("placeholder", t("placeholder prefix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"first\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("first name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"first\" type=\"text\"" + (jade.attr("value", n[1], true, false)) + (jade.attr("placeholder", t("placeholder first"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"middle\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("middle name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"middle\" type=\"text\"" + (jade.attr("value", n[2], true, false)) + (jade.attr("placeholder", t("placeholder middle"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"last\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("last name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"last\" type=\"text\"" + (jade.attr("value", n[0], true, false)) + (jade.attr("placeholder", t("placeholder last"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"suffix\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("suffix")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"suffix\" type=\"text\"" + (jade.attr("value", n[4], true, false)) + (jade.attr("placeholder", t("placeholder suffix"), true, false)) + "/></div></div><div class=\"control-group\"><label for=\"full\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("full name")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"full\" type=\"text\" disabled=\"disabled\"" + (jade.attr("value", fn, true, false)) + "/></div></div></form></div><div class=\"modal-footer\"><a id=\"cancel-btn\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button\">" + (jade.escape(null == (jade_interp = t("save")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
-;require.register("templates/photo_browser", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-var locals_ = (locals || {}),dates = locals_.dates,percent = locals_.percent,photos = locals_.photos,hasPrev = locals_.hasPrev,hasNext = locals_.hasNext;
-buf.push("<div class=\"files\"><!-- TODO BJA : juste pour mise au point--><button id=\"crop-req-btn\">SIMULATE SINGLE IMAGE SELECTION AND VALIDATION</button>");
-if ( dates.length === 0)
-{
-buf.push("<p>" + (jade.escape(null == (jade_interp = t("photos search")) ? "" : jade_interp)) + "</p>");
-}
-else if ( dates === "No photos found")
-{
-buf.push("<p>" + (jade.escape(null == (jade_interp = t("no photos found")) ? "" : jade_interp)) + "</p>");
-}
-else if ( dates === "Thumb creation")
-{
-buf.push("<p>" + (jade.escape(null == (jade_interp = t("thumb creation")) ? "" : jade_interp)) + "</p><p>" + (jade.escape((jade_interp = t('progress')) == null ? '' : jade_interp)) + ": " + (jade.escape((jade_interp = percent) == null ? '' : jade_interp)) + "%</p>");
-}
-else
-{
-// iterate dates
-;(function(){
-  var $$obj = dates;
-  if ('number' == typeof $$obj.length) {
-
-    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-      var date = $$obj[$index];
-
-buf.push("<h4>" + (jade.escape((jade_interp = t(date.split('-')[1])) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = date.split('-')[0]) == null ? '' : jade_interp)) + "</h4><br/>");
-// iterate photos[date]
-;(function(){
-  var $$obj = photos[date];
-  if ('number' == typeof $$obj.length) {
-
-    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-      var photo = $$obj[$index];
-
-buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in $$obj) {
-      $$l++;      var photo = $$obj[$index];
-
-buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
-    }
-
-  }
-}).call(this);
-
-buf.push("<br/>");
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in $$obj) {
-      $$l++;      var date = $$obj[$index];
-
-buf.push("<h4>" + (jade.escape((jade_interp = t(date.split('-')[1])) == null ? '' : jade_interp)) + " " + (jade.escape((jade_interp = date.split('-')[0]) == null ? '' : jade_interp)) + "</h4><br/>");
-// iterate photos[date]
-;(function(){
-  var $$obj = photos[date];
-  if ('number' == typeof $$obj.length) {
-
-    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-      var photo = $$obj[$index];
-
-buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
-    }
-
-  } else {
-    var $$l = 0;
-    for (var $index in $$obj) {
-      $$l++;      var photo = $$obj[$index];
-
-buf.push("<img" + (jade.attr("src", "files/thumbs/" + (photo.id) + ".jpg", true, false)) + (jade.attr("id", "" + (photo.id) + "", true, false)) + "/>");
-    }
-
-  }
-}).call(this);
-
-buf.push("<br/>");
-    }
-
-  }
-}).call(this);
-
-if ( hasPrev)
-{
-buf.push("<a class=\"btn btn-cozy left prev\"><p>&#12296 " + (jade.escape((jade_interp = t('modal prev')) == null ? '' : jade_interp)) + "</p></a>");
-}
-if ( hasNext)
-{
-buf.push("<a class=\"btn btn-cozy right next\"><p>" + (jade.escape((jade_interp = t('modal next')) == null ? '' : jade_interp)) + " &#12297</p></a>");
-}
-}
-buf.push("</div><div class=\"cropping\"><table><tbody><tr><td><img id=\"img-to-crop\" src=\"img/photo-pour-tests.png\"/></td><td><div id=\"frame-img-preview\"><img id=\"img-preview\" src=\"img/photo-pour-tests.png\"/></div></td></tr></tbody></table></div>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
-;require.register("views/callimporter", function(exports, require, module) {
-var BaseView, CallImporterView, CallLogReader, ContactLogCollection, app,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BaseView = require('lib/base_view');
-
-CallLogReader = require('lib/call_log_reader');
-
-ContactLogCollection = require('collections/contactlog');
-
-app = require('application');
-
-module.exports = CallImporterView = (function(_super) {
-  __extends(CallImporterView, _super);
-
-  function CallImporterView() {
-    this.close = __bind(this.close, this);
-    this.showFaillure = __bind(this.showFaillure, this);
-    this.onLogFileParsed = __bind(this.onLogFileParsed, this);
-    this.onLogFileProgress = __bind(this.onLogFileProgress, this);
-    return CallImporterView.__super__.constructor.apply(this, arguments);
-  }
-
-  CallImporterView.prototype.template = require('templates/callimporter');
-
-  CallImporterView.prototype.id = 'callimporter';
-
-  CallImporterView.prototype.tagName = 'div';
-
-  CallImporterView.prototype.className = 'modal fade';
-
-  CallImporterView.prototype.events = function() {
-    return {
-      'change #csvupload': 'onUpload',
-      'click  #confirm-btn': 'doImport'
-    };
-  };
-
-  CallImporterView.prototype.getRenderData = function() {
-    return {
-      countries: require('lib/phone_number').countries
-    };
-  };
-
-  CallImporterView.prototype.afterRender = function() {
-    this.$el.modal('show');
-    this.upload = this.$('#csvupload')[0];
-    this.country = this.$('#phonecountry');
-    this.file_step = this.$('#import-file');
-    this.parse_step = this.$('#import-config').hide();
-    this.confirm_step = this.$('#import-confirm').hide();
-    return this.confirmBtn = this.$('#confirm-btn');
-  };
-
-  CallImporterView.prototype.onUpload = function() {
-    var country, file, reader;
-    file = this.upload.files[0];
-    country = this.country.val();
-    reader = new FileReader();
-    reader.readAsText(file);
-    reader.onloadend = (function(_this) {
-      return function() {
-        var error;
-        try {
-          return CallLogReader.parse(reader.result, country, _this.onLogFileParsed, _this.onLogFileProgress);
-        } catch (_error) {
-          error = _error;
-          console.log(error.stack);
-          _this.$('.control-group').addClass('error');
-          return _this.$('.help-inline').text(t('failed to parse'));
-        }
-      };
-    })(this);
-    return reader.onerror = (function(_this) {
-      return function() {
-        return console.log("ERROR READING", reader.result, reader.error);
-      };
-    })(this);
-  };
-
-  CallImporterView.prototype.onLogFileProgress = function(done, total) {
-    var p;
-    p = Math.round(100 * done / total);
-    return this.$('.help-inline').text(t('progress') + (": " + p + "%"));
-  };
-
-  CallImporterView.prototype.onLogFileParsed = function(err, toImport) {
-    var content, html, log, _i, _len;
-    if (err) {
-      console.log(error.stack);
-      this.$('.control-group').addClass('error');
-      this.$('.help-inline').text(t('failed to parse'));
-      return;
-    }
-    this.file_step.remove();
-    this.parse_step.show();
-    for (_i = 0, _len = toImport.length; _i < _len; _i++) {
-      log = toImport[_i];
-      content = log.content.message || this.formatDuration(log.content.duration);
-      html = '<tr>';
-      html += "<td> " + log.direction + " </td>";
-      html += "<td> " + log.remote.tel + " </td>";
-      html += "<td> " + (Date.create(log.timestamp).format()) + " </td>";
-      html += "<td> " + content + " </td>";
-      html += '</tr>';
-      this.$('tbody').append($(html));
-    }
-    this.toImport = toImport;
-    return this.confirmBtn.removeClass('disabled');
-  };
-
-  CallImporterView.prototype.formatDuration = function(duration) {
-    var hours, minutes, out, seconds;
-    seconds = duration % 60;
-    minutes = (duration - seconds) % 3600;
-    hours = duration - minutes - seconds;
-    out = seconds + t('seconds');
-    if (minutes) {
-      out = minutes / 60 + t('minutes') + ' ' + out;
-    }
-    if (hours) {
-      out = hours / 3600 + t('hours') + ' ' + out;
-    }
-    return out;
-  };
-
-  CallImporterView.prototype.doImport = function() {
-    var req;
-    if (this.confirmBtn.hasClass('disabled')) {
-      return;
-    }
-    this.parse_step.remove();
-    this.confirm_step.show();
-    this.confirmBtn.addClass('disabled');
-    req = $.ajax('logs', {
-      type: 'POST',
-      data: JSON.stringify(new ContactLogCollection(this.toImport).toJSON()),
-      contentType: 'application/json',
-      dataType: 'json'
-    });
-    req.done((function(_this) {
-      return function(data) {
-        if (data.success) {
-          return _this.close();
-        } else {
-          return _this.showFaillure();
-        }
-      };
-    })(this));
-    return req.fail(this.showFaillure);
-  };
-
-  CallImporterView.prototype.showFaillure = function() {
-    this.$('.modal-body').html('<p>' + t('import fail') + '</p>');
-    return this.confirmBtn.remove();
-  };
-
-  CallImporterView.prototype.close = function() {
-    this.$el.modal('hide');
-    app.router.navigate('');
-    return this.remove();
-  };
-
-  return CallImporterView;
-
-})(BaseView);
-});
-
-;require.register("views/contact", function(exports, require, module) {
-var ContactView, Datapoint, HistoryView, NameModal, PhotoBrowser, TagsView, ViewCollection, request,
->>>>>>> use home photo picker for avatar
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-ViewCollection = require('lib/view_collection');
 
 TagsView = require('widgets/tags');
 
 ContactName = require('views/contact_name');
 
-Datapoint = require('models/datapoint');
-
 Contact = require('models/contact');
 
-request = require('../lib/request');
+ViewCollection = require('lib/view_collection');
 
-PhotoBrowser = require('./photo_browser');
+Datapoint = require('models/datapoint');
+
+request = require('../lib/request');
 
 module.exports = ContactView = (function(_super) {
   __extends(ContactView, _super);
@@ -2272,13 +1962,6 @@ module.exports = ContactView = (function(_super) {
 
   ContactView.prototype.events = function() {
     return {
-<<<<<<< HEAD
-=======
-      'click #picture': 'choosePhoto',
-      'click .addbirthday': this.addClicked('about', 'birthday'),
-      'click .addorg': this.addClicked('about', 'company'),
-      'click .addtitle': this.addClicked('about', 'title'),
->>>>>>> use home photo picker for avatar
       'click .addcozy': this.addClicked('about', 'cozy'),
       'click .addtwitter': this.addClicked('social', 'twitter'),
       'click .addabout': this.addClicked('about'),
@@ -2294,7 +1977,6 @@ module.exports = ContactView = (function(_super) {
       'click #name': 'toggleContactName',
       'click #undo': 'undo',
       'click #delete': 'delete',
-      'change #uploader': 'photoChanged',
       'keyup input.value': 'addBelowIfEnter',
       'keydown #notes': 'resizeNote',
       'keypress #notes': 'resizeNote',
@@ -2303,21 +1985,18 @@ module.exports = ContactView = (function(_super) {
       'keydown textarea#notes': 'onNoteKeyPress',
       'keydown .ui-widget-content': 'onTagInputKeyPress',
       'blur #notes': 'changeOccured',
-      'blur .datapoint input.value': 'changeOccured'
+      'blur .datapoint input.value': 'changeOccured',
+      'click #picture': 'choosePhoto'
     };
   };
 
   function ContactView(options) {
-    this.photoChanged = __bind(this.photoChanged, this);
     this.resizeNiceScroll = __bind(this.resizeNiceScroll, this);
     this.modelChanged = __bind(this.modelChanged, this);
     this.undo = __bind(this.undo, this);
     this.onMoreOptionsClicked = __bind(this.onMoreOptionsClicked, this);
-<<<<<<< HEAD
-=======
-    this.showNameModal = __bind(this.showNameModal, this);
+    this.choosePhoto_answer = __bind(this.choosePhoto_answer, this);
     this.choosePhoto = __bind(this.choosePhoto, this);
->>>>>>> use home photo picker for avatar
     this.save = __bind(this.save, this);
     this.changeOccured = __bind(this.changeOccured, this);
     this.doNeedSaving = __bind(this.doNeedSaving, this);
@@ -2384,7 +2063,6 @@ module.exports = ContactView = (function(_super) {
     this.savedInfo = this.$('#save-info').hide();
     this.needSaving = false;
     this.notesfield = this.$('#notes');
-    this.uploader = this.$('#uploader')[0];
     this.picture = this.$('#picture .picture');
     this.tags = new TagsView({
       el: this.$('.tags'),
@@ -2523,7 +2201,6 @@ module.exports = ContactView = (function(_super) {
     });
   };
 
-<<<<<<< HEAD
   ContactView.prototype.toggleContactName = function() {
     if (this.$('#name').is(':visible')) {
       this.$('#name').hide();
@@ -2534,28 +2211,39 @@ module.exports = ContactView = (function(_super) {
       this.$('#contact-name').hide();
       return this.$('#name').blur();
     }
-=======
+  };
+
   ContactView.prototype.choosePhoto = function() {
-    return new PhotoBrowser({
-      model: this.album,
-      collection: this.collection
+    var choosePhoto_answer, intent, that, timeout;
+    intent = {
+      type: 'pickObject',
+      params: {
+        objectType: 'singlePhoto',
+        isCropped: true,
+        proportion: 1,
+        maxWidth: 10,
+        minWidth: 10
+      }
+    };
+    timeout = 10800000;
+    that = this;
+    choosePhoto_answer = this.choosePhoto_answer;
+    return window.app.intentManager.send('nameSpace', intent, timeout).then(choosePhoto_answer, function(error) {
+      return console.log('contact : response in error : ', error);
     });
   };
 
-  ContactView.prototype.showNameModal = function() {
-    var modal;
-    modal = new NameModal({
-      model: this.model,
-      onChange: (function(_this) {
-        return function() {
-          _this.needSaving = true;
-          return _this.save();
-        };
-      })(this)
-    });
-    $('body').append(modal.$el);
-    return modal.render();
->>>>>>> use home photo picker for avatar
+  ContactView.prototype.choosePhoto_answer = function(message) {
+    var answer;
+    answer = message.data;
+    console.log('CONTACT : response: ', answer);
+    if (answer.newPhotoChosen) {
+      return this.changePhoto(answer.dataUrl);
+    }
+  };
+
+  ContactView.prototype.intentHandler = function(intentID, cb) {
+    return this.castIntent[intentID] = cb;
   };
 
   ContactView.prototype.onMoreOptionsClicked = function() {
@@ -2681,35 +2369,10 @@ module.exports = ContactView = (function(_super) {
     return this.$el.on('click', toggleMenu);
   };
 
-  ContactView.prototype.photoChanged = function() {
-    var file, img, reader;
-    console.log('trotro');
-    file = this.uploader.files[0];
-    if (!file.type.match(/image\/.*/)) {
-      return alert(t('This is not an image'));
-    }
-    reader = new FileReader();
-    img = new Image();
-    reader.readAsDataURL(file);
-    return reader.onloadend = (function(_this) {
-      return function() {
-        img.src = reader.result;
-        return img.onload = function() {
-          var IMAGE_DIMENSION, canvas, ctx, dataUrl, ratio, ratiodim;
-          IMAGE_DIMENSION = 600;
-          ratiodim = img.width > img.height ? 'height' : 'width';
-          ratio = IMAGE_DIMENSION / img[ratiodim];
-          canvas = document.createElement('canvas');
-          canvas.height = canvas.width = IMAGE_DIMENSION;
-          ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, ratio * img.width, ratio * img.height);
-          dataUrl = canvas.toDataURL('image/jpeg');
-          _this.picture.attr('src', dataUrl);
-          _this.model.photo = dataUrl.split(',')[1];
-          return _this.model.savePicture();
-        };
-      };
-    })(this);
+  ContactView.prototype.changePhoto = function(dataUrl) {
+    this.picture.attr('src', dataUrl);
+    this.model.photo = dataUrl.split(',')[1];
+    return this.model.savePicture();
   };
 
   ContactView.prototype.onTagInputKeyPress = function(event) {
@@ -3577,227 +3240,173 @@ module.exports = ImporterView = (function(_super) {
 })(BaseView);
 });
 
-<<<<<<< HEAD
+;require.register("views/modal", function(exports, require, module) {
+var Modal,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Modal = (function(_super) {
+  __extends(Modal, _super);
+
+  function Modal() {
+    this.onKeyStroke = __bind(this.onKeyStroke, this);
+    return Modal.__super__.constructor.apply(this, arguments);
+  }
+
+  Modal.prototype.id = 'modal-dialog';
+
+  Modal.prototype.className = 'modalCY fade';
+
+  Modal.prototype.attributes = {
+    'data-backdrop': "static",
+    'data-keyboard': "false"
+  };
+
+  Modal.prototype.initialize = function(options) {
+    if (this.title == null) {
+      this.title = options.title;
+    }
+    if (this.content == null) {
+      this.content = options.content;
+    }
+    if (this.yes == null) {
+      this.yes = options.yes || 'ok';
+    }
+    if (this.no == null) {
+      this.no = options.no || 'cancel';
+    }
+    if (this.cb == null) {
+      this.cb = options.cb || function() {};
+    }
+    this.render();
+    if (options.cssSpaceName != null) {
+      this.el.classList.add(options.cssSpaceName);
+    }
+    this.saving = false;
+    this.$el.modal('show');
+    this.el.tabIndex = 0;
+    this.el.focus();
+    this.$('button.close').click((function(_this) {
+      return function(event) {
+        event.stopPropagation();
+        return _this.onNo();
+      };
+    })(this));
+    return this.$el.on('keyup', this.onKeyStroke);
+  };
+
+  Modal.prototype.events = function() {
+    return {
+      "click #modal-dialog-no": 'onNo',
+      "click #modal-dialog-yes": 'onYes',
+      'click': 'onClickAnywhere'
+    };
+  };
+
+  Modal.prototype.onNo = function() {
+    this.close();
+    return this.cb(false);
+  };
+
+  Modal.prototype.onYes = function() {
+    this.close();
+    return this.cb(true);
+  };
+
+  Modal.prototype.close = function() {
+    if (this.closing) {
+      return;
+    }
+    this.closing = true;
+    this.$el.modal('hide');
+    return setTimeout(((function(_this) {
+      return function() {
+        return _this.remove();
+      };
+    })(this)), 500);
+  };
+
+  Modal.prototype.onKeyStroke = function(e) {
+    e.stopPropagation();
+    if (e.which === 27) {
+      this.onNo();
+      return false;
+    }
+  };
+
+  Modal.prototype.remove = function() {
+    this.$el.off('keyup', this.onKeyStroke);
+    return Modal.__super__.remove.apply(this, arguments);
+  };
+
+  Modal.prototype.render = function() {
+    var body, close, foot, head, title, yesBtn;
+    close = $('<button class="close" type="button" data-dismiss="modal">×</button>');
+    title = $('<p>').text(this.title);
+    head = $('<div class="modalCY-header">').append(close, title);
+    body = $('<div class="modalCY-body"></div>').append(this.renderContent());
+    yesBtn = $('<button id="modal-dialog-yes" class="btn btn-cozy">').text(this.yes);
+    foot = $('<div class="modalCY-footer">').append(yesBtn);
+    if (this.no) {
+      foot.prepend($('<button id="modal-dialog-no" class="btn btn-link">').text(this.no));
+    }
+    return $("body").append(this.$el.append(head, body, foot));
+  };
+
+  Modal.prototype.renderContent = function() {
+    return this.content;
+  };
+
+  Modal.prototype.onClickAnywhere = function(event) {
+    if (event.target.id === this.id) {
+      return this.onNo();
+    }
+  };
+
+  return Modal;
+
+})(Backbone.View);
+
+Modal.alert = function(title, content, cb) {
+  return new Modal({
+    title: title,
+    content: content,
+    yes: 'ok',
+    no: null,
+    cb: cb
+  });
+};
+
+Modal.confirm = function(title, content, yesMsg, noMsg, cb) {
+  return new Modal({
+    title: title,
+    content: content,
+    yes: yesMsg,
+    no: noMsg,
+    cb: cb
+  });
+};
+
+Modal.error = function(text, cb) {
+  return new Modal({
+    title: t('modal error'),
+    content: text,
+    yes: t('modal ok'),
+    no: false,
+    cb: cb
+  });
+};
+
+module.exports = Modal;
+});
+
 ;require.register("widgets/autocomplete", function(exports, require, module) {
 var ARROW_DOWN_KEY, ARROW_UP_KEY, Autocomplete, BaseView, ENTER_KEY, ESCAPE_KEY,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-=======
-;require.register("views/photo_browser", function(exports, require, module) {
-var FilesBrowser, Modal, Photo,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-Modal = require('cozy-clearance/modal');
-
-Photo = require('../models/photo');
-
-module.exports = FilesBrowser = (function(_super) {
-  __extends(FilesBrowser, _super);
-
-  function FilesBrowser() {
-    return FilesBrowser.__super__.constructor.apply(this, arguments);
-  }
-
-  FilesBrowser.prototype.id = 'files-browser-modal';
-
-  FilesBrowser.prototype.template_content = require('../templates/photo_browser');
-
-  FilesBrowser.prototype.title = t('pick from files');
-
-  FilesBrowser.prototype.content = '<p>Loading ...</p>';
-
-  FilesBrowser.prototype.events = function() {
-    return _.extend(FilesBrowser.__super__.events.apply(this, arguments), {
-      'click img': 'toggleSelected',
-      'click a.next': 'displayNextPage',
-      'click a.prev': 'displayPrevPage',
-      'click #crop-req-btn': 'showCropingTool'
-    });
-  };
-
-  FilesBrowser.prototype.toggleSelected = function(e) {
-    return $(e.target).toggleClass('selected');
-  };
-
-  FilesBrowser.prototype.getRenderData = function() {
-    return this.options;
-  };
-
-  FilesBrowser.prototype.initialize = function(options) {
-    this.yes = t('modal ok');
-    this.no = t('modal cancel');
-    if (options.page == null) {
-      FilesBrowser.__super__.initialize.call(this, {});
-    }
-    if (options.page == null) {
-      options.page = 0;
-    }
-    this.options = {};
-    if (options.selected == null) {
-      this.options.selected = [];
-    }
-    this.options.page = options.page;
-    return Photo.listFromFiles(options.page, (function(_this) {
-      return function(err, body) {
-        var dates, img, pathToSocketIO, showPreview, socket, _i, _len, _ref, _results;
-        if ((body != null ? body.files : void 0) != null) {
-          dates = body.files;
-        }
-        if (err) {
-          return console.log(err);
-        } else if (body.percent != null) {
-          _this.options.dates = "Thumb creation";
-          _this.options.percent = body.percent;
-          pathToSocketIO = "" + (window.location.pathname.substring(1)) + "socket.io";
-          socket = io.connect(window.location.origin, {
-            resource: pathToSocketIO
-          });
-          socket.on('progress', function(event) {
-            var template;
-            _this.options.percent = event.percent;
-            if (_this.options.percent === 100) {
-              return _this.initialize(options);
-            } else {
-              template = _this.template_content(_this.getRenderData());
-              return _this.$('.modal-body').html(template);
-            }
-          });
-        } else if ((dates != null) && Object.keys(dates).length === 0) {
-          _this.options.dates = "No photos found";
-        } else {
-          if ((body != null ? body.hasNext : void 0) != null) {
-            _this.options.hasNext = body.hasNext;
-          }
-          _this.options.hasPrev = options.page !== 0;
-          _this.options.dates = Object.keys(dates);
-          _this.options.dates.sort(function(a, b) {
-            return -1 * a.localeCompare(b);
-          });
-          _this.options.photos = dates;
-        }
-        _this.$('.modal-body').html(_this.template_content(_this.getRenderData()));
-        _this.$('.modal-body').scrollTop(0);
-        showPreview = function(coords) {
-          var img_h, img_w, prev_h, prev_w, prev_x, prev_y, target_h, target_w;
-          target_h = 100;
-          target_w = 100;
-          img_w = 300;
-          img_h = 241;
-          prev_w = img_w / coords.w * target_w;
-          prev_h = img_h / coords.h * target_h;
-          prev_x = target_w / coords.w * coords.x;
-          prev_y = target_h / coords.h * coords.y;
-          return $('#img-preview').css({
-            width: Math.round(prev_w) + 'px',
-            height: Math.round(prev_h) + 'px',
-            marginLeft: '-' + Math.round(prev_x) + 'px',
-            marginTop: '-' + Math.round(prev_y) + 'px'
-          });
-        };
-        $('#img-to-crop').Jcrop({
-          onChange: showPreview,
-          onSelect: showPreview,
-          aspectRatio: 1,
-          setSelect: [10, 10, 150, 150]
-        });
-        _this.$('.cropping').hide();
-        if (_this.options.selected[_this.options.page] != null) {
-          _ref = _this.options.selected[_this.options.page];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            img = _ref[_i];
-            _results.push(_this.$("#" + img.id).toggleClass('selected'));
-          }
-          return _results;
-        }
-      };
-    })(this));
-  };
-
-  FilesBrowser.prototype.cb = function(confirmed) {
-    if (!confirmed) {
-      return;
-    }
-    return this.options.beforeUpload((function(_this) {
-      return function(attrs) {
-        var fileid, img, page, phototmp, tmp, _i, _len, _ref, _results;
-        tmp = [];
-        _this.options.selected[_this.options.page] = _this.$('.selected');
-        _ref = _this.options.selected;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          page = _ref[_i];
-          _results.push((function() {
-            var _j, _len1, _results1;
-            _results1 = [];
-            for (_j = 0, _len1 = page.length; _j < _len1; _j++) {
-              img = page[_j];
-              fileid = img.id;
-              attrs.title = img.name;
-              phototmp = new Photo(attrs);
-              phototmp.file = img;
-              tmp.push(phototmp);
-              this.collection.add(phototmp);
-              _results1.push(Photo.makeFromFile(fileid, attrs, (function(_this) {
-                return function(err, photo) {
-                  if (err) {
-                    return console.log(err);
-                  }
-                  phototmp = tmp.pop();
-                  _this.collection.remove(phototmp, {
-                    parse: true
-                  });
-                  return _this.collection.add(photo, {
-                    parse: true
-                  });
-                };
-              })(this)));
-            }
-            return _results1;
-          }).call(_this));
-        }
-        return _results;
-      };
-    })(this));
-  };
-
-  FilesBrowser.prototype.displayNextPage = function() {
-    var options;
-    this.options.selected[this.options.page] = this.$('.selected');
-    options = {
-      page: this.options.page + 1,
-      selected: this.options.selected
-    };
-    return this.initialize(options);
-  };
-
-  FilesBrowser.prototype.displayPrevPage = function() {
-    var options;
-    this.options.selected[this.options.page] = this.$('.selected');
-    options = {
-      page: this.options.page - 1,
-      selected: this.options.selected
-    };
-    return this.initialize(options);
-  };
-
-  FilesBrowser.prototype.showCropingTool = function() {
-    this.$('.files').hide();
-    return this.$('.croping').show();
-  };
-
-  return FilesBrowser;
-
-})(Modal);
-});
-
-;require.register("widget", function(exports, require, module) {
-var __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
->>>>>>> use home photo picker for avatar
 
 BaseView = require('../lib/base_view');
 
