@@ -114,7 +114,7 @@ module.exports =
   "progress"             : "Progression"
   "loading import preview": "chargement de l'aperçu de l'importation…"
   "import succeeded": "Votre importation de contact a réussi."
-  "import progress": "Progression de l'importation : "
+  "import progress": "Progression de l'importation :"
   "fail to import": "Échec de l'importation"
 
 # doc
