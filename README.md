@@ -6,7 +6,7 @@ Cozy Contacts makes your contact management easy. Main features are:
 * Contact tagging
 * Contact notes
 * VCF import
-* CardDAV sync (it requires [Cozy Webdav](https://github.com/mycozycloud/cozy-webdav))
+* CardDAV sync (it requires [Cozy Sync](https://github.com/cozy/cozy-sync))
 
 ## Install
 
