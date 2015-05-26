@@ -135,8 +135,8 @@ module.exports =
     Click here to export all your contacts as a vCard file:"""
 
   "sync title"                : "Mobile Synchronization (CardDav)"
-  "sync headline no data"     : "To synchronize your calendar with your devices, you must follow two steps"
-  "sync headline with data"   : "To synchronize your calendar, use the following information:"
+  "sync headline no data"     : "To synchronize your contacts with your devices, you must follow two steps"
+  "sync headline with data"   : "To synchronize your contacts, use the following information:"
   "sync url"                  : "URL:"
   "sync login"                : "Username:"
   "sync password"             : "Password: "
