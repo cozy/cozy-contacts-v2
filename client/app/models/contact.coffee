@@ -114,7 +114,7 @@ module.exports = class Contact extends Backbone.Model
 
             markChanged = (err, body) =>
                 if err
-                    console.log err
+                    console.error err
                 else
                     @set 'pictureRev', true
                     delete @photo

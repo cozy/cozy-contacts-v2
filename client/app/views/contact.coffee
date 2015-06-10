@@ -220,13 +220,12 @@ module.exports = class ContactView extends ViewCollection
         .then( choosePhoto_answer
             ,
             (error) ->
-                console.log 'contact : response in error : ', error
+                console.error 'contact : response in error : ', error
         )
 
 
     choosePhoto_answer : (message) =>
         answer = message.data
-        console.log 'CONTACT : response: ', answer
         if answer.newPhotoChosen
             @changePhoto(answer.dataUrl)
 
