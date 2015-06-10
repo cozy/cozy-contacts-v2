@@ -82,6 +82,7 @@ task 'build', 'Build CoffeeScript to Javascript', ->
     command = "coffee -cb --output build/server server && " + \
               "coffee -cb --output build/ server.coffee && " + \
               "rm -rf build/client && mkdir build/client && " + \
+              "mkdir -p build/server/views && " + \
               "cd client/ && brunch build --production && cd .."
 
     exec command, (err, stdout, stderr) ->
