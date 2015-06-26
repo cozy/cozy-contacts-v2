@@ -10,7 +10,7 @@ Cozy Contacts makes your contact management easy. Main features are:
 
 ## Install
 
-We assume here that the Cozy platform is correctly [installed](http://cozy.io/host/install.html)
+We assume here that the Cozy platform is correctly [installed](http://cozy.io/host/install)
  on your server.
 
 You can simply install the Contacts application via the app registry. Click on ythe *Chose Your Apps* button located on the right of your Cozy Home.
