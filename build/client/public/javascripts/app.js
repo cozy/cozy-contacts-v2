@@ -187,8 +187,8 @@ module.exports = ContactCollection = (function(_super) {
 
   ContactCollection.prototype.comparator = function(a, b) {
     var compare, nameA, nameB, out;
-    nameA = a.getDisplayName().toLowerCase();
-    nameB = b.getDisplayName().toLowerCase();
+    nameA = a.getDisplayName().replace(/\ /g, '').toLowerCase();
+    nameB = b.getDisplayName().replace(/\ /g, '').toLowerCase();
     compare = nameA.localeCompare(nameB);
     return out = compare > 0 ? 1 : compare < 0 ? -1 : 0;
   };
@@ -1451,7 +1451,7 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.prototype.getDisplayName = function() {
-    var familly, given, middle, n, prefix, suffix;
+    var familly, given, middle, n, name, prefix, suffix;
     n = this.get('n');
     if (!(n && n.length > 0)) {
       return '';
@@ -1459,12 +1459,18 @@ module.exports = Contact = (function(_super) {
     familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
     switch (app.config.get('nameOrder')) {
       case 'given-familly':
-        return "" + given + " " + middle + " " + familly;
+        name = "" + given + " " + middle + " " + familly;
+        break;
       case 'given-middleinitial-familly':
-        return "" + given + " " + (initial(middle)) + " " + familly;
+        name = "" + given + " " + (initial(middle)) + " " + familly;
+        break;
       default:
-        return "" + familly + " " + given + " " + middle;
+        name = "" + familly + " " + given + " " + middle;
     }
+    if ((suffix != null ? suffix.length : void 0) > 0) {
+      name += ", " + suffix;
+    }
+    return name;
   };
 
   initial = function(middle) {
