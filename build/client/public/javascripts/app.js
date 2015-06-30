@@ -187,8 +187,8 @@ module.exports = ContactCollection = (function(_super) {
 
   ContactCollection.prototype.comparator = function(a, b) {
     var compare, nameA, nameB, out;
-    nameA = a.getDisplayName().toLowerCase();
-    nameB = b.getDisplayName().toLowerCase();
+    nameA = a.getDisplayName().replace(/\ /g, '').toLowerCase();
+    nameB = b.getDisplayName().replace(/\ /g, '').toLowerCase();
     compare = nameA.localeCompare(nameB);
     return out = compare > 0 ? 1 : compare < 0 ? -1 : 0;
   };
@@ -403,41 +403,6 @@ module.exports = BaseView = (function(_super) {
   return BaseView;
 
 })(Backbone.View);
-});
-
-;require.register("lib/client", function(exports, require, module) {
-exports.request = function(type, url, data, callbacks) {
-  var error, success;
-  success = callbacks.success || function(res) {
-    return callbacks(null, res);
-  };
-  error = callbacks.error || function(err) {
-    return callbacks(err);
-  };
-  return $.ajax({
-    type: type,
-    url: url,
-    data: data,
-    success: success,
-    error: error
-  });
-};
-
-exports.get = function(url, callbacks) {
-  return exports.request("GET", url, null, callbacks);
-};
-
-exports.post = function(url, data, callbacks) {
-  return exports.request("POST", url, data, callbacks);
-};
-
-exports.put = function(url, data, callbacks) {
-  return exports.request("PUT", url, data, callbacks);
-};
-
-exports.del = function(url, callbacks) {
-  return exports.request("DELETE", url, null, callbacks);
-};
 });
 
 ;require.register("lib/colorhash", function(exports, require, module) {
@@ -950,14 +915,6 @@ module.exports = {
   "placeholder suffix": " ",
   "full name": "Full name",
   "save": "Save",
-  "more thumbs": "More photos",
-  "pick from files": "Choose one photo",
-  "photo-modal chooseAgain": "Choose another photo",
-  "modal ok": "OK",
-  "modal cancel": "Cancel",
-  "no image": "There is no image on your Cozy",
-  "ObjPicker upload btn": "Upload a local file",
-  "drop a file": "Drag & drop a file",
   "search placeholder": "Search…",
   "new contact": "New Contact",
   "go to settings": "Settings",
@@ -991,8 +948,8 @@ module.exports = {
   "format given mid familly": "Full (John J. Johnson)",
   "vcard export info": "Click here to export all your contacts as a vCard file:",
   "sync title": "Mobile Synchronization (CardDav)",
-  "sync headline no data": "To synchronize your calendar with your devices, you must follow two steps",
-  "sync headline with data": "To synchronize your calendar, use the following information:",
+  "sync headline no data": "To synchronize your contacts with your devices, you must follow two steps",
+  "sync headline with data": "To synchronize your contacts, use the following information:",
   "sync url": "URL:",
   "sync login": "Username:",
   "sync password": "Password: ",
@@ -1205,14 +1162,6 @@ module.exports = {
   "placeholder suffix": " ",
   "full name": "Nom complet",
   "save": "Enregister",
-  "pick from files": "Choisir une photo",
-  "photo-modal chooseAgain": "Changer de photo",
-  "modal ok": "OK",
-  "modal cancel": "Annuler",
-  "no image": "Il n'y a pas d'image sur votre Cozy",
-  "ObjPicker upload btn": "Sélectionnez un fichier local",
-  "more thumbs": "Plus de photo",
-  "drop a file": "Glissez et déposez un fichier",
   "search placeholder": "Recherche…",
   "new contact": "Nouveau Contact",
   "go to settings": "Paramètres",
@@ -1246,8 +1195,8 @@ module.exports = {
   "format given mid familly": "Format américain (John J. Johnson)",
   "vcard export info": "Cliquez ici pour exporter tous vos contacts dans un fichier vCard :",
   "sync title": "Synchronisation mobile (CardDav)",
-  "sync headline no data": "Pour synchroniser votre agenda avec votre mobile vous devez :",
-  "sync headline with data": "Pour synchroniser votre agenda, utilisez les identifiants suivant :",
+  "sync headline no data": "Pour synchroniser vos contacts avec votre mobile vous devez :",
+  "sync headline with data": "Pour synchroniser vos contacts, utilisez les identifiants suivants :",
   "sync url": "URL :",
   "sync login": "Nom d'utilisateur :",
   "sync password": "Mot de passe : ",
@@ -1436,7 +1385,7 @@ module.exports = Contact = (function(_super) {
       markChanged = (function(_this) {
         return function(err, body) {
           if (err) {
-            return console.log(err);
+            return console.error(err);
           } else {
             _this.set('pictureRev', true);
             return delete _this.photo;
@@ -1502,7 +1451,7 @@ module.exports = Contact = (function(_super) {
   };
 
   Contact.prototype.getDisplayName = function() {
-    var familly, given, middle, n, prefix, suffix;
+    var familly, given, middle, n, name, prefix, suffix;
     n = this.get('n');
     if (!(n && n.length > 0)) {
       return '';
@@ -1510,12 +1459,18 @@ module.exports = Contact = (function(_super) {
     familly = n[0], given = n[1], middle = n[2], prefix = n[3], suffix = n[4];
     switch (app.config.get('nameOrder')) {
       case 'given-familly':
-        return "" + given + " " + middle + " " + familly;
+        name = "" + given + " " + middle + " " + familly;
+        break;
       case 'given-middleinitial-familly':
-        return "" + given + " " + (initial(middle)) + " " + familly;
+        name = "" + given + " " + (initial(middle)) + " " + familly;
+        break;
       default:
-        return "" + familly + " " + given + " " + middle;
+        name = "" + familly + " " + given + " " + middle;
     }
+    if ((suffix != null ? suffix.length : void 0) > 0) {
+      name += ", " + suffix;
+    }
+    return name;
   };
 
   initial = function(middle) {
@@ -1608,61 +1563,6 @@ module.exports = DataPoint = (function(_super) {
   return DataPoint;
 
 })(Backbone.Model);
-});
-
-;require.register("models/photo", function(exports, require, module) {
-var Photo, client,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-client = require('../lib/client');
-
-module.exports = Photo = (function(_super) {
-  __extends(Photo, _super);
-
-  function Photo() {
-    return Photo.__super__.constructor.apply(this, arguments);
-  }
-
-  Photo.prototype.defaults = function() {
-    return {
-      thumbsrc: 'img/loading.gif',
-      src: '',
-      orientation: 1
-    };
-  };
-
-  Photo.prototype.url = function() {
-    return Photo.__super__.url.apply(this, arguments) + app.urlKey;
-  };
-
-  Photo.prototype.parse = function(attrs) {
-    if (!attrs.id) {
-      return attrs;
-    } else {
-      return _.extend(attrs, {
-        thumbsrc: ("photos/thumbs/" + attrs.id + ".jpg") + app.urlKey,
-        src: ("photos/" + attrs.id + ".jpg") + app.urlKey,
-        orientation: attrs.orientation
-      });
-    }
-  };
-
-  Photo.prototype.getPrevSrc = function() {
-    return "photos/" + (this.get('id')) + ".jpg";
-  };
-
-  return Photo;
-
-})(Backbone.Model);
-
-Photo.listFromFiles = function(skip, limit, callback) {
-  return client.get("files/range/" + skip + "/" + limit, callback);
-};
-
-Photo.makeFromFile = function(fileid, attr, callback) {
-  return client.post("files/" + fileid + "/toPhoto", attr, callback);
-};
 });
 
 ;require.register("models/tag", function(exports, require, module) {
@@ -2037,25 +1937,6 @@ if (typeof define === 'function' && define.amd) {
 }
 });
 
-;require.register("templates/photo-picker-croper", function(exports, require, module) {
-var __templateData = function template(locals) {
-var buf = [];
-var jade_mixins = {};
-var jade_interp;
-
-buf.push("<input id=\"uploader\" type=\"file\" style=\"display:none\"/><div class=\"objectPickerCont\"><nav role=\"tablist\" aria-controls=\"objectPickerCont\" class=\"fp-nav-tabs\"><div role=\"tabMarginTop\"></div><div><div role=\"tab\" aria-controls=\"thumbPicker\" aria-selected=\"true\">photo</div><div role=\"tab\" aria-controls=\"photoUpload\" aria-selected=\"false\">upload</div><div role=\"tab\" aria-controls=\"urlPhotoUpload\" aria-selected=\"false\">url</div></div><div role=\"tabMarginBottom\"></div></nav><section role=\"tabpanel\" aria-hidden=\"false\" class=\"thumbPicker\"><div class=\"thumbsContainer\"></div><a class=\"btn btn-cozy right next\"><p>" + (jade.escape((jade_interp = t('more thumbs')) == null ? '' : jade_interp)) + " &nbsp;&#12297</p></a></section><section role=\"tabpanel\" aria-hidden=\"true\" class=\"photoUpload\"><button class=\"modal-uploadBtn\">" + (jade.escape((jade_interp = t('ObjPicker upload btn')) == null ? '' : jade_interp)) + "</button><div class=\"modal-file-drop-zone\"><p>" + (jade.escape((jade_interp = t('drop a file')) == null ? '' : jade_interp)) + "</p><div></div></div></section><section role=\"tabpanel\" aria-hidden=\"true\" class=\"urlPhotoUpload\"><div><div class=\"url-preview\"></div></div><input placeholder=\"url\" value=\"\" class=\"modal-url-input\"/></section></div><div class=\"croperCont\"><table><tbody><tr><td><img id=\"img-to-crop\"/></td><td><div id=\"frame-img-preview\"><img id=\"img-preview\"/></div></td></tr></tbody></table><a class=\"chooseAgain\">" + (jade.escape((jade_interp = t('photo-modal chooseAgain')) == null ? '' : jade_interp)) + "</a></div>");;return buf.join("");
-};
-if (typeof define === 'function' && define.amd) {
-  define([], function() {
-    return __templateData;
-  });
-} else if (typeof module === 'object' && module && module.exports) {
-  module.exports = __templateData;
-} else {
-  __templateData;
-}
-});
-
 ;require.register("views/contact", function(exports, require, module) {
 var Contact, ContactName, ContactView, Datapoint, TagsView, ViewCollection, request,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -2352,14 +2233,13 @@ module.exports = ContactView = (function(_super) {
     that = this;
     choosePhoto_answer = this.choosePhoto_answer;
     return window.app.intentManager.send('nameSpace', intent, timeout).then(choosePhoto_answer, function(error) {
-      return console.log('contact : response in error : ', error);
+      return console.error('contact : response in error : ', error);
     });
   };
 
   ContactView.prototype.choosePhoto_answer = function(message) {
     var answer;
     answer = message.data;
-    console.log('CONTACT : response: ', answer);
     if (answer.newPhotoChosen) {
       return this.changePhoto(answer.dataUrl);
     }
@@ -3361,167 +3241,6 @@ module.exports = ImporterView = (function(_super) {
   return ImporterView;
 
 })(BaseView);
-});
-
-;require.register("views/modal", function(exports, require, module) {
-var Modal,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-Modal = (function(_super) {
-  __extends(Modal, _super);
-
-  function Modal() {
-    this.onKeyStroke = __bind(this.onKeyStroke, this);
-    return Modal.__super__.constructor.apply(this, arguments);
-  }
-
-  Modal.prototype.id = 'modal-dialog';
-
-  Modal.prototype.className = 'modalCY fade';
-
-  Modal.prototype.attributes = {
-    'data-backdrop': "static",
-    'data-keyboard': "false"
-  };
-
-  Modal.prototype.initialize = function(options) {
-    if (this.title == null) {
-      this.title = options.title;
-    }
-    if (this.content == null) {
-      this.content = options.content;
-    }
-    if (this.yes == null) {
-      this.yes = options.yes || 'ok';
-    }
-    if (this.no == null) {
-      this.no = options.no || 'cancel';
-    }
-    if (this.cb == null) {
-      this.cb = options.cb || function() {};
-    }
-    this.render();
-    if (options.cssSpaceName != null) {
-      this.el.classList.add(options.cssSpaceName);
-    }
-    this.saving = false;
-    this.$el.modal('show');
-    this.el.tabIndex = 0;
-    this.el.focus();
-    this.$('button.close').click((function(_this) {
-      return function(event) {
-        event.stopPropagation();
-        return _this.onNo();
-      };
-    })(this));
-    return this.$el.on('keyup', this.onKeyStroke);
-  };
-
-  Modal.prototype.events = function() {
-    return {
-      "click #modal-dialog-no": 'onNo',
-      "click #modal-dialog-yes": 'onYes',
-      'click': 'onClickAnywhere'
-    };
-  };
-
-  Modal.prototype.onNo = function() {
-    this.close();
-    return this.cb(false);
-  };
-
-  Modal.prototype.onYes = function() {
-    this.close();
-    return this.cb(true);
-  };
-
-  Modal.prototype.close = function() {
-    if (this.closing) {
-      return;
-    }
-    this.closing = true;
-    this.$el.modal('hide');
-    return setTimeout(((function(_this) {
-      return function() {
-        return _this.remove();
-      };
-    })(this)), 500);
-  };
-
-  Modal.prototype.onKeyStroke = function(e) {
-    e.stopPropagation();
-    if (e.which === 27) {
-      this.onNo();
-      return false;
-    }
-  };
-
-  Modal.prototype.remove = function() {
-    this.$el.off('keyup', this.onKeyStroke);
-    return Modal.__super__.remove.apply(this, arguments);
-  };
-
-  Modal.prototype.render = function() {
-    var body, close, foot, head, title, yesBtn;
-    close = $('<button class="close" type="button" data-dismiss="modal">×</button>');
-    title = $('<p>').text(this.title);
-    head = $('<div class="modalCY-header">').append(close, title);
-    body = $('<div class="modalCY-body"></div>').append(this.renderContent());
-    yesBtn = $('<button id="modal-dialog-yes" class="btn btn-cozy">').text(this.yes);
-    foot = $('<div class="modalCY-footer">').append(yesBtn);
-    if (this.no) {
-      foot.prepend($('<button id="modal-dialog-no" class="btn btn-link">').text(this.no));
-    }
-    return $("body").append(this.$el.append(head, body, foot));
-  };
-
-  Modal.prototype.renderContent = function() {
-    return this.content;
-  };
-
-  Modal.prototype.onClickAnywhere = function(event) {
-    if (event.target.id === this.id) {
-      return this.onNo();
-    }
-  };
-
-  return Modal;
-
-})(Backbone.View);
-
-Modal.alert = function(title, content, cb) {
-  return new Modal({
-    title: title,
-    content: content,
-    yes: 'ok',
-    no: null,
-    cb: cb
-  });
-};
-
-Modal.confirm = function(title, content, yesMsg, noMsg, cb) {
-  return new Modal({
-    title: title,
-    content: content,
-    yes: yesMsg,
-    no: noMsg,
-    cb: cb
-  });
-};
-
-Modal.error = function(text, cb) {
-  return new Modal({
-    title: t('modal error'),
-    content: text,
-    yes: t('modal ok'),
-    no: false,
-    cb: cb
-  });
-};
-
-module.exports = Modal;
 });
 
 ;require.register("widgets/autocomplete", function(exports, require, module) {

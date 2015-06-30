@@ -80,16 +80,6 @@ module.exports =
   "full name"             : "Nom complet"
   "save"                  : "Enregister"
 
-# photo modal
-  "pick from files"         : "Choisir une photo"
-  "photo-modal chooseAgain" : "Changer de photo"
-  "modal ok"                : "OK"
-  "modal cancel"            : "Annuler"
-  "no image"                : "Il n'y a pas d'image sur votre Cozy"
-  "ObjPicker upload btn"    : "Sélectionnez un fichier local"
-  "more thumbs"             : "Plus de photo"
-  "drop a file"             : "Glissez et déposez un fichier"
-
 # ContactList
   "search placeholder"    : "Recherche…"
   "new contact"           : "Nouveau Contact"

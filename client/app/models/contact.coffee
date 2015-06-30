@@ -114,7 +114,7 @@ module.exports = class Contact extends Backbone.Model
 
             markChanged = (err, body) =>
                 if err
-                    console.log err
+                    console.error err
                 else
                     @set 'pictureRev', true
                     delete @photo
@@ -175,11 +175,15 @@ module.exports = class Contact extends Backbone.Model
 
         [familly, given, middle, prefix, suffix] = n
         switch app.config.get 'nameOrder'
-            when 'given-familly' then "#{given} #{middle} #{familly}"
-
+            when 'given-familly'
+                name = "#{given} #{middle} #{familly}"
             when 'given-middleinitial-familly'
-                "#{given} #{initial(middle)} #{familly}"
-            else "#{familly} #{given} #{middle}"
+                name = "#{given} #{initial(middle)} #{familly}"
+            else
+                name = "#{familly} #{given} #{middle}"
+        if suffix?.length > 0
+            name += ", #{suffix}"
+        return name
 
     initial =  (middle) ->
         if i = middle.split(/[ \,]/)[0][0]?.toUpperCase() then i + '.'
