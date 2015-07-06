@@ -11,7 +11,7 @@ Tag.all = (callback) ->
     Tag.request 'all', callback
 
 Tag.byName = (name, callback) ->
-    Tag.request 'all', key: name, callback
+    Tag.request 'byName', key: name, callback
 
 Tag.getOrCreate = (data, callback) ->
     # Name is a primary key.
