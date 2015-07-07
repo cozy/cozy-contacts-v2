@@ -31,7 +31,7 @@ module.exports = {
     all: americano.defaultRequests.all
   },
   tag: {
-    all: function(doc) {
+    byName: function(doc) {
       return emit(doc.name, doc);
     }
   },

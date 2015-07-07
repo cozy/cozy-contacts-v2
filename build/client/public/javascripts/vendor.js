@@ -35738,7 +35738,7 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
     end: /^END:VCARD$/i,
     beginNonVCard: /^BEGIN:(.*)$/i,
     endNonVCard: /^END:(.*)$/i,
-    simple: /^(version|fn|n|title|org|note|categories|bday|url|nickname)(;CHARSET=UTF-8)?(;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
+    simple: /^(version|fn|n|title|org|note|categories|bday|url|nickname|uid)(;CHARSET=UTF-8)?(;ENCODING=QUOTED-PRINTABLE)?\:(.+)$/i,
     composedkey: /^item(\d{1,2})\.([^\:]+):(.+)$/,
     complex: /^([^\:\;]+);([^\:]+)\:(.+)$/,
     property: /^(.+)=(.+)$/,
@@ -35755,7 +35755,7 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
 
   ANDROID_RELATIONS = ['custom', 'assistant', 'brother', 'child', 'domestic partner', 'father', 'friend', 'manager', 'mother', 'parent', 'partner', 'referred by', 'relative', 'sister', 'spouse'];
 
-  BASE_FIELDS = ['fn', 'bday', 'org', 'title', 'url', 'note', 'nickname'];
+  BASE_FIELDS = ['fn', 'bday', 'org', 'title', 'url', 'note', 'nickname', 'uid'];
 
   SOCIAL_URLS = {
     twitter: "http://twitter.com/",
@@ -36002,7 +36002,12 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
           return this.currentContact['n'] = value;
         } else {
           nPartsCleaned = ['', '', '', '', ''];
-          if (nParts.length < 5) {
+          if (nParts.length <= 5) {
+            nParts.forEach(function(part, index) {
+              return nPartsCleaned[index] = part;
+            });
+          } else if (nParts.length === 6) {
+            nPartsCleaned.push('');
             nParts.forEach(function(part, index) {
               return nPartsCleaned[index] = part;
             });
@@ -36294,6 +36299,9 @@ exports.rethrow = function rethrow(err, filename, lineno, str){
     _ref = model.datapoints;
     for (i in _ref) {
       datapoint = _ref[i];
+      if (!((datapoint.name != null) && (datapoint.value != null))) {
+        continue;
+      }
       key = datapoint.name.toUpperCase();
       type = ((_ref1 = datapoint.type) != null ? _ref1.toUpperCase() : void 0) || null;
       value = datapoint.value;

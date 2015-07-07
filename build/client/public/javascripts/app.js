@@ -1099,7 +1099,7 @@ module.exports = {
   "show": "Montrer",
   "hide": "Cacher",
   "contact name expand": "Afficher les détails sur le nom",
-  "contact name check": "Fermet l'édition du nom",
+  "contact name check": "Fermer l'édition du nom",
   "company": "Société",
   "org": "Société",
   "department": "Département",
