@@ -1631,11 +1631,7 @@ module.exports = Router = (function(_super) {
   };
 
   Router.prototype.list = function() {
-    if ($(window).width() > 900) {
-      this.help();
-    } else {
-      this.displayView(null);
-    }
+    this.help();
     $('#filterfied').focus();
     return app.contactslist.activate(null);
   };

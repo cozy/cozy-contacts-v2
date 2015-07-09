@@ -17,8 +17,7 @@ module.exports = class Router extends Backbone.Router
             @navigate "", true if event.keyCode is 27 #ESC
 
     list: ->
-        if $(window).width() > 900 then @help()
-        else @displayView null
+        @help()
         $('#filterfied').focus()
         app.contactslist.activate null
 
