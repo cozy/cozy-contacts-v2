@@ -16,8 +16,18 @@ module.exports = class Router extends Backbone.Router
         $('body').on 'keyup', (event) =>
             @navigate "", true if event.keyCode is 27 #ESC
 
+        @isLargeScreen = $(window).width() > 900
+
+        $(window).on 'resize', (event) =>
+            if @isLargeScreen isnt $(window).width() > 900
+                @isLargeScreen = $(window).width() > 900
+                # force refresh to display the properview
+                Backbone.history.loadUrl Backbone.history.fragment
+
     list: ->
-        @help()
+        width = $(window).width()
+        if width > 900 or not width then @help()
+        else @displayView null
         $('#filterfied').focus()
         app.contactslist.activate null
 

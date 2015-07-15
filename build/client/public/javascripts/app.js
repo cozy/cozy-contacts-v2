@@ -1621,17 +1621,33 @@ module.exports = Router = (function(_super) {
   };
 
   Router.prototype.initialize = function() {
-    return $('body').on('keyup', (function(_this) {
+    $('body').on('keyup', (function(_this) {
       return function(event) {
         if (event.keyCode === 27) {
           return _this.navigate("", true);
         }
       };
     })(this));
+    this.isLargeScreen = $(window).width() > 900;
+    return $(window).on('resize', (function(_this) {
+      return function(event) {
+        var _ref;
+        if ((_this.isLargeScreen !== (_ref = $(window).width()) && _ref > 900)) {
+          _this.isLargeScreen = $(window).width() > 900;
+          return Backbone.history.loadUrl(Backbone.history.fragment);
+        }
+      };
+    })(this));
   };
 
   Router.prototype.list = function() {
-    this.help();
+    var width;
+    width = $(window).width();
+    if (width > 900 || !width) {
+      this.help();
+    } else {
+      this.displayView(null);
+    }
     $('#filterfied').focus();
     return app.contactslist.activate(null);
   };
