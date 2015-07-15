@@ -30,7 +30,7 @@ module.exports = Tag = (function(superClass) {
 })(cozydb.CozyModel);
 
 Tag.all = function(callback) {
-  return Tag.request('all', callback);
+  return Tag.request('byName', callback);
 };
 
 Tag.byName = function(name, callback) {
