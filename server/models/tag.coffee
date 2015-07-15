@@ -8,7 +8,7 @@ module.exports = class Tag extends cozydb.CozyModel
         color: type: String
 
 Tag.all = (callback) ->
-    Tag.request 'all', callback
+    Tag.request 'byName', callback
 
 Tag.byName = (name, callback) ->
     Tag.request 'byName', key: name, callback
