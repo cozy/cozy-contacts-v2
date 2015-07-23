@@ -56,7 +56,7 @@ module.exports = class DataPointView extends BaseView
             when 'email'
                 action 'envelope-o', 'send mail', "mailto:#{value}", true
             when 'tel'
-                href = @callProtocol() + ':+' + value
+                href = @callProtocol() + ':' + value
                 action 'phone', 'call', href, true
             when 'url'
                 action 'link', 'go to this url', "#{value}", false
