@@ -2885,7 +2885,7 @@ module.exports = DataPointView = (function(_super) {
       case 'email':
         return action('envelope-o', 'send mail', "mailto:" + value, true);
       case 'tel':
-        href = this.callProtocol() + ':+' + value;
+        href = this.callProtocol() + ':' + value;
         return action('phone', 'call', href, true);
       case 'url':
         return action('link', 'go to this url', "" + value, false);
