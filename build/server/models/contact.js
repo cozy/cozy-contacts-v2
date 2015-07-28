@@ -153,7 +153,7 @@ Contact.prototype.migrateAdr = function(callback) {
       datapoints: datapoints
     }, callback);
   } else {
-    return callback();
+    return setImmediate(callback);
   }
 };
 
