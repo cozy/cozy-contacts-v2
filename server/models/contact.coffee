@@ -122,7 +122,7 @@ Contact::migrateAdr = (callback) ->
     if hasMigrate
         @updateAttributes {datapoints}, callback
     else
-        callback()
+        setImmediate callback
 
 
 Contact.migrateAll = (callback) ->
