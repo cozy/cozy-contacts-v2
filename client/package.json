@@ -1,15 +1,19 @@
 {
-  "dependencies": {
-    "javascript-brunch": "1.7.1",
-    "css-brunch": "1.7.0",
-    "coffee-script-brunch": "1.8.0",
-    "stylus-brunch": "1.8.0",
-    "jade-brunch": "1.8.1",
-    "digest-brunch": "1.2.2",
-    "clean-css-brunch": "1.7.1",
-    "browser-sync-brunch": "*"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "brunch": "1.8.0"
+    "autoprefixer": "^5.2.0",
+    "bower": "^1.4.1",
+    "browser-sync-brunch": "0.0.9",
+    "coffee-script-brunch": "1.8.0",
+    "coffeelint-brunch": "^1.7.0",
+    "css-brunch": "1.7.0",
+    "css-mqpacker": "^3.1.0",
+    "csswring": "^3.0.5",
+    "jade-brunch": "1.8.1",
+    "javascript-brunch": "1.7.1",
+    "postcss-brunch": "^0.4.2",
+    "postcss-focus": "^0.1.1",
+    "stylus-brunch": "1.8.0",
+    "uglify-js-brunch": "^1.7.8"
   }
 }
