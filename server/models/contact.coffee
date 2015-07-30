@@ -50,10 +50,16 @@ module.exports = class Contact extends cozydb.CozyModel
             if not target.fn?
                 target.fn = ''
 
-            target.n = target.getComputedN()
+            if target instanceof Contact
+                target.n = target.getComputedN()
+            else
+                target.n = VCardParser.fnToN(target.fn).join ';'
 
         else if not target.fn? or target.fn is ''
-            target.fn = target.getComputedFN()
+            if target instanceof Contact
+                target.fn = target.getComputedFN()
+            else
+                target.fn = VCardParser.nToFN target.n.split ';'
 
         return target
 
