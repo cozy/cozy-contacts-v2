@@ -32,14 +32,13 @@ getImports = (callback) ->
         if webDavAccount?
             webDavAccount.domain = instance?.domain or ''
 
-        callback null, """
-            window.config = #{JSON.stringify(config)};
-            window.locale = "#{locale}";
-            window.initcontacts = #{JSON.stringify(contacts)};
-            window.tags = #{JSON.stringify(tags)};
-            window.webDavAccount = #{JSON.stringify webDavAccount};
-            window.inittags = #{JSON.stringify(tagInstances)}
-        """
+        callback null,
+            config:        config
+            locale:        locale
+            initcontacts:  contacts
+            tags:          tags
+            webDavAccount: webDavAccount
+            inittags:      tagInstances
 
 
 module.exports =
@@ -48,7 +47,9 @@ module.exports =
         getImports (err, imports) ->
             return res.error 500, 'An error occured', err if err
 
-            res.render "index", imports: imports
+            res.render "index",
+                imports: JSON.stringify(imports)
+                locale:  imports.locale
 
 
     setConfig: (req, res) ->
@@ -60,4 +61,3 @@ module.exports =
         log.error req.body.data
         log.error req.body.data.error?.stack
         res.send 'ok'
-

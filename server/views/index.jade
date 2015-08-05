@@ -32,6 +32,9 @@ html(lang="en")
     link(rel="stylesheet", href="stylesheets/app.css")
 
   body
-    script!= imports
     script(src="scripts/vendor.js")
+    script.
+        require.register('imports', function(exports, require, module) {
+          module.exports = !{imports}
+        })
     script(src="scripts/app.js", onload="require('initialize');")
