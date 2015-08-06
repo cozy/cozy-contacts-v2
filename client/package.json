@@ -1,7 +1,7 @@
 {
   "dependencies": {},
   "devDependencies": {
-    "autoprefixer": "^5.2.0",
+    "autoprefixer-core": "^5.2.1",
     "bower": "^1.4.1",
     "browser-sync-brunch": "0.0.9",
     "coffee-script-brunch": "1.8.0",

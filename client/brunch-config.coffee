@@ -16,15 +16,25 @@ exports.config =
             defaultExtension: 'jade'
             joinTo: 'scripts/app.js'
 
+
     plugins:
         jade:
             globals: ['t', 'moment']
-    
+
         coffeelint:
             options:
                 indentation:
                     value: 4
                     level: 'error'
+
+        postcss:
+            processors: [
+                require('autoprefixer-core')(['last 2 versions', '> 5%'])
+                require('postcss-focus')
+                require('css-mqpacker')
+                require('csswring')
+            ]
+
 
     overrides:
         production:
