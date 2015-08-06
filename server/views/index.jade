@@ -32,6 +32,8 @@ html(lang="#{locale}")
     link(rel="stylesheet", href="stylesheets/app.css")
 
   body
+    main(role='application')
+
     script(src="scripts/vendor.js")
     script.
         require.register('imports', function(exports, require, module) {
