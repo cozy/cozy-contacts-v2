@@ -9,5 +9,7 @@
     "clean-css-brunch": "1.7.1",
     "browser-sync-brunch": "*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "brunch": "1.8.0"
+  }
 }
