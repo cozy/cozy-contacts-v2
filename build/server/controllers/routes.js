@@ -49,5 +49,8 @@ module.exports = {
     get: tags.read,
     put: tags.update,
     "delete": tags["delete"]
+  },
+  'log': {
+    post: application.logClient
   }
 };
