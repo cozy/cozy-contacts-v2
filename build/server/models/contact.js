@@ -64,9 +64,17 @@ module.exports = Contact = (function(superClass) {
       if (target.fn == null) {
         target.fn = '';
       }
-      target.n = target.getComputedN();
+      if (target instanceof Contact) {
+        target.n = target.getComputedN();
+      } else {
+        target.n = VCardParser.fnToN(target.fn).join(';');
+      }
     } else if ((target.fn == null) || target.fn === '') {
-      target.fn = target.getComputedFN();
+      if (target instanceof Contact) {
+        target.fn = target.getComputedFN();
+      } else {
+        target.fn = VCardParser.nToFN(target.n.split(';'));
+      }
     }
     return target;
   };
@@ -153,7 +161,7 @@ Contact.prototype.migrateAdr = function(callback) {
       datapoints: datapoints
     }, callback);
   } else {
-    return callback();
+    return setImmediate(callback);
   }
 };
 

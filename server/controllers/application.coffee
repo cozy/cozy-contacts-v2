@@ -6,6 +6,8 @@ Tag = require '../models/tag'
 WebDavAccount = require '../models/webdavaccount'
 async   = require 'async'
 cozydb = require 'cozydb'
+log = require('printit')
+    prefix: 'contact:application'
 
 getTemplateExtension = ->
     # If run from build/, templates are compiled to JS
@@ -63,3 +65,9 @@ module.exports =
         Config.set req.body, (err, config) ->
             return res.error 500, 'An error occured', err if err
             res.send config
+
+    logClient: (req, res) ->
+        log.error req.body.data
+        log.error req.body.data.error?.stack
+        res.send 'ok'
+

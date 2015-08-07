@@ -351,9 +351,66 @@ var app;
 
 app = require('application');
 
+window.onerror = function(msg, url, line, col, error) {
+  var data, exception, xhr;
+  console.error(msg, url, line, col, error, error != null ? error.stack : void 0);
+  exception = (error != null ? error.toString() : void 0) || msg;
+  if (exception !== window.lastError) {
+    data = {
+      data: {
+        type: 'error',
+        error: {
+          msg: msg,
+          name: error != null ? error.name : void 0,
+          full: exception,
+          stack: error != null ? error.stack : void 0
+        },
+        url: url,
+        line: line,
+        col: col,
+        href: window.location.href
+      }
+    };
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', 'log', true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify(data));
+    return window.lastError = exception;
+  }
+};
+
 $(function() {
-  jQuery.event.props.push('dataTransfer');
-  return app.initialize();
+  var data, e, exception, xhr;
+  try {
+    jQuery.event.props.push('dataTransfer');
+    return app.initialize();
+  } catch (_error) {
+    e = _error;
+    console.error(e, e != null ? e.stack : void 0);
+    exception = e.toString();
+    if (exception !== window.lastError) {
+      data = {
+        data: {
+          type: 'error',
+          error: {
+            msg: e.message,
+            name: e != null ? e.name : void 0,
+            full: exception,
+            stack: e != null ? e.stack : void 0
+          },
+          file: e != null ? e.fileName : void 0,
+          line: e != null ? e.lineNumber : void 0,
+          col: e != null ? e.columnNumber : void 0,
+          href: window.location.href
+        }
+      };
+      xhr = new XMLHttpRequest();
+      xhr.open('POST', 'log', true);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.send(JSON.stringify(data));
+      return window.lastError = exception;
+    }
+  }
 });
 });
 

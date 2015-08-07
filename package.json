@@ -25,11 +25,14 @@
     "chai": "1.5.0",
     "mocha": "1.9.0",
     "sinon": "1.6.0",
-    "coffee-script": "1.9.1"
+    "coffee-script": "1.9.3"
   },
   "scripts": {
     "test": "cake --use-js tests",
-    "start": "node build/server.js"
+    "start": "node build/server.js",
+    "build:client": "cd client && brunch b",
+    "build:server": "cake build",
+    "build": "npm run build:client && npm run build:server"
   },
   "repository": "https://github.com/mycozycloud/cozy-contacts",
   "readmeFilename": "README.md",
