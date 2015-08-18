@@ -9,14 +9,6 @@ cozydb = require 'cozydb'
 log = require('printit')
     prefix: 'contact:application'
 
-getTemplateExtension = ->
-    # If run from build/, templates are compiled to JS
-    # otherwise, they are in jade
-    filePath = path.resolve __dirname, '../views/index.js'
-    runFromBuild = fs.existsSync filePath
-    extension = if runFromBuild then 'js' else 'jade'
-    return extension
-
 getImports = (callback) ->
     async.parallel [
         (cb) -> Contact.all cb
@@ -56,9 +48,7 @@ module.exports =
         getImports (err, imports) ->
             return res.error 500, 'An error occured', err if err
 
-            extension = getTemplateExtension()
-
-            res.render "index.#{extension}", imports: imports
+            res.render "index", imports: imports
 
 
     setConfig: (req, res) ->
