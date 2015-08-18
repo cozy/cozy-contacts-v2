@@ -34,10 +34,8 @@ exports.config =
 
         postcss:
             processors: [
-                require('autoprefixer-core')(['last 2 versions', '> 5%'])
+                require('autoprefixer-core')(['last 2 versions'])
                 require('postcss-focus')
-                require('css-mqpacker')
-                require('csswring')
             ]
 
 
@@ -46,3 +44,12 @@ exports.config =
             paths:
                 watched: ['app', 'vendor']
                 public: '../build/client/public'
+
+            plugins:
+                postcss:
+                    processors: [
+                        require('autoprefixer-core')(['last 2 versions'])
+                        require('postcss-focus')
+                        require('css-mqpacker')
+                        require('csswring')
+                    ]
