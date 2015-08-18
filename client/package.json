@@ -1,9 +1,18 @@
 {
+  "scripts": {
+    "start": "cake dev",
+    "test": "cake test"
+  },
   "dependencies": {},
   "devDependencies": {
     "autoprefixer-core": "^5.2.1",
+    "backbone": "^1.2.1",
+    "backbone.marionette": "^2.4.2",
+    "backbone.subroute": "^0.4.6",
     "bower": "^1.4.1",
     "browser-sync-brunch": "0.0.9",
+    "chai": "^3.2.0",
+    "coffee-script": "^1.9.3",
     "coffee-script-brunch": "1.8.0",
     "coffeelint-brunch": "^1.7.0",
     "css-brunch": "1.7.0",
@@ -11,8 +20,13 @@
     "csswring": "^3.0.5",
     "jade-brunch": "1.8.1",
     "javascript-brunch": "1.7.1",
+    "mocha": "^2.2.5",
+    "nodemon": "^1.4.1",
+    "opener": "^1.4.1",
     "postcss-brunch": "^0.4.2",
     "postcss-focus": "^0.1.1",
+    "printit": "^0.1.8",
+    "sinon": "^1.15.4",
     "stylus-brunch": "1.8.0",
     "uglify-js-brunch": "^1.7.8"
   }

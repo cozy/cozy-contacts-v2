@@ -4,13 +4,17 @@ exports.config =
             joinTo:
                 'scripts/vendor.js': /^(bower_components|vendor)/
                 'scripts/app.js': /^app/
+                'test/scripts/test.js': /^test\/(?!vendor)/
+                'test/scripts/test-vendor.js': /^test\/(?=vendor)/
             order:
                 before: [
                     'bower_components/jquery/dist/jquery.js'
                 ]
 
         stylesheets:
-            joinTo: 'stylesheets/app.css'
+            joinTo:
+                'stylesheets/app.css': /^(bower_components|vendor|app)/
+                'test/stylesheets/test.css': /^test/
 
         templates:
             defaultExtension: 'jade'
@@ -22,6 +26,7 @@ exports.config =
             globals: ['t', 'moment']
 
         coffeelint:
+            pattern: /^app\/.*\.coffee$/
             options:
                 indentation:
                     value: 4
@@ -39,4 +44,5 @@ exports.config =
     overrides:
         production:
             paths:
+                watched: ['app', 'vendor']
                 public: '../build/client/public'
