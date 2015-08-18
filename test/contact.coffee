@@ -26,7 +26,7 @@ describe 'Contacts', ->
 
         it 'should reply with the index.html file', ->
             expect(@err).to.not.exist
-            expect(@body).to.have.string 'window.locale = '
+            expect(@body).to.have.string 'html lang='
 
     describe 'List - GET /contacts', ->
 

@@ -4,6 +4,7 @@ Main application Router
 Handles routes exposed by the application. It generate views/viewModels couples
 when needed and show them in the app_layout regions.
 ###
+
 ContactsRouter = require 'routes/contacts'
 
 

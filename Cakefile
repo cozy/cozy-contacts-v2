@@ -1,95 +1,86 @@
-fs     = require 'fs'
+fs          = require 'fs'
+path        = require 'path'
+glob        = require 'glob'
+prependFile = require 'prepend-file'
+
 {exec} = require 'child_process'
 logger = require('printit')
-            date: false
-            prefix: 'cake'
+    date: false
+    prefix: 'cake'
+
 
 option '-f' , '--file [FILE*]' , 'test file to run'
 option ''   , '--dir [DIR*]'   , 'directory where to grab test files'
 option '-j' , '--use-js', 'If enabled, tests will run with the built files'
 
-options =  # defaults, will be overwritten by command line options
-    file        : no
-    dir         : no
+# defaults, will be overwritten by command line options
+options =
+    file: no
+    dir:  no
 
-# Grab test files of a directory
-walk = (dir, fileList) ->
-    list = fs.readdirSync(dir)
-    if list
-        for file in list
-            if file
-                filename = dir + '/' + file
-                stat = fs.statSync(filename)
-                if stat and stat.isDirectory()
-                    walk(filename, fileList)
-                else if filename.substr(-6) == "coffee"
-                    fileList.push(filename)
-    return fileList
 
-task 'tests', 'run server tests, ./test is parsed by default, otherwise use -f or --dir', (opts) ->
+dsc = 'run server tests, ./test is parsed by default, otherwise use -f or --dir'
+task 'test', dsc, (opts) ->
     options   = opts
-    testFiles = []
-    if options.dir
-        dirList   = options.dir
-        testFiles = walk(dir, testFiles) for dir in dirList
-    if options.file
-        testFiles  = testFiles.concat(options.file)
-    if not(options.dir or options.file)
-        testFiles = walk("tests", [])
-    runTests testFiles
+    testFiles = if options.dir
+        fileLists = (glob.sync "#{dir}/**/*.coffee" for dir in options.dir)
+        Array.prototype.concat.apply [], fileLists
+    else if options.file
+        [].concat options.file
+    else
+        glob.sync 'test/**/*.coffee'
 
-task 'tests:client', 'run client tests through mocha', (opts) ->
-    exec "mocha-phantomjs client/_specs/index.html", (err, stdout, stderr) ->
-        if err
-            console.log "Running mocha caught exception: \n" + err
-        console.log stdout
+    runTests testFiles
 
 
 runTests = (fileList) ->
-    env = "NODE_ENV=test"
+    env  = "NODE_ENV=test"
     env += " USE_JS=true" if options['use-js']? and options['use-js']
 
-    command = "#{env} mocha " + fileList.join(" ") + " "
-    command += " --globals setImmediate,clearImmediate"
-    command += " --reporter spec --compilers coffee:coffee-script/register --colors"
+    command = """#{env} mocha #{fileList.join ' '} \
+        --globals setImmediate,clearImmediate \
+        --reporter spec \
+        --compilers coffee:coffee-script/register \
+        --colors
+    """
     exec command, (err, stdout, stderr) ->
-        console.log stdout if stdout? and stdout.length > 0
-        #console.log stderr if stderr? and stderr.length > 0
+        logger.info stdout if stdout? and stdout.length > 0
         if err?
-            console.log "Running mocha caught exception:\n"
-            console.log err
-            console.log stderr
+            logger.error """Running mocha caught exception:
+                #{err}
+                #{stderr}
+            """
             setTimeout (-> process.exit 1), 100
         else
-            console.log "Tests succeeded!"
+            logger.info "Tests succeeded!"
             setTimeout (-> process.exit 0), 100
 
-buildJade = ->
-    jade = require 'jade'
-    path = require 'path'
-    for file in fs.readdirSync './server/views/'
-        return unless path.extname(file) is '.jade'
-        filename = "./server/views/#{file}"
-        template = fs.readFileSync filename, 'utf8'
-        output = "var jade = require('jade/runtime');\n"
-        output += "module.exports = " + jade.compileClient template, {filename}
-        name = file.replace '.jade', '.js'
-        fs.writeFileSync "./build/server/views/#{name}", output
 
-task 'build', 'Build CoffeeScript to Javascript', ->
+dsc = 'Build CoffeeScript to Javascript'
+task 'build', dsc, ->
     logger.options.prefix = 'cake:build'
     logger.info "Start compilation..."
-    command = "coffee -cb --output build/server server && " + \
-              "coffee -cb --output build/ server.coffee && " + \
-              "rm -rf build/client && mkdir build/client && " + \
-              "mkdir -p build/server/views && " + \
-              "cd client/ && brunch build --production && cd .."
 
+    command = """
+        rm -rf build
+        coffee -cb --output build/server server
+        coffee -cb --output build/ server.coffee
+        ./node_modules/.bin/jade -cPDH -o build/server/views server/views
+        cd client
+            #{path.resolve 'node_modules', '.bin', 'bower'} install
+            brunch build --production
+    """
     exec command, (err, stdout, stderr) ->
         if err
-            logger.error "An error has occurred while compiling:\n" + err
+            logger.error """
+                An error has occurred while compiling:
+                #{err}
+            """
             process.exit 1
         else
-            buildJade()
+            data = """var jade = require('jade/runtime');
+                      module.exports = """
+            for file in glob.sync './build/server/views/**/*.js'
+                prependFile.sync file, data
             logger.info "Compilation succeeded."
             process.exit 0
