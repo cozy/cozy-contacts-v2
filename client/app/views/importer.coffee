@@ -10,19 +10,23 @@ module.exports = class ImporterView extends BaseView
     tagName: 'div'
     className: 'modal'
 
+    events:
+        "change #vcfupload": 'onupload'
+        "click #confirm-btn": 'addcontacts'
+        "click #cancel-btn": 'close'
+
 
     afterRender: ->
-        @$el.modal()
+        @$el.modal
+            backdrop: 'static'
         @upload = @$('#vcfupload')[0]
         @content = @$('.modal-body')
         @confirmBtn = @$('#confirm-btn')
-        # the events doesn't seem to be fired by Backbone when the application
-        # runs inside an iframe, so we need tu add them by hand
-        @$('#vcfupload').change () => @onupload()
-        @$('#confirm-btn').click () => @addcontacts()
-        @$('#cancel-btn').click () => @close()
+        @cancelBtn = @$('#cancel-btn')
+        @backUrl = '#help'
 
-
+    getRenderData: ->
+        {@backUrl}
 
     # Handle upload of vcard file: check type and make it a string.
     onupload: ->
@@ -115,6 +119,8 @@ module.exports = class ImporterView extends BaseView
             currentSize = total = @toImport.length
             @importing = true
             @updateProgress 0, total
+            @cancelBtn.hide()
+            @confirmBtn.addClass 'disabled'
 
             do importContact = =>
                 if @toImport.length is 0
@@ -146,9 +152,9 @@ module.exports = class ImporterView extends BaseView
                             """
                             importContact()
 
-
-    close: ->
+    close: (event) ->
+        event?.preventDefault()
         unless @importing
             @$el.modal 'hide'
             @remove()
-            app.router.navigate '#help', trigger: true
+            app.router.navigate @backUrl, trigger: true
