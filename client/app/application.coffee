@@ -5,9 +5,10 @@ Main application that create a Mn.Application singleton and exposes it. Needs
 router and app_layout view.
 ###
 
-Router       = require 'routes'
-AppLayout    = require 'views/app_layout'
-AppViewModel = require 'views/models/app'
+Router             = require 'routes'
+ContactsCollection = require 'collections/contacts'
+AppLayout          = require 'views/app_layout'
+AppViewModel       = require 'views/models/app'
 
 
 class Application extends Mn.Application
@@ -23,9 +24,10 @@ class Application extends Mn.Application
     initialize: ->
         # initialize components before loading app
         @on 'before:start', =>
-            appViewModel = new AppViewModel()
-            @layout = new AppLayout model: appViewModel
-            @router = new Router()
+            @model    = new AppViewModel()
+            @contacts = new ContactsCollection()
+            @layout   = new AppLayout model: @model
+            @router   = new Router()
 
             # prohibit pushState because URIs mapped from cozy-home rely on
             # fragment
@@ -35,7 +37,7 @@ class Application extends Mn.Application
         # render components when app starts
         @on 'start', =>
             @layout.render()
-
+            @contacts.fetch()
 
 
 # Exports Application singleton instance

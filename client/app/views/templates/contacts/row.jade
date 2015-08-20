@@ -1,0 +1,10 @@
+label(for="select-#{_id}")
+    i.fa.fa-square-o
+    input(type='checkbox', id="select-#{_id}")
+
+if avatar
+    img(src=avatar, width="64", height="64")
+else
+    span.initials= initials
+    
+p!= formattedName
