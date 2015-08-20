@@ -20,7 +20,8 @@ module.exports = class ImporterView extends BaseView
         # runs inside an iframe, so we need tu add them by hand
         @$('#vcfupload').change () => @onupload()
         @$('#confirm-btn').click () => @addcontacts()
-        @$('#cancel-btn').click () => @close()
+        @$('#cancel-btn').click () =>
+            @close()
 
 
 
@@ -38,7 +39,6 @@ module.exports = class ImporterView extends BaseView
         reader = new FileReader()
         reader.readAsText file
         reader.onloadend = =>
-
             @prepareImport reader.result
 
 
@@ -147,8 +147,13 @@ module.exports = class ImporterView extends BaseView
                             importContact()
 
 
+    isOpen: ->
+        (@$el.data('bs.modal') || {}).isShown
+
+
     close: ->
         unless @importing
             @$el.modal 'hide'
             @remove()
             app.router.navigate '#help', trigger: true
+
