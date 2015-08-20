@@ -1992,8 +1992,8 @@ var __templateData = function template(locals) {
 var buf = [];
 var jade_mixins = {};
 var jade_interp;
-
-buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("import vcard")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><div class=\"control-group\"><label for=\"vcfupload\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("choose vcard file")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"vcfupload\" type=\"file\"/><span class=\"help-inline\"></span></div><div class=\"infos\"><span class=\"loading\">" + (jade.escape(null == (jade_interp = t("loading import preview")) ? "" : jade_interp)) + "</span><span class=\"progress\"></span></div></div></div><div class=\"modal-footer\"><a id=\"cancel-btn\" href=\"#\" class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button disabled\">" + (jade.escape(null == (jade_interp = t("import")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
+var locals_ = (locals || {}),backUrl = locals_.backUrl;
+buf.push("<div class=\"modal-header\">" + (jade.escape(null == (jade_interp = t("import vcard")) ? "" : jade_interp)) + "</div><div class=\"modal-body\"><div class=\"control-group\"><label for=\"vcfupload\" class=\"control-label\">" + (jade.escape(null == (jade_interp = t("choose vcard file")) ? "" : jade_interp)) + "</label><div class=\"controls\"><input id=\"vcfupload\" type=\"file\"/><span class=\"help-inline\"></span></div><div class=\"infos\"><span class=\"loading\">" + (jade.escape(null == (jade_interp = t("loading import preview")) ? "" : jade_interp)) + "</span><span class=\"progress\"></span></div></div></div><div class=\"modal-footer\"><a id=\"cancel-btn\"" + (jade.attr("href", backUrl, true, false)) + " class=\"minor-button\">" + (jade.escape(null == (jade_interp = t("cancel")) ? "" : jade_interp)) + "</a><a id=\"confirm-btn\" class=\"button disabled\">" + (jade.escape(null == (jade_interp = t("import")) ? "" : jade_interp)) + "</a></div>");;return buf.join("");
 };
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -3186,26 +3186,27 @@ module.exports = ImporterView = (function(_super) {
 
   ImporterView.prototype.className = 'modal';
 
+  ImporterView.prototype.events = {
+    "change #vcfupload": 'onupload',
+    "click #confirm-btn": 'addcontacts',
+    "click #cancel-btn": 'close'
+  };
+
   ImporterView.prototype.afterRender = function() {
-    this.$el.modal();
+    this.$el.modal({
+      backdrop: 'static'
+    });
     this.upload = this.$('#vcfupload')[0];
     this.content = this.$('.modal-body');
     this.confirmBtn = this.$('#confirm-btn');
-    this.$('#vcfupload').change((function(_this) {
-      return function() {
-        return _this.onupload();
-      };
-    })(this));
-    this.$('#confirm-btn').click((function(_this) {
-      return function() {
-        return _this.addcontacts();
-      };
-    })(this));
-    return this.$('#cancel-btn').click((function(_this) {
-      return function() {
-        return _this.close();
-      };
-    })(this));
+    this.cancelBtn = this.$('#cancel-btn');
+    return this.backUrl = '#help';
+  };
+
+  ImporterView.prototype.getRenderData = function() {
+    return {
+      backUrl: this.backUrl
+    };
   };
 
   ImporterView.prototype.onupload = function() {
@@ -3277,6 +3278,8 @@ module.exports = ImporterView = (function(_super) {
       currentSize = total = this.toImport.length;
       this.importing = true;
       this.updateProgress(0, total);
+      this.cancelBtn.hide();
+      this.confirmBtn.addClass('disabled');
       return (importContact = (function(_this) {
         return function() {
           var contact;
@@ -3306,11 +3309,14 @@ module.exports = ImporterView = (function(_super) {
     }
   };
 
-  ImporterView.prototype.close = function() {
+  ImporterView.prototype.close = function(event) {
+    if (event != null) {
+      event.preventDefault();
+    }
     if (!this.importing) {
       this.$el.modal('hide');
       this.remove();
-      return app.router.navigate('#help', {
+      return app.router.navigate(this.backUrl, {
         trigger: true
       });
     }

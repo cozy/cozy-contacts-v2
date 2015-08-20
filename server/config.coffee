@@ -1,5 +1,9 @@
 americano = require 'americano'
 path = require 'path'
+fs = require 'fs'
+
+viewsDir = path.resolve __dirname, 'views'
+useBuildView = fs.existsSync path.resolve viewsDir, 'index.js'
 
 module.exports =
 
@@ -17,7 +21,8 @@ module.exports =
                 dumpExceptions: true
                 showStack: true
         set:
-            views: path.join __dirname, 'views'
+            'view engine': if useBuildView then 'js' else 'jade'
+            'views': viewsDir
 
         engine:
             js: (path, locales, callback) ->
