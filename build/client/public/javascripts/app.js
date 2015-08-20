@@ -3186,18 +3186,26 @@ module.exports = ImporterView = (function(_super) {
 
   ImporterView.prototype.className = 'modal';
 
-  ImporterView.prototype.events = function() {
-    return {
-      'change #vcfupload': 'onupload',
-      'click  #confirm-btn': 'addcontacts'
-    };
-  };
-
   ImporterView.prototype.afterRender = function() {
     this.$el.modal();
     this.upload = this.$('#vcfupload')[0];
     this.content = this.$('.modal-body');
-    return this.confirmBtn = this.$('#confirm-btn');
+    this.confirmBtn = this.$('#confirm-btn');
+    this.$('#vcfupload').change((function(_this) {
+      return function() {
+        return _this.onupload();
+      };
+    })(this));
+    this.$('#confirm-btn').click((function(_this) {
+      return function() {
+        return _this.addcontacts();
+      };
+    })(this));
+    return this.$('#cancel-btn').click((function(_this) {
+      return function() {
+        return _this.close();
+      };
+    })(this));
   };
 
   ImporterView.prototype.onupload = function() {
@@ -3263,38 +3271,39 @@ module.exports = ImporterView = (function(_super) {
   ImporterView.prototype.addcontacts = function() {
     var currentSize, importContact, total;
     if (!this.toImport) {
-      return true;
+      return this.close();
+    } else {
+      this.content.html("<p>" + (t('dont close navigator import')) + "</p>\n<p>\n    " + (t('import progress')) + ":&nbsp;\n    <span class=\"import-progress\"></span>\n</p>\n<p class=\"errors\">\n</p>");
+      currentSize = total = this.toImport.length;
+      this.importing = true;
+      this.updateProgress(0, total);
+      return (importContact = (function(_this) {
+        return function() {
+          var contact;
+          if (_this.toImport.length === 0) {
+            alert(t('import succeeded'));
+            _this.importing = false;
+            return _this.close();
+          } else {
+            contact = _this.toImport.pop();
+            currentSize--;
+            contact.set('import', true);
+            return contact.save(null, {
+              success: function() {
+                _this.updateProgress(total - currentSize, total);
+                app.contacts.add(contact);
+                contact.savePicture();
+                return setTimeout(importContact, 10);
+              },
+              error: function() {
+                $(".errors").append("<p>" + (t('fail to import')) + ":\n" + (contact.getComputedFN()) + "</p>");
+                return importContact();
+              }
+            });
+          }
+        };
+      })(this))();
     }
-    this.content.html("<p>" + (t('dont close navigator import')) + "</p>\n<p>\n    " + (t('import progress')) + ":&nbsp;<span class=\"import-progress\"></span>\n</p>\n<p class=\"errors\">\n</p>");
-    currentSize = total = this.toImport.length;
-    this.importing = true;
-    this.updateProgress(0, total);
-    return (importContact = (function(_this) {
-      return function() {
-        var contact;
-        if (_this.toImport.length === 0) {
-          alert(t('import succeeded'));
-          _this.importing = false;
-          return _this.close();
-        } else {
-          contact = _this.toImport.pop();
-          currentSize--;
-          contact.set('import', true);
-          return contact.save(null, {
-            success: function() {
-              _this.updateProgress(total - currentSize, total);
-              app.contacts.add(contact);
-              contact.savePicture();
-              return setTimeout(importContact, 10);
-            },
-            error: function() {
-              $(".errors").append("<p>" + (t('fail to import')) + ": " + (contact.getComputedFN()) + "</p>");
-              return importContact();
-            }
-          });
-        }
-      };
-    })(this))();
   };
 
   ImporterView.prototype.close = function() {

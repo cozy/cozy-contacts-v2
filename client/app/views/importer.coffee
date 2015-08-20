@@ -10,16 +10,18 @@ module.exports = class ImporterView extends BaseView
     tagName: 'div'
     className: 'modal'
 
-    events: ->
-        'change #vcfupload': 'onupload'
-        'click  #confirm-btn': 'addcontacts'
-
 
     afterRender: ->
         @$el.modal()
         @upload = @$('#vcfupload')[0]
         @content = @$('.modal-body')
         @confirmBtn = @$('#confirm-btn')
+        # the events doesn't seem to be fired by Backbone when the application
+        # runs inside an iframe, so we need tu add them by hand
+        @$('#vcfupload').change () => @onupload()
+        @$('#confirm-btn').click () => @addcontacts()
+        @$('#cancel-btn').click () => @close()
+
 
 
     # Handle upload of vcard file: check type and make it a string.
@@ -98,46 +100,51 @@ module.exports = class ImporterView extends BaseView
     # Run the import process. It creates all contacts stored in the toImport
     # attribute. Contacts were stored during the import preparation step.
     addcontacts: ->
-        return true unless @toImport
-        @content.html """
-        <p>#{t('dont close navigator import')}</p>
-        <p>
-            #{t('import progress')}:&nbsp;<span class="import-progress"></span>
-        </p>
-        <p class="errors">
-        </p>
-        """
-        currentSize = total = @toImport.length
-        @importing = true
-        @updateProgress 0, total
+        if not @toImport
+            @close()
+        else
+            @content.html """
+            <p>#{t('dont close navigator import')}</p>
+            <p>
+                #{t('import progress')}:&nbsp;
+                <span class="import-progress"></span>
+            </p>
+            <p class="errors">
+            </p>
+            """
+            currentSize = total = @toImport.length
+            @importing = true
+            @updateProgress 0, total
 
-        do importContact = =>
-            if @toImport.length is 0
-                alert t 'import succeeded'
-                @importing = false
-                @close()
-            else
-                contact = @toImport.pop()
-                currentSize--
+            do importContact = =>
+                if @toImport.length is 0
+                    alert t 'import succeeded'
+                    @importing = false
+                    @close()
+                else
+                    contact = @toImport.pop()
+                    currentSize--
 
-                contact.set 'import', true
-                contact.save null,
-                    success: =>
-                        @updateProgress (total - currentSize), total
-                        app.contacts.add contact
-                        contact.savePicture()
-                        # Don't know why datasystem has hard time dealing with
-                        # too many successive request. This aims to let it
-                        # breath. But we should handle import on the server
-                        # side and make bulk creations to make it much faster.
-                        # (Write leads to reindexation, so one write at at time
-                        # is really inefficient).
-                        setTimeout importContact, 10
-                    error: =>
-                        $(".errors").append """
-                        <p>#{t 'fail to import'}: #{contact.getComputedFN()}</p>
-                        """
-                        importContact()
+                    contact.set 'import', true
+                    contact.save null,
+                        success: =>
+                            @updateProgress (total - currentSize), total
+                            app.contacts.add contact
+                            contact.savePicture()
+                            # Don't know why datasystem has hard time dealing
+                            # with too many successive request. This aims to
+                            # let it breath. But we should handle import on
+                            # the server side and make bulk creations to
+                            # make it much faster.
+                            # (Write leads to reindexation, so one write at
+                            # a time is really inefficient).
+                            setTimeout importContact, 10
+                        error: ->
+                            $(".errors").append """
+                            <p>#{t 'fail to import'}:
+                            #{contact.getComputedFN()}</p>
+                            """
+                            importContact()
 
 
     close: ->
