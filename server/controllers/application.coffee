@@ -11,14 +11,13 @@ log = require('printit')
 
 getImports = (callback) ->
     async.parallel [
-        (cb) -> Contact.all cb
         Config.getInstance
         (cb) -> cozydb.api.getCozyInstance cb
         (cb) -> cozydb.api.getCozyTags cb # All tags values in cozy.
         (cb) -> WebDavAccount.first cb
         Tag.all # tags instances (with color).
-    ], (err, results) ->
-        [contacts, config, instance, tags, webDavAccount, tagInstances] = results
+    ], (err, res) ->
+        [config, instance, tags, webDavAccount, tagInstances] = res
 
         # Remove this fix once cozydb is fixed:
         # https://github.com/cozy/cozydb/issues/6
@@ -35,7 +34,6 @@ getImports = (callback) ->
         callback null,
             config:        config
             locale:        locale
-            initcontacts:  contacts
             tags:          tags
             webDavAccount: webDavAccount
             inittags:      tagInstances
