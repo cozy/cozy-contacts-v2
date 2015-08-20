@@ -1716,12 +1716,6 @@ module.exports = Router = (function(_super) {
     return this.displayView(new DocView());
   };
 
-  Router.prototype["import"] = function() {
-    this.help();
-    this.importer = new ImporterView();
-    return $('body').append(this.importer.render().$el);
-  };
-
   Router.prototype.newcontact = function() {
     var contact;
     $(".toggled").removeClass('toggled');
@@ -1769,6 +1763,18 @@ module.exports = Router = (function(_super) {
     }
   };
 
+  Router.prototype["import"] = function() {
+    this.help();
+    return setTimeout((function(_this) {
+      return function() {
+        _this.importer = new ImporterView();
+        if ($('.modal').length === 0) {
+          return $('body').append(_this.importer.render().$el);
+        }
+      };
+    })(this), 1000);
+  };
+
   Router.prototype.displayView = function(view, creation) {
     var _ref, _ref1, _ref2;
     if (this.currentContact) {
@@ -1783,10 +1789,11 @@ module.exports = Router = (function(_super) {
       })(this));
       return;
     }
-    if (this.importer) {
+    if (this.importer != null) {
       this.importer.close();
+      this.importer.$el.remove();
+      this.importer = null;
     }
-    this.importer = null;
     if (app.contactview) {
       app.contactview.remove();
     }
@@ -3199,6 +3206,21 @@ module.exports = ImporterView = (function(_super) {
     this.upload = this.$('#vcfupload')[0];
     this.content = this.$('.modal-body');
     this.confirmBtn = this.$('#confirm-btn');
+    this.$('#vcfupload').change((function(_this) {
+      return function() {
+        return _this.onupload();
+      };
+    })(this));
+    this.$('#confirm-btn').click((function(_this) {
+      return function() {
+        return _this.addcontacts();
+      };
+    })(this));
+    this.$('#cancel-btn').click((function(_this) {
+      return function() {
+        return _this.close();
+      };
+    })(this));
     this.cancelBtn = this.$('#cancel-btn');
     return this.backUrl = '#help';
   };
