@@ -12,6 +12,7 @@ module.exports = class Router extends Backbone.Router
         'contact/new'         : 'newcontact'
         'contact/:id'         : 'showcontact'
 
+
     initialize: ->
         $('body').on 'keyup', (event) =>
             @navigate "", true if event.keyCode is 27 #ESC
@@ -24,6 +25,7 @@ module.exports = class Router extends Backbone.Router
                 # force refresh to display the properview
                 Backbone.history.loadUrl Backbone.history.fragment
 
+
     list: ->
         width = $(window).width()
         if width > 900 or not width then @help()
@@ -31,16 +33,12 @@ module.exports = class Router extends Backbone.Router
         $('#filterfied').focus()
         app.contactslist.activate null
 
+
     help: ->
         $(".toggled").removeClass 'toggled'
         $("#gohelp").addClass 'toggled'
         $(".activated").removeClass 'activated'
         @displayView new DocView()
-
-    import: ->
-        @help()
-        @importer = new ImporterView()
-        $('body').append @importer.render().$el
 
 
     newcontact: ->
@@ -55,6 +53,7 @@ module.exports = class Router extends Backbone.Router
             @navigate "contact/#{contact.id}", false
         @displayViewFor contact, true
         $('#name').focus()
+
 
     showcontact: (id) ->
         $(".toggled").removeClass 'toggled'
@@ -74,6 +73,15 @@ module.exports = class Router extends Backbone.Router
             @navigate '', true
 
 
+    import: ->
+        @help()
+        setTimeout =>
+            @importer = new ImporterView()
+            if $('.modal').length is 0
+                $('body').append @importer.render().$el
+        , 1000
+
+
     # helpers
     displayView: (view, creation) ->
         @stopListening @currentContact if @currentContact
@@ -83,8 +91,10 @@ module.exports = class Router extends Backbone.Router
             app.contactview.model.once 'sync', => @displayView view
             return
 
-        @importer.close() if @importer
-        @importer = null
+        if @importer?
+            @importer.close()
+            @importer.$el.remove()
+            @importer = null
 
         app.contactview.remove() if app.contactview
         app.contactview = view
@@ -96,7 +106,9 @@ module.exports = class Router extends Backbone.Router
             view?.$("#adder").show()
             view?.$("#adder h2").show()
 
+
     displayViewFor: (contact, creation) ->
         @currentContact = contact
         @displayView new ContactView(model: contact), creation
         @listenTo contact, 'destroy', -> @navigate '', true
+
