@@ -6,6 +6,7 @@ main region for its subviews.
 ###
 
 DrawerLayout = require 'views/drawer_layout'
+SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 
 
@@ -25,12 +26,17 @@ module.exports = class AppLayout extends Mn.LayoutView
         app = require('application')
 
         @on 'render', @showDrawer
+        @on 'render', @showToolbar
         @listenTo app.contacts, 'sync', @showContactsList
         @listenTo app.contacts, 'sync', @disableBusyState
 
 
     showDrawer: ->
         @showChildView 'drawer', new DrawerLayout()
+
+
+    showToolbar: ->
+        @showChildView 'toolbar', new SearchView()
 
 
     showContactsList: ->
