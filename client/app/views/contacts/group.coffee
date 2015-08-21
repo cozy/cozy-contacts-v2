@@ -1,7 +1,5 @@
 ContactViewModel = require 'views/models/contact'
 
-ContactView = require 'views/contacts/row'
-
 
 module.exports = class Group extends Mn.CompositeView
 
@@ -11,7 +9,7 @@ module.exports = class Group extends Mn.CompositeView
 
     childViewContainer: 'ul'
 
-    childView: ContactView
+    childView: require 'views/contacts/row'
 
     childViewOptions: (model) ->
         model: new ContactViewModel {}, model: model

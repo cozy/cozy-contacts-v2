@@ -3,14 +3,12 @@ Filtered = BackboneProjections.Filtered
 
 GroupViewModel = require 'views/models/group'
 
-GroupView = require 'views/contacts/group'
-
 
 module.exports = class Contacts extends Mn.CompositeView
 
     template: ->
 
-    childView: GroupView
+    childView: require 'views/contacts/group'
 
     childViewOptions: (model) ->
         collection: model.compositeCollection
