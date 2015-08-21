@@ -1,14 +1,10 @@
-if mode == 'select'
-    .tool-selection
-      
-
-nav.tool-actions
+.tool-actions
 
 
 .tool-labels
 
 
 if mode != 'select'
-    nav.tool-subactions
-        ul
-            li: button settings
+    footer.tool-subactions
+        nav: ul
+            li: button= t('tools subactions settings')

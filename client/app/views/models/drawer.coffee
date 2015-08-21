@@ -5,4 +5,4 @@ module.exports = class DrawerViewModel extends Backbone.ViewModel
 
 
     getDisplayMode: ->
-        if @model.get('selected').length then 'selected' else 'display'
+        if @model.get('selected').length then 'select' else 'display'

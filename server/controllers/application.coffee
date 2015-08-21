@@ -15,9 +15,8 @@ getImports = (callback) ->
         (cb) -> cozydb.api.getCozyInstance cb
         (cb) -> cozydb.api.getCozyTags cb # All tags values in cozy.
         (cb) -> WebDavAccount.first cb
-        Tag.all # tags instances (with color).
     ], (err, res) ->
-        [config, instance, tags, webDavAccount, tagInstances] = res
+        [config, instance, tags, webDavAccount] = res
 
         # Remove this fix once cozydb is fixed:
         # https://github.com/cozy/cozydb/issues/6
@@ -36,7 +35,6 @@ getImports = (callback) ->
             locale:        locale
             tags:          tags
             webDavAccount: webDavAccount
-            inittags:      tagInstances
 
 
 module.exports =

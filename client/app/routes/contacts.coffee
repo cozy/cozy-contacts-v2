@@ -5,4 +5,4 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
 
     index: ->
-        console.debug 'contacts default subroute'
+        

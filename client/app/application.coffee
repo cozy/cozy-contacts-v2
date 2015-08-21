@@ -5,10 +5,13 @@ Main application that create a Mn.Application singleton and exposes it. Needs
 router and app_layout view.
 ###
 
-Router             = require 'routes'
+Router = require 'routes'
+
 ContactsCollection = require 'collections/contacts'
-AppLayout          = require 'views/app_layout'
-AppViewModel       = require 'views/models/app'
+TagsCollection     = require 'collections/tags'
+
+AppLayout    = require 'views/app_layout'
+AppViewModel = require 'views/models/app'
 
 
 class Application extends Mn.Application
@@ -25,7 +28,10 @@ class Application extends Mn.Application
         # initialize components before loading app
         @on 'before:start', =>
             @model    = new AppViewModel()
+
             @contacts = new ContactsCollection()
+            @tags     = new TagsCollection()
+
             @layout   = new AppLayout model: @model
             @router   = new Router()
 
@@ -34,10 +40,12 @@ class Application extends Mn.Application
             Backbone.history.start pushState: false if Backbone.history
             Object.freeze @ if typeof Object.freeze is 'function'
 
+
         # render components when app starts
         @on 'start', =>
             @layout.render()
-            @contacts.fetch()
+            @contacts.fetch reset: true
+            @tags.fetch reset: true
 
 
 # Exports Application singleton instance
