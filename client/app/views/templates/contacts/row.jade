@@ -1,3 +1,21 @@
+mixin formatpoint(point)
+    span.type #{point.type}: 
+    span= point.value
+
+
+mixin datapoints(points, prefix)
+    if points.length
+        dl(class=prefix)
+            dt
+                +formatpoint(points[0])
+                if points.length > 1
+                    span.fa.fa-caret-down
+            if points.length > 1
+                dd: ul
+                    each point in points.slice(1)
+                        li: +formatpoint(point)
+
+
 label(for="select-#{_id}")
     i.fa.fa-square-o
     input(type='checkbox', id="select-#{_id}")
@@ -8,3 +26,6 @@ else
     span.initials= initials
     
 p!= formattedName
+
++datapoints(phones, 'phones')
++datapoints(emails, 'emails')

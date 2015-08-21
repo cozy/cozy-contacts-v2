@@ -4,6 +4,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         avatar:        'getPictureSrc'
         initials:      'getInitials'
         formattedName: 'getFormattedName'
+        phones:        -> @getDatapointsFactory 'tel'
+        emails:        -> @getDatapointsFactory 'email'
+        addresses:     -> @getDatapointsFactory 'adr'
 
 
     getPictureSrc: ->
@@ -21,3 +24,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     getFormattedName: ->
         [fn, gn, ...] = @model.get('n').split ';'
         "#{gn} <b>#{fn}</b>"
+
+
+    getDatapointsFactory: (type) ->
+        _.chain @model.get 'datapoints'
+            .where name: type
+            .map (datapoint) -> _.omit datapoint, 'name'
+            .value() or []
