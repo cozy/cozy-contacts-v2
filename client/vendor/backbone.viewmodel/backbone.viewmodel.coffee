@@ -52,6 +52,13 @@ do (factory = (root, Backbone) ->
             else
                 _.clone @attributes
 
+
+        get: (attr) ->
+            if @attributes[attr]?
+                @attributes[attr]
+            else
+                @model.get attr
+
 ) ->
     root = (typeof self is 'object' and self.self is self and self) or
            (typeof global is 'object' and global.global is global and global)
