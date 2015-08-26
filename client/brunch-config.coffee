@@ -22,15 +22,20 @@ exports.config =
 
 
     plugins:
-        jade:
-            globals: ['t', 'moment']
-
         coffeelint:
             pattern: /^app\/.*\.coffee$/
             options:
                 indentation:
                     value: 4
                     level: 'error'
+
+        jade:
+            globals: ['t', 'moment']
+
+        stylus:
+            plugins: [
+                'cozy-ui'
+            ]
 
         postcss:
             processors: [
