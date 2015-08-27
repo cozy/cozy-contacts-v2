@@ -21,6 +21,13 @@ exports.config =
             joinTo: 'scripts/app.js'
 
 
+    conventions:
+        ignored: [
+            /[\\/]_/
+            /[\\/]index.styl/
+        ]
+
+
     plugins:
         coffeelint:
             pattern: /^app\/.*\.coffee$/

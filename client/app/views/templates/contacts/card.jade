@@ -1,0 +1,42 @@
+include helpers.jade
+
+
+div
+    if avatar
+        img(src=avatar, width="128", height="128")
+
+.data
+    h1
+        +formatName(name)
+    
+    ul.infos
+        if title || org || department
+            li: +formatJob(title, org, department)
+        if note
+            li= note
+    ul.phones
+        each point in phones
+            li: +formatPoint(point)
+        
+    ul.emails
+        each point in emails
+            li: +formatPoint(point)
+        
+    ul.addresses
+        each point in addresses
+            li: +formatPoint(point)
+            
+    ul.extras
+        each point in extras
+            li: +formatPoint(point)
+        if url
+            - var point = {type: 'web', value: url}
+            li: +formatPoint(point)
+        if bday
+            - var point = {type: t('datapoint label birthday'), value: bday}
+            li: +formatPoint(point)
+
+aside
+    ul
+        li: a(role="button", href="contacts/#{_id}/edit")= t('card actions edit')
+        li: button.delete= t('card actions delete')

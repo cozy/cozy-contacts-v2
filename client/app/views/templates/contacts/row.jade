@@ -1,21 +1,16 @@
-mixin formatpoint(point)
-    span.type #{point.type}: 
-    span= point.value
-
+include helpers.jade
 
 mixin datapoints(points, prefix)
-    if points.length
-        dl(class=prefix)
+    dl(class=prefix)
+        if points.length
             dt
-                +formatpoint(points[0])
+                +formatPoint(points[0])
                 if points.length > 1
                     span.fa.fa-caret-down
             if points.length > 1
                 dd: ul
                     each point in points.slice(1)
-                        li: +formatpoint(point)
-    else
-        dl(class=prefix)
+                        li: +formatPoint(point)
 
 
 span(for="select-#{_id}")
@@ -27,7 +22,8 @@ if avatar
 else
     span.initials= initials
     
-p!= formattedName
+p: a(href="contacts/#{_id}")
+    +formatName(name)
 
 +datapoints(phones, 'phones')
 +datapoints(emails, 'emails')
