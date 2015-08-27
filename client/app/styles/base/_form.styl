@@ -1,0 +1,56 @@
+input
+    border  0
+    outline 0
+
+
+// CHECKBOX
+
+/* Base for label styling */
+input[type="checkbox"]
+    position absolute
+    left     -100vw
+
+    & + label
+        position     relative
+        padding-left 20px
+        cursor       pointer
+
+        /* checkbox aspect */
+        &:before
+            content       ''
+            position      absolute
+            left          0
+            top           0
+            width         20px
+            height        20px
+            border-radius 2px
+            box-shadow    inset 0 0 0 2px grey-02
+            transition    all 350ms cubic-bezier(0, 0.89, 0.44, 1)
+
+        /* checked mark aspect */
+        &:after
+            content           ''
+            position          absolute
+            top               0
+            left              0
+            width             20px
+            height            20px
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 10.019l4.523 4.523 9.541-9.541' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            transition        all .2s
+
+        /* hover style just for information */
+        &:hover:before
+            box-shadow inset 0 0 0 2px blue
+
+/* checked mark aspect changes */
+input[type="checkbox"]:not(:checked) + label:after
+    opacity   0
+    transform scale(0)
+
+input[type="checkbox"]:checked + label:after
+    opacity   1
+    transform scale(1)
+
+input[type="checkbox"]:checked + label:before
+    box-shadow inset 0 0 0 30px blue
+

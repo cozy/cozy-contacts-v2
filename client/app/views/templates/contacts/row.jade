@@ -14,11 +14,13 @@ mixin datapoints(points, prefix)
                 dd: ul
                     each point in points.slice(1)
                         li: +formatpoint(point)
+    else
+        dl(class=prefix)
 
 
-label(for="select-#{_id}")
-    i.fa.fa-square-o
+span(for="select-#{_id}")
     input(type='checkbox', id="select-#{_id}")
+    label(for="select-#{_id}")
 
 if avatar
     img(src=avatar, width="64", height="64")
