@@ -17,10 +17,13 @@
             margin 0
 
         div > dl > dt
-            padding-left 2em
+            padding-left 1.5em
 
         dd
             margin 0
+
+            .type
+                display none
 
         ul
             margin  0
@@ -29,11 +32,21 @@
             li
                 display     flex
                 align-items center
-                padding     0.2em 0
+                padding     0.3em 0
 
                 & > p
                 & > dl
                     flex 1
+
+                & > dl
+                    dt span
+                        margin-right 0.4em
+
+                        &.fa
+                            color grey-03
+
+                    ul
+                        display none
 
         .initials // TO REMOVE !!!
             display         flex

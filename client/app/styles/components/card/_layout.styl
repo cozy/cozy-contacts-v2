@@ -4,14 +4,34 @@
     [role=separator]
         @extend $fullbleed
 
-
 section
-    width 100%
-    max-width em(960px)
+    width      100%
+    max-width  em(960px)
     max-height 90vh
-    @extend $centerized
+    @extend    $centerized
 
     display flex
 
     .data
-        flex 1
+        flex    1
+        padding em(20px)
+
+        ul
+            padding 0 0 0.8em
+            margin  0.8em 0
+
+            li
+                margin-bottom 0.2em
+
+                &:last-child
+                    margin 0
+
+            .type
+                display inline-block
+                width   6em
+
+    aside
+        padding em(20px)
+        li > *
+            display block
+            margin-bottom em(10px)
