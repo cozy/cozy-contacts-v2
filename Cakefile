@@ -61,13 +61,22 @@ task 'build', dsc, ->
     logger.options.prefix = 'cake:build'
     logger.info "Start compilation..."
 
+    bin =
+        bower: path.resolve 'node_modules', '.bin', 'bower'
+        jade:  path.resolve 'node_modules', '.bin', 'jade'
+
+    paths =
+        buildSrv:   path.join 'build', 'server'
+        buildViews: path.join 'build', 'server', 'views'
+        srcViews:   path.join 'server', 'views'
+
     command = """
         rm -rf build
-        coffee -cb --output build/server server
-        coffee -cb --output build/ server.coffee
-        ./node_modules/.bin/jade -cPDH -o build/server/views server/views
+        coffee -cb --output #{paths.buildSrv} server
+        coffee -cb --output build server.coffee
+        #{bin.jade} -cPDH -o #{paths.buildViews} #{paths.srcViews}
         cd client
-            #{path.resolve 'node_modules', '.bin', 'bower'} install
+            #{bin.bower} install
             brunch build --production
     """
     exec command, (err, stdout, stderr) ->
@@ -80,7 +89,7 @@ task 'build', dsc, ->
         else
             data = """var jade = require('jade/runtime');
                       module.exports = """
-            for file in glob.sync './build/server/views/**/*.js'
+            for file in glob.sync path.join paths.buildViews, '**', '*.js'
                 prependFile.sync file, data
             logger.info "Compilation succeeded."
             process.exit 0
