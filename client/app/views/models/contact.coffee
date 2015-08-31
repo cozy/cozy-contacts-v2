@@ -1,3 +1,6 @@
+{asciize} = require 'lib/diacritics'
+
+
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
     map:
@@ -19,7 +22,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     getInitials: ->
         [gn, fn, ...] = @model.get('n').split ';'
-        "#{gn[0]}#{fn[0]}".toUpperCase()
+        """#{if fn then asciize(fn)[0] else '' }\
+           #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
     getDatapointsFactory: (type) ->

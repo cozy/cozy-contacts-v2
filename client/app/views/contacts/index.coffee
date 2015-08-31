@@ -29,8 +29,10 @@ module.exports = class Contacts extends Mn.CompositeView
         letter = letter.toLowerCase()
         new Filtered require('application').contacts,
             filter: (contact) ->
-                [fn, gn, ...] = contact.get('n').split ';'
-                initial = asciize(fn)[0].toLowerCase()
+                [gn, fn, ...] = contact.get('n').split ';'
+                initial = if fn then asciize(fn)[0].toLowerCase()
+                else if gn then asciize(gn)[0].toLowerCase()
+                else '#'
 
                 if letter is '#'
                     not initial.match alphabet
