@@ -35,5 +35,9 @@ div
 
 aside
     ul
-        li: a.outline.secondary(role="button", href="contacts/#{_id}/edit")= t('card actions edit')
-        li: button.delete.outline.secondary= t('card actions delete')
+        li: a.outline.secondary(role="button", href="contacts/#{_id}/edit")
+            .fa.fa-pencil
+            span= t('card actions edit')
+        li: button.delete.outline.secondary
+            .fa.fa-trash
+            span= t('card actions delete')
