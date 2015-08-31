@@ -11,6 +11,7 @@ module.exports = class Group extends Mn.CompositeView
 
     childView: require 'views/contacts/row'
 
+
     childViewOptions: (model) ->
         model: new ContactViewModel {}, model: model
 

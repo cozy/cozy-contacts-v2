@@ -6,5 +6,6 @@ section
     background-color white
     border-radius 4px
 
-    .data ul
-        border-bottom 1px solid grey-02
+    .data
+        :not(:empty) ~ ul:not(:first-of-type)
+            border-top 1px solid grey-02

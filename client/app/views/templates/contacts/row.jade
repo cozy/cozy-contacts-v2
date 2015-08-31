@@ -1,29 +1,31 @@
 include helpers.jade
 
-mixin datapoints(points, prefix)
-    dl(class=prefix)
-        if points.length
+mixin formatDatapoints(points, prefix)
+    if points
+        dl(role="gridcell", class=prefix)
             dt
                 +formatPoint(points[0])
                 if points.length > 1
                     span.fa.fa-caret-down
             if points.length > 1
-                dd: ul
+                dd(aria-hidden="true"): ul
                     each point in points.slice(1)
                         li: +formatPoint(point)
+    else
+        .placeholder(role="gridcell", class=prefix)
 
 
-span(for="select-#{_id}")
-    input(type='checkbox', id="select-#{_id}")
-    label(for="select-#{_id}")
+a(role="listitem", href="contacts/#{_id}")
+    span(for="select-#{_id}")
+        input(type='checkbox', id="select-#{_id}")
+        label(for="select-#{_id}")
 
-if avatar
-    img(src=avatar, width="64", height="64")
-else
-    span.initials= initials
-    
-p: a(href="contacts/#{_id}")
-    +formatName(name)
+    if avatar
+        img(src=avatar, width="64", height="64")
+    else
+        span.initials= initials
+        
+    p.name(role="gridcell"): +formatName(name)
 
-+datapoints(phones, 'phones')
-+datapoints(emails, 'emails')
+    +formatDatapoints(datapoints.phones, 'phones')
+    +formatDatapoints(datapoints.emails, 'emails')

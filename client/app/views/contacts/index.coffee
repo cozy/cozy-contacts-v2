@@ -8,6 +8,9 @@ module.exports = class Contacts extends Mn.CompositeView
 
     template: ->
 
+    attributes:
+        role: 'list'
+
     childView: require 'views/contacts/group'
 
     childViewOptions: (model) ->

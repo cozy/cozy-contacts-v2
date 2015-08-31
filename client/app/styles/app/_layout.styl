@@ -1,3 +1,7 @@
+.empty
+    hide()
+
+
 [role=application]
     display  flex
     width    100vw
@@ -23,30 +27,7 @@
             margin 0
 
             .type
-                display none
-
-        ul
-            margin  0
-            padding 0 1em
-
-            li
-                display     flex
-                align-items center
-                padding     0.3em 0
-
-                & > p
-                & > dl
-                    flex 1
-
-                & > dl
-                    dt span
-                        margin-right 0.4em
-
-                        &.fa
-                            color grey-03
-
-                    ul
-                        display none
+                hide()
 
         .initials // TO REMOVE !!!
             display         flex
@@ -57,5 +38,25 @@
             margin          0 1em
 
 
-.empty
-    hide()
+[role=list]
+    [role=rowgroup]
+        padding 0 1em
+
+    [role=listitem]
+        display flex
+        align-items center
+        padding .3em 0
+
+    [role=gridcell]
+        flex 1
+        white-space nowrap
+
+        &.name
+            flex 2
+
+        dt
+            display flex
+            align-items center
+
+            span
+                margin 0 .3em

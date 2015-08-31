@@ -1,5 +1,18 @@
 include helpers.jade
 
+mixin formatDatapoints(points, prefix)
+    if points
+        ul(class=prefix)
+            each point in points
+                li: +formatPoint(point)
+            if prefix == 'extras'
+                if url
+                    - var point = {type: 'web', value: url}
+                    li: +formatPoint(point)
+                if bday
+                    - var point = {type: t('datapoint label birthday'), value: bday}
+                    li: +formatPoint(point)
+
 
 div
     if avatar
@@ -9,32 +22,16 @@ div
     h1
         +formatName(name)
     
-    ul.infos
-        if title || org || department
-            li: +formatJob(title, org, department)
-        if note
-            li= note
-    ul.phones
-        each point in phones
-            li: +formatPoint(point)
-        
-    ul.emails
-        each point in emails
-            li: +formatPoint(point)
-        
-    ul.addresses
-        each point in addresses
-            li: +formatPoint(point)
-            
-    ul.extras
-        each point in extras
-            li: +formatPoint(point)
-        if url
-            - var point = {type: 'web', value: url}
-            li: +formatPoint(point)
-        if bday
-            - var point = {type: t('datapoint label birthday'), value: bday}
-            li: +formatPoint(point)
+    if title || org || department || note
+        ul.infos
+            if title || org || department
+                li: +formatJob(title, org, department)
+            if note
+                li= note
+
+    each name in ['phones', 'emails', 'addresses', 'xtras']
+        +formatDatapoints(datapoints[name], name)
+
 
 aside
     ul

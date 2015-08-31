@@ -4,13 +4,10 @@
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
     map:
-        avatar:    'getPictureSrc'
-        initials:  'getInitials'
-        name:      'splitName'
-        phones:    -> @getDatapointsFactory 'tel'
-        emails:    -> @getDatapointsFactory 'email'
-        addresses: -> @getDatapointsFactory 'adr'
-        extras:    -> @getDatapointsFactory 'others'
+        avatar:     'getPictureSrc'
+        initials:   'getInitials'
+        name:       'splitName'
+        datapoints: 'filterDatapoints'
 
 
     getPictureSrc: ->
@@ -26,17 +23,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
            #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
-    getDatapointsFactory: (type) ->
-        _.chain @model.get 'datapoints'
-            .filter (point)->
-                if type is 'others'
-                    not(point.name in ['tel', 'email', 'adr'])
-                else
-                    point.name is type
-            .map (point) -> _.omit point, 'name'
-            .value() or []
-
-
     splitName: ->
         [gn, fn, mn, pf, sf] = @model.get('n').split ';'
         name =
@@ -46,3 +32,17 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         name.prefix = pf if pf
         name.suffix = sf if sf
         return name
+
+
+    filterDatapoints: ->
+        groups =
+            tel:   'phones'
+            email: 'emails'
+            adr:   'addresses'
+
+        _.chain @model.get 'datapoints'
+        .groupBy (point) ->
+            if point.name in ['tel', 'email', 'adr']
+                groups[point.name]
+            else 'xtras'
+        .value() or []

@@ -5,6 +5,9 @@ module.exports = class ContactRow extends Mn.ItemView
 
     tagName: 'li'
 
+    attributes:
+        role: 'row'
+
     ui:
         navigate: 'a[href^=contacts]'
 
