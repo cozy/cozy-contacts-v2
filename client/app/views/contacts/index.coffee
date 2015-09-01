@@ -16,6 +16,13 @@ module.exports = class Contacts extends Mn.CompositeView
     childViewOptions: (model) ->
         collection: model.compositeCollection
 
+    ui:
+        navigate: '[role=listitem]'
+
+    behaviors:
+        Navigator:
+            behaviorClass: require 'behaviors/navigator'
+
 
     initialize: ->
         initials = '#abcdefghijklmnopqrstuvwxyz'

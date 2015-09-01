@@ -3,60 +3,32 @@
 
 
 [role=application]
-    display  flex
-    width    100vw
-    height   100vh
-    overflow hidden
+    display flex
+    width   100vw
+    height  100vh
 
     main
-        flex           1
-        display        flex
+        flex     1
+        height   auto
+        overflow auto
+        display  flex
         flex-direction column
 
-    [role=contentinfo]
-        flex       1
-        overflow-y auto
 
-        dl
-            margin 0
+[role=contentinfo]
+    flex     1
+    height   auto
+    overflow auto
 
-        div > dl > dt
-            padding-left 1.5em
+    dl
+    dd
+        margin 0
 
-        dd
-            margin 0
-
-            .type
-                hide()
-
-        .initials // TO REMOVE !!!
-            display         flex
-            align-items     center
-            justify-content center
-            width           40px
-            height          40px
-            margin          0 1em
-
-
-[role=list]
-    [role=rowgroup]
-        padding 0 1em
-
-    [role=listitem]
-        display flex
-        align-items center
-        padding .3em 0
-
-    [role=gridcell]
-        flex 3
-        white-space nowrap
-
-        &.name
-            flex 4
-
-        dt
-            display flex
-            align-items center
-
-            span
-                margin 0 .3em
+    // TODO: make a mixin for avaters and use it it conteact-list component
+    .initials
+        display         flex
+        align-items     center
+        justify-content center
+        width           40px
+        height          40px
+        margin          0 1em
