@@ -25,14 +25,8 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     initialize: ->
-        initials = '#abcdefghijklmnopqrstuvwxyz'
-        @collection = new Backbone.Collection()
-
-        for letter in initials
-            do (letter) =>
-                attributes = name: letter
-                options = compositeCollection: @_filterContactsByInitial letter
-                @collection.add new GroupViewModel attributes, options
+        @on 'show', @attachScrollEvents
+        @_buildFilteredCollections()
 
 
     _filterContactsByInitial: (letter) ->
@@ -48,3 +42,25 @@ module.exports = class Contacts extends Mn.CompositeView
                     not initial.match alphabet
                 else
                     initial is letter
+
+
+    _buildFilteredCollections: ->
+        initials = '#abcdefghijklmnopqrstuvwxyz'
+        @collection = new Backbone.Collection()
+        for letter in initials
+            do (letter) =>
+                attributes = name: letter
+                options = compositeCollection: @_filterContactsByInitial letter
+                @collection.add new GroupViewModel attributes, options
+
+
+    scroll: (down) ->
+        dir  = if down then 1 else -1
+        incr = @_parent.$el.scrollTop() + @_parent.$el.innerHeight() * dir
+        @_parent.$el.scrollTop incr
+
+
+    attachScrollEvents: ->
+        app = require('application')
+        @listenTo app.layout, 'key:pageup', @scroll.bind @, false
+        @listenTo app.layout, 'key:pagedown', @scroll.bind @, true

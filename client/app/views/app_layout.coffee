@@ -12,11 +12,16 @@ SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 CardView     = require 'views/contacts/card'
 
+
 module.exports = class AppLayout extends Mn.LayoutView
 
     template: require 'views/templates/layouts/app'
 
     el: '[role=application]'
+
+    behaviors:
+        Keyboard:
+            behaviorClass: require 'behaviors/keyboard'
 
     regions:
         content: '[role=contentinfo]'
@@ -26,6 +31,10 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     ui:
         backdrop: '.container [role=separator]'
+
+    keymaps:
+        '33': 'key:pageup'
+        '34': 'key:pagedown'
 
     triggers:
         'click @ui.backdrop': 'click:backdrop'
