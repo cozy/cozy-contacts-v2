@@ -1,6 +1,6 @@
 [role=list]
     [role=columnheader]
-    padding-left 1.5em
+        padding-left 1.3em
 
 
     [role=rowgroup]
@@ -12,6 +12,10 @@
         align-items center
         padding .3em 0
 
+        & > label
+            @media (max-width: (360/16)rem)
+                display none
+
 
     [role=gridcell]
         flex 3
@@ -22,6 +26,17 @@
             flex 4
             display flex
             align-items center
+
+            @media (max-width: (360/16)rem)
+                margin-left 0
+
+        &.phones
+            flex 2
+
+        &.phones
+        &.emails
+            @media (max-width: (360/16)rem)
+                display none
 
 
     .fa-caret-down
