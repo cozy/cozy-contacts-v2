@@ -17,7 +17,7 @@ module.exports = class Contacts extends Mn.CompositeView
         collection: model.compositeCollection
 
     ui:
-        navigate: '[role=listitem]'
+        navigate: '.name'
 
     behaviors:
         Navigator:

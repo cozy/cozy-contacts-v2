@@ -15,16 +15,16 @@ mixin formatDatapoints(points, prefix)
         .placeholder(role="gridcell", class=prefix)
 
 
-a(role="listitem", href="contacts/#{_id}")
-    label(for="select-#{_id}")
-        input(type='checkbox', id="select-#{_id}")
+label(for="select-#{_id}")
+    input(type='checkbox', id="select-#{_id}")
     
+a.name(role="gridcell", href="contacts/#{_id}")
     if avatar
        img(src=avatar, width="64", height="64")
     else
         span.initials= initials
         
-    p.name(role="gridcell"): +formatName(name)
+    p: +formatName(name)
     
-    +formatDatapoints(datapoints.phones, 'phones')
-    +formatDatapoints(datapoints.emails, 'emails')
++formatDatapoints(datapoints.phones, 'phones')
++formatDatapoints(datapoints.emails, 'emails')
