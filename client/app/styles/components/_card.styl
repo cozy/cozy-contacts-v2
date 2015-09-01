@@ -1,0 +1,55 @@
+.card
+    &.container
+        @extend $fullbleed
+
+        [role=separator]
+            @extend $fullbleed
+
+            background rgba(grey-07,.85)
+
+    section
+        width      100%
+        max-width  em(960px)
+        max-height 90vh
+        @extend    $centerized
+
+        display flex
+
+        background-color white
+        border-radius 4px
+
+        .data
+            flex    1
+            padding em(20px)
+
+            :empty
+                hide()
+
+            ul
+                padding-top em(10px)
+                margin      em(10px) 0
+
+                li
+                    margin-bottom em(4px)
+
+                    &:last-child
+                        margin 0
+
+                .type
+                    display        inline-block
+                    width          6em
+
+                    font-size      em(13px)
+                    color          grey-05
+                    font-style     normal
+                    text-transform uppercase
+
+        aside
+            padding em(20px)
+
+            li > *
+                display block
+                margin-bottom em(10px)
+
+            .fa
+                margin-right em(10px)

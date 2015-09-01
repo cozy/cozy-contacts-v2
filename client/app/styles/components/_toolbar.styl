@@ -1,0 +1,25 @@
+[role=toolbar]
+    [for=contacts-search]
+        display flex
+        align-items center
+        position relative
+
+        .fa
+            position absolute
+            left 1em
+            top 50%
+            transform translateY(-50%)
+
+            color grey-05
+
+        input
+            flex 1
+            padding .7em 1em .7em 3em
+
+            background-color grey-01
+            border-bottom    1px solid grey-03
+
+            &:active
+            &:focus
+                background-color white
+                border-color     blue
