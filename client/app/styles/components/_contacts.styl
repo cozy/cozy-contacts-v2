@@ -19,7 +19,6 @@
 
     [role=gridcell]
         flex 3
-        white-space nowrap
         margin 0 .5em
 
         &.name
@@ -27,16 +26,8 @@
             display flex
             align-items center
 
-            @media (max-width: (360/16)rem)
-                margin-left 0
-
-        &.phones
-            flex 2
-
-        &.phones
-        &.emails
-            @media (max-width: (360/16)rem)
-                display none
+            .initials
+                flex-shrink 0
 
 
     .fa-caret-down
