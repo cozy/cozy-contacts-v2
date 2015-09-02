@@ -21,7 +21,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     behaviors:
         Keyboard:
-            behaviorClass: require 'behaviors/keyboard'
+            behaviorClass: require 'lib/behaviors/keyboard'
             keymaps:
                 '33': 'key:pageup'
                 '34': 'key:pagedown'
@@ -30,31 +30,15 @@ module.exports = class AppLayout extends Mn.LayoutView
         content: '[role=contentinfo]'
         drawer:  'aside'
         toolbar: '[role=toolbar]'
-        dialogs: '.dialogs'
+        dialogs:
+            selector: '.dialogs'
+            regionClass: require 'lib/regions/dialogs'
 
     modelEvents:
         'change:dialog': 'showContact'
 
-
-    initialize: ->
-        @listenTo @dialogs, 'show', @_showDialog
-        @listenTo @dialogs, 'before:empty', @_hideDialog
-
-
-    toggleDialogs: (visible) ->
-        visible ?= @dialogs.$el.attr('aria-hidden') isnt 'true'
-        @dialogs.$el.attr 'aria-hidden', not visible
-
-
-    _showDialog: ->
-        @listenTo @dialogs.currentView, 'dialog:close', =>
-            @model.set 'dialog', false
-        @toggleDialogs true
-
-
-    _hideDialog: ->
-        @stopListening @dialogs.currentView
-        @toggleDialogs false
+    childEvents:
+        'dialog:close': -> @model.set 'dialog', false
 
 
     onRender: ->

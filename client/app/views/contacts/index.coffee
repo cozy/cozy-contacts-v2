@@ -20,8 +20,7 @@ module.exports = class Contacts extends Mn.CompositeView
         navigate: '.name'
 
     behaviors:
-        Navigator:
-            behaviorClass: require 'behaviors/navigator'
+        Navigator: behaviorClass: require 'lib/behaviors/navigator'
 
 
     initialize: ->

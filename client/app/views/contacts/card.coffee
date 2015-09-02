@@ -10,7 +10,7 @@ module.exports = class ContactCardView extends Mn.ItemView
         role: 'dialog'
 
     behaviors:
-        Dialog: behaviorClass: require 'behaviors/dialog'
+        Dialog: behaviorClass: require 'lib/behaviors/dialog'
 
     ui:
         edit: '.edit'
