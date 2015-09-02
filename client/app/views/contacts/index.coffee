@@ -10,6 +10,7 @@ module.exports = class Contacts extends Mn.CompositeView
 
     attributes:
         role: 'list'
+        tabindex: 0
 
     childView: require 'views/contacts/group'
 
@@ -63,3 +64,8 @@ module.exports = class Contacts extends Mn.CompositeView
         app = require('application')
         @listenTo app.layout, 'key:pageup', @scroll.bind @, false
         @listenTo app.layout, 'key:pagedown', @scroll.bind @, true
+        @focus()
+        
+
+    focus: ->
+        @$el.focus()

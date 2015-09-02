@@ -34,6 +34,7 @@ module.exports = class AppLayout extends Mn.LayoutView
             selector: '.dialogs'
             regionClass: require 'lib/regions/dialogs'
 
+
     modelEvents:
         'change:dialog': 'showContact'
 
@@ -62,3 +63,4 @@ module.exports = class AppLayout extends Mn.LayoutView
             @showChildView 'dialogs', new CardView model: modelView
         else
             @dialogs.empty()
+            @content.currentView.focus()
