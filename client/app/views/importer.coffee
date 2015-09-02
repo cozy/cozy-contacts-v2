@@ -10,11 +10,6 @@ module.exports = class ImporterView extends BaseView
     tagName: 'div'
     className: 'modal'
 
-    events:
-        "change #vcfupload": 'onupload'
-        "click #confirm-btn": 'addcontacts'
-        "click #cancel-btn": 'close'
-
 
     afterRender: ->
         @$el.modal
