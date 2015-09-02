@@ -3,23 +3,16 @@ module.exports = class Keyboard extends Mn.Behavior
     defaults:
         eventName: 'keydown'
 
-
-    initialize: ->
-        @listenTo @view, 'render', @configureKeyEvents
-
-
-    configureKeyEvents: ->
-        triggers = _.result @view, 'keymaps'
-        return unless triggers
+    events: ->
+        return unless @options.keymaps
 
         events = {}
-        keyEvents = _.mapObject triggers, @_buildKeyboardTrigger
-        events[@defaults.eventName] = (event) =>
+        keyEvents = _.mapObject @options.keymaps, @_buildKeyboardTrigger
+        events[@options.eventName] = (event) =>
             key = event.which.toString()
             return unless key in _.keys keyEvents
             keyEvents[key].call @, event
-
-        Backbone.View.prototype.delegateEvents.call @view, events
+        return events
 
 
     _buildKeyboardTrigger: (triggerDef) ->

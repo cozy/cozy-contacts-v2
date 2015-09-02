@@ -22,61 +22,59 @@ module.exports = class AppLayout extends Mn.LayoutView
     behaviors:
         Keyboard:
             behaviorClass: require 'behaviors/keyboard'
+            keymaps:
+                '33': 'key:pageup'
+                '34': 'key:pagedown'
 
     regions:
         content: '[role=contentinfo]'
         drawer:  'aside'
         toolbar: '[role=toolbar]'
-        card:    '.container .card'
+        dialogs: '.dialogs'
 
-    ui:
-        backdrop: '.container [role=separator]'
-
-    keymaps:
-        '33': 'key:pageup'
-        '34': 'key:pagedown'
-
-    triggers:
-        'click @ui.backdrop': 'click:backdrop'
+    modelEvents:
+        'change:dialog': 'showContact'
 
 
     initialize: ->
-        app = require('application')
+        @listenTo @dialogs, 'show', @_showDialog
+        @listenTo @dialogs, 'before:empty', @_hideDialog
 
-        @listenTo app.contacts, 'sync', @showContactsList
-        @listenTo app.contacts, 'sync', @disableBusyState
 
-        @on 'render', @showDrawer
-        @on 'render', @showToolbar
+    toggleDialogs: (visible) ->
+        visible ?= @dialogs.$el.attr('aria-hidden') isnt 'true'
+        @dialogs.$el.attr 'aria-hidden', not visible
 
-        @listenTo @card, 'show', @toggleCardContainer.bind @, true
-        @listenTo @card, 'before:empty', @toggleCardContainer.bind @, false
 
-        @on 'click:backdrop', => @card.reset()
+    _showDialog: ->
+        @listenTo @dialogs.currentView, 'dialog:close', =>
+            @model.set 'dialog', false
+        @toggleDialogs true
+
+
+    _hideDialog: ->
+        @stopListening @dialogs.currentView
+        @toggleDialogs false
+
+
+    onRender: ->
+        @showChildView 'drawer', new DrawerLayout()
+        @showChildView 'toolbar', new SearchView()
 
 
     disableBusyState: ->
         @$el.attr 'aria-busy', false
 
 
-    showDrawer: ->
-        @showChildView 'drawer', new DrawerLayout()
-
-
-    showToolbar: ->
-        @showChildView 'toolbar', new SearchView()
-
-
     showContactsList: ->
         @showChildView 'content', new ContactsView()
 
 
-    showContact: (model) ->
-        modelView = new ContactViewModel {}, model: model
-        @showChildView 'card', new CardView model: modelView
-
-
-    toggleCardContainer: (visible) ->
-        $container = @card.$el.parent()
-        visible ?= $container.attr('aria-hidden') isnt 'true'
-        @card.$el.parent().attr 'aria-hidden', not visible
+    showContact: (viewModel, id) ->
+        if id
+            app = require 'application'
+            model = app.contacts.get id
+            modelView = new ContactViewModel {}, model: model
+            @showChildView 'dialogs', new CardView model: modelView
+        else
+            @dialogs.empty()

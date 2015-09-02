@@ -5,24 +5,31 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         ':slug': 'show'
 
 
-    initialize: ->
+    _setInitialState: (callback) ->
         app = require 'application'
-        app.layout.on 'click:backdrop', => @navigate 'contacts'
+        @listenTo app.contacts, 'sync', ->
+            app.layout.showContactsList()
+            app.layout.disableBusyState()
+
+        if callback and _.isFunction callback
+            @listenTo app.contacts, 'sync', callback
+
+        @listenTo app.layout.model, 'change:dialog', (model, value) =>
+            @navigate 'contacts' unless value
+
+
+    _setCardState: (id) ->
+        app = require 'application'
+        app.model.set 'dialog', if app.contacts.get(id) then id else false
 
 
     index: ->
+        @_setInitialState()
 
 
     show: (id) ->
         app = require 'application'
-        show = ->
-            model = app.contacts.get id
-            if model?
-                app.layout.showContact model
-            else
-                app.router.navigate 'contacts'
-
         if app.contacts.isEmpty()
-            @listenTo app.contacts, 'sync', show
+            @_setInitialState _.partial @_setCardState, id
         else
-            show()
+            @_setCardState id

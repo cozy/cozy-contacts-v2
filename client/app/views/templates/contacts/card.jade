@@ -1,43 +1,46 @@
-include helpers.jade
+extends ../base/dialog.jade
 
-mixin formatDatapoints(points, prefix)
-    if points
-        ul(class=prefix)
-            each point in points
-                li: +formatPoint(point)
-            if prefix == 'extras'
-                if url
-                    - var point = {type: 'web', value: url}
+block content
+    include helpers.jade
+
+    mixin formatDatapoints(points, prefix)
+        if points
+            ul(class=prefix)
+                each point in points
                     li: +formatPoint(point)
-                if bday
-                    - var point = {type: t('datapoint label birthday'), value: bday}
-                    li: +formatPoint(point)
+                if prefix == 'extras'
+                    if url
+                        - var point = {type: 'web', value: url}
+                        li: +formatPoint(point)
+                    if bday
+                        - var point = {type: t('datapoint label birthday'), value: bday}
+                        li: +formatPoint(point)
 
 
-div
-    if avatar
-        img(src=avatar, width="128", height="128")
+    div
+        if avatar
+            img(src=avatar, width="128", height="128")
 
-.data
-    h1
-        +formatName(name)
-    
-    if title || org || department || note
-        ul.infos
-            if title || org || department
-                li: +formatJob(title, org, department)
-            if note
-                li= note
+    .data
+        h1
+            +formatName(name)
+        
+        if title || org || department || note
+            ul.infos
+                if title || org || department
+                    li: +formatJob(title, org, department)
+                if note
+                    li= note
 
-    each name in ['phones', 'emails', 'addresses', 'xtras']
-        +formatDatapoints(datapoints[name], name)
+        each name in ['phones', 'emails', 'addresses', 'xtras']
+            +formatDatapoints(datapoints[name], name)
 
 
-aside
-    ul
-        li: a.outline.secondary(role="button", href="contacts/#{_id}/edit")
-            .fa.fa-pencil
-            span= t('card actions edit')
-        li: button.delete.outline.secondary
-            .fa.fa-trash
-            span= t('card actions delete')
+    aside
+        ul
+            li: a.edit.outline.secondary(role="button", href="contacts/#{_id}/edit")
+                .fa.fa-pencil
+                span= t('card actions edit')
+            li: button.delete.outline.secondary
+                .fa.fa-trash
+                span= t('card actions delete')
