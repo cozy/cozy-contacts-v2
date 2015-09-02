@@ -20,8 +20,12 @@ module.exports = class Router extends Backbone.Router
         # started (in `app:before:start` event).
         #
         # see https://github.com/BackboneSubroute/backbone.subroute/issues/3
-        require('application').on 'start', ->
+        app = require 'application'
+        app.on 'start', ->
             contacts = new ContactsRouter 'contacts'
+        app.contacts.on 'sync', ->
+            app.layout.showContactsList()
+            app.layout.disableBusyState()
 
 
     index: ->

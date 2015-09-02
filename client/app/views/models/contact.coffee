@@ -3,11 +3,20 @@
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
+    defaults:
+        edit: false
+
     map:
         avatar:     'getPictureSrc'
         initials:   'getInitials'
         name:       'splitName'
         datapoints: 'filterDatapoints'
+
+
+    initialize: ->
+        app = require 'application'
+        @listenTo app.model, 'change:editing', (appModel, value)=>
+            @set 'edit', value
 
 
     getPictureSrc: ->

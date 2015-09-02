@@ -1,35 +1,34 @@
 module.exports = class ContactsRouter extends Backbone.SubRoute
 
     routes:
-        '':      'index'
-        ':slug': 'show'
+        ':slug':      'show'
+        ':slug/edit': 'edit'
 
 
-    _setInitialState: (callback) ->
+    initialize: ->
         app = require 'application'
-        @listenTo app.contacts, 'sync', ->
-            app.layout.showContactsList()
-            app.layout.disableBusyState()
-
-        if callback and _.isFunction callback
-            @listenTo app.contacts, 'sync', callback
-
-        @listenTo app.layout.model, 'change:dialog', (model, value) =>
+        app.model.on 'change:dialog', (model, value) =>
             @navigate 'contacts' unless value
 
 
-    _setCardState: (id) ->
+    _ensureContacts: (callback) ->
+        return unless _.isFunction callback
+        app = require 'application'
+        if app.contacts.isEmpty()
+            @listenToOnce app.contacts, 'sync', callback
+        else
+            callback()
+
+
+    _setCardState: (id, edit = false) ->
         app = require 'application'
         app.model.set 'dialog', if app.contacts.get(id) then id else false
-
-
-    index: ->
-        @_setInitialState()
+        app.model.set 'editing', edit
 
 
     show: (id) ->
-        app = require 'application'
-        if app.contacts.isEmpty()
-            @_setInitialState _.partial @_setCardState, id
-        else
-            @_setCardState id
+        @_ensureContacts _.wrap @_setCardState, (fn) -> fn(id)
+
+
+    edit: (id) ->
+        @_ensureContacts _.wrap @_setCardState, (fn) -> fn(id, true)

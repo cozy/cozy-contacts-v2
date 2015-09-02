@@ -1,14 +1,40 @@
 extends ../base/dialog.jade
 
 block content
+    - var ref = id.slice(0, 6)
+
     include helpers.jade
 
     mixin formatDatapoints(points, prefix)
-        if points
-            ul(class=prefix)
-                each point in points
-                    li: +formatPoint(point)
-                if prefix == 'extras'
+        if edit
+            fieldset.block(class=prefix)
+                legend= prefix
+                if points
+                    each point, index in points
+                        - var name = prefix + '.' + index + '.'
+                        +input(name + 'type', 'text')(value=point.type, span=false, disabled=(prefix == 'xtras'))
+                        +input(name + 'value', 'text')(value=point.value, placeholder=true, span=false)
+                        if prefix == 'xtras'
+                            +input(name + 'name', 'hidden')(value=point.name, span=false)
+                else if prefix != 'xtras'
+                    - var name = prefix + '.0.'
+                    +input(name + 'type', 'text')(value='main', span=false, placeholder=false)
+                    +input(name + 'value', 'text')(placeholder=true, span=false)
+                        
+                if prefix == 'xtras'
+                    if url
+                        +input('url', 'text')(value=url, placeholder=true)
+                    if bday
+                        +input('bday', 'text')(value=bday, placeholder=true)
+                    if note
+                        +input('note', 'textarea')(value=note)
+
+        else if points || prefix == 'xtras' && (url || bday)
+            ul.block(class=prefix)
+                if points
+                    each point in points
+                        li: +formatPoint(point)
+                if prefix == 'xtras'
                     if url
                         - var point = {type: 'web', value: url}
                         li: +formatPoint(point)
@@ -22,15 +48,28 @@ block content
             img(src=avatar, width="128", height="128")
 
     .data
-        h1
-            +formatName(name)
-        
-        if title || org || department || note
-            ul.infos
-                if title || org || department
-                    li: +formatJob(title, org, department)
-                if note
-                    li= note
+        if edit
+            +input('prefix', 'text')(value=name.prefix)
+            +input('firstname', 'text')(value=name.first)
+            +input('middlename', 'text')(value=name.middle)
+            +input('givenname', 'text')(value=name.given)
+            +input('suffix', 'text')(value=name.suffix)
+            
+            
+            fieldset.infos
+                +input('org', 'text')(value=org, placeholder=true)
+                +input('department', 'text')(value=department, placeholder=true)
+                +input('title', 'text')(value=title, placeholder=true)
+        else
+            h1
+                +formatName(name)
+            
+            if title || org || department || note
+                ul.infos
+                    if title || org || department
+                        li: +formatJob(title, org, department)
+                    if note
+                        li= note
 
         each name in ['phones', 'emails', 'addresses', 'xtras']
             +formatDatapoints(datapoints[name], name)
@@ -38,9 +77,17 @@ block content
 
     aside
         ul
-            li: a.edit.outline.secondary(role="button", href="contacts/#{_id}/edit")
-                .fa.fa-pencil
-                span= t('card actions edit')
-            li: button.delete.outline.secondary
-                .fa.fa-trash
-                span= t('card actions delete')
+            if edit
+                li: button.create
+                    .fa.fa-plus
+                    span= t('card actions save')
+                li: button.cancel
+                    .fa.fa-times
+                    span= t('card actions cancel')
+            else
+                li: a.edit.outline.secondary(role="button", href="contacts/#{_id}/edit")
+                    .fa.fa-pencil
+                    span= t('card actions edit')
+                li: button.delete.outline.secondary
+                    .fa.fa-trash
+                    span= t('card actions delete')

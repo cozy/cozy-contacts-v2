@@ -14,9 +14,6 @@
             flex    1
             padding em(20px)
 
-            :empty
-                hide()
-
             ul
                 padding-top em(10px)
                 margin      em(10px) 0
@@ -35,6 +32,9 @@
                     color          grey-05
                     font-style     normal
                     text-transform uppercase
+
+            :not(:empty) ~ .block:not(:first-of-type)
+                border-top 1px solid grey-02
 
         aside
             padding em(20px)
