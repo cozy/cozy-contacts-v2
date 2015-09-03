@@ -41,7 +41,7 @@ exports.config =
 
         stylus:
             plugins: [
-                'cozy-ui'
+                'cozy-ui/lib/stylus'
             ]
 
         postcss:

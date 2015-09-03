@@ -3,34 +3,21 @@
 
 
 [role=application]
-    display flex
-    width   100vw
-    height  100vh
-
-    main
-        flex     1
-        height   auto
-        overflow auto
-        display  flex
-        flex-direction column
+    @extend $app-2panes-toolbar
 
 
 [role=contentinfo]
-    flex     1
-    height   auto
-    overflow auto
-
     dl
     dd
-        margin 0
+        reset()
 
     // TODO: make a mixin for avaters and use it it conteact-list component
     .initials
         @extend $content-center
 
-        width         em(40px)
-        height        em(40px)
-        margin-right .5em
+        width        em(40px)
+        height       em(40px)
+        right-spaced .5em
 
 
 .dialogs
