@@ -10,9 +10,20 @@
         background-color white
         border-radius 4px
 
+        .initials
+            @extend          $content-center
+            width            em(50px)
+            height           em(50px)
+
+            background-color grey-02
+            border-radius    50%
+
+            color            white
+            font-size        32px
+
         .data
             flex    1
-            padding em(20px)
+            padding em(30px) em(10px)
 
             ul
                 padding-top em(10px)
@@ -24,20 +35,60 @@
                     &:last-child
                         margin 0
 
-                .type
-                    display        inline-block
-                    width          6em
+            // input - type name
+            .type
+                display        inline-block
+                width          8em
 
-                    font-size      em(13px)
-                    color          grey-05
-                    font-style     normal
-                    text-transform uppercase
+                font-size      em(13px)
+                color          grey-05
+                font-style     normal
+                text-transform uppercase
 
             :not(:empty) ~ .block:not(:first-of-type)
-                border-top 1px solid grey-02
+                margin-top  em(10px)
+                padding-top em(10px)
+
+                border-top  1px solid grey-02
+
+            // edition mode
+            label
+                display block
+
+                input
+                    padding          em(4px) em(8px)
+                    margin-bottom    1px
+                    width            calc(100% - 8em)
+
+                    background-color transparent
+                    border-radius    2px
+
+                    &:hover
+                    &:focus
+                        background-color grey-01
+
+            fieldset:not(.infos)
+                label
+                    display inline-block
+
+                    &:first-of-type input
+                        width 8em
+                        padding em(6px) 0
+                        margin 0
+
+                        font-size      em(13px)
+                        color          grey-05
+                        font-style     normal
+                        text-transform uppercase
+
+                        &:focus
+                            color grey-08
+
+                    &:last-of-type
+                        width calc(100% - 8em)
 
         aside
-            padding em(20px)
+            padding em(30px)
 
             @media (max-width: (360/16)rem)
                 display none
@@ -45,6 +96,12 @@
             li > *
                 display block
                 margin-bottom em(10px)
+
+            button
+                // allow the button type to make 100% of the container (aside)
+                width 100%
+
+                text-align left
 
             .fa
                 margin-right em(10px)
