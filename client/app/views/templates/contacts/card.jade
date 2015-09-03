@@ -8,12 +8,12 @@ block content
     mixin formatDatapoints(points, prefix)
         if edit
             fieldset.block(class=prefix)
-                legend= prefix
                 if points
                     each point, index in points
                         - var name = prefix + '.' + index + '.'
-                        +input(name + 'type', 'text')(value=point.type, span=false, disabled=(prefix == 'xtras'))
-                        +input(name + 'value', 'text')(value=point.value, placeholder=true, span=false)
+                        div.group
+                            +input(name + 'type', 'text')(value=point.type, span=false, disabled=(prefix == 'xtras'))
+                            +input(name + 'value', 'text')(value=point.value, placeholder=true, span=false)
                         if prefix == 'xtras'
                             +input(name + 'name', 'hidden')(value=point.name, span=false)
                 else if prefix != 'xtras'
@@ -47,6 +47,10 @@ block content
         if avatar
             img(src=avatar, width="128", height="128")
 
+        else
+            aside
+                span.initials= initials
+
     .data
         if edit
             +input('prefix', 'text')(value=name.prefix)
@@ -56,7 +60,7 @@ block content
             +input('suffix', 'text')(value=name.suffix)
             
             
-            fieldset.infos
+            fieldset.block.infos
                 +input('org', 'text')(value=org, placeholder=true)
                 +input('department', 'text')(value=department, placeholder=true)
                 +input('title', 'text')(value=title, placeholder=true)
@@ -65,7 +69,7 @@ block content
                 +formatName(name)
             
             if title || org || department || note
-                ul.infos
+                ul.block.infos
                     if title || org || department
                         li: +formatJob(title, org, department)
                     if note
@@ -78,10 +82,10 @@ block content
     aside
         ul
             if edit
-                li: button.create
-                    .fa.fa-plus
+                li: button.create.outline.secondary
+                    .fa.fa-check
                     span= t('card actions save')
-                li: button.cancel
+                li: button.cancel.outline.secondary
                     .fa.fa-times
                     span= t('card actions cancel')
             else
