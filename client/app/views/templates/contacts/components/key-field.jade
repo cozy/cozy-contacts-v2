@@ -1,0 +1,6 @@
+label.group(for=fid)
+    span.type= label
+    if type == 'textarea'
+        textarea(id=fid, name=name)= value
+    else
+        input.value(id=fid, name=name, type='text', value=value, placeholder=placeholder)

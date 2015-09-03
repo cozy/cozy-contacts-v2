@@ -1,8 +1,6 @@
 extends ../base/dialog.jade
 
 block content
-    - var ref = id.slice(0, 6)
-
     include helpers.jade
 
     mixin formatDatapoints(points, prefix)
@@ -10,24 +8,18 @@ block content
             fieldset.block(class=prefix)
                 if points
                     each point, index in points
-                        - var name = prefix + '.' + index + '.'
-                        div.group
-                            +input(name + 'type', 'text')(value=point.type, span=false, disabled=(prefix == 'xtras'))
-                            +input(name + 'value', 'text')(value=point.value, placeholder=true, span=false)
-                        if prefix == 'xtras'
-                            +input(name + 'name', 'hidden')(value=point.name, span=false)
-                else if prefix != 'xtras'
-                    - var name = prefix + '.0.'
-                    +input(name + 'type', 'text')(value='main', span=false, placeholder=false)
-                    +input(name + 'value', 'text')(placeholder=true, span=false)
-                        
-                if prefix == 'xtras'
+                        +groupInput(point, prefix, index)(placeholder=true)
+                
+                if prefix != 'xtras'
+                    - var point = {name: prefix, type: undefined, value: ''}
+                    +groupInput(point, prefix, points? points.length : 0)(placeholder=true)
+                
+                else
                     if url
                         +input('url', 'text')(value=url, placeholder=true)
                     if bday
                         +input('bday', 'text')(value=bday, placeholder=true)
-                    if note
-                        +input('note', 'textarea')(value=note)
+                    +input('note', 'textarea')(value=note)
 
         else if points || prefix == 'xtras' && (url || bday)
             ul.block(class=prefix)
@@ -43,8 +35,16 @@ block content
                         li: +formatPoint(point)
 
 
-    div
-        if avatar
+    if edit
+        each list, listname in lists
+            datalist(id="list-#{listname}")
+                each item in list
+                    - var opt = item.split(':')
+                    option(value=opt[0], data-name=opt[1])
+
+
+    if avatar
+        div
             img(src=avatar, width="128", height="128")
 
         else
@@ -53,17 +53,17 @@ block content
 
     .data
         if edit
-            +input('prefix', 'text')(value=name.prefix)
-            +input('firstname', 'text')(value=name.first)
-            +input('middlename', 'text')(value=name.middle)
-            +input('givenname', 'text')(value=name.given)
-            +input('suffix', 'text')(value=name.suffix)
+            +input('prefix')(value=name.prefix)
+            +input('firstname')(value=name.first)
+            +input('middlename')(value=name.middle)
+            +input('givenname')(value=name.given)
+            +input('suffix')(value=name.suffix)
             
             
             fieldset.block.infos
-                +input('org', 'text')(value=org, placeholder=true)
-                +input('department', 'text')(value=department, placeholder=true)
-                +input('title', 'text')(value=title, placeholder=true)
+                +input('org')(value=org, placeholder=true)
+                +input('department')(value=department, placeholder=true)
+                +input('title')(value=title, placeholder=true)
         else
             h1
                 +formatName(name)
@@ -75,8 +75,17 @@ block content
                     if note
                         li= note
 
-        each name in ['phones', 'emails', 'addresses', 'xtras']
+        each name in ['tel', 'email', 'adr', 'xtras']
             +formatDatapoints(datapoints[name], name)
+            
+        if edit
+            dl.dropdown.add
+                dt= t('card action add select')
+                dd: ul
+                    li: button(value="bday")= t('card action add birthday')
+                    li: button(value="social")= t('card action add social')
+                    li: button(value="link")= t('card action add link')
+                    li: button(value="other")= t('card action add other')
 
 
     aside

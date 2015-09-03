@@ -34,13 +34,21 @@ mixin formatJob(title, org, dept)
 
 
 mixin input(name, type)
-    - var id = name + '-' + ref
-    - var span = attributes.span != undefined ? attributes.span : true
-    - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name.replace(/\.[0-9]+\./g, ' ')) : false
-    label.group(for=id)
-        if span
-            span.type= t('datapoint label ' + name)
-        if type == 'textarea'
-            textarea(id=id, name=name)= attributes.value
-        else
-            input(type=type, id=id, name=name, placeholder=placeholder, value=attributes.value, disabled=attributes.disabled)
+    - var label = t('datapoint label ' + name)
+    - var fid = [name, ref].join('-')
+    - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name) : false
+    - var value = attributes.value
+    include components/key-field.jade
+    
+
+mixin groupInput(point, prefix, index)
+    case point.name
+        when 'im'
+        when 'chat'
+            - var entity = 'social'
+        when 'url'
+            - var entity = 'link'
+        default
+            - var entity = 'default'
+    - var placeholder = attributes.placeholder? t('datapoint placeholder ' + (entity == 'default'? point.name : entity)) : false
+    include components/datapoint-field.jade

@@ -5,8 +5,14 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     defaults:
         edit: false
+        lists:
+            default: ['main', 'work', 'home']
+            social: ['twitter:chat', 'skype:im']
+            link: ['web:url', 'blog:url']
+
 
     map:
+        ref:        'getRef'
         avatar:     'getPictureSrc'
         initials:   'getInitials'
         name:       'splitName'
@@ -17,6 +23,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         app = require 'application'
         @listenTo app.model, 'change:editing', (appModel, value)=>
             @set 'edit', value
+
+
+    getRef: ->
+        @model.id.slice 0, 6
 
 
     getPictureSrc: ->
@@ -44,14 +54,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     filterDatapoints: ->
-        groups =
-            tel:   'phones'
-            email: 'emails'
-            adr:   'addresses'
-
         _.chain @model.get 'datapoints'
         .groupBy (point) ->
             if point.name in ['tel', 'email', 'adr']
-                groups[point.name]
+                point.name
             else 'xtras'
         .value() or []
