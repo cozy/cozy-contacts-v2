@@ -37,9 +37,9 @@ mixin input(name, type)
     - var id = name + '-' + ref
     - var span = attributes.span != undefined ? attributes.span : true
     - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name.replace(/\.[0-9]+\./g, ' ')) : false
-    label(for=id)
+    label.group(for=id)
         if span
-            span= t('datapoint label ' + name)
+            span.type= t('datapoint label ' + name)
         if type == 'textarea'
             textarea(id=id, name=name)= attributes.value
         else
