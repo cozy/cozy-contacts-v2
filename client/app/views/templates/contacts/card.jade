@@ -43,13 +43,12 @@ block content
                     option(value=opt[0], data-name=opt[1])
 
 
-    if avatar
-        div
-            img(src=avatar, width="128", height="128")
+    div
+        if avatar
+            img.avatar(src=avatar, width="128", height="128")
 
         else
-            aside
-                span.initials= initials
+            span.avatar.initials= initials
 
     .data
         if edit
