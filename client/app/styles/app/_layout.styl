@@ -1,3 +1,12 @@
+avatar(size)
+    @extend $content-center
+
+    width         em(size)
+    height        em(size)
+    right-spaced  .5em
+    border-radius 50%
+
+
 .empty
     hide()
 
@@ -10,14 +19,6 @@
     dl
     dd
         reset()
-
-    // TODO: make a mixin for avaters and use it it conteact-list component
-    .initials
-        @extend $content-center
-
-        width        em(40px)
-        height       em(40px)
-        right-spaced .5em
 
 
 .dialogs

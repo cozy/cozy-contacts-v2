@@ -22,9 +22,9 @@ label(for="select-#{_id}")
 
 a.name(role="gridcell", href="contacts/#{_id}")
     if avatar
-       img(src=avatar, width="64", height="64")
+       img.avatar(src=avatar)
     else
-        span.initials= initials
+        span.avatar.initials= initials
         
     p: +formatName(name)
     

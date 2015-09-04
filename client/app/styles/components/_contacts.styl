@@ -29,8 +29,14 @@
             display flex
             align-items center
 
-            .initials
-                flex-shrink 0
+            @media (max-width: (360/16)rem)
+                margin-left 0
+
+        .initials
+            flex-shrink 0
+
+        .avatar
+            avatar(40px)
 
 
     .fa-caret-down
