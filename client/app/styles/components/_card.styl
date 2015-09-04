@@ -1,4 +1,5 @@
 .card
+
     .wrapper
         width      100%
         max-width  em(960px)
@@ -10,103 +11,103 @@
         background-color white
         border-radius 4px
 
-        .avatar
-            horizontally-spaced 1em
-            vertically-spaced   1em
+    .avatar
+        horizontally-spaced 1em
+        vertically-spaced   1em
 
 
-        .initials
-            @extend $content-center
-            width            em(50px)
-            height           em(50px)
+    .initials
+        @extend $content-center
+        width            em(50px)
+        height           em(50px)
 
-            background-color grey-02
-            border-radius    50%
+        background-color grey-02
+        border-radius    50%
 
-            color            white
-            font-size        32px
+        color            white
+        font-size        32px
 
-        .data
-            flex    1
-            padding em(30px) em(10px)
+    .data
+        flex    1
+        padding em(30px) em(10px)
 
-            ul
-                padding-top em(10px)
-                margin      em(10px) 0
+        ul
+            padding-top em(10px)
+            margin      em(10px) 0
 
-                li
-                    margin-bottom em(4px)
+            li
+                margin-bottom em(4px)
 
-                    &:last-child
-                        margin 0
+                &:last-child
+                    margin 0
 
-            // input - type name
-            .type
-                display        inline-block
-                width          8em
+        // input - type name
+        .type
+            display        inline-block
+            width          8em
 
-                font-size      em(13px)
-                color          grey-05
-                font-style     normal
-                text-transform uppercase
+            font-size      em(13px)
+            color          grey-05
+            font-style     normal
+            text-transform uppercase
 
-            :not(:empty) ~ .block:not(:first-of-type)
-                margin-top  em(10px)
-                padding-top em(10px)
+        :not(:empty) ~ .block:not(:first-of-type)
+            margin-top  em(10px)
+            padding-top em(10px)
 
-                border-top  1px solid grey-02
+            border-top  1px solid grey-02
 
-            // edition mode
+        // edition mode
+        label
+            display block
+
+            input
+                padding          em(4px) em(8px)
+                margin-bottom    1px
+                width            calc(100% - 8em)
+
+                background-color transparent
+                border-radius    2px
+
+                &:hover
+                &:focus
+                    background-color grey-01
+
+        fieldset:not(.infos)
             label
-                display block
+                display inline-block
 
-                input
-                    padding          em(4px) em(8px)
-                    margin-bottom    1px
-                    width            calc(100% - 8em)
+                &:first-of-type input
+                    width 8em
+                    padding em(6px) 0
+                    margin 0
 
-                    background-color transparent
-                    border-radius    2px
+                    font-size      em(13px)
+                    color          grey-05
+                    font-style     normal
+                    text-transform uppercase
 
-                    &:hover
                     &:focus
-                        background-color grey-01
+                        color grey-08
 
-            fieldset:not(.infos)
-                label
-                    display inline-block
+                &:last-of-type
+                    width calc(100% - 8em)
 
-                    &:first-of-type input
-                        width 8em
-                        padding em(6px) 0
-                        margin 0
+    aside
+        padding em(30px)
 
-                        font-size      em(13px)
-                        color          grey-05
-                        font-style     normal
-                        text-transform uppercase
+        @media (max-width: (360/16)rem)
+            display none
 
-                        &:focus
-                            color grey-08
+        li > *
+            display block
+            margin-bottom em(10px)
 
-                    &:last-of-type
-                        width calc(100% - 8em)
+        button
+            // allow the button type to make 100% of the container (aside)
+            width 100%
 
-        aside
-            padding em(30px)
+            text-align left
 
-            @media (max-width: (360/16)rem)
-                display none
-
-            li > *
-                display block
-                margin-bottom em(10px)
-
-            button
-                // allow the button type to make 100% of the container (aside)
-                width 100%
-
-                text-align left
-
-            .fa
-                margin-right em(10px)
+        .fa
+            margin-right em(10px)
