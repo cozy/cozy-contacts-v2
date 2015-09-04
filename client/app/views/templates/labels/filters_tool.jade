@@ -3,5 +3,6 @@ nav: ul
     li
         - var ref = "filter-label-all"
         label(for=ref)
-            input(type='radio', id=ref, name'labels', value='all', checked=true)
+            input(type='radio', id=ref, name='labels', value='all', checked=true)
+            span.fa.fa-dot-circle-o
             span= t('tools labels filters all')
