@@ -2,7 +2,8 @@ module.exports =
     "tools subactions settings": "configuration"
     "tools actions add contact": "ajouter un contact"
     "tools search placeholder":  "rechercher des contacts, libellés…"
-    "tools labels filters":      "afficher les libellés"
+    "tools labels filters":      "libellés"
+    "tools labels filters all":  "tous les contacts"
 
     "card actions save":        "enregistrer"
     "card actions cancel":      "annuler"

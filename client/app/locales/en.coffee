@@ -2,7 +2,8 @@ module.exports =
     "tools subactions settings": "settings"
     "tools actions add contact": "add contact"
     "tools search placeholder":  "search for contacts, labels…"
-    "tools labels filters":      "show labels"
+    "tools labels filters":      "labels"
+    "tools labels filters all":  "all contacts"
 
     "card actions save":        "save"
     "card actions cancel":      "cancel"

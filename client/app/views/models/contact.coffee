@@ -4,12 +4,12 @@
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
     defaults:
-        edit: false
+        edit:  false
+        props: ['tel', 'email', 'adr']
         lists:
             default: ['main', 'work', 'home']
-            social: ['twitter:chat', 'skype:im']
-            link: ['web:url', 'blog:url']
-
+            social:  ['twitter:chat', 'skype:im']
+            link:    ['web:url', 'blog:url']
 
     map:
         ref:        'getRef'
@@ -55,8 +55,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     filterDatapoints: ->
         _.chain @model.get 'datapoints'
-        .groupBy (point) ->
-            if point.name in ['tel', 'email', 'adr']
-                point.name
-            else 'xtras'
+        .groupBy (point) =>
+            if point.name in @defaults.props then point.name else 'xtras'
         .value() or []

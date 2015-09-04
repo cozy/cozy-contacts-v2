@@ -5,6 +5,17 @@
 [role=application]
     @extend $app-2panes-toolbar
 
+    .tools
+        height 100%
+        display flex
+        flex-direction column
+
+        .tool-labels
+            flex 1
+
+        footer
+            reset()
+
 
 [role=contentinfo]
     dl
