@@ -11,9 +11,9 @@
         background-color white
         border-radius 4px
 
+
     .avatar
-        horizontally-spaced 1em
-        vertically-spaced   1em
+        spaced()
 
 
     .initials
@@ -27,23 +27,25 @@
         color            white
         font-size        32px
 
+
     .data
         flex    1
-        padding em(30px) em(10px)
+        padded 30px, 10px
 
-        ul
-            padding-top em(10px)
-            margin      em(10px) 0
+        .block
+            reset()
+            vertically-spaced 10px
 
             li
-                margin-bottom em(4px)
+                bottom-spaced 4px
 
                 &:last-child
-                    margin 0
+                    bottom-spaced 0
 
-        // input - type name
+        .group
+            display flex
+
         .type
-            display        inline-block
             width          8em
 
             font-size      em(13px)
@@ -51,47 +53,42 @@
             font-style     normal
             text-transform uppercase
 
+        .value
+            reset()
+            flex 1
+
+
         :not(:empty) ~ .block:not(:first-of-type)
-            margin-top  em(10px)
-            padding-top em(10px)
+            top-padded 10px
 
             border-top  1px solid grey-02
 
-        // edition mode
-        label
-            display block
 
-            input
-                padding          em(4px) em(8px)
-                margin-bottom    1px
-                width            calc(100% - 8em)
+    // edition mode
+    .edit
+        input
+            background-color transparent
 
-                background-color transparent
-                border-radius    2px
+        .group
+            vertically-spaced 6px
 
-                &:hover
-                &:focus
-                    background-color grey-01
+        .type
+            vertically-padded 6px
 
-        fieldset:not(.infos)
-            label
-                display inline-block
+            &:focus
+                color grey-08
 
-                &:first-of-type input
-                    width 8em
-                    padding em(6px) 0
-                    margin 0
+        .value
+            horizontally-padded 8px
+            border-radius       em(2px)
 
-                    font-size      em(13px)
-                    color          grey-05
-                    font-style     normal
-                    text-transform uppercase
+            &:hover
+            &:focus
+                background-color grey-01
 
-                    &:focus
-                        color grey-08
+        textarea.value
+            padded 8px
 
-                &:last-of-type
-                    width calc(100% - 8em)
 
     aside
         padding em(30px)

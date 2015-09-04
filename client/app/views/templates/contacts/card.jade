@@ -25,14 +25,14 @@ block content
             ul.block(class=prefix)
                 if points
                     each point in points
-                        li: +formatPoint(point)
+                        li.group: +formatPoint(point)
                 if prefix == 'xtras'
                     if url
                         - var point = {type: 'web', value: url}
-                        li: +formatPoint(point)
+                        li.group: +formatPoint(point)
                     if bday
                         - var point = {type: t('datapoint label birthday'), value: bday}
-                        li: +formatPoint(point)
+                        li.group: +formatPoint(point)
 
 
     if edit
@@ -50,7 +50,7 @@ block content
         else
             span.avatar.initials= initials
 
-    .data
+    .data(class=edit? 'edit' : '')
         if edit
             +input('prefix')(value=name.prefix)
             +input('firstname')(value=name.first)
