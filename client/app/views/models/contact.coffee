@@ -71,3 +71,11 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             name.suffix
         ].join ';'
         return attrs
+
+
+    addField: (type) ->
+        type = if type in @defaults.props then type else 'xtras'
+        @model.get('datapoints').add
+            type:  undefined
+            value: ''
+            name:  type

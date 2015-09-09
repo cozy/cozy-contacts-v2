@@ -5,7 +5,7 @@ block content
 
     mixin formatDatapoints(points, prefix)
         if edit
-            fieldset.block(class=prefix)
+            fieldset.block(class=prefix, class=(props.indexOf(prefix) != -1)? 'auto' : '')
                 if points
                     each point, index in points
                         +groupInput(point, prefix, index)(placeholder=true)
@@ -31,7 +31,7 @@ block content
                         - var point = {type: 'web', value: url}
                         li.group: +formatPoint(point)
                     if bday
-                        - var point = {type: t('datapoint label birthday'), value: bday}
+                        - var point = {type: t('datapoint label bday'), value: bday}
                         li.group: +formatPoint(point)
 
 
@@ -90,7 +90,7 @@ block content
     aside
         ul
             if edit
-                li: button.create.outline.secondary
+                li: button.save.outline.secondary
                     .fa.fa-check
                     span= t('card actions save')
                 li: button.cancel.outline.secondary
