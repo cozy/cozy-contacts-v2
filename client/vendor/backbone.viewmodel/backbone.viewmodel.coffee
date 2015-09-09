@@ -1,49 +1,70 @@
 do (factory = (root, Backbone) ->
+    Object.defineProperty Object.prototype, 'setValueOf',
+        __proto__: null,
+        value : (path, value) ->
+            path.split('.').reduce (obj, key, index, arr) ->
+                val = if index is arr.length - 1 then value
+                else if obj[key]? then obj[key]
+                else if +key is 'number' then []
+                else {}
+                obj[key] = val
+            , @
+
+
     Backbone.ViewModel = class ViewModel extends Backbone.Model
-
-        sync: ->
-
 
         constructor: (attributes, options) ->
             @model               = options?.model or null
             @compositeCollection = options?.compositeCollection or null
-            @_attachEvents()
-
+            mappedAttrs          = @_buildMappedAttributes()
             super
-
-            @updateMap()
-
-
-        _attachEvents: ->
-            @model?.on 'all', =>
-                args = Array.prototype.slice.call arguments
-                @trigger.apply @, args
-            @model?.on 'change', @updateMap
+            @set mappedAttrs
 
 
-        _getMappedValues: ->
-            map = _.result @, 'map'
-            return null unless _.isObject map
-
-            attrs = {}
-            for attr, action of map
-                do (attr, action) =>
-                    value = if _.isString action
-                        if @[action]
-                            _.result @, action
-                        else if @model.has action
-                            @model.get action
-                    else if _.isFunction action
-                        action.call @
-
-                    attrs[attr] = value
-
-            return attrs
+        sync: ->
 
 
-        updateMap: ->
-            attributes = @_getMappedValues()
-            @set attributes if attributes
+        save: (key, val, options) ->
+            if !key? or typeof key is 'object'
+                attrs   = key
+                options = val
+            else
+                (attrs = {})[key] = val
+
+            @set attrs if attrs
+
+            diff = _.reduce @attributes, (memo, value, key) =>
+                method = "saveMapped#{key[0].toUpperCase()}#{key[1..]}"
+                if @map[key]? and _.isFunction @[method]
+                    _.extend memo, @[method]()
+
+                else if not @defaults[key]? and not @map[key]?
+                    memo[key] = value
+
+                return memo
+            , {}
+            @model.save diff, options
+
+
+        _buildMappedAttributes: ->
+            props = _.reduce @map, (memo, attrs, prop) =>
+                method = "getMapped#{prop[0].toUpperCase()}#{prop[1..]}"
+                return unless _.isFunction @[method]
+
+                callback = =>
+                    args = attrs.split(' ').map (attr) => @model.get attr
+                    @[method].apply @, args
+
+                events = attrs.split(' ').reduce( (memo, attr) ->
+                    memo += "change:#{attr} "
+                , '').trim()
+                @model.on events, =>
+                    console.debug prop, callback()
+                    @set prop, callback()
+
+                memo[prop] = callback()
+                return memo
+            , {}
 
 
         toJSON: ->
@@ -54,10 +75,41 @@ do (factory = (root, Backbone) ->
 
 
         get: (attr) ->
-            if @attributes[attr]?
-                @attributes[attr]
+            if @attributes[attr]? then @attributes[attr] else @model.get attr
+
+
+        set: (key, val, options) ->
+            return @ unless key?
+
+            if typeof key is 'object'
+                attrs   = key
+                options = val
             else
-                @model.get attr
+                (attrs = {})[key] = val
+
+            options ||= {}
+
+            for attr, value of attrs
+                if typeof value is 'object' and
+                typeof @attributes[attr] is 'object'
+                    attrs[attr] = _.extend {}, @attributes[attr], value
+
+            super(attrs, options)
+
+
+        attachViewEvents: (view) ->
+            events = _.result @, 'viewEvents'
+            return unless events
+
+            _.each events, (actions, event) =>
+                if _.isFunction actions
+                    @listenTo view, event, actions
+                else
+                    actionNames = actions.split /\s+/
+                    _.each actionNames, (actionName) =>
+                        return unless @[actionName]
+                        @listenTo view, event, @[actionName]
+
 
 ) ->
     root = (typeof self is 'object' and self.self is self and self) or

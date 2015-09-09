@@ -52,11 +52,11 @@ block content
 
     .data(class=edit? 'edit' : '')
         if edit
-            +input('prefix')(value=name.prefix)
-            +input('firstname')(value=name.first)
-            +input('middlename')(value=name.middle)
-            +input('givenname')(value=name.given)
-            +input('suffix')(value=name.suffix)
+            +input('name.prefix')(value=name.prefix)
+            +input('name.first')(value=name.first)
+            +input('name.middle')(value=name.middle)
+            +input('name.given')(value=name.given)
+            +input('name.suffix')(value=name.suffix)
             
             
             fieldset.block.infos

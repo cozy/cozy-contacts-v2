@@ -1,7 +1,11 @@
 module.exports = class GroupViewModel extends Backbone.ViewModel
 
-    map:
-        isEmpty: 'isEmpty'
+    defaults: ->
+        isEmpty: @isEmpty()
+
+
+    initialize: ->
+        @compositeCollection.on 'add remove', => @set 'isEmpty', @isEmpty()
 
 
     isEmpty: ->

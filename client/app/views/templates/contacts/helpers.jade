@@ -34,7 +34,7 @@ mixin formatJob(title, org, dept)
 
 
 mixin input(name, type)
-    - var label = t('datapoint label ' + name)
+    - var label = t('datapoint label ' + name.replace('.', ' '))
     - var fid = [name, ref].join('-')
     - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name) : false
     - var value = attributes.value

@@ -12,38 +12,46 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             link:    ['web:url', 'blog:url']
 
     map:
-        ref:        'getRef'
-        avatar:     'getPictureSrc'
-        initials:   'getInitials'
-        name:       'splitName'
-        datapoints: 'filterDatapoints'
+        ref:        'id'
+        avatar:     '_attachments id'
+        initials:   'n'
+        name:       'n'
+
+    viewEvents:
+        'field:add': 'addField'
 
 
     initialize: ->
         app = require 'application'
-        @listenTo app.model, 'change:editing', (appModel, value)=>
+        @listenTo app.model, 'change:editing', (appModel, value) =>
             @set 'edit', value
 
+        @set
+            tel:   []
+            email: []
+            adr:   []
+            xtras: []
 
-    getRef: ->
-        @model.id.slice 0, 6
+
+    getMappedRef: (id) ->
+        id.slice 0, 6
 
 
-    getPictureSrc: ->
-        if @model.get('_attachments')?.picture
-            "/contacts/#{@model.get '_id'}/picture.png"
+    getMappedAvatar: (attachments, id) ->
+        if attachments?.picture
+            "/contacts/#{id}/picture.png"
         else
             null
 
 
-    getInitials: ->
-        [gn, fn, ...] = @model.get('n').split ';'
+    getMappedInitials: (n) ->
+        [gn, fn, ...] = n.split ';'
         """#{if fn then asciize(fn)[0] else '' }\
            #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
-    splitName: ->
-        [gn, fn, mn, pf, sf] = @model.get('n').split ';'
+    getMappedName: (n) ->
+        [gn, fn, mn, pf, sf] = n.split ';'
         name =
             first: fn
             given: gn
@@ -53,8 +61,13 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         return name
 
 
-    filterDatapoints: ->
-        _.chain @model.get 'datapoints'
-        .groupBy (point) =>
-            if point.name in @defaults.props then point.name else 'xtras'
-        .value() or []
+    saveMappedName: ->
+        name = @get 'name'
+        (attrs = {})['n'] = [
+            name.given
+            name.first
+            name.middle
+            name.prefix
+            name.suffix
+        ].join ';'
+        return attrs
