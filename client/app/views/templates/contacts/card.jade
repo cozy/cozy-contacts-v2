@@ -5,7 +5,7 @@ block content
 
     mixin formatDatapoints(points, prefix)
         if edit
-            fieldset.block(class=prefix, class=(props.indexOf(prefix) != -1)? 'auto' : '')
+            fieldset.block(data-group=prefix, class=(props.indexOf(prefix) != -1)? 'auto' : '')
                 if points
                     each point, index in points
                         +groupInput(point, prefix, index)(placeholder=true)

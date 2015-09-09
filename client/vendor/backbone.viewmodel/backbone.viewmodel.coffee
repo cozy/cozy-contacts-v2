@@ -17,8 +17,7 @@ do (factory = (root, Backbone) ->
             @model               = options?.model or null
             @compositeCollection = options?.compositeCollection or null
             mappedAttrs          = @_buildMappedAttributes()
-            super
-            @set mappedAttrs
+            super(mappedAttrs)
 
 
         sync: ->
@@ -58,9 +57,7 @@ do (factory = (root, Backbone) ->
                 events = attrs.split(' ').reduce( (memo, attr) ->
                     memo += "change:#{attr} "
                 , '').trim()
-                @model.on events, =>
-                    console.debug prop, callback()
-                    @set prop, callback()
+                @model.on events, => @set prop, callback()
 
                 memo[prop] = callback()
                 return memo

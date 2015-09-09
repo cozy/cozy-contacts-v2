@@ -15,18 +15,12 @@ module.exports = class ContactCardView extends Mn.ItemView
         Form:      behaviorClass: require 'lib/behaviors/form'
 
     ui:
-        navigate:     '[href^=contacts]'
-        edit:         '.edit'
-        save:         '.save'
-        addfield:     '.add button'
-        autoAddField: '.auto .value'
-        inputFields:  'input, textarea'
-
-    events: ->
-        'click @ui.addfield':     'addField'
-        'keyup @ui.autoAddField': 'addField'
-        'keyup @ui.inputFields':  _.debounce @updateFields, 250
-        'click @ui.save':         'save'
+        navigate: '[href^=contacts]'
+        edit:     '.edit'
+        submit:   '.save'
+        inputs:   'input, textarea'
+        add:      '.add button'
+        autoAdd:  '.auto .value'
 
     modelEvents:
         'change:edit': 'render'
@@ -38,25 +32,3 @@ module.exports = class ContactCardView extends Mn.ItemView
 
     onShow: ->
         @ui.edit.focus()
-
-
-    addField: (event)  ->
-        if event.type is 'click'
-            @triggerMethod "field:add", event.currentTarget.value
-        else
-            type = @$(event.currentTarget).siblings('.name').val()
-            hasEmpty = !!@$(".#{type} input.value")
-                .filter -> $(this).val() is ''
-                .length
-
-            @triggerMethod "field:add", type unless hasEmpty
-
-
-    updateFields: (event) ->
-        el = event.currentTarget
-        (attrs = {}).setValueOf el.name, el.value
-        @model.set attrs
-
-
-    save: (event) ->
-        @model.save()
