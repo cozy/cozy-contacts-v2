@@ -23,7 +23,7 @@ module.exports = class Router extends Backbone.Router
         app = require 'application'
         app.on 'start', ->
             contacts = new ContactsRouter 'contacts'
-        app.contacts.on 'sync', ->
+        app.contacts.once 'sync', ->
             app.layout.showContactsList()
             app.layout.disableBusyState()
 
