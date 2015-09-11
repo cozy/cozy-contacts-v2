@@ -1,4 +1,4 @@
-Filtered = BackboneProjections.Filtered
+{Filtered, Sorted}  = BackboneProjections
 {asciize, alphabet} = require 'lib/diacritics'
 
 GroupViewModel = require 'views/models/group'
@@ -30,18 +30,21 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     _filterContactsByInitial: (letter) ->
-        letter = letter.toLowerCase()
-        new Filtered require('application').contacts,
+        letter   = letter.toLowerCase()
+        contacts = new Filtered require('application').contacts,
             filter: (contact) ->
                 [gn, fn, ...] = contact.get('n').split ';'
-                initial = if fn then asciize(fn)[0].toLowerCase()
-                else if gn then asciize(gn)[0].toLowerCase()
+                initial = if gn then asciize(gn)[0].toLowerCase()
+                else if fn then asciize(fn)[0].toLowerCase()
                 else '#'
 
                 if letter is '#'
                     not initial.match alphabet
                 else
                     initial is letter
+        sortedContacts = new Sorted contacts,
+            comparator: (a, b)->
+                a.get('n').localeCompare b.get('n')
 
 
     _buildFilteredCollections: ->
@@ -65,7 +68,7 @@ module.exports = class Contacts extends Mn.CompositeView
         @listenTo app.layout, 'key:pageup', @scroll.bind @, false
         @listenTo app.layout, 'key:pagedown', @scroll.bind @, true
         @focus()
-        
+
 
     focus: ->
         @$el.focus()
