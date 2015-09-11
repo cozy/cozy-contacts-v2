@@ -1,3 +1,4 @@
+Filtered = BackboneProjections.Filtered
 {asciize} = require 'lib/diacritics'
 
 
@@ -18,20 +19,28 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         name:       'n'
 
     viewEvents:
-        'form:addfield':   'addField'
-        'form:submit': -> @save()
+        'form:addfield': 'addField'
+        'sync':          -> @save()
+        'before:sync':   'syncDatapoints'
 
 
     initialize: ->
         app = require 'application'
+
         @listenTo app.model, 'change:editing', (appModel, value) =>
             @set 'edit', value
 
-        @set
-            tel:   []
-            email: []
-            adr:   []
-            xtras: []
+        @['xtras'] = @filterDatapoints null
+        for attr in @defaults.props
+            @[attr] = @filterDatapoints attr
+
+
+    toJSON: ->
+        datapoints = _.reduce @defaults.props, (memo, attr) =>
+            memo[attr] = @[attr].toJSON()
+            return memo
+        , xtras: @xtras.toJSON()
+        _.extend {}, super, datapoints
 
 
     getMappedRef: (id) ->
@@ -75,8 +84,17 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     addField: (type) ->
-        type = if type in @defaults.props then type else 'xtras'
-        @model.get('datapoints').add
-            type:  undefined
-            value: ''
-            name:  type
+
+
+    filterDatapoints: (filter) ->
+        new Filtered @model.get('datapoints'),
+            filter: (datapoint) =>
+                if filter in @defaults.props
+                    datapoint.get('name') is filter
+                else
+                    not datapoint.get('name') in @defaults.props
+
+
+    syncDatapoints: (name, collection) ->
+        toAdd = _.difference collection, @[name].models
+        @model.get('datapoints').add toAdd

@@ -38,17 +38,17 @@ mixin input(name, type)
     - var fid = [name, ref].join('-')
     - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name) : false
     - var value = attributes.value
-    include components/key-field.jade
-    
+    label.group(for=fid)
+        span.type= label
+        if type == 'textarea'
+            textarea.value(id=fid, name=name)= value
+        else
+            input.value(id=fid, name=name, type='text', value=value, placeholder=placeholder)
+
 
 mixin groupInput(point, prefix, index)
-    case point.name
-        when 'im'
-        when 'chat'
-            - var entity = 'social'
-        when 'url'
-            - var entity = 'link'
-        default
-            - var entity = 'default'
     - var placeholder = attributes.placeholder? t('datapoint placeholder ' + (entity == 'default'? point.name : entity)) : false
-    include components/datapoint-field.jade
+    - var group = prefix + '.' + index
+    input.type(id="#{group}.type-#{ref}", name="#{group}.type", type='text', value=point.type, list="list-#{entity}")
+    input.value(id="#{group}.value-#{ref}", name="#{group}.value", type='text', value=point.value, placeholder=placeholder)
+    input.name(id="#{group}.name-#{ref}", name="#{group}.name", type='hidden', value=point.name)

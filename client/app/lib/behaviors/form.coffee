@@ -12,16 +12,17 @@ module.exports = class Form extends Mn.Behavior
     updateFields: (event) ->
         el = event.currentTarget
         (attrs = {}).setValueOf el.name, el.value
-        @view.model.set attrs
+        @view.model.set attrs if @view.model
+        @view.triggerMethod 'form:updatefield', event
 
 
     addField: (event)  ->
         if event.type is 'click'
             @view.triggerMethod 'form:addfield', event.currentTarget.value
         else
-            type = @$(event.currentTarget).parents('[data-group]').data 'group'
-            hasEmpty = !!@$("[data-group=#{type}] input.value")
-                .filter -> $(this).val() is ''
+            $group   = @$(event.currentTarget).parents('[data-type]')
+            type     = $group.data 'type'
+            hasEmpty = !!$group.find('.value')
+                .filter -> !this.value
                 .length
-
             @view.triggerMethod 'form:addfield', type unless hasEmpty

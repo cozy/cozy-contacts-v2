@@ -42,8 +42,7 @@ module.exports = class Contacts extends Mn.CompositeView
                     not initial.match alphabet
                 else
                     initial is letter
-        sortedContacts = new Sorted contacts,
-            comparator: (a, b)->
+            comparator: (a, b) ->
                 a.get('n').localeCompare b.get('n')
 
 

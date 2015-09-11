@@ -1,6 +1,0 @@
-div.group
-    - var group = prefix + '.' + index
-    - point.type = point.type || lists[entity][0]
-    input.type(id="#{group}.type-#{ref}", name="#{group}.type", type='text', value=point.type, list="list-#{entity}")
-    input.value(id="#{group}.value-#{ref}", name="#{group}.value", type='text', value=point.value, placeholder=placeholder)
-    input.name(id="#{group}.name-#{ref}", name="#{group}.name", type='hidden', value=point.name)

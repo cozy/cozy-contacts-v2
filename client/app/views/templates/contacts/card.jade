@@ -3,38 +3,6 @@ extends ../base/dialog.jade
 block content
     include helpers.jade
 
-    mixin formatDatapoints(points, prefix)
-        if edit
-            fieldset.block(data-group=prefix, class=(props.indexOf(prefix) != -1)? 'auto' : '')
-                if points
-                    each point, index in points
-                        +groupInput(point, prefix, index)(placeholder=true)
-                
-                if prefix != 'xtras'
-                    - var point = {name: prefix, type: undefined, value: ''}
-                    +groupInput(point, prefix, points? points.length : 0)(placeholder=true)
-                
-                else
-                    if url
-                        +input('url', 'text')(value=url, placeholder=true)
-                    if bday
-                        +input('bday', 'text')(value=bday, placeholder=true)
-                    +input('note', 'textarea')(value=note)
-
-        else if points || prefix == 'xtras' && (url || bday)
-            ul.block(class=prefix)
-                if points
-                    each point in points
-                        li.group: +formatPoint(point)
-                if prefix == 'xtras'
-                    if url
-                        - var point = {type: 'web', value: url}
-                        li.group: +formatPoint(point)
-                    if bday
-                        - var point = {type: t('datapoint label bday'), value: bday}
-                        li.group: +formatPoint(point)
-
-
     if edit
         each list, listname in lists
             datalist(id="list-#{listname}")
@@ -59,7 +27,7 @@ block content
             +input('name.suffix')(value=name.suffix)
             
             
-            fieldset.block.infos
+            fieldset.block(data-type="infos")
                 +input('org')(value=org, placeholder=true)
                 +input('department')(value=department, placeholder=true)
                 +input('title')(value=title, placeholder=true)
@@ -67,33 +35,39 @@ block content
             h1
                 +formatName(name)
             
-            if title || org || department || note
-                ul.block.infos
+            ul.block(data-type="infos")
+                if title || org || department || note
                     if title || org || department
                         li: +formatJob(title, org, department)
                     if note
                         li= note
-
-        each name in ['tel', 'email', 'adr', 'xtras']
-            +formatDatapoints(datapoints[name], name)
+        
+        .block(data-type="tel")
+        .block(data-type="email")
+        .block(data-type="adr")
+        .block
+            div(data-type="xtras")
+            if edit
+                if bday
+                    +input('bday', 'text')(value=bday, placeholder=true)
+                +input('note', 'textarea')(value=note)
+            else
+                if bday
+                    ul
+                        - var point = {type: t('datapoint label bday'), value: bday}
+                        li.group: +formatPoint(point)
+                
             
         if edit
-            dl.dropdown.add
-                dt= t('card action add select')
-                dd: ul
-                    li: button(value="bday")= t('card action add birthday')
-                    li: button(value="social")= t('card action add social')
-                    li: button(value="link")= t('card action add link')
-                    li: button(value="other")= t('card action add other')
-
+            .actions
 
     aside
         ul
             if edit
-                li: button.save.outline.secondary
+                li: button(type="submit").outline.secondary
                     .fa.fa-check
                     span= t('card actions save')
-                li: button.cancel.outline.secondary
+                li: a.cancel.confirm.outline.secondary(role="button", href="contacts/#{_id}")
                     .fa.fa-times
                     span= t('card actions cancel')
             else

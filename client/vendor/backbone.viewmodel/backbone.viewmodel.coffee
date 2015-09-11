@@ -17,7 +17,7 @@ do (factory = (root, Backbone) ->
             @model               = options?.model or null
             @compositeCollection = options?.compositeCollection or null
             mappedAttrs          = @_buildMappedAttributes()
-            super(mappedAttrs)
+            super _.extend({}, attributes, mappedAttrs), options
 
 
         sync: ->

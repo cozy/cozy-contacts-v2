@@ -1,7 +1,7 @@
 include helpers.jade
 
 mixin formatDatapoints(points, prefix)
-    if points
+    if points.length
         dl(role="gridcell", class=prefix)
             dt
                 +formatPoint(points[0])
@@ -28,5 +28,5 @@ a.name(role="gridcell", href="contacts/#{_id}")
         
     p: +formatName(name)
     
-+formatDatapoints(datapoints.tel, 'tel')
-+formatDatapoints(datapoints.email, 'email')
++formatDatapoints(tel, 'tel')
++formatDatapoints(email, 'email')
