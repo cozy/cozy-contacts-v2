@@ -2,6 +2,12 @@
     [role=columnheader]
         padding-left 1.5em
 
+        background-color grey-01
+
+        font-size      14px
+        font-weight    bold
+        text-transform uppercase
+
 
     [role=rowgroup]
         padding 0 1em
@@ -12,11 +18,23 @@
         align-items center
         padding .3em 0
 
-        & > label
+        text-decoration none
+
+        &:not(:last-child)
+            border-bottom 1px solid grey-02
+
+        > a
+            color           grey-08
+            text-decoration none
+
+        > dl
+            color grey-05
+
+        > label
             @media (max-width: (360/16)rem)
                 display none
 
-        input
+        [type=checkbox]
             hide()
 
 
@@ -29,11 +47,18 @@
             display flex
             align-items center
 
+            color grey-08
+
             @media (max-width: (360/16)rem)
                 margin-left 0
 
         .initials
             flex-shrink 0
+
+            background-color grey-03 // TO DO: remove it
+            border-radius    50%
+
+            color white
 
         .avatar
             avatar(40px)
