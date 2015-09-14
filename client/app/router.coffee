@@ -93,7 +93,6 @@ module.exports = class Router extends Backbone.Router
 
         if @importer?
             @importer.close()
-            @importer.$el.remove()
             @importer = null
 
         app.contactview.remove() if app.contactview
