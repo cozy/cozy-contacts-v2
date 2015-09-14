@@ -19,6 +19,9 @@ module.exports = class Group extends Mn.CompositeView
     modelEvents:
         'change:isEmpty': 'toggleEmpty'
 
+    collectionEvents:
+        'change': 'render'
+
 
     initialize: ->
         @on 'render:template', @toggleEmpty
