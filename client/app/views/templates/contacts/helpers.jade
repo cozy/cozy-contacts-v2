@@ -44,6 +44,8 @@ mixin input(name, type)
             textarea.value(id=fid, name=name)= value
         else
             input.value(id=fid, name=name, type='text', value=value, placeholder=placeholder)
+            button.clear
+                .fa.fa-times
 
 
 mixin groupInput(point, prefix, index)

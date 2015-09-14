@@ -28,6 +28,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         submit:   '[type=submit]'
         inputs:   'input, textarea'
         add:      '.add button'
+        clear:    '.clear'
 
 
     modelEvents:

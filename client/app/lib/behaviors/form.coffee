@@ -4,20 +4,22 @@ module.exports = class Form extends Mn.Behavior
         'click @ui.add':     'addField'
         'keyup @ui.autoAdd': 'addField'
         'keyup @ui.inputs':  _.debounce @updateFields, 250
-        'change @ui.inputs':  @updateFields
+        'change @ui.inputs': 'updateFields'
+        'click @ui.clear':   'clearField'
+        'click @ui.delete':  'deleteField'
 
     triggers:
         'click @ui.submit': 'form:submit'
 
 
-    updateFields: (event) ->
-        el = event.currentTarget
+    updateFields: (event, el) ->
+        el ?= event.currentTarget
         (attrs = {}).setValueOf el.name, el.value
         @view.model.set attrs, silent: true if @view.model
         @view.triggerMethod 'form:updatefield', event
 
 
-    addField: (event)  ->
+    addField: (event) ->
         if event.type is 'click'
             @view.triggerMethod 'form:addfield', event.currentTarget.value
         else
@@ -27,3 +29,13 @@ module.exports = class Form extends Mn.Behavior
                 .filter -> !this.value
                 .length
             @view.triggerMethod 'form:addfield', type unless hasEmpty
+
+
+    clearField: (event) ->
+        $el = @$(event.currentTarget).prev '.value'
+        $el.val null
+        @view.triggerMethod 'form:clearfield', event
+        @updateFields event, $el[0]
+
+
+    deleteField: (event) ->
