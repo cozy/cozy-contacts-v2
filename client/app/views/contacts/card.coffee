@@ -34,6 +34,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'change:edit':     'render'
         'change:initials': 'updateInitials'
         'before:save':     'syncDatapoints'
+        'save':            -> @triggerMethod 'dialog:close'
 
 
     initialize: ->
