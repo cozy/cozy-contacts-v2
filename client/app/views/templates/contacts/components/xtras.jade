@@ -1,0 +1,8 @@
+include ../helpers.jade
+
+each value, key in xtras
+    if edit
+        +input(key, 'text')(value=value, placeholder=true)
+    else
+        - var point = {type: t('datapoint label ' + key), value: value}
+        li.group: +formatPoint(point)

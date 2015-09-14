@@ -1,5 +1,8 @@
 DatapointsView  = require 'views/contacts/components/datapoints'
+XtrasView       = require 'views/contacts/components/xtras'
 EditActionsView = require 'views/contacts/components/edit_actions'
+
+CONFIG = require('config').contact
 
 
 module.exports = class ContactCardView extends Mn.LayoutView
@@ -26,28 +29,40 @@ module.exports = class ContactCardView extends Mn.LayoutView
         inputs:   'input, textarea'
         add:      '.add button'
 
-    regions:
-        actions: '.actions'
-
 
     modelEvents:
         'change:edit':     'render'
         'change:initials': 'updateInitials'
+        'before:save':     'syncDatapoints'
 
 
     initialize: ->
         @model.attachViewEvents @
-        @on 'form:submit', @syncDatapoints
+
+
+    serializeData: ->
+        data = _.extend super, lists: CONFIG.datapoints.types
 
 
     onRender: ->
-        @$('[data-type]:not(:first)').each (index, el) =>
+        @$('.datapoints').each (index, el) =>
             name = el.dataset.type
             @addRegion name, "[data-type=#{name}]"
             @showChildView name, new DatapointsView
                 collection:    @model[name]
                 name:          name
                 cardViewModel: @model
+
+        @addRegion 'xtras-infos', '[data-type=xtras-infos]'
+        @showChildView 'xtras-infos', new XtrasView model: @model
+
+        if @model.get 'edit'
+            @addRegion 'actions', '.actions'
+            @showChildView 'actions', new EditActionsView model: @model
+
+            @on 'form:addfield', (type) ->
+                return if type in CONFIG.xtras
+                @getRegion('xtras').currentView.addEmptyField type
 
 
     onShow: ->
@@ -63,5 +78,4 @@ module.exports = class ContactCardView extends Mn.LayoutView
             return unless region.currentView?.getDatapoints
             name       = region.currentView.options.name
             datapoints = region.currentView.getDatapoints()
-            @triggerMethod 'before:sync', name, datapoints
-        @triggerMethod 'sync'
+            @model.syncDatapoints name, datapoints

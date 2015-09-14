@@ -4,7 +4,7 @@ ContactDatapointView = require 'views/contacts/components/datapoint'
 module.exports = class ContactDatapointsView extends Mn.CollectionView
 
     tagName: ->
-        if @options.edit then 'fieldset' else 'ul'
+        if @options.cardViewModel.get 'edit' then 'fieldset' else 'ul'
 
 
     behaviors:
@@ -28,14 +28,14 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
         if options.cardViewModel.get 'edit'
             @collection = new Backbone.Collection options.collection.models
-            @addEmptyField() unless  @options.name is 'xtras'
+            @addEmptyField() unless @options.name is 'xtras'
 
 
-    addEmptyField: ->
+    addEmptyField: (name) ->
         @collection.add
             type:  undefined
             value: ''
-            name:  @options.name
+            name:  name or @options.name
 
 
     updateFields: (event) ->

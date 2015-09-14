@@ -42,22 +42,15 @@ block content
                     if note
                         li= note
         
-        .block(data-type="tel")
-        .block(data-type="email")
-        .block(data-type="adr")
-        .block
-            div(data-type="xtras")
+        .block.datapoints(data-type="tel")
+        .block.datapoints(data-type="email")
+        .block.datapoints(data-type="adr")
+        fieldset.block
+            div.datapoints(data-type="xtras")
+            div(data-type="xtras-infos")
             if edit
-                if bday
-                    +input('bday', 'text')(value=bday, placeholder=true)
                 +input('note', 'textarea')(value=note)
-            else
-                if bday
-                    ul
-                        - var point = {type: t('datapoint label bday'), value: bday}
-                        li.group: +formatPoint(point)
-                
-            
+
         if edit
             .actions
 

@@ -1,7 +1,7 @@
-//- dl.dropdown.add
-//-     dt= t('card action add select')
-//-     dd: ul
-//-         li: button(value="bday")= t('card action add birthday')
-//-         li: button(value="social")= t('card action add social')
-//-         li: button(value="link")= t('card action add link')
-//-         li: button(value="other")= t('card action add other')
+dt= t('card action add select')
+dd.add: ul
+    if bday == null
+        li: button(value="bday")= t('card action add birthday')
+    li: button(value="social")= t('card action add social')
+    li: button(value="url")= t('card action add link')
+    li: button(value="other")= t('card action add other')

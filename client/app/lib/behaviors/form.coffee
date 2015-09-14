@@ -4,6 +4,7 @@ module.exports = class Form extends Mn.Behavior
         'click @ui.add':     'addField'
         'keyup @ui.autoAdd': 'addField'
         'keyup @ui.inputs':  _.debounce @updateFields, 250
+        'change @ui.inputs':  @updateFields
 
     triggers:
         'click @ui.submit': 'form:submit'
@@ -12,7 +13,7 @@ module.exports = class Form extends Mn.Behavior
     updateFields: (event) ->
         el = event.currentTarget
         (attrs = {}).setValueOf el.name, el.value
-        @view.model.set attrs if @view.model
+        @view.model.set attrs, silent: true if @view.model
         @view.triggerMethod 'form:updatefield', event
 
 

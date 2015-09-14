@@ -42,7 +42,10 @@ do (factory = (root, Backbone) ->
 
                 return memo
             , {}
+            
+            @trigger 'before:save'
             @model.save diff, options
+            @trigger 'save'
 
 
         _buildMappedAttributes: ->

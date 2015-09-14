@@ -1,16 +1,13 @@
 Filtered = BackboneProjections.Filtered
 {asciize} = require 'lib/diacritics'
 
+CONFIG = require('config').contact
+
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
     defaults:
         edit:  false
-        props: ['tel', 'email', 'adr']
-        lists:
-            default: ['main', 'work', 'home']
-            social:  ['twitter:chat', 'skype:im']
-            link:    ['web:url', 'blog:url']
 
     map:
         ref:        'id'
@@ -20,8 +17,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     viewEvents:
         'form:addfield': 'addField'
-        'sync':          -> @save()
-        'before:sync':   'syncDatapoints'
+        'form:submit':   -> @save()
 
 
     initialize: ->
@@ -31,12 +27,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             @set 'edit', value
 
         @['xtras'] = @filterDatapoints null
-        for attr in @defaults.props
+        for attr in CONFIG.datapoints.main
             @[attr] = @filterDatapoints attr
 
 
     toJSON: ->
-        datapoints = _.reduce @defaults.props, (memo, attr) =>
+        datapoints = _.reduce CONFIG.datapoints.main, (memo, attr) =>
             memo[attr] = @[attr].toJSON()
             return memo
         , xtras: @xtras.toJSON()
@@ -84,15 +80,16 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     addField: (type) ->
+        @set type, '' if type in CONFIG.xtras
 
 
     filterDatapoints: (filter) ->
         new Filtered @model.get('datapoints'),
             filter: (datapoint) =>
-                if filter in @defaults.props
+                if filter in CONFIG.datapoints.main
                     datapoint.get('name') is filter
                 else
-                    not datapoint.get('name') in @defaults.props
+                    datapoint.get('name') not in CONFIG.datapoints.main
 
 
     syncDatapoints: (name, collection) ->

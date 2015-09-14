@@ -1,7 +1,10 @@
+CONFIG = require('config').contact
+
+
 module.exports = class ContactDatapointView extends Mn.ItemView
 
     tagName: ->
-        if @options.edit then 'div' else 'li'
+        if @options.cardViewModel.get 'edit' then 'div' else 'li'
 
     className: 'group'
 
@@ -11,14 +14,23 @@ module.exports = class ContactDatapointView extends Mn.ItemView
     template: require 'views/templates/contacts/components/datapoint'
 
 
-    serializeData: ->
-        entity = switch @options.name
-            when 'im', 'chat' then 'social'
-            when 'url'        then 'link'
-            else                   'default'
+    ui:
+        'type': 'input.type'
 
+    events: ->
+        if @options.name is 'xtras'
+            'keyup @ui.type':  _.debounce @updateType, 250
+            'change @ui.type': @updateType
+
+
+    serializeData: ->
         data = super
-        data.type ?= @options.cardViewModel.get('lists')[entity][0]
+        entity = switch data.name
+            when 'social', 'chat' then 'social'
+            when 'url'            then 'url'
+            else                       'default'
+
+        data.type ?= CONFIG.datapoints.types[entity][0].split(':')[0]
 
         edit:   @options.cardViewModel.get 'edit'
         ref:    @options.cardViewModel.get 'ref'
@@ -26,3 +38,17 @@ module.exports = class ContactDatapointView extends Mn.ItemView
         index:  @options.index
         entity: entity
         point:  data
+
+
+    updateType: (event) ->
+        name = @model.get 'name'
+        return if name is 'url'
+
+        entity = _.find CONFIG.datapoints.types.social, (type) ->
+            type.match new RegExp "^#{event.currentTarget.value.toLowerCase()}"
+        if entity
+            [..., name] = entity.split ':'
+        else
+            name = 'other'
+
+        @$(event.currentTarget).siblings('.name').val name

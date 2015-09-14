@@ -30,9 +30,10 @@
     "datapoint placeholder email":      "ajouter une adresse email",
     "datapoint placeholder adr":        "ajouter une adresse",
     "datapoint placeholder social":     "ajouter un nom d'utilisateur",
-    "datapoint placeholder link":       "ajouter une url",
-    "datapoint label url":              "web",
+    "datapoint placeholder im":         "ajouter un nom d'utilisateur",
+    "datapoint placeholder chat":       "ajouter un nom d'utilisateur",
     "datapoint placeholder url":        "ajouter une url",
+    "datapoint placeholder other":      "ajouter une information",
     "datapoint label bday":             "anniversaire",
     "datapoint placeholder bday":       "YYYY-MM-DD",
     "datapoint label note":             "notes"
