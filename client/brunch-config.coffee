@@ -47,7 +47,6 @@ exports.config =
         postcss:
             processors: [
                 require('autoprefixer-core')(['last 2 versions'])
-                require('postcss-focus')
             ]
 
 
@@ -61,7 +60,6 @@ exports.config =
                 postcss:
                     processors: [
                         require('autoprefixer-core')(['last 2 versions'])
-                        require('postcss-focus')
                         require('css-mqpacker')
                         require('csswring')
                     ]

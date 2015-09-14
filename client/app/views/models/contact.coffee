@@ -85,7 +85,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     filterDatapoints: (filter) ->
         new Filtered @model.get('datapoints'),
-            filter: (datapoint) =>
+            filter: (datapoint) ->
                 if filter in CONFIG.datapoints.main
                     datapoint.get('name') is filter
                 else

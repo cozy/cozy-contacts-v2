@@ -24,7 +24,6 @@
     "mocha": "^2.2.5",
     "opener": "^1.4.1",
     "postcss-brunch": "^0.4.2",
-    "postcss-focus": "^0.1.1",
     "printit": "^0.1.8",
     "sinon": "^1.15.4",
     "stylus-brunch": "^1.8.1",

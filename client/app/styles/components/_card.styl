@@ -63,6 +63,14 @@
         .group
             vertically-spaced 6px
 
+            &:focus
+            &:hover
+                .value
+                    background-color grey-01
+
+            &:not(:hover) button
+                hide()
+
         .type
             vertically-padded 6px
 
@@ -72,10 +80,6 @@
         .value
             horizontally-padded 8px
             border-radius       em(2px)
-
-            &:hover
-            &:focus
-                background-color grey-01
 
         textarea.value
             padded 8px
