@@ -26,14 +26,19 @@ module.exports = class ContactCardView extends Mn.LayoutView
         navigate: '[href^=contacts]'
         edit:     '.edit'
         submit:   '[type=submit]'
+        cancel:   '.cancel'
         inputs:   'input, textarea'
         add:      '.add button'
         clear:    '.clear'
+
+    triggers:
+        'click @ui.cancel': 'edit:cancel'
 
 
     modelEvents:
         'change:edit':     'render'
         'change:initials': 'updateInitials'
+        'change':          -> @render() unless @model.get 'edit'
         'before:save':     'syncDatapoints'
         'save':            -> @triggerMethod 'dialog:close'
 
@@ -43,7 +48,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     serializeData: ->
-        data = _.extend super, lists: CONFIG.datapoints.types
+        _.extend super, lists: CONFIG.datapoints.types
 
 
     onRender: ->

@@ -23,6 +23,11 @@ do (factory = (root, Backbone) ->
         sync: ->
 
 
+        reset: ->
+            @unset attr if @has attr for attr in @model?.attributes
+            @trigger 'reset'
+
+
         save: (key, val, options) ->
             if !key? or typeof key is 'object'
                 attrs   = key
@@ -61,6 +66,7 @@ do (factory = (root, Backbone) ->
                     .map (attr) -> "change:#{attr}"
                     .join ' '
                 @model.on events, -> @set prop, callback()
+                @listenTo @, 'reset', -> @set prop, callback()
 
                 memo[prop] = callback()
                 return memo
