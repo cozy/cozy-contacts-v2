@@ -63,10 +63,12 @@
         .group
             vertically-spaced 6px
 
-            &:focus
             &:hover
                 .value
                     background-color grey-01
+
+            .value:focus
+                background-color grey-01
 
             &:not(:hover) button
                 hide()
