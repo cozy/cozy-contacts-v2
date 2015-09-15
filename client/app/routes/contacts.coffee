@@ -7,8 +7,8 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     initialize: ->
         app = require 'application'
-        app.model.on 'change:dialog', (model, value) =>
-            @navigate 'contacts' unless value
+        @listenTo app.model, 'change:dialog', (model, id) ->
+            @navigate 'contacts' unless id
 
 
     _ensureContacts: (callback) ->
@@ -23,7 +23,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
     _setCardState: (id, edit = false) ->
         app = require 'application'
         app.model.set 'dialog', if app.contacts.get(id) then id else false
-        app.model.set 'editing', edit
+        app.trigger 'mode:edit', edit
 
 
     show: (id) ->

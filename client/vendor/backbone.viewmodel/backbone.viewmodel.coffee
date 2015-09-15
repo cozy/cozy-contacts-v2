@@ -42,7 +42,7 @@ do (factory = (root, Backbone) ->
 
                 return memo
             , {}
-            
+
             @trigger 'before:save'
             @model.save diff, options
             @trigger 'save'
@@ -57,10 +57,10 @@ do (factory = (root, Backbone) ->
                     args = attrs.split(' ').map (attr) => @model.get attr
                     @[method].apply @, args
 
-                events = attrs.split(' ').reduce( (memo, attr) ->
-                    memo += "change:#{attr} "
-                , '').trim()
-                @model.on events, => @set prop, callback()
+                events = attrs.split(' ')
+                    .map (attr) -> "change:#{attr}"
+                    .join ' '
+                @model.on events, -> @set prop, callback()
 
                 memo[prop] = callback()
                 return memo
@@ -90,7 +90,8 @@ do (factory = (root, Backbone) ->
             options ||= {}
 
             for attr, value of attrs
-                if typeof value is 'object' and
+                if value and
+                typeof value is 'object' and
                 typeof @attributes[attr] is 'object'
                     attrs[attr] = _.extend {}, @attributes[attr], value
 

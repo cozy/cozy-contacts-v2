@@ -60,6 +60,7 @@ module.exports = class AppLayout extends Mn.LayoutView
             app = require 'application'
             model = app.contacts.get id
             modelView = new ContactViewModel {}, model: model
+            app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
             @showChildView 'dialogs', new CardView model: modelView
         else
             @dialogs.empty()

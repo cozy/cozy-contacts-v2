@@ -23,9 +23,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     initialize: ->
         app = require 'application'
 
-        @listenTo app.model, 'change:editing', (appModel, value) =>
-            @set 'edit', value
-
         @['xtras'] = @filterDatapoints null
         for attr in CONFIG.datapoints.main
             @[attr] = @filterDatapoints attr
