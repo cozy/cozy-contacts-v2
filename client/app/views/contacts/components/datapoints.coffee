@@ -8,7 +8,7 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
 
     behaviors:
-        Form: behaviorClass: require 'lib/behaviors/form'
+        Form: {}
 
     ui: ->
         (ui = {})['inputs'] = ':input:not(button)'

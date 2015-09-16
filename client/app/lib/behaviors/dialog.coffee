@@ -2,7 +2,6 @@ module.exports = class Modal extends Mn.Behavior
 
     behaviors:
         Keyboard:
-            behaviorClass: require 'lib/behaviors/keyboard'
             keymaps:
                 '27': 'key:escape'
 

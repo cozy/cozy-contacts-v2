@@ -33,5 +33,6 @@ Starts
 Trigger locale initilization and starts application singleton.
 ###
 $ ->
+    Mn.Behaviors.behaviorsLookup = require 'lib/behaviors'
     initLocale()
     application.start()

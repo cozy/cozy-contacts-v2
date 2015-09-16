@@ -21,7 +21,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     behaviors:
         Keyboard:
-            behaviorClass: require 'lib/behaviors/keyboard'
             keymaps:
                 '33': 'key:pageup'
                 '34': 'key:pagedown'
