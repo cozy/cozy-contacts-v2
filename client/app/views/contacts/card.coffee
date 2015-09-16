@@ -73,8 +73,9 @@ module.exports = class ContactCardView extends Mn.LayoutView
                 @getRegion('xtras').currentView.addEmptyField type
 
 
-    onShow: ->
-        @ui.edit.focus()
+    onDomRefresh: ->
+        if @model.get('edit') then @ui.inputs.first().focus()
+        else @ui.edit.focus()
 
 
     updateInitials: (model, value) ->
