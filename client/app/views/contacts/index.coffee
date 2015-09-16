@@ -12,16 +12,19 @@ module.exports = class Contacts extends Mn.CompositeView
         role: 'list'
         tabindex: 0
 
+
     childView: require 'views/contacts/group'
 
     childViewOptions: (model) ->
         collection: model.compositeCollection
+
 
     ui:
         navigate: '.name'
 
     behaviors:
         Navigator: behaviorClass: require 'lib/behaviors/navigator'
+        Dropdown:  behaviorClass: require 'lib/behaviors/dropdown'
 
 
     initialize: ->

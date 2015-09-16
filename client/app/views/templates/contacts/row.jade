@@ -2,13 +2,14 @@ include helpers.jade
 
 mixin formatDatapoints(points, prefix)
     if points.length
-        dl(role="gridcell", class=prefix)
+        - var pop = points.length > 1
+        dl(role="gridcell", class=prefix, aria-haspopup=(pop? 'true' : 'false'), aria-expanded="false", data-position='bottom left')
             dt
                 +formatPoint(points[0])
-                if points.length > 1
+                if pop
                     span.fa.fa-caret-down
-            if points.length > 1
-                dd(aria-hidden="true"): ul
+            if pop
+                dd: ul
                     each point in points.slice(1)
                         li: +formatPoint(point)
     else

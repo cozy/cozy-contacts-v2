@@ -21,6 +21,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Navigator: behaviorClass: require 'lib/behaviors/navigator'
         Dialog:    behaviorClass: require 'lib/behaviors/dialog'
         Form:      behaviorClass: require 'lib/behaviors/form'
+        Dropdown:  behaviorClass: require 'lib/behaviors/dropdown'
 
     ui:
         navigate: '[href^=contacts]'
