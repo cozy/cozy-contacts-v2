@@ -49,10 +49,11 @@
             flex 1
 
 
-        .block:not(:empty):not(:nth-child(1))
+        .block[data-type] ul:not(:empty)
+        .block [data-type]:first-child ul:not(:empty)
+        &.edit .block
             top-padded 10px
-
-            border-top  1px solid grey-02
+            border-top 1px solid grey-02
 
 
     // edition mode

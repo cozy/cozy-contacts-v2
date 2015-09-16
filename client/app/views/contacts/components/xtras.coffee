@@ -4,7 +4,7 @@ CONFIG = require('config').contact
 module.exports = class ContactXtrasView extends Mn.ItemView
 
     tagName: ->
-        if @model.get 'edit' then 'div' else 'ul'
+        if @model.get 'edit' then 'fieldset' else 'ul'
 
     template: require 'views/templates/contacts/components/xtras'
 
