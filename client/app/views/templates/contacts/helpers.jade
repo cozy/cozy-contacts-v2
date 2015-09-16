@@ -44,7 +44,7 @@ mixin input(name, type)
             textarea.value(id=fid, name=name)= value
         else
             input.value(id=fid, name=name, type='text', value=value, placeholder=placeholder)
-            button.clear
+            button.link.clear
                 .fa.fa-times
 
 
@@ -53,6 +53,6 @@ mixin groupInput(point, prefix, index)
     - var group = prefix + '.' + index
     input.type(id="#{group}.type-#{ref}", name="#{group}.type", type='text', value=point.type, list="list-#{entity}")
     input.value(id="#{group}.value-#{ref}", name="#{group}.value", type='text', value=point.value, placeholder=placeholder)
-    button.delete
+    button.link.delete
         .fa.fa-trash
     input.name(id="#{group}.name-#{ref}", name="#{group}.name", type='hidden', value=point.name)
