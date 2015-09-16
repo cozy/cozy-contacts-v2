@@ -27,7 +27,8 @@ module.exports = class Contact extends Backbone.Model
         datapoints = model.attributes.datapoints.toJSON()
         mainUrl = _.findWhere datapoints, {name: 'url'}
 
-        options.attrs.datapoints = _.without datapoints, mainUrl
-        options.attrs.url = mainUrl.value
+        if mainUrl
+            options.attrs.datapoints = _.without datapoints, mainUrl
+            options.attrs.url = mainUrl.value
 
         super
