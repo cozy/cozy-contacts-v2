@@ -27,8 +27,9 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
 
     initialize: (options) ->
-        @on 'form:addfield', @addEmptyField
-        @on 'form:updatefield', @updateFields
+        @listenTo @, 'form:addfield', @addEmptyField
+        @listenTo @, 'form:updatefield', @updateFields
+        @listenTo @, 'form:deletefield', @deleteField
 
         if options.cardViewModel.get 'edit'
             @collection = new Backbone.Collection options.collection.models

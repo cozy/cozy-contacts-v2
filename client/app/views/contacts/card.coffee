@@ -72,7 +72,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
             @addRegion 'actions', '.actions'
             @showChildView 'actions', new EditActionsView model: @model
 
-            @on 'form:addfield', (type) ->
+            @listenTo @, 'form:addfield', (type) ->
                 return if type in CONFIG.xtras
                 @getRegion('xtras').currentView.addEmptyField type
 

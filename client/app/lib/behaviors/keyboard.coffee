@@ -6,9 +6,8 @@ module.exports = class Keyboard extends Mn.Behavior
     events: ->
         return unless @options.keymaps
 
-        events = {}
         keyEvents = _.mapObject @options.keymaps, @_buildKeyboardTrigger
-        events[@options.eventName] = (event) =>
+        (events = {})[@options.eventName] = (event) =>
             key = event.which.toString()
             return unless key in _.keys keyEvents
             keyEvents[key].call @, event
