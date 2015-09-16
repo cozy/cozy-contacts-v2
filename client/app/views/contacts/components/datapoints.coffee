@@ -11,8 +11,12 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         Form: {}
 
     ui: ->
-        (ui = {})['inputs'] = ':input:not(button)'
+        ui =
+            inputs: ':input:not(button)'
+            delete: '.delete'
+
         ui.autoAdd = '.value' unless @options.name is 'xtras'
+
         return ui
 
 
@@ -29,6 +33,10 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         if options.cardViewModel.get 'edit'
             @collection = new Backbone.Collection options.collection.models
             @addEmptyField() unless @options.name is 'xtras'
+
+
+    getDatapoints: ->
+        @collection.filter (model) -> model.get('value') isnt ''
 
 
     addEmptyField: (name) ->
@@ -48,5 +56,5 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         model.set attrs
 
 
-    getDatapoints: ->
-        @collection.filter (model) -> model.get('value') isnt ''
+    deleteField: (id) ->
+        @collection.remove id

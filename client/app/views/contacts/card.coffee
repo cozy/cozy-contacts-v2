@@ -28,7 +28,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         edit:     '.edit'
         submit:   '[type=submit]'
         cancel:   '.cancel'
-        inputs:   ':input:not(button)'
+        inputs:   '.group:not([data-cid]) :input:not(button)'
         add:      '.add button'
         clear:    '.clear'
 

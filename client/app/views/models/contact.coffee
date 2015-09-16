@@ -91,5 +91,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     syncDatapoints: (name, collection) ->
-        toAdd = _.difference collection, @[name].models
-        @model.get('datapoints').add toAdd
+        datapoints = @model.get 'datapoints'
+        datapoints.remove _.difference @[name].models, collection
+        datapoints.add _.difference collection, @[name].models
