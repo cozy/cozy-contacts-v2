@@ -1,7 +1,8 @@
-dt= t('card action add select')
+dt.outline.secondary.caret(role="button")= t('card action add select')
+    i.fa.fa-caret-down
 dd.add: ul
     if bday == null
-        li: button(value="bday")= t('card action add birthday')
-    li: button(value="social")= t('card action add social')
-    li: button(value="url")= t('card action add link')
-    li: button(value="other")= t('card action add other')
+        li: button.link(value="bday")= t('card action add birthday')
+    li: button.link(value="social")= t('card action add social')
+    li: button.link(value="url")= t('card action add link')
+    li: button.link(value="other")= t('card action add other')
