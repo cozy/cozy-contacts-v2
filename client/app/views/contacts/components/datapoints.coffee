@@ -11,7 +11,7 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         Form: behaviorClass: require 'lib/behaviors/form'
 
     ui: ->
-        (ui = {})['inputs'] = ':input'
+        (ui = {})['inputs'] = ':input:not(button)'
         ui.autoAdd = '.value' unless @options.name is 'xtras'
         return ui
 

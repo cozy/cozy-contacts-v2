@@ -28,5 +28,4 @@ module.exports = class Keyboard extends Mn.Behavior
                     event.preventDefault()
                 if event.stopPropagation and options.stopPropagation
                     event.stopPropagation()
-
-            @triggerMethod.call @view, eventName
+            @view.triggerMethod eventName, event

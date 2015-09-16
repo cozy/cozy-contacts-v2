@@ -1,5 +1,12 @@
 module.exports = class Form extends Mn.Behavior
 
+    behaviors:
+        Keyboard:
+            behaviorClass: require 'lib/behaviors/keyboard'
+            keymaps:
+                '13': 'form:enter'
+
+
     events: ->
         'click @ui.add':     'addField'
         'keyup @ui.autoAdd': 'addField'
