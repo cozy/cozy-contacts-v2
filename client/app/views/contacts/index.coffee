@@ -28,7 +28,6 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     initialize: ->
-        @on 'show', @attachScrollEvents
         @_buildFilteredCollections()
 
 
@@ -65,7 +64,7 @@ module.exports = class Contacts extends Mn.CompositeView
         @_parent.$el.scrollTop incr
 
 
-    attachScrollEvents: ->
+    onShow: ->
         app = require('application')
         @listenTo app.layout, 'key:pageup', @scroll.bind @, false
         @listenTo app.layout, 'key:pagedown', @scroll.bind @, true

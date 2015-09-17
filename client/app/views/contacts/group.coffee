@@ -20,7 +20,7 @@ module.exports = class Group extends Mn.CompositeView
         'change:isEmpty': 'toggleEmpty'
 
     collectionEvents:
-        'change': 'render'
+        'update': 'render'
 
 
     initialize: ->

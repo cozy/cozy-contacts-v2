@@ -18,6 +18,9 @@ do (factory = (root, Backbone) ->
             @compositeCollection = options?.compositeCollection or null
             mappedAttrs          = @_buildMappedAttributes()
             super _.extend({}, attributes, mappedAttrs), options
+            @listenTo @model, 'all', ->
+                args = Array.prototype.slice.call arguments, 0
+                @trigger.apply @, args
 
 
         sync: ->
@@ -71,11 +74,10 @@ do (factory = (root, Backbone) ->
                     args = attrs.split(' ').map (attr) => @model.get attr
                     @[method].apply @, args
 
-                events = attrs.split(' ')
-                    .map (attr) -> "change:#{attr}"
-                    .join ' '
-                @model.on events, -> @set prop, callback()
                 @listenTo @, 'reset', -> @set prop, callback()
+                _.each attrs.split(' '), (attr) ->
+                    @listenTo @model, "change:#{attr}", -> @set prop, callback()
+                , @
 
                 memo[prop] = callback()
                 return memo
