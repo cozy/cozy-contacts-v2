@@ -67,7 +67,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     saveMappedName: ->
-        name = @get 'name'
+        name = _.clone(@get 'name')
         (attrs = {})['n'] = [
             name.given
             name.first

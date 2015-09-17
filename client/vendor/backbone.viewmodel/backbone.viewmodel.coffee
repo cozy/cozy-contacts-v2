@@ -70,17 +70,24 @@ do (factory = (root, Backbone) ->
                 method = "getMapped#{prop[0].toUpperCase()}#{prop[1..]}"
                 return unless _.isFunction @[method]
 
-                callback = (immediate = true) =>
+                callback = (options) =>
+                    opts = _.defaults {}, options,
+                        immediate: true
+                        reset:     false
+
                     args  = attrs.split(' ').map (attr) => @model.get attr
                     value = @[method].apply @, args
-                    @set prop, value if immediate
+
+                    @set prop, value, reset: opts.reset if opts.immediate
+
                     return value
 
                 @listenTo @, 'reset', callback
                 _.each attrs.split(' '), (attr) =>
-                    @listenTo @model, "change:#{attr}", callback
+                    @listenTo @model, "change:#{attr}", ->
+                        callback reset: true
 
-                memo[prop] = callback false
+                memo[prop] = callback immediate: false
                 return memo
             , {}
 
@@ -107,11 +114,12 @@ do (factory = (root, Backbone) ->
 
             options ||= {}
 
-            for attr, value of attrs
-                if value and
-                typeof value is 'object' and
-                typeof @attributes[attr] is 'object'
-                    attrs[attr] = _.extend {}, @attributes[attr], value
+            unless options.reset
+                for attr, value of attrs
+                    if value and
+                    typeof value is 'object' and
+                    typeof @attributes[attr] is 'object'
+                        attrs[attr] = _.extend {}, @attributes[attr], value
 
             super(attrs, options)
 
