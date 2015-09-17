@@ -7,9 +7,13 @@ module.exports = class Modal extends Mn.Behavior
 
     ui:
         backdrop: '[role=separator]'
+        content:  '[role=contentinfo]'
 
     triggers:
         'click @ui.backdrop': 'click:backdrop'
+
+    events:
+        'click @ui.content': 'detectClickOutside'
 
 
     initialize: ->
@@ -19,3 +23,10 @@ module.exports = class Modal extends Mn.Behavior
 
     close: ->
         @view.triggerMethod 'dialog:close'
+
+
+    detectClickOutside: (event) ->
+        box = @ui.content[0].getBoundingClientRect()
+        if (event.pageX < box.left or event.pageX > box.right) and
+        (event.pageY < box.top or event.pageY > box.bottom)
+            @close()
