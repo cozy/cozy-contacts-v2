@@ -70,16 +70,17 @@ do (factory = (root, Backbone) ->
                 method = "getMapped#{prop[0].toUpperCase()}#{prop[1..]}"
                 return unless _.isFunction @[method]
 
-                callback = =>
-                    args = attrs.split(' ').map (attr) => @model.get attr
-                    @[method].apply @, args
+                callback = (immediate = true) =>
+                    args  = attrs.split(' ').map (attr) => @model.get attr
+                    value = @[method].apply @, args
+                    @set prop, value if immediate
+                    return value
 
-                @listenTo @, 'reset', -> @set prop, callback()
-                _.each attrs.split(' '), (attr) ->
-                    @listenTo @model, "change:#{attr}", -> @set prop, callback()
-                , @
+                @listenTo @, 'reset', callback
+                _.each attrs.split(' '), (attr) =>
+                    @listenTo @model, "change:#{attr}", callback
 
-                memo[prop] = callback()
+                memo[prop] = callback false
                 return memo
             , {}
 
