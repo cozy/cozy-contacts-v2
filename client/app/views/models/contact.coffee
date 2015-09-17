@@ -19,6 +19,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'form:addfield': 'addField'
         'form:submit':   -> @save()
         'edit:cancel':   'reset'
+        'delete':        -> @destroy()
 
 
     initialize: ->

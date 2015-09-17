@@ -26,6 +26,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
     ui:
         navigate: '[href^=contacts]'
         edit:     '.edit'
+        delete:   '.delete'
         submit:   '[type=submit]'
         cancel:   '.cancel'
         inputs:   '.group:not([data-cid]) :input:not(button)'
@@ -34,6 +35,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     triggers:
         'click @ui.cancel': 'edit:cancel'
+        'click @ui.delete': 'delete'
 
 
     modelEvents:
@@ -41,7 +43,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'change:initials': 'updateInitials'
         'change':          -> @render() unless @model.get 'edit'
         'before:save':     'syncDatapoints'
-        'save':            -> @triggerMethod 'dialog:close'
+        'destroy':          -> @triggerMethod 'dialog:close'
 
     childEvents:
         'form:enter': 'jumpToNextField'

@@ -53,6 +53,15 @@ do (factory = (root, Backbone) ->
             @trigger 'save'
 
 
+        destroy: (options) ->
+            destroy = =>
+                @stopListening()
+                @trigger 'destroy', @, @collection, options
+            @model.destroy _.extend {}, options,
+                wait:    true
+                success: destroy
+
+
         _buildMappedAttributes: ->
             props = _.reduce @map, (memo, attrs, prop) =>
                 method = "getMapped#{prop[0].toUpperCase()}#{prop[1..]}"
