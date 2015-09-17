@@ -57,7 +57,7 @@ block content
     aside
         ul
             if edit
-                li: button(type="submit").outline
+                li: button(type="submit", data-next="contacts/#{_id}").outline
                     .fa.fa-check
                     span= t('card actions save')
                 li: a.cancel.confirm.outline.secondary(role="button", href="contacts/#{_id}")

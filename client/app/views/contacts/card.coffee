@@ -24,7 +24,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dropdown: {}
 
     ui:
-        navigate: '[href^=contacts]'
+        navigate: '[href^=contacts], [data-next]'
         edit:     '.edit'
         delete:   '.delete'
         submit:   '[type=submit]'
@@ -43,7 +43,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'change:initials': 'updateInitials'
         'change':          -> @render() unless @model.get 'edit'
         'before:save':     'syncDatapoints'
-        'destroy':          -> @triggerMethod 'dialog:close'
+        'destroy':         -> @triggerMethod 'dialog:close'
 
     childEvents:
         'form:enter': 'jumpToNextField'

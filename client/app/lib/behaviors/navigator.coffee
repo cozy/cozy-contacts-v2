@@ -6,5 +6,6 @@ module.exports = class Navigator extends Mn.Behavior
 
     navigate: (event) ->
         event.preventDefault()
-        dest = event.currentTarget.getAttribute 'href'
+        el = event.currentTarget
+        dest = el.dataset.next or el.getAttribute 'href'
         require('application').router.navigate dest, trigger: true
