@@ -46,12 +46,11 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'destroy':         -> @triggerMethod 'dialog:close'
 
     childEvents:
-        'form:enter': 'jumpToNextField'
+        'form:enter': 'onFormEnter'
 
 
     initialize: ->
-        @model.attachViewEvents @
-        @listenTo @, 'form:enter', @jumpToNextField
+        Mn.bindEntityEvents @model, @, @model.viewEvents
 
 
     serializeData: ->
@@ -84,6 +83,11 @@ module.exports = class ContactCardView extends Mn.LayoutView
         else @ui.edit.focus()
 
 
+    onFormEnter: ->
+        inputs = @$ ':input:not(button):not([type=hidden])'
+        inputs.eq(inputs.index(document.activeElement) + 1).focus()
+
+
     updateInitials: (model, value) ->
         @$('.initials').text value
 
@@ -94,8 +98,3 @@ module.exports = class ContactCardView extends Mn.LayoutView
             name       = region.currentView.options.name
             datapoints = region.currentView.getDatapoints()
             @model.syncDatapoints name, datapoints
-
-
-    jumpToNextField: ->
-        inputs = @$ ':input:not(button):not([type=hidden])'
-        inputs.eq(inputs.index(document.activeElement) + 1).focus()

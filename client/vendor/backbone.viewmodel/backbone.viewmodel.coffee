@@ -73,7 +73,7 @@ do (factory = (root, Backbone) ->
                 callback = (options) =>
                     opts = _.defaults {}, options,
                         immediate: true
-                        reset:     false
+                        reset:     true
 
                     args  = attrs.split(' ').map (attr) => @model.get attr
                     value = @[method].apply @, args
@@ -84,8 +84,7 @@ do (factory = (root, Backbone) ->
 
                 @listenTo @, 'reset', callback
                 _.each attrs.split(' '), (attr) =>
-                    @listenTo @model, "change:#{attr}", ->
-                        callback reset: true
+                    @listenTo @model, "change:#{attr}", callback
 
                 memo[prop] = callback immediate: false
                 return memo
@@ -122,20 +121,6 @@ do (factory = (root, Backbone) ->
                         attrs[attr] = _.extend {}, @attributes[attr], value
 
             super(attrs, options)
-
-
-        attachViewEvents: (view) ->
-            events = _.result @, 'viewEvents'
-            return unless events
-
-            _.each events, (actions, event) =>
-                if _.isFunction actions
-                    @listenTo view, event, actions
-                else
-                    actionNames = actions.split /\s+/
-                    _.each actionNames, (actionName) =>
-                        return unless @[actionName]
-                        @listenTo view, event, @[actionName]
 
 
 ) ->
