@@ -1,6 +1,7 @@
 module.exports = class ContactsRouter extends Backbone.SubRoute
 
     routes:
+        'new':        'create'
         ':slug':      'show'
         ':slug/edit': 'edit'
 
@@ -20,9 +21,10 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
             callback()
 
 
-    _setCardState: (id, edit = false) ->
-        app = require 'application'
-        app.model.set 'dialog', if app.contacts.get(id) then id else false
+    _setCardState: (id, edit) ->
+        app    = require 'application'
+        dialog = if app.contacts.get(id) or id is 'new' then id else false
+        app.model.set 'dialog', dialog
         app.trigger 'mode:edit', edit
 
 
@@ -32,3 +34,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     edit: (id) ->
         @_ensureContacts _.wrap @_setCardState, (fn) -> fn(id, true)
+
+
+    create: ->
+        @_setCardState 'new', true

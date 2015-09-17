@@ -7,11 +7,11 @@ CONFIG = require('config').contact
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
     defaults:
-        edit:  false
+        new:  false
+        edit: false
 
     map:
-        ref:        'id'
-        avatar:     '_attachments id'
+        avatar:     '_attachments'
         initials:   'n'
         name:       'n'
 
@@ -23,7 +23,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     initialize: ->
-        app = require 'application'
+        @listenTo @, 'save', @onSave
+
+        @set 'ref', @model.cid
 
         @['xtras'] = @filterDatapoints null
         for attr in CONFIG.datapoints.main
@@ -38,20 +40,16 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         _.extend {}, super, datapoints
 
 
-    getMappedRef: (id) ->
-        id.slice 0, 6
-
-
-    getMappedAvatar: (attachments, id) ->
+    getMappedAvatar: (attachments) ->
         if attachments?.picture
-            "/contacts/#{id}/picture.png"
+            "/contacts/#{@model.id}/picture.png"
         else
             null
 
 
     getMappedInitials: (n) ->
         [gn, fn, ...] = n.split ';'
-        """#{if fn then asciize(fn)[0] else '' }\
+        """#{if fn then asciize(fn)[0] else ''}\
            #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
@@ -95,3 +93,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         datapoints = @model.get 'datapoints'
         datapoints.remove _.difference @[name].models, collection
         datapoints.add _.difference collection, @[name].models
+
+
+    onSave: ->
+        return unless @get 'new'
+        app = require 'application'
+        app.contacts.add @model

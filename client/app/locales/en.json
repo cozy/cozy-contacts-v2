@@ -5,6 +5,7 @@
     "tools labels filters":      "labels",
     "tools labels filters all":  "all contacts",
 
+    "card actions create":      "create",
     "card actions save":        "save",
     "card actions cancel":      "cancel",
     "card actions edit":        "edit",

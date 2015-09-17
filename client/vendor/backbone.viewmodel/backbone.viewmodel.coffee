@@ -38,6 +38,8 @@ do (factory = (root, Backbone) ->
             else
                 (attrs = {})[key] = val
 
+            options ||= {}
+
             @set attrs if attrs
 
             diff = _.reduce @attributes, (memo, value, key) =>
@@ -51,9 +53,11 @@ do (factory = (root, Backbone) ->
                 return memo
             , {}
 
+            options.wait = true
+            options.success = => @trigger 'save'
+
             @trigger 'before:save'
             @model.save diff, options
-            @trigger 'save'
 
 
         destroy: (options) ->

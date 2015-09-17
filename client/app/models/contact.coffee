@@ -2,6 +2,12 @@ module.exports = class Contact extends Backbone.Model
 
     idAttribute: '_id'
 
+    urlRoot: 'contacts'
+
+    defaults:
+        n:          ';;;;'
+        datapoints: []
+
 
     parse: (attrs) ->
         delete attrs[key] for key, value of attrs when value is ''

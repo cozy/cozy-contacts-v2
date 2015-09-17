@@ -43,6 +43,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'change:initials': 'updateInitials'
         'change':          -> @render() unless @model.get 'edit'
         'before:save':     'syncDatapoints'
+        'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
 
     childEvents:
@@ -81,6 +82,17 @@ module.exports = class ContactCardView extends Mn.LayoutView
     onDomRefresh: ->
         if @model.get('edit') then @ui.inputs.first().focus()
         else @ui.edit.focus()
+
+
+    onSave: ->
+        return unless @model.get 'new'
+        app  = require 'application'
+        dest = "contacts/#{@model.get 'id'}"
+        app.router.navigate dest, trigger: true
+
+
+    onEditCancel: ->
+        @triggerMethod 'dialog:close' if @model.get 'new'
 
 
     onFormEnter: ->

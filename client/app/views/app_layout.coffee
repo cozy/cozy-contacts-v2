@@ -5,6 +5,8 @@ Attach itself to the `[role=application] DOM node and declares the application
 main region for its subviews.
 ###
 
+ContactModel = require 'models/contact'
+
 ContactViewModel = require 'views/models/contact'
 
 DrawerLayout = require 'views/drawer_layout'
@@ -26,9 +28,9 @@ module.exports = class AppLayout extends Mn.LayoutView
                 '34': 'key:pagedown'
 
     regions:
-        content: '[role=contentinfo]'
+        content: 'main [role=contentinfo]'
         drawer:  'aside'
-        toolbar: '[role=toolbar]'
+        toolbar: 'main [role=toolbar]'
         dialogs:
             selector: '.dialogs'
             regionClass: require 'lib/regions/dialogs'
@@ -57,9 +59,12 @@ module.exports = class AppLayout extends Mn.LayoutView
     showContact: (viewModel, id) ->
         if id
             app = require 'application'
-            model = app.contacts.get id
-            modelView = new ContactViewModel {}, model: model
+            model = if id is 'new' then new ContactModel null, parse: true
+            else app.contacts.get id
+
+            modelView = new ContactViewModel {new: id is 'new'}, model: model
             app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
+
             @showChildView 'dialogs', new CardView model: modelView
         else
             @dialogs.empty()
