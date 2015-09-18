@@ -1,6 +1,9 @@
 {
   "dependencies": {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8e54f233b8fd0f58dacb59492c7c60457db4dccb
     "javascript-brunch": "1.7.1",
     "css-brunch": "1.7.0",
     "coffee-script-brunch": "1.8.0",
@@ -8,8 +11,12 @@
     "jade-brunch": "1.8.1",
     "digest-brunch": "1.2.2",
     "clean-css-brunch": "1.7.1",
+<<<<<<< HEAD
     "browser-sync-brunch": "*",
     "json-brunch": "^1.5.4"
+=======
+    "browser-sync-brunch": "*"
+>>>>>>> 8e54f233b8fd0f58dacb59492c7c60457db4dccb
   },
   "devDependencies": {
     "brunch": "1.8.0"
