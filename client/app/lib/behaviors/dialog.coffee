@@ -1,4 +1,4 @@
-module.exports = class Modal extends Mn.Behavior
+module.exports = class Dialog extends Mn.Behavior
 
     behaviors:
         Keyboard:

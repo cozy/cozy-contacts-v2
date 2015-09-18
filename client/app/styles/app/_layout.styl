@@ -22,6 +22,40 @@ avatar(size)
 
 
 // TODO: move those defs to cozy-ui
+[role=alertdialog]
+    @extend $dialog
+
+    [role=contentinfo]
+        flex-basis em(420px)
+        box-sizing border-box
+        padded 30px
+
+        transform translateY(-50%)
+
+        background-color white
+        border em(1px) solid grey-01
+        border-radius em(5px)
+        box-shadow 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)
+
+    h2
+        top-spaced 0
+
+    p
+        bottom-spaced em(30px)
+
+    .actions
+        display flex
+        flex-direction row-reverse
+
+        li
+            flex 1
+            horizontally-spaced 10px
+
+        button
+            height 100%
+
+
+
 [aria-haspopup=true]
     position relative
 

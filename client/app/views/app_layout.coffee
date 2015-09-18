@@ -34,6 +34,9 @@ module.exports = class AppLayout extends Mn.LayoutView
         dialogs:
             selector: '.dialogs'
             regionClass: require 'lib/regions/dialogs'
+        alerts:
+            selector: '.alerts'
+            regionClass: require 'lib/regions/dialogs'
 
 
     modelEvents:

@@ -2,6 +2,8 @@ DatapointsView  = require 'views/contacts/components/datapoints'
 XtrasView       = require 'views/contacts/components/xtras'
 EditActionsView = require 'views/contacts/components/edit_actions'
 
+t = require 'lib/i18n'
+
 CONFIG = require('config').contact
 
 
@@ -17,11 +19,22 @@ module.exports = class ContactCardView extends Mn.LayoutView
         role: 'dialog'
 
 
-    behaviors:
+    behaviors: ->
+        opts =
+            name: @options.model.get 'fn'
+
         Navigator: {}
-        Dialog: {}
-        Form: {}
-        Dropdown: {}
+        Dialog:    {}
+        Form:      {}
+        Dropdown:  {}
+        Confirm:
+            triggers:
+                'click @ui.delete':
+                    event:      'delete'
+                    title:      t 'card confirm delete title', opts
+                    message:    t 'card confirm delete message', opts
+                    btn_ok:     t 'card confirm delete ok'
+                    btn_cancel: t 'card confirm delete cancel'
 
     ui:
         navigate: '[href^=contacts], [data-next]'
@@ -35,8 +48,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     triggers:
         'click @ui.cancel': 'edit:cancel'
-        'click @ui.delete': 'delete'
-
 
     modelEvents:
         'change:edit':     'render'

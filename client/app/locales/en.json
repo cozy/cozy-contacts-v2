@@ -16,6 +16,11 @@
     "card action add link":     "url",
     "card action add other":    "other information",
 
+    "card confirm delete title":   "Remove %{name}?",
+    "card confirm delete message": "You'll remove the %{name} contact. Are you sure?",
+    "card confirm delete ok":      "Yes, I don't want it in my contacts anymore",
+    "card confirm delete cancel":  "Oops, nope, turn back quickly",
+
     "datapoint label name prefix":      "prefix",
     "datapoint label name first":       "first name",
     "datapoint label name middle":      "middle name",

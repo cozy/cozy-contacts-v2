@@ -1,4 +1,5 @@
 behaviors =
+    Confirm:   require './confirm'
     Dialog:    require './dialog'
     Dropdown:  require './dropdown'
     Form:      require './form'
