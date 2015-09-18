@@ -18,16 +18,15 @@ do (factory = (root, Backbone) ->
             @compositeCollection = options?.compositeCollection or null
             mappedAttrs          = @_buildMappedAttributes()
             super _.extend({}, attributes, mappedAttrs), options
-            @listenTo @model, 'all', ->
-                args = Array.prototype.slice.call arguments, 0
-                @trigger.apply @, args
+            @listenTo @model, 'all', (args...) -> @trigger.apply @, args
 
 
         sync: ->
 
 
         reset: ->
-            @unset attr if @has attr for attr in @model?.attributes
+            @unset attr for attr, value of @model?.attributes when @has attr
+            @unset attr for attr, value of @attributes when value is ''
             @trigger 'reset'
 
 
