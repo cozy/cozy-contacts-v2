@@ -1,5 +1,7 @@
 ContactDatapointView = require 'views/contacts/components/datapoint'
 
+CONFIG = require('config').contact
+
 
 module.exports = class ContactDatapointsView extends Mn.CollectionView
 
@@ -14,9 +16,7 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         ui =
             inputs: ':input:not(button)'
             delete: '.delete'
-
         ui.autoAdd = '.value' unless @options.name is 'xtras'
-
         return ui
 
 
@@ -27,27 +27,16 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
 
     initialize: (options) ->
-        @listenTo @, 'form:addfield', @addEmptyField
-        @listenTo @, 'form:updatefield', @updateFields
-        @listenTo @, 'form:deletefield', @deleteField
+        return unless options.cardViewModel.get 'edit'
 
-        if options.cardViewModel.get 'edit'
-            @collection = new Backbone.Collection options.collection.models
-            @addEmptyField() unless @options.name is 'xtras'
+        @collection = new Backbone.Collection options.collection.models
+        @addEmptyField() unless @options.name is 'xtras'
 
 
-    getDatapoints: ->
-        @collection.filter (model) -> model.get('value') isnt ''
+    onFormFieldAdd: (name) -> @addEmptyField name
 
 
-    addEmptyField: (name) ->
-        @collection.add
-            type:  undefined
-            value: ''
-            name:  name or @options.name
-
-
-    updateFields: (event) ->
+    onFormFieldUpdate: (event) ->
         $item = @$(event.currentTarget).parents '[data-cid]'
         model = @collection.get $item.data 'cid'
         attrs = _.reduce $item.find(':input').serializeArray(), (memo, input) ->
@@ -57,5 +46,20 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         model.set attrs
 
 
-    deleteField: (id) ->
+    onFormFieldDelete: (id) ->
         @collection.remove id
+
+
+    getDatapoints: ->
+        @collection.filter (model) -> model.get('value') isnt ''
+
+
+    addEmptyField: (name) ->
+        model = @collection.add
+            type:  undefined
+            value: ''
+            name:  name or @options.name
+
+        return if name in CONFIG.datapoints.main
+
+        @$("[data-cid=#{model.cid}] input.value").focus()

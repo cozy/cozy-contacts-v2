@@ -3,7 +3,7 @@ module.exports = class Form extends Mn.Behavior
     behaviors:
         Keyboard:
             keymaps:
-                '13': 'form:enter'
+                '13': 'form:key:enter'
 
 
     events: ->
@@ -22,28 +22,28 @@ module.exports = class Form extends Mn.Behavior
         el ?= event.currentTarget
         (attrs = {}).setValueOf el.name, el.value
         @view.model?.set attrs, silent: true
-        @view.triggerMethod 'form:updatefield', event
+        @view.triggerMethod 'form:field:update', event
 
 
     addField: (event) ->
         if event.type is 'click'
-            @view.triggerMethod 'form:addfield', event.currentTarget.value
+            @view.triggerMethod 'form:field:add', event.currentTarget.value
         else
             $group   = @$(event.currentTarget).parents('[data-type]')
             type     = $group.data 'type'
             hasEmpty = !!$group.find('.value')
                 .filter -> !this.value
                 .length
-            @view.triggerMethod 'form:addfield', type unless hasEmpty
+            @view.triggerMethod 'form:field:add', type unless hasEmpty
 
 
     clearField: (event) ->
         $el = @$(event.currentTarget).prev '.value'
         $el.val null
-        @view.triggerMethod 'form:clearfield', event
+        @view.triggerMethod 'form:field:clear', event
         @updateFields event, $el[0]
 
 
     deleteField: (event) ->
         cid = @$(event.currentTarget).parents('[data-cid]').data 'cid'
-        @view.triggerMethod 'form:deletefield', cid, event
+        @view.triggerMethod 'form:field:delete', cid, event

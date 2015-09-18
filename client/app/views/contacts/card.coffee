@@ -47,7 +47,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'destroy':         -> @triggerMethod 'dialog:close'
 
     childEvents:
-        'form:enter': 'onFormEnter'
+        'form:key:enter': 'onFormKeyEnter'
 
 
     initialize: ->
@@ -70,13 +70,10 @@ module.exports = class ContactCardView extends Mn.LayoutView
         @addRegion 'xtras-infos', '[data-type=xtras-infos]'
         @showChildView 'xtras-infos', new XtrasView model: @model
 
-        if @model.get 'edit'
-            @addRegion 'actions', '.actions'
-            @showChildView 'actions', new EditActionsView model: @model
+        return unless @model.get 'edit'
 
-            @listenTo @, 'form:addfield', (type) ->
-                return if type in CONFIG.xtras
-                @getRegion('xtras').currentView.addEmptyField type
+        @addRegion 'actions', '.actions'
+        @showChildView 'actions', new EditActionsView model: @model
 
 
     onDomRefresh: ->
@@ -95,9 +92,14 @@ module.exports = class ContactCardView extends Mn.LayoutView
         @triggerMethod 'dialog:close' if @model.get 'new'
 
 
-    onFormEnter: ->
+    onFormKeyEnter: ->
         inputs = @$ ':input:not(button):not([type=hidden])'
         inputs.eq(inputs.index(document.activeElement) + 1).focus()
+
+
+    onFormFieldAdd: (type) ->
+        return if type in CONFIG.xtras
+        @getRegion('xtras').currentView.addEmptyField type
 
 
     updateInitials: (model, value) ->
