@@ -13,8 +13,23 @@ mixin formatName(name)
         = name.suffix
 
 
-mixin formatPoint(point)
-    i.type
+mixin formatPoint(point, icon)
+    if icon
+        case point.type.toLowerCase()
+            when 'home'
+                - var icon = 'home'
+            when 'work'
+                - var icon = 'building'
+            default
+                case point.name
+                    when 'tel'
+                        - var icon = 'phone'
+                    when 'email'
+                        - var icon = 'envelope'
+                    default
+                        - var icon = false
+
+    i.type(class=icon? "fa fa-#{icon}" : false)
         = point.type
         | &nbsp;
     span.value= point.value

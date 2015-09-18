@@ -10,8 +10,8 @@ mixin formatDatapoints(points, prefix)
                     span.fa.fa-caret-down
             if pop
                 dd: ul
-                    each point in points.slice(1)
-                        li: +formatPoint(point)
+                    each point in points
+                        li: +formatPoint(point, true)
     else
         .placeholder(role="gridcell", class=prefix)
 

@@ -2,8 +2,6 @@ module.exports = class ContactEditActionsView extends Mn.ItemView
 
     tagName: 'dl'
 
-    className: 'dropdown'
-
     attributes:
         'aria-haspopup': true
         'aria-expanded': false
