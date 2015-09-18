@@ -16,11 +16,6 @@ mixin formatDatapoints(points, prefix)
         .placeholder(role="gridcell", class=prefix)
 
 
-label(for="select-#{_id}")
-    input(type='checkbox', id="select-#{_id}")
-    span.fa.fa-square-o
-
-
 a.name(role="gridcell", href="contacts/#{_id}")
     if avatar
        img.avatar(src=avatar)

@@ -48,7 +48,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     onRender: ->
         @showChildView 'drawer', new DrawerLayout()
-        @showChildView 'toolbar', new SearchView()
 
 
     disableBusyState: ->
