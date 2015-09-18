@@ -21,6 +21,11 @@
     "card confirm delete ok":      "Yes, I don't want it in my contacts anymore",
     "card confirm delete cancel":  "Oops, nope, turn back quickly",
 
+    "card confirm cancel title":   "Are you sure you want to leave?",
+    "card confirm cancel message": "Your contact hasn't been saved.",
+    "card confirm cancel ok":      "Yes, leave and forgot what I've done",
+    "card confirm cancel cancel":  "Wait, no! I need to save it before",
+
     "datapoint label name prefix":      "prefix",
     "datapoint label name first":       "first name",
     "datapoint label name middle":      "middle name",

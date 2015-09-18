@@ -13,19 +13,11 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
         btn_cancel: 'button.cancel'
 
     triggers:
-        'click @ui.btn_ok':     'confirm'
-        'click @ui.btn_cancel': 'close'
+        'click @ui.btn_ok':     'confirm:true'
+        'click @ui.btn_cancel': 'confirm:false'
+        'click button':         'confirm:close'
 
 
-    onConfirm: ->
-        @options.success()
-        @close()
-
-
-    onClose: ->
-        @close()
-
-
-    close: ->
+    onConfirmClose: ->
         app = require 'application'
         app.layout.alerts.empty()

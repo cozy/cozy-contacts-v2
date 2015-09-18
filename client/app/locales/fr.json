@@ -21,6 +21,11 @@
     "card confirm delete ok":      "Oui, je n'en veux plus dans mes contacts",
     "card confirm delete cancel":  "Oups, non, refermons cette fenêtre",
 
+    "card confirm cancel title":   "Voulez-vous vraiment quitter l'édition ?",
+    "card confirm cancel message": "Vos modifications n'ont pas été sauvées.",
+    "card confirm cancel ok":      "Oui, je n'en ai pas besoin finalement",
+    "card confirm cancel cancel":  "Quoi ? Non ! Je veux sauvegarder avant",
+
     "datapoint label name prefix":      "civilité",
     "datapoint label name first":       "prénom",
     "datapoint label name middle":      "surnom",

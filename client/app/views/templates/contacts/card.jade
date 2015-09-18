@@ -63,11 +63,12 @@ block content
                         span= t('card actions save')
                 else
                     li: button(type="submit").outline
-                        .fa.fa-check
+                        .fa.fa-plus
                         span= t('card actions create')
-                li: a.cancel.confirm.outline.secondary(role="button", href=(id? "contacts/#{_id}" : 'contacts'))
-                    .fa.fa-times
-                    span= t('card actions cancel')
+                        
+                li: a.cancel.outline.secondary(role="button", href=(id? "contacts/#{_id}" : 'contacts'), data-confirm='{"title":"#{t("card confirm cancel title")}","message":"#{t("card confirm cancel message")}","btn_ok":"#{t("card confirm cancel ok")}","btn_cancel":"#{t("card confirm cancel cancel")}"}')
+                        .fa.fa-times
+                        span= t('card actions cancel')
             else
                 li: a.edit.outline.secondary(role="button", href="contacts/#{_id}/edit")
                     .fa.fa-pencil
