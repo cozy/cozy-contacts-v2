@@ -1,0 +1,669 @@
+@import 'nib'
+@import '_cozy'
+@import '_vars'
+@import '_layouts'
+@import '_tabs'
+@import '_menus'
+
+*
+    outline: none
+
+html
+    height 100%
+
+body
+    height 100%
+    background-color bgcolor
+    font-family 'Source Sans Pro', sans-serif
+
+h1, h2, h3, h4
+    font-family 'Maven Pro', sans-serif
+
+a
+    cursor: pointer
+
+textarea
+    font-family 'Source Sans Pro', sans-serif
+
+
+[role=button]
+    color blue
+
+    &:hover
+        text-decoration none
+        color orange
+
+// CONTACT LIST
+#contacts-list
+    width 450px
+    position absolute
+    left 0px
+    top 0px
+    bottom 0px
+    right 0px
+
+    #toolbar
+        background-color: #AABACB + 70%
+        height 60px
+        padding 1px
+        overflow hidden
+        padding 10px
+        box-sizing border-box
+
+    .fa
+        color #fff
+        font-size 16px
+
+        &.fa-remove
+            margin 4px
+
+    input:focus
+        box-shadow none
+        border 1px solid highlightcolor
+
+    .input-append.input-prepend
+        float left
+        width 65.95744680851064%
+
+    // search logo
+    .add-on
+        background-color lightgrey
+        border-top-left-radius 100%
+        border-bottom-left-radius 100%
+        border 0px
+        height 22px
+
+        i
+            margin-top 2px
+
+    #filterfield
+        font-family: 'Maven Pro', sans-serif
+
+    #filterfield:active
+    #filterfield:focus
+        border: 1px solid blue
+
+    #filterClean
+        display inline-block
+        position relative
+        height 26px
+        line-height 13px
+        text-align center
+        width 26px
+        padding 0px
+        box-sizing border-box
+        vertical-align middle
+        margin 0px 0px 0px -28px
+        border 0px
+        border-radius 13px
+        z-index 2
+
+    #new, #gohelp
+        padding: 0
+        margin-top: 3px
+        display inline-block
+        float left
+        margin-left 2.127659574468085%
+        width 14.893617021276595%
+        text-align center
+        line-height 26px
+
+        i
+            margin-top 2px
+
+    #contacts
+        position absolute
+        top 50px
+        bottom 0px
+        left 0px
+        right 0px
+
+    .contact-thumb
+        display block
+        width 100%
+        box-sizing border-box
+        background-color basecolor + 50%
+        color almostblack
+        height 60px
+        overflow hidden
+
+        img
+            float left
+            line-height 100%
+            height 60px
+            width 60px
+
+        h2
+            padding 5px 0 0 0
+            margin 0px
+            margin-left 70px
+            font-size 20px
+            font-family 'Source Sans Pro', sans-serif
+            line-height 28px
+            overflow hidden
+            font-weight normal
+
+        span
+            font-size 13px
+
+        .infos
+            span:first-child
+                margin-left 12px
+
+            .email
+                margin-right 12px
+
+    .contact-thumb:active
+    .contact-thumb:focus
+        outline: none
+
+    .contact-thumb:nth-child(even)
+        background-color white
+
+    .contact-thumb.activated
+        background-color buttoncolor + 60%
+
+    .contact-thumb:hover
+        text-decoration none
+        background-color highlightcolor
+
+    .contact-thumb:focus
+      text-decoration none
+
+
+#contact, #doc
+    position absolute
+    z-index 3
+    left 450px
+    right 0px
+    top 0px
+    bottom 0px
+    background-color: #FCFCFC
+    box-shadow: 6px 0px 3px -2px basecolor inset
+
+    h3
+        font-size: 16px
+        font-weight: normal
+
+
+#doc
+    padding 20px 40px
+    box-sizing border-box
+
+    h2
+        margin-top 15px
+        font-weight normal
+        border-bottom 1px solid #CCC
+
+    .important
+        color red
+        font-size 2em
+
+    #show-password
+    #hide-password
+        margin-left 5px
+        border-radius 5px
+        padding 5px
+
+    #hide-password
+        display none
+
+
+#contact
+
+    h2
+        font-family 'Maven Pro', sans-serif
+
+    #picture
+        position relative
+        cursor pointer
+        border 1px solid transparent
+
+        &:hover #uploadnotice
+            opacity 1
+
+    .picture
+        border-radius 50%
+
+    #uploader
+        z-index 10
+        position absolute
+        opacity 0.01
+        cursor pointer
+        border 0px
+        font-size 100px
+
+    #uploadnotice
+        z-index 0
+        position absolute
+        top 0
+        left 0
+        opacity 0
+        border-radius 50%
+        border 1px solid orange
+        text-align center
+        background-color rgba(buttoncolor, .65)
+        color white
+
+    input, textarea
+        border-radius 0px
+        background-color transparent
+        display inline-block
+        box-shadow none
+        margin 0px
+        border 1px solid transparent
+
+        &:hover
+            border 1px solid orange
+
+        &:focus
+            border 1px solid blue
+            background-color white
+            outline none
+
+    #name-edit
+        display none
+        float right
+
+    .button-wrapper
+        margin-bottom: 15px
+
+        a
+            padding-right: 10px
+
+            &:hover
+                color: orange
+
+        #toggle-name-fields
+            display inline-block
+
+    &:hover
+        #name-edit
+            display: inline-block
+
+    #name
+        display block
+        box-sizing border-box
+        font-size 30px
+        line-height 34px
+        padding .3em 0
+        margin-top 5px
+        margin-bottom 15px
+        cursor pointer
+
+        &:hover
+            color orange
+
+        &:focus
+        &:active
+            color blue
+
+    #save-info
+        position absolute
+        top 38px
+        right 3%
+        height 30px
+        line-height 30px
+        padding 0px 5px
+        background-color #f9edbe
+
+    .info-fields
+        input.type[disabled]
+            cursor default
+
+        input.type[disabled]:hover
+            border 1px solid transparent
+
+#contact-name
+    .form-horizontal
+        display inline-block
+        margin 0px
+        width 100%
+
+    .control-group
+        margin-bottom 10px
+
+        .control-label
+            width 100%
+            padding 0
+            border 1px solid transparent
+            border-top-color #ddd
+            color #ddd
+            text-align left
+            font-size 1em
+            transition color 350ms
+
+        input:focus + .control-label
+            color blue
+
+        .controls
+            margin-left 0
+
+        input
+            box-sizing border-box
+            width 100%
+            height 2em
+            font-family 'Source Sans Pro', sans-serif
+            font-size 17px
+
+
+#menu-actions
+    #delete:hover
+        color: red
+
+
+.tags
+    margin 5px 0 0
+    padding 0
+    list-style-type none
+    font-size: 13px
+
+    input
+        padding-left 5px
+        width 100px
+
+    li.tag
+        margin-right 5px
+        padding 0.2em 0.5em
+        border 1px solid transparent
+        border-radius 2px
+        font-family 'Maven Pro', sans-serif
+        color white
+        cursor pointer
+        user-select none
+
+        &:hover
+            border: 1px solid orange
+            background-color: orange !important
+
+    .deleter
+        cursor: pointer
+
+        &:hover
+            color: orange - 40%
+
+
+.contact-thumb ul.tags
+    margin: 0 0 0 12px
+    font-size: 10px
+
+    li.tags
+        line-height 1.5em
+
+#tagsAutocomplete
+    background-color: white
+    border: 1px solid blue
+    position: absolute
+    width: 150px
+    list-style-type: none
+    padding-left: 0px
+    margin: 0
+    z-index: 1000
+
+    &.empty
+        border 0
+
+    li
+        padding-left: 5px
+
+        &.selected
+        &:hover
+            background-color orange + 40%
+
+
+#contact-container
+
+    h2
+        color inherit
+        font: 24px/40px 'Maven Pro', sans-serif
+        border-bottom 1px solid lightgrey
+
+
+#notes
+    height 200px
+    width 100%
+    box-sizing border-box
+
+    table
+        table-layout fixed
+        box-sizing border-box
+        width 90%
+        margin 10px 5%
+
+        thead
+            background-color buttoncolor
+            color white
+
+        tr
+            td:nth-child(1)
+            td:nth-child(2)
+            th:nth-child(1)
+            th:nth-child(2)
+                width 18px
+
+            td:nth-child(3)
+            th:nth-child(3)
+                width 30%
+
+            td:nth-child(4)
+                overflow hidden
+                white-space nowrap
+
+        .injector
+            line-height 0px
+            height 2px
+
+            td
+                background-color highlightcolor
+                height 2px
+                padding 0px
+                position relative
+            a
+                display block
+                position absolute
+                box-sizing border-box
+                padding 0px 5px
+                bottom 0px
+                height 20px
+                line-height 20px
+                right 0px
+                background-color highlightcolor
+
+
+.zone
+    &:hover
+    &:focus
+        a.btn.add
+            opacity 1
+
+    a.btn.add
+        display inline-block
+        background-color #EEE
+        color darkgrey
+        font-weight bold
+        background-image none
+        border 0px
+        padding 0px 10px
+        margin 5px 0px 0px 0px
+        border-radius 0px
+        line-height 30px
+        opacity 0
+        text-shadow: none
+        width auto
+        background: #EEE
+        font-weight: normal
+        color:  #777
+
+        &:hover
+            background-color orange
+            color: white
+
+
+    ul
+        margin 0px
+        list-style-type none
+
+        &:hover .dpremove
+            display inline-block
+
+
+        .type
+            width 25%
+            font-family 'Maven Pro', sans-serif
+            font-size: 17px
+
+        .value
+            width 50%
+            font-family 'Source Sans Pro', sans-serif
+            font-size: 17px
+
+        .dpremove
+        .dpaction
+            height 20px
+            padding 4px 6px
+            float right
+            vertical-align middle
+
+        .dpremove
+            display none
+
+
+#contact
+    #adder
+        margin-top: 20px
+        display: none
+
+        h2
+            display: none
+
+
+#more-options
+    width: 100%
+    padding: 5px
+    margin-right: 10px
+    background: #EEE
+    color: #777
+    font-weight: normal
+
+    &:hover
+        text-decoration: none
+        color: white
+        background: orange
+
+
+#adder
+    .button
+        padding: 6px
+        margin-right: 10px
+        font-weight: normal
+        line-height: 30px
+        color: white
+        margin-top: 10px
+        display: block
+
+    .button:hover
+        text-decoration: none
+        color: white
+
+#importer
+    .loading
+        display: none
+
+
+.modal-footer
+    #confirm-btn
+        border-radius: 3px
+
+
+@media (max-width: mobile-bp)
+    body
+        padding: 0
+
+    #contacts-list
+        #toolbar
+            #new
+                float: right
+            #gohelp
+                display: none
+
+    #contacts-list, #doc, #contact
+        width 100%
+        left 0px
+
+    .ui-menubar
+        border-bottom 1px solid grey
+        background-color #eee
+
+        #close
+        #menu-actions [aria-controls]
+            background-color transparent
+            color blue
+
+            &:hover
+                color orange
+
+    #contact
+        background white
+        box-shadow none
+
+        h2
+        [role=tab]
+            font-size 20px
+
+        #abouts.zone h2
+            visibility hidden
+            height 10px
+
+        #left
+            width 98%
+            box-sizing border-box
+            top 220px
+
+        #left
+            .zone
+                a.btn.add
+                    display none
+
+        #adder
+            display none
+
+        #name
+            padding-left 0
+
+        #picture
+            display none
+
+        #wrap-name-notes
+            padding-left 0
+
+        #wrap-name-notes:hover
+            #name-edit
+                display none
+
+        #top
+            margin-top 15px
+
+            #name
+                font-size 24px
+                margin-bottom 5px
+                width 90%
+
+    #contact-name
+        .control-group
+            margin-bottom 0
+
+            .control-label
+                float left
+                padding-top 5px
+                text-align left
+
+
+// Widget
+#contacts-list.contact-widget
+    #toolbar
+        #new
+        #gohelp
+            display: none
+
+        input#filterfield
+            width: 100%

@@ -1,0 +1,21 @@
+
+form.form-horizontal
+    label.control-group.prefix
+        input#prefix(type="text", value=n[3], placeholder=t("placeholder prefix"))
+        .control-label(for="prefix")= t("prefix")
+    label.control-group.first
+        input#first(type="text", value=n[1], placeholder=t("placeholder first"))
+        .control-label(for="first")= t("first name")
+    label.control-group.middle
+        input#middle(type="text", value=n[2], placeholder=t("placeholder middle"))
+        .control-label(for="middle")= t("middle name")
+    label.control-group.last
+        input#last(type="text", value=n[0], placeholder=t("placeholder last"))
+        .control-label(for="last")= t("last name")
+    label.control-group.suffix
+        input#suffix(type="text", value=n[4], placeholder=t("placeholder suffix"))
+        .control-label(for="suffix")= t("suffix")
+
+.button-wrapper
+    a#toggle-name-fields(title=t("contact name expand"), tabindex="0").fa.fa-minus
+    a#toggle-name(title=t("contact name check"), tabindex="0").fa.fa-check

@@ -1,0 +1,78 @@
+[role=menu]
+    &[aria-expanded=false]
+        .ui-menulist
+            display none
+    &[aria-expanded=true]
+        .ui-menulist
+            display block
+
+    position relative
+    float    left       // ensure the div isn't too large
+    padding  0
+    margin   0
+
+
+    [role=button]
+        display          block
+        min-width        100%
+        padding          0.5em
+        border           none
+        background-color transparent
+        color            black
+        text-decoration  none
+        text-align       left
+
+        &:hover
+            color orange
+
+        i
+            display      inline-block
+            margin-right 0.5em
+
+        span
+            // fix font for button with icon
+            font-family 'Source Sans Pro', sans-serif
+
+    [role=menuitem]
+        display     block
+        white-space nowrap
+
+        & + [role=menuitem]
+            padding-top 0.5em
+
+
+    [aria-controls]
+        background-color blue
+        color            #fff
+        border-radius    2px
+
+        &:hover
+        &:focus
+        [aria-expanded=true]&
+            background-color orange
+            color            #fff
+
+        &.fa-angle-down
+            padding-right 1.5em
+
+            &:before
+                position absolute
+                right .5em      // button padding right
+
+
+    .ui-menulist
+        z-index          99
+        position         absolute
+        top              100%
+        left             0
+        box-sizing       border-box
+        margin           .35em 0
+        padding          0.5em
+        min-width        100%
+        list-style-type  none
+        border           1px solid #ddd
+        background-color #fff
+
+
+    .ui-line
+        border-bottom 1px solid #ddd

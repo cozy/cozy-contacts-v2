@@ -1,0 +1,46 @@
+a#close(href="#") &lt;
+
+h2= t('help')
+
+p= t("search info")
+
+p= t("click left to display")
+
+p= t("creation info")
+
+
+h2= t('sync title')
+if account == null
+    p= t('sync headline no data')
+    ol
+        li= t('install the sync module')
+        li= t('connect to it and follow')
+else
+    p= t('sync headline with data')
+    ul
+        li #{t('sync url')} https://#{account.domain}/public/sync/principals/me
+        li #{t('sync login')} #{account.login}
+        li #{t('sync password')}
+            span#placeholder= account.placeholder
+            button.button#show-password= t('show')
+            button.button#hide-password= t('hide')
+p= t('sync help')
+    a(href='https://cozy.io/mobile/contacts.html', target="_blank")= t('sync help link')
+
+
+h2= t('settings')
+
+label.control-label(for="nameFormat")= t('name format info')
+.control
+    select.span5.large#nameFormat
+        option(value="")= t('name format info')
+        option(value="given-familly")= t('format given familly')
+        option(value="familly-given")= t('format familly given')
+        option(value="given-middleinitial-familly")= t('format given mid familly')
+    span.help-inline
+
+p= t('vcard export info') + ' '
+    a(href="contacts.vcf", download="contacts.vcf", title=t("export vcard"))= t('export all vcard')
+
+p= t("vcard import info") + ' '
+    a(href="#import")= t('import vcard')

@@ -1,0 +1,113 @@
+mixin zone(slug, label)
+    - label = label || slug
+    .zone(id="#{slug}s")
+        h2= t(label)
+        ul
+        a(class="btn add add#{slug}", tabindex="0")= t('add')
+
+
+#contact-container
+    nav.ui-menubar.ui-flex.ui-flex-full
+        a#close(role="button", href="#")
+            i.fa.fa-chevron-left
+            span= t('contacts')
+
+        #menu-actions.ui-menu(role="menu", aria-expanded="false")
+            button(role="button", aria-controls="menu-actions")
+                i.fa.fa-cog
+                span= t('more options')
+            ul.ui-menulist
+                li(role="menuitem"): a#export(role="button", href='contacts/#{id}/#{fn}.vcf')
+                    i.fa.fa-download
+                    span= t('export contact')
+                li(role="menuitem"): button#delete(role="button")
+                    i.fa.fa-trash
+                    span= t('delete contact')
+
+    div.ui-flex.ui-flex-full
+        header
+            #picture
+                if hasPicture
+                    img.picture(src="contacts/#{id}/picture.png")
+                else
+                    img.picture(src="img/defaultpicture.png")
+
+                //- input#uploader(type="file", tabindex="-1")
+                #uploadnotice= t("change")
+
+            #wrap-name-notes
+                #contact-name(style="display: none;")
+                #name= fn
+                ul.tags
+
+                span#save-info= t('changes saved') + ' '
+                    a#undo=t('undo')
+
+
+        nav.nav-tabs(role="tablist")
+            ul(role='presentation')
+                li(role='tab', aria-controls='infos-panel',
+                   aria-selected='true')= t('info')
+                li(role='tab', aria-controls='notes-panel', 
+                   aria-selected='false')= t('profile')
+
+    section#infos-panel.ui-flex.ui-flex-half(role='tabpanel', aria-hidden='false')
+        +zone('about')
+        +zone('tel', 'phones')
+        +zone('email', 'emails')
+        +zone('adr', 'postal')
+        +zone('url', 'links')
+        +zone('chat', 'instant messaging')
+        +zone('relation', 'relations')
+        +zone('social', 'socials')
+        +zone('other', 'others')
+
+        #menu-addmore.ui-menu(role="menu", aria-expanded="false")
+            button.fa.fa-angle-down(role="button", aria-controls="menu-addmore")
+                span= t("add fields")
+            ul.ui-menulist
+                li(role="menutiem"): button(role="button").addemail= t("email")
+                li(role="menutiem"): button(role="button").addtel= t("phone")
+                li.ui-line(role="menutiem"): button(role="button").addadr= t("postal")
+                li(role="menutiem"): button(role="button").addcozy= t("cozy url")
+                li(role="menutiem"): button(role="button").addtwitter= t("twitter")
+                li(role="menutiem"): button(role="button").addskype= t("skype")
+                li(role="menutiem"): button(role="button").addurl= t("url")
+                li(role="menutiem"): button(role="button").addother= t("other")
+
+
+    section#notes-panel.ui-flex.ui-flex-half(role='tabpanel', aria-hidden='true')
+        h2.tab-title= t("information")
+        .zone
+            ul.info-fields
+                li.datapoint.org-field
+                    input.type.org-label(type="text", disabled="", 
+                                         value="#{t('org')}")
+                    input.value.org-input(type="text", value="#{org || ''}",
+                                          placeholder="#{t('org')}")
+                li.datapoint.title-field
+                    input.type.title-label(type="text", disabled="", 
+                                           value="#{t('title')}")
+                    input.value.title-input(type="text", 
+                                            value="#{title || ''}",
+                                            placeholder="#{t('title')}")
+                li.datapoint.department-field
+                    input.type.department-label(type="text", disabled="", 
+                                           value="#{t('department')}")
+                    input.value.department-input(type="text",
+                                                 value="#{department || ''}",
+                                                 placeholder="#{t('department')}")
+                li.datapoint.bday-field
+                    input.type.bday-label(type="text", disabled="", 
+                                          value="#{t('bday')}")
+                    input.value.bday-input(type="text", 
+                                           value="#{bday || ''}",
+                                           placeholder="#{t('bday')}")
+                li.datapoint.url-field
+                    input.type.url-label.disable(type="text", disabled="", 
+                                                 value="#{t('url')}")
+                    input.value.url-input(type="text", value="#{url || ''}",
+                                          placeholder="#{t('url')}")
+        #notes-zone
+            h2= t("notes")
+            textarea(rows="3", placeholder=t('notes placeholder'))#notes #{note || ''}
