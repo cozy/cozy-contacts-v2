@@ -36,8 +36,8 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
     onFormFieldAdd: (name) -> @addEmptyField name
 
 
-    onFormFieldUpdate: (event) ->
-        $item = @$(event.currentTarget).parents '[data-cid]'
+    onFormFieldUpdate: (el) ->
+        $item = @$(el).parents '[data-cid]'
         model = @collection.get $item.data 'cid'
         attrs = _.reduce $item.find(':input').serializeArray(), (memo, input) ->
             memo[_.last(input.name.split '.')] = input.value

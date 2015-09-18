@@ -22,7 +22,8 @@ module.exports = class Form extends Mn.Behavior
         el ?= event.currentTarget
         (attrs = {}).setValueOf el.name, el.value
         @view.model?.set attrs, silent: true
-        @view.triggerMethod 'form:field:update', event
+        el.classList.toggle 'empty', el.value is ''
+        @view.triggerMethod 'form:field:update', el, event
 
 
     addField: (event) ->

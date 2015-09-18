@@ -73,13 +73,20 @@
                 background-color grey-01
 
             &:not(:hover) button
+            input.empty + button
                 hide()
 
-            .delete
-            .clear
-                position absolute
-                right    0
-                padding 0.25em 0.4em
+            input + button
+                padding                   0 .4em
+                background-color          grey-01
+                border-top-left-radius    0
+                border-bottom-left-radius 0
+                font-size                 .8em
+                color                     grey-06
+
+            input:not(.empty)
+                border-top-right-radius    0
+                border-bottom-right-radius 0
 
             .fa
                 margin 0
