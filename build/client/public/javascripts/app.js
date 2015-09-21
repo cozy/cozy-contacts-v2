@@ -895,10 +895,11 @@ module.exports = {
   "export": "Export",
   "export contact": "Kontact exportieren",
   "are you sure": "Sind Sie sicher?"
-};
+}
+;
 });
 
-;require.register("locales/en", function(exports, require, module) {
+require.register("locales/en", function(exports, require, module) {
 module.exports = {
   "contacts": "Contacts",
   "saving": "Saving…",
@@ -1019,10 +1020,11 @@ module.exports = {
   "export": "Export",
   "export contact": "Export contact",
   "are you sure": "Are you sure?"
-};
+}
+;
 });
 
-;require.register("locales/es", function(exports, require, module) {
+require.register("locales/es", function(exports, require, module) {
 module.exports = {
   "contacts": "Contactos",
   "saving": "Guardando...",
@@ -1142,10 +1144,11 @@ module.exports = {
   "export": "Exportar",
   "export contact": "Exportar contacto",
   "are you sure": "¿Está usted seguro(a)?"
-};
+}
+;
 });
 
-;require.register("locales/fr", function(exports, require, module) {
+require.register("locales/fr", function(exports, require, module) {
 module.exports = {
   "contacts": "Contacts",
   "saving": "Sauvegarde…",
@@ -1266,10 +1269,11 @@ module.exports = {
   "export": "Exporter",
   "export contact": "Exporter contact",
   "are you sure": "Le voulez-vous vraiment ?"
-};
+}
+;
 });
 
-;require.register("models/config", function(exports, require, module) {
+require.register("models/config", function(exports, require, module) {
 var Config,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };

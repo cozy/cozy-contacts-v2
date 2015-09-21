@@ -7,7 +7,8 @@
     "jade-brunch": "1.8.1",
     "digest-brunch": "1.2.2",
     "clean-css-brunch": "1.7.1",
-    "browser-sync-brunch": "*"
+    "browser-sync-brunch": "*",
+    "json-brunch": "^1.5.4"
   },
   "devDependencies": {
     "brunch": "1.8.0"
