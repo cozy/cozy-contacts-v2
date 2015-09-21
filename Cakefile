@@ -99,7 +99,6 @@ task 'build', 'Build CoffeeScript to Javascript', ->
               "rm -rf client/app/locales/*.coffee && " + \
               "cd client/ && brunch build --production && cd .. &&" + \
               "cp -R client/public build/client/"
-              "cd client/ && brunch build --production && cd .."
 
     exec command, (err, stdout, stderr) ->
         if err
