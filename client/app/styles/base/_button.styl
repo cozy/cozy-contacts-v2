@@ -45,6 +45,30 @@ button
                 background-color grey-05
                 color            white
 
+    &.danger
+        background-color red
+        border-color     red
+
+        &:hover
+            background-color darken(red, 20%)
+            border-color     darken(red, 20%)
+
+        &.outline
+            background-color transparent
+            color            red
+
+            &.special
+                background-color transparent
+                border-color     grey-04
+                color            grey-05
+
+                &:hover
+                    border-color red
+
+            &:hover
+                background-color red
+                color            white
+
     &.link
         padding          0 (4/16)em
         background-color transparent

@@ -17,14 +17,14 @@
     "card action add other":    "other information",
 
     "card confirm delete title":   "Remove %{name}?",
-    "card confirm delete message": "You'll remove the %{name} contact. Are you sure?",
-    "card confirm delete ok":      "Yes, I don't want it in my contacts anymore",
-    "card confirm delete cancel":  "Oops, nope, turn back quickly",
+    "card confirm delete message": "You'll remove %{name} from your contacts. Are you sure?",
+    "card confirm delete ok":      "Delete Contact",
+    "card confirm delete cancel":  "Keep it",
 
     "card confirm cancel title":   "Are you sure you want to leave?",
     "card confirm cancel message": "Your contact hasn't been saved.",
-    "card confirm cancel ok":      "Yes, leave and forgot what I've done",
-    "card confirm cancel cancel":  "Wait, no! I need to save it before",
+    "card confirm cancel ok":      "Leave",
+    "card confirm cancel cancel":  "Stay on Edit Mode",
 
     "datapoint label name prefix":      "prefix",
     "datapoint label name first":       "first name",

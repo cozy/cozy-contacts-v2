@@ -17,14 +17,14 @@
     "card action add other":    "autre",
 
     "card confirm delete title":   "Supprimer %{name} ?",
-    "card confirm delete message": "Vous allez supprimer %{name}. Êtes-vous sûr ?",
-    "card confirm delete ok":      "Oui, je n'en veux plus dans mes contacts",
-    "card confirm delete cancel":  "Oups, non, refermons cette fenêtre",
+    "card confirm delete message": "Vous allez supprimer %{name} de vos contacts. Êtes-vous sûr ?",
+    "card confirm delete ok":      "Le Supprimer",
+    "card confirm delete cancel":  "Le garder",
 
     "card confirm cancel title":   "Voulez-vous vraiment quitter l'édition ?",
     "card confirm cancel message": "Vos modifications n'ont pas été sauvées.",
-    "card confirm cancel ok":      "Oui, je n'en ai pas besoin finalement",
-    "card confirm cancel cancel":  "Quoi ? Non ! Je veux sauvegarder avant",
+    "card confirm cancel ok":      "Quitter",
+    "card confirm cancel cancel":  "Rester",
 
     "datapoint label name prefix":      "civilité",
     "datapoint label name first":       "prénom",
