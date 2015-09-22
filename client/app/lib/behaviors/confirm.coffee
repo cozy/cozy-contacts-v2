@@ -37,10 +37,7 @@ module.exports = class Confirm extends Mn.Behavior
                     if event.stopPropagation and options.stopPropagation
                         event.stopPropagation()
 
-                cfg = _.pick options, 'title', 'message', 'btn_ok', 'btn_cancel'
-                confirmView = @_triggerView cfg
-                @listenToOnce confirmView, 'confirm:true', ->
-                    view.triggerMethod options.event
+                confirmView = @_triggerView options
 
             return memo
         , {}
@@ -48,11 +45,14 @@ module.exports = class Confirm extends Mn.Behavior
 
     _triggerView: (cfg) ->
         app         = require 'application'
-        confirmView = new ConfirmView model: new Backbone.Model cfg
+        viewOpts    = _.pick cfg, 'title', 'message', 'btn_ok', 'btn_cancel'
+        confirmView = new ConfirmView model: new Backbone.Model viewOpts
 
         Mn.bindEntityEvents @, confirmView,
-            'confirm:true':  -> @view.triggerMethod 'confirm:true'
             'confirm:close': -> @view.triggerMethod 'confirm:close'
+            'confirm:true':  ->
+                @view.triggerMethod 'confirm:true'
+                @view.triggerMethod cfg.event if cfg.event
 
         app.layout.showChildView 'alerts', confirmView
         return confirmView

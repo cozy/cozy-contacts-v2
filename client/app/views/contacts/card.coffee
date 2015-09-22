@@ -46,8 +46,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
         add:      '.add button'
         clear:    '.clear'
 
-    triggers:
-        'click @ui.cancel': 'edit:cancel'
 
     modelEvents:
         'change:edit':     'render'

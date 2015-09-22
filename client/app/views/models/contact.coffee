@@ -15,6 +15,11 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         initials:   'n'
         name:       'n'
 
+
+    events:
+        save:  'onSave'
+        reset: 'onReset'
+
     viewEvents:
         'form:field:add': 'addField'
         'form:submit':    -> @save()
@@ -23,9 +28,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     initialize: ->
-        @listenTo @, 'save', @onSave
-
-        @set 'ref', @model.cid
+        @onReset()
 
         @['xtras'] = @filterDatapoints null
         for attr in CONFIG.datapoints.main
@@ -99,3 +102,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         return unless @get 'new'
         app = require 'application'
         app.contacts.add @model
+
+
+    onReset: ->
+        @set 'ref', @model.cid

@@ -66,7 +66,7 @@ block content
                         .fa.fa-plus
                         span= t('card actions create')
                         
-                li: a.cancel.outline.secondary(role="button", href=(id? "contacts/#{_id}" : 'contacts'), data-confirm='{"title":"#{t("card confirm cancel title")}","message":"#{t("card confirm cancel message")}","btn_ok":"#{t("card confirm cancel ok")}","btn_cancel":"#{t("card confirm cancel cancel")}"}')
+                li: a.cancel.outline.secondary(role="button", href=(id? "contacts/#{_id}" : 'contacts'), data-confirm='{"event":"edit:cancel","title":"#{t("card confirm cancel title")}","message":"#{t("card confirm cancel message")}","btn_ok":"#{t("card confirm cancel ok")}","btn_cancel":"#{t("card confirm cancel cancel")}"}')
                         .fa.fa-times
                         span= t('card actions cancel')
             else
