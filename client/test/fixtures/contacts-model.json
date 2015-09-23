@@ -1,0 +1,134 @@
+[
+  {
+    "name": "docType",
+    "type": "Template",
+    "value": "Contact"
+  },
+  {
+    "name": "__first_name",
+    "type": "First Name"
+  },
+  {
+    "name": "__last_name",
+    "type": "Last Name"
+  },
+  {
+    "name": "__title_name",
+    "type": "Title",
+    "percentBlank": 80
+  },
+  {
+    "name": "__suffix_name",
+    "type": "Suffix",
+    "percentBlank": 80
+  },
+  {
+    "name": "__middle_name",
+    "type": "Words",
+    "min": 1,
+    "max": 2,
+    "percentBlank": 80
+  },
+  {
+    "name": "fn",
+    "type": "Full Name"
+  },
+  {
+    "name": "n",
+    "type": "Template",
+    "value": "{__last_name};{__first_name};{__middle_name};{__title_name};{__suffix_name}"
+  },
+  {
+    "name": "note",
+    "type": "Sentences",
+    "min": 1,
+    "max": 3,
+    "percentBlank": 70
+  },
+  {
+    "name": "org",
+    "type": "Company Name",
+    "percentBlank": 80
+  },
+  {
+    "name": "title",
+    "type": "Job Title",
+    "percentBlank": 80
+  },
+  {
+    "name": "department",
+    "type": "Words",
+    "min": 1,
+    "max": 3,
+    "percentBlank": 80
+  },
+  {
+    "name": "url",
+    "type": "URL",
+    "includePath": false,
+    "includeQueryString": false,
+    "percentBlank": 60
+  },
+  {
+    "name": "bday",
+    "type": "Date",
+    "min": "01/01/1950",
+    "max": "12/31/2010",
+    "format": "%Y-%m-%d",
+    "percentBlank": 65
+  },
+  {
+    "name": "__phone[8]",
+    "type": "Phone"
+  },
+  {
+    "name": "__email[8]",
+    "type": "Email Address"
+  },
+  {
+    "name": "__types[8]",
+    "type": "Custom List",
+    "values": ["home", "work"]
+  },
+  {
+    "name": "__addr_street",
+    "type": "Street Address"
+  },
+  {
+    "name": "__addr_city",
+    "type": "City"
+  },
+  {
+    "name": "__addr_pc",
+    "type": "Postal Code"
+  },
+  {
+    "name": "__addr_country",
+    "type": "Country"
+  },
+  {
+    "name": "__username",
+    "type": "Username"
+  },
+  {
+    "name": "datapoints",
+    "type": "JSON Array",
+    "min": 1,
+    "max": 8
+  },
+  {
+    "name": "datapoints.name",
+    "type": "Custom List",
+    "values": ["tel", "email", "adr", "social", "chat"]
+  },
+  {
+    "name": "datapoints.type",
+    "type": "Formula",
+    "value": "case name when 'social' then 'twitter' when 'chat' then 'skype' else __types[random(0,7)] end"
+  },
+  {
+    "name": "datapoints.value",
+    "type": "Formula",
+    "value": "case name when 'tel' then __phone[random(0,7)] when 'email' then __email[random(0,7)] when 'adr' then concat(__addr_street, ', ', __addr_pc, ' ', __addr_city, ', ', __addr_country) when 'social' then concat('@', __username) when 'chat' then __username end"
+  }
+]

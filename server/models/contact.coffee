@@ -21,7 +21,6 @@ class DataPoint extends cozydb.Model
 module.exports = class Contact extends cozydb.CozyModel
     @docType: 'contact'
     @schema:
-        id            : String
         # vCard FullName = display name
         # (Prefix Given Middle Familly Suffix), or something else.
         fn            : String
