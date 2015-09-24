@@ -46,6 +46,13 @@ module.exports = class AppLayout extends Mn.LayoutView
         'dialog:close': -> @model.set 'dialog', false
 
 
+    initialize: ->
+        app = require 'application'
+        @listenToOnce app.contacts, 'sync', ->
+            @showContactsList()
+            @disableBusyState()
+
+
     onRender: ->
         @showChildView 'drawer', new DrawerLayout()
 

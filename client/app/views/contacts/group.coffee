@@ -7,10 +7,13 @@ module.exports = class Group extends Mn.CompositeView
 
     tagName: 'dl'
 
+    className: ->
+        return 'empty' if @model.get 'isEmpty'
+
+
     childViewContainer: 'ul'
 
     childView: require 'views/contacts/row'
-
 
     childViewOptions: (model) ->
         model: new ContactViewModel {}, model: model
@@ -18,13 +21,6 @@ module.exports = class Group extends Mn.CompositeView
 
     modelEvents:
         'change:isEmpty': 'toggleEmpty'
-
-    collectionEvents:
-        'update': 'render'
-
-
-    initialize: ->
-        @on 'render:template', @toggleEmpty
 
 
     toggleEmpty: ->

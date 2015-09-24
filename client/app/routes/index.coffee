@@ -6,6 +6,7 @@ when needed and show them in the app_layout regions.
 ###
 
 ContactsRouter = require 'routes/contacts'
+TagsRouter     = require 'routes/tags'
 
 
 module.exports = class Router extends Backbone.Router
@@ -21,11 +22,10 @@ module.exports = class Router extends Backbone.Router
         #
         # see https://github.com/BackboneSubroute/backbone.subroute/issues/3
         app = require 'application'
+
         app.on 'start', ->
             contacts = new ContactsRouter 'contacts'
-        app.contacts.once 'sync', ->
-            app.layout.showContactsList()
-            app.layout.disableBusyState()
+            tags     = new TagsRouter 'tags'
 
 
     index: ->

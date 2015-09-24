@@ -4,6 +4,45 @@
 GroupViewModel = require 'views/models/group'
 
 
+class Tagged extends Filtered
+    constructor: (underlying, options = {}) ->
+        app  = require 'application'
+        @tag = app.model.get 'filter'
+
+        options.filter = (model) =>
+            if @tag then _.contains model.attributes.tags, @tag
+            else true
+        super underlying, options
+
+        @listenTo app.model, 'change:filter', (model, value) ->
+            @tag = value
+            @update()
+
+    update: ->
+        if @tag then @reset @underlying.models.filter @options.filter
+        else @reset @underlying.models
+
+
+class ByInitial extends Filtered
+    constructor: (underlying, options) ->
+        options.comparator = (a, b) ->
+            a.attributes.n.localeCompare b.attributes.n
+        options.comparator.induced = true
+
+        options.filter = (model) ->
+            n = asciize(model.attributes.n).toLowerCase()
+
+            [gn, fn, ...] = n.split ';'
+            initial = if gn then gn[0] else if fn then fn[0] else '#'
+
+            if options.char is '#'
+                not initial.match alphabet
+            else
+                options.char is initial
+
+        super
+
+
 module.exports = class Contacts extends Mn.CompositeView
 
     template: ->
@@ -28,34 +67,21 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     initialize: ->
+        app = require 'application'
+        @taggedCollection = new Tagged app.contacts
         @_buildFilteredCollections()
 
 
-    _filterContactsByInitial: (letter) ->
-        letter   = letter.toLowerCase()
-        contacts = new Filtered require('application').contacts,
-            filter: (contact) ->
-                [gn, fn, ...] = contact.get('n').split ';'
-                initial = if gn then asciize(gn)[0].toLowerCase()
-                else if fn then asciize(fn)[0].toLowerCase()
-                else '#'
-
-                if letter is '#'
-                    not initial.match alphabet
-                else
-                    initial is letter
-            comparator: (a, b) ->
-                a.get('n').localeCompare b.get('n')
-
-
     _buildFilteredCollections: ->
-        initials = '#abcdefghijklmnopqrstuvwxyz'
+        initials    = '#abcdefghijklmnopqrstuvwxyz'
         @collection = new Backbone.Collection()
-        for letter in initials
-            do (letter) =>
-                attributes = name: letter
-                options = compositeCollection: @_filterContactsByInitial letter
-                @collection.add new GroupViewModel attributes, options
+
+        for char in initials
+            do (char) =>
+                attributes = name: char
+                collection = new ByInitial @taggedCollection, char: char
+                @collection.add new GroupViewModel attributes,
+                    compositeCollection: collection
 
 
     scroll: (down) ->
@@ -66,8 +92,9 @@ module.exports = class Contacts extends Mn.CompositeView
 
     onShow: ->
         app = require('application')
-        @listenTo app.layout, 'key:pageup', @scroll.bind @, false
-        @listenTo app.layout, 'key:pagedown', @scroll.bind @, true
+        @listenTo app.layout,
+            'key:pageup':   @scroll.bind @, false
+            'key:pagedown': @scroll.bind @, true
         @focus()
 
 

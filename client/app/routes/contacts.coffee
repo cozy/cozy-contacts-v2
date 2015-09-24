@@ -4,12 +4,13 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         'new':        'create'
         ':slug':      'show'
         ':slug/edit': 'edit'
+        '':           'index'
 
 
     initialize: ->
         app = require 'application'
         @listenTo app.model, 'change:dialog', (model, id) ->
-            @navigate 'contacts' unless id
+            @navigate 'contacts', trigger: true unless id
 
 
     _ensureContacts: (callback) ->
@@ -26,6 +27,11 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         dialog = if app.contacts.get(id) or id is 'new' then id else false
         app.model.set 'dialog', dialog
         app.trigger 'mode:edit', edit
+
+
+    index: ->
+        app = require 'application'
+        app.model.set 'filter', null
 
 
     show: (id) ->
