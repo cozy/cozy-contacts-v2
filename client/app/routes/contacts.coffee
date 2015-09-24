@@ -7,12 +7,6 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         '':           'index'
 
 
-    initialize: ->
-        app = require 'application'
-        @listenTo app.model, 'change:dialog', (model, id) ->
-            @navigate 'contacts', trigger: true unless id
-
-
     _ensureContacts: (callback) ->
         return unless _.isFunction callback
         app = require 'application'

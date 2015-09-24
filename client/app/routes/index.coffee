@@ -27,6 +27,14 @@ module.exports = class Router extends Backbone.Router
             contacts = new ContactsRouter 'contacts'
             tags     = new TagsRouter 'tags'
 
+        @listenTo app.model, 'change:dialog', (model, id) ->
+            return if id
+            
+            path = if _ref = app.model.get 'filter' then "tags/#{_ref}"
+            else 'contacts'
+            @navigate path, trigger: true
+
+
 
     index: ->
         @navigate 'contacts', trigger: true
