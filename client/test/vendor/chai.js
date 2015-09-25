@@ -1727,7 +1727,7 @@ module.exports = function (chai, _) {
       , result
     );
   }
-  
+
   Assertion.addMethod('satisfy', satisfy);
   Assertion.addMethod('satisfies', satisfy);
 
@@ -1937,7 +1937,7 @@ module.exports = function (chai, _) {
   /**
    * ### .extensible
    *
-   * Asserts that the target is extensible (can have new properties added to 
+   * Asserts that the target is extensible (can have new properties added to
    * it).
    *
    *     var nonExtensibleObject = Object.preventExtensions({});
@@ -4101,7 +4101,7 @@ var getPathInfo = require('./getPathInfo');
 module.exports = function(path, obj) {
   var info = getPathInfo(path, obj);
   return info.value;
-}; 
+};
 
 },{"./getPathInfo":17}],19:[function(require,module,exports){
 /*!
@@ -4169,7 +4169,7 @@ var type = require('type-detect');
  *     hasProperty('str', obj);  // true
  *     hasProperty('constructor', obj);  // true
  *     hasProperty('bar', obj);  // false
- *     
+ *
  *     hasProperty('length', obj.str); // true
  *     hasProperty(1, obj.str);  // true
  *     hasProperty(5, obj.str);  // false
