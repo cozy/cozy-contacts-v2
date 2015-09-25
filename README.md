@@ -1,6 +1,6 @@
 # [Cozy](http://cozy.io) Contacts
 
-Cozy Contacts makes your contact management easy. Main features are: 
+Cozy Contacts makes your contact management easy. Main features are:
 
 * Simple UI
 * Contact tagging
