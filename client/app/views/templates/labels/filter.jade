@@ -1,4 +1,5 @@
-label(for="filter-#{_id}")
+label(for="filter-#{_id}", aria-checked=selected? 'true' : 'false')
+    span.fa.fa-dot-circle-o
     span.fa.fa-circle-o
     input(type="radio", id="filter-#{_id}", name="label-filters")
-    span.label= name
+    a.label(href=_id == 'all'? "contacts" : "tags/#{name.toLowerCase()}")= name

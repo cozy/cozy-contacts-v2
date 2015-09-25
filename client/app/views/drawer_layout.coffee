@@ -13,7 +13,7 @@ It handles a `mode` that reflects its rendering context.
 DrawerViewModel = require 'views/models/drawer'
 
 DefaultActionsTool = require 'views/tools/default_actions'
-LabelsFiltersTool  = require 'views/labels/filters_tool'
+LabelsFiltersTool  = require 'views/labels/filters'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -28,16 +28,15 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     initialize: ->
-        @model = new DrawerViewModel {}, model: require('application').model
-        @on 'render', @showTools
-        @listenTo require('application').tags, 'sync', @showFilters
+        app    = require 'application'
+        @model = new DrawerViewModel {}, model: app.model
+        @listenToOnce app.tags, 'sync', @showFilters
 
 
-    showTools: ->
+    onRender: ->
         @showChildView 'actions', new DefaultActionsTool()
 
 
     showFilters: ->
         @showChildView 'labels', new LabelsFiltersTool
             model: @model
-            collection: require('application').tags

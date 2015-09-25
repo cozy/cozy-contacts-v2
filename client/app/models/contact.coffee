@@ -24,6 +24,8 @@ module.exports = class Contact extends Backbone.Model
         datapoints.add attrs.datapoints if attrs.datapoints
         attrs.datapoints = datapoints
 
+        attrs.tags = _.invoke attrs.tags, 'toLowerCase'
+
         return attrs
 
 
