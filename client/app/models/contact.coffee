@@ -41,6 +41,7 @@ module.exports = class Contact extends Backbone.Model
 
         super
 
+<<<<<<< HEAD
 
     toString: (opts = {}) ->
         parts = @attributes.n.split ';'
@@ -63,3 +64,7 @@ module.exports = class Contact extends Backbone.Model
                 .replace '«', opts.format.post
 
         return search
+
+
+    toJSON: ->
+        _.extend {}, super, datapoints: @attributes.datapoints.toJSON()

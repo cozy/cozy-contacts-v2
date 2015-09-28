@@ -1,0 +1,9 @@
+extends ../../lib/views/templates/base/dialog.jade
+
+block content
+    h1 find duplicates
+
+    for group in duplicates
+        ul
+            for contact in group
+                li= contact.fn
