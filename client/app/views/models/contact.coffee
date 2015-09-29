@@ -45,7 +45,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     getMappedAvatar: (attachments) ->
         if attachments?.picture
-            "/contacts/#{@model.id}/picture.png"
+            "contacts/#{@model.id}/picture.png"
         else
             null
 
