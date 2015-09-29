@@ -1,16 +1,16 @@
 mixin formatName(name)
     if name.prefix
-        = name.prefix
+        != name.prefix
         | 
-    = name.first
+    != name.first
     | 
     if name.middle
-        = name.middle
+        != name.middle
         | 
-    b= name.given
+    b!= name.given
     if name.suffix
         | 
-        = name.suffix
+        != name.suffix
 
 
 mixin formatPoint(point, icon)

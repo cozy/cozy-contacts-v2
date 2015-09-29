@@ -12,8 +12,9 @@
     "tests"
   ],
   "dependencies": {
+    "backbone.subroute": "~0.4.6",
+    "fuzzy": "~0.1.1",
     "marionette": "~2.4.2",
-    "polyglot": "~0.4.3",
-    "backbone.subroute": "~0.4.6"
+    "polyglot": "~0.4.3"
   }
 }
