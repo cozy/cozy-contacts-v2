@@ -32,8 +32,7 @@ block content
                 +input('department')(value=department, placeholder=true)
                 +input('title')(value=title, placeholder=true)
         else
-            h1
-                +formatName(name)
+            h1= fullname
             
             ul.block(data-type="infos")
                 if title || org || department || note

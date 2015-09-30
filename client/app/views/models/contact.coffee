@@ -43,6 +43,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         _.extend {}, super, datapoints
 
 
+    toString: (opts = {})->
+        @model.toString opts
+
+
     getMappedAvatar: (attachments) ->
         if attachments?.picture
             "contacts/#{@model.id}/picture.png"

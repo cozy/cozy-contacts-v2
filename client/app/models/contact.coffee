@@ -40,3 +40,16 @@ module.exports = class Contact extends Backbone.Model
             options.attrs.url = mainUrl.value
 
         super
+
+
+    toString: (opts = {}) ->
+        [gn, fn, mn, pf, sf] = @attributes.n.split ';'
+        str  = ''
+        str += "#{pf} " if pf
+        str += "#{fn} "
+        str += "#{mn} " if mn
+        str += opts.pre if opts.pre
+        str += gn
+        str += opts.post if opts.post
+        str += " #{sf}" if sf
+        return str
