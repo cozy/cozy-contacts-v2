@@ -64,7 +64,9 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     serializeData: ->
-        _.extend super, lists: CONFIG.datapoints.types
+        _.extend super,
+            lists: CONFIG.datapoints.types
+            fullname: @model.toString pre: '<b>', post: '</b>'
 
 
     onRender: ->
