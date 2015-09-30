@@ -4,13 +4,21 @@
         align-items center
         position relative
 
+        &.empty .fa-times
+        &:not(.empty) .fa-search
+            hide()
+
         .fa
             position absolute
             left 1em
             top 50%
             transform translateY(-50%)
-
             color grey-05
+
+        .fa-times
+            padding 0
+            border  none
+            background-color transparent
 
         input
             flex 1

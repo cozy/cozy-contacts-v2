@@ -7,11 +7,27 @@ module.exports = class SearchView extends Mn.ItemView
 
     ui:
         'search': 'input'
+        'clear': 'button.clear'
 
     events: ->
-        'keyup @ui.search': _.debounce @updateSearch, 850
+        updateSearch = _.debounce @updateSearch, 850
+        'keyup @ui.search': (event) ->
+            value = event.currentTarget.value
+            @toggleUi value
+            updateSearch value
+        'click @ui.clear': @clearSearch
 
 
-    updateSearch: (event) ->
+    updateSearch: (value) ->
         app = require 'application'
-        app.search 'text', event.currentTarget.value
+        app.search 'text', value
+
+
+    clearSearch: (event) ->
+        @ui.search.val ''
+        @toggleUi ''
+        @updateSearch null
+
+
+    toggleUi: (value) ->
+        @$('label').toggleClass 'empty', not value.length
