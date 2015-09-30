@@ -14,4 +14,4 @@ module.exports = class SearchView extends Mn.ItemView
 
     updateSearch: (event) ->
         app = require 'application'
-        app.model.set 'filter', event.currentTarget.value
+        app.search 'text', event.currentTarget.value

@@ -25,7 +25,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     index: ->
         app = require 'application'
-        app.model.set 'filter', null
+        app.search 'tag', null
 
 
     show: (id) ->

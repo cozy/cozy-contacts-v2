@@ -53,3 +53,7 @@ module.exports = class Contact extends Backbone.Model
         str += opts.post if opts.post
         str += " #{sf}" if sf
         return str
+
+
+    match: (pattern, opts = {}) ->
+        fuzzy.match pattern, @toString(), opts
