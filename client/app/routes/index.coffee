@@ -17,7 +17,7 @@ module.exports = class Router extends Backbone.Router
 
     initialize: ->
         # we initialize sub-routers only when app starts to prevent a bug that
-        # crashes subrouters if they are loaded bafore Backbone.History is
+        # crashes subrouters if they are loaded before Backbone.History is
         # started (in `app:before:start` event).
         #
         # see https://github.com/BackboneSubroute/backbone.subroute/issues/3
@@ -29,11 +29,9 @@ module.exports = class Router extends Backbone.Router
 
         @listenTo app.model, 'change:dialog', (model, id) ->
             return if id
-            
-            path = if _ref = app.model.get 'filter' then "tags/#{_ref}"
-            else 'contacts'
-            @navigate path, trigger: true
 
+            filter = (app.model.get('filter') or '').match /tag:(\w+)/i
+            @navigate if filter then "tags/#{filter[1]}" else 'contacts'
 
 
     index: ->
