@@ -145,6 +145,25 @@ module.exports = class MergeView extends Mn.ItemView
         return options: @mergeOptions
         # _.extend super, lists: CONFIG.datapoints.types
 
+    _imgUrl2DataUrl = (uri, callback) ->
+        img = new Image()
+
+        img.onload = ->
+            IMAGE_DIMENSION = 600
+            ratiodim = if img.width > img.height then 'height' else 'width'
+            ratio = IMAGE_DIMENSION / img[ratiodim]
+
+            # use canvas to resize the image
+            canvas = document.createElement 'canvas'
+            canvas.height = canvas.width = IMAGE_DIMENSION
+            ctx = canvas.getContext '2d'
+            ctx.drawImage img, 0, 0, ratio * img.width, ratio * img.height
+            dataUrl = canvas.toDataURL 'image/jpeg'
+
+            callback null, dataUrl
+
+        img.src = uri
+
     merge: ->
         console.log 'merge'
         # get form data about merging
@@ -181,14 +200,34 @@ module.exports = class MergeView extends Mn.ItemView
         console.log merged
         # Create new
         Contact = require 'models/contact'
+        ContactViewModel = require 'views/models/contact'
 
-        contact = new Contact()
+        contact = new Contact merged, parse: true
 
+        modelView = new ContactViewModel { new: true }, model: contact
         # Avatar picture
         if @model.has 'avatar'
-            contact.setPicture toMerge[@model.get 'avatar']
-        # contact.attributes = contact.parse merged
+            # get url :
+            uri = "/contacts/#{toMerge[@model.get('avatar')].id}/picture.png"
+
+            modelView.set 'avatar', @_imgUrl2DataUrl uri
+
+
+
+            #     contact._attachments =
+            #         picture:
+            #             content_type: 'application/octet-stream'
+            #             data: dataUrl.split(',')[1]
+
+            #     callback null, cozyContact
+
+            # img.src = photo.value
+
+
+        # modelView.attributes = contact.parse merged
+        console.log "merged contact"
         console.log contact
+        console.log modelView
 
 
         # TODO Deactivated!
@@ -200,6 +239,7 @@ module.exports = class MergeView extends Mn.ItemView
         #         console.log "Contact saved !"
         #         console.log model
 
+        # TODO Deactivated!
         #         # Delete olds
         #         toMerge = @model.get 'toMerge'
         #         console.log toMerge

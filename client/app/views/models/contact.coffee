@@ -102,9 +102,24 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onSave: ->
-        return unless @get 'new'
-        app = require 'application'
-        app.contacts.add @model
+        if @get 'new'
+            app = require 'application'
+            app.contacts.add @model
+
+        # Save picture if changed
+        avatar = @get 'avatar'
+        if avatar? and not avatar.match(/\/contacts\/.+\/picture.png/)?
+            @model.savePicture avatar, (err) =>
+                if err
+                    # TODO: error handling ?
+                    console.log err
+                else
+                    # TODO: uggly, and make image flick.
+                    setTimeout =>
+                        @unset 'avatar'
+                        @model.fetch()
+                        console.log @model.toJSON()
+                    , 500
 
 
     onReset: ->

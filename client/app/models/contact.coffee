@@ -1,3 +1,5 @@
+request = require 'lib/request'
+
 module.exports = class Contact extends Backbone.Model
 
     idAttribute: '_id'
@@ -41,7 +43,6 @@ module.exports = class Contact extends Backbone.Model
 
         super
 
-<<<<<<< HEAD
 
     toString: (opts = {}) ->
         parts = @attributes.n.split ';'
@@ -68,3 +69,32 @@ module.exports = class Contact extends Backbone.Model
 
     toJSON: ->
         _.extend {}, super, datapoints: @attributes.datapoints.toJSON()
+
+
+    savePicture: (dataURL, callback) ->
+        callback = callback or ->
+
+        unless @has 'id'
+            return callback new Error 'Model should ahve been saved once.'
+
+        #transform into a blob
+        binary = atob dataURL.split(',')[1]
+        array = []
+        for i in [0..binary.length]
+            array.push binary.charCodeAt i
+
+        blob = new Blob [new Uint8Array(array)], type: 'image/jpeg'
+
+        data = new FormData()
+        data.append 'picture', blob
+        data.append 'contact', JSON.stringify @toJSON()
+
+        markChanged = (err, body) =>
+            if err
+                console.error err
+            else
+                @set 'pictureRev', true
+
+        path = "contacts/#{@get 'id'}/picture"
+        request.put path, data, markChanged, false
+        callback()

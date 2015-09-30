@@ -27,6 +27,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
+        PickAvatar: {}
         Confirm:
             triggers:
                 'click @ui.delete':
@@ -45,6 +46,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         inputs:   '.group:not([data-cid]) :input:not(button)'
         add:      '.add button'
         clear:    '.clear'
+        avatar:   '.avatar'
 
 
     modelEvents:
@@ -54,6 +56,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'before:save':     'syncDatapoints'
         'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
+
 
     childEvents:
         'form:key:enter': 'onFormKeyEnter'
