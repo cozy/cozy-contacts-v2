@@ -13,10 +13,22 @@ module.exports = class ContactRow extends Mn.ItemView
 
 
     serializeData: ->
-        data = _.extend {}, super(),
-            fullname: @model.toString
-                pre: '<b>'
-                post: '</b>'
+        app        = require 'application'
+        filter     = (app.model.get('filter') or '').match /text:(\w+)/i
+        formatOpts =
+            pre: '<b>'
+            post: '</b>'
+
+        if filter
+            match = @model.match filter[1],
+                pre: '<span class="search">'
+                post: '</span>'
+                format: formatOpts
+            fullname = match.rendered
+        else
+            fullname = @model.toString formatOpts
+
+        _.extend {}, super(), fullname: fullname
         # filter = require('application').model.get 'filter'
         #
         # if filter and not filter.match /^tag:/i

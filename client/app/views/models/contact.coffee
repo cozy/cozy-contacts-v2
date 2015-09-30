@@ -27,7 +27,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'delete':         -> @destroy()
 
 
+    proxy: ['toString', 'match']
+
+
     initialize: ->
+        @[method] = @model[method].bind @model for method in @proxy
+
         @onReset()
 
         @['xtras'] = @filterDatapoints null
@@ -41,10 +46,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             return memo
         , xtras: @xtras.toJSON()
         _.extend {}, super, datapoints
-
-
-    toString: (opts = {})->
-        @model.toString opts
 
 
     getMappedAvatar: (attachments) ->
