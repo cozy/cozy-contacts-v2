@@ -7,6 +7,44 @@ input
        font-style     italic
 
 
+// RADIO
+
+.radio
+    display inline-block
+    box-sizing border-box
+    height (20/16)em
+    width (20/16)em
+    margin-right (10/16)em
+
+    background transparent
+    border 2px solid grey-04
+    border-radius 50%
+
+
+.radio-selected
+    display inline-block
+    box-sizing border-box
+    height (20/16)em
+    width (20/16)em
+    margin-right (10/16)em
+
+    background blue
+    border 2px solid grey-04
+    box-shadow inset 0 0 0 3px grey-01
+    border-radius 50%
+
+
+[aria-checked=false] .radio-selected
+[aria-checked=true] .radio
+    hide()
+
+[aria-checked=false] a
+    color grey-06
+
+[aria-checked=true] a
+    color grey-08
+
+
 // CHECKBOX
 
 /* Base for label styling */
