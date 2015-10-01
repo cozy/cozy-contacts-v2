@@ -65,7 +65,6 @@ module.exports = class MergeView extends Mn.ItemView
         'form:submit': 'merge'
 
 
-
     initialize: ->
         console.log 'initialize view merge'
         # STUB : take a to merge list automaticaly,
@@ -94,6 +93,8 @@ module.exports = class MergeView extends Mn.ItemView
 
             @model.set 'toMerge', toMerge
             Mn.bindEntityEvents @model, @, @model.viewEvents
+            @mergeOptions = @model.buildMergeOptions()
+
         else
             return
         # @model.attributes.toMerge =
@@ -102,50 +103,59 @@ module.exports = class MergeView extends Mn.ItemView
         # return unless @toMerge
         # console.log @toMerge
         # # display it.
-        @buildMergeChoices()
+        # @buildMergeChoices()
 
 
-    buildMergeChoices: ->
-        @mergeOptions = {}
-        fields = CHOICE_FIELDS
-        # _attachments  : Object
+    # buildMergeChoices: ->
+    #     @mergeOptions = {}
+    #     fields = CHOICE_FIELDS
+    #     # _attachments  : Object
 
-        toMerge = @model.get 'toMerge'
-        toMerge = toMerge.map (contact) -> contact.toJSON()
-        for field in fields
-            options = []
-            toMerge.forEach (contact, index) ->
-                value = contact[field]
-                # Remove useless values, and filter identical value.
-                if value? and value isnt '' and not (options.some (option)->
-                    option.value is value)
-                        options.push
-                            value: value
-                            index: index
-            # Ask for a choice if there is anything to choose.
-            if options.length > 1
-                @mergeOptions[field] = options
+    #     toMerge = @model.get 'toMerge'
+    #     toMerge = toMerge.map (contact) -> contact.toJSON()
+    #     for field in fields
+    #         options = []
+    #         toMerge.forEach (contact, index) ->
+    #             value = contact[field]
+    #             # Remove useless values, and filter identical value.
+    #             if value? and value isnt '' and not (options.some (option)->
+    #                 option.value is value)
+    #                     options.push
+    #                         value: value
+    #                         index: index
+    #         # Ask for a choice if there is anything to choose.
+    #         if options.length > 1
+    #             @mergeOptions[field] = options
 
-        # Photo :
-        options = []
-        toMerge.forEach (contact, index) ->
-            if contact._attachments?
-                options.push
-                    value: "/contacts/#{contact.id}/picture.png"
-                    index: index
-        # Ask for a choice if there is anything to choose.
-        if options.length > 1
-            @mergeOptions['avatar'] = options
+    #     # Photo :
+    #     options = []
+    #     toMerge.forEach (contact, index) ->
+    #         if contact._attachments?
+    #             options.push
+    #                 value: "contacts/#{contact.id}/picture.png"
+    #                 index: index
+    #     # Ask for a choice if there is anything to choose.
+    #     if options.length > 1
+    #         @mergeOptions['avatar'] = options
 
-        console.log @mergeOptions
-        # TODO : if @mergeOptions empty --> do merge whitout prompt !
+    #     console.log @mergeOptions
+    #     # TODO : if @mergeOptions empty --> do merge whitout prompt !
+    #     if Object.keys(@mergeOptions).length is 0
+
 
 
     serializeData: ->
         return options: @mergeOptions
         # _.extend super, lists: CONFIG.datapoints.types
 
-    _imgUrl2DataUrl = (uri, callback) ->
+    onShow: ->
+        console.log "render"
+        if Object.keys(@mergeOptions).length is 0
+            console.log "empty merge options"
+            # go to merge directly
+            @merge()
+
+    _imgUrl2DataUrl: (uri, callback) ->
         img = new Image()
 
         img.onload = ->
@@ -205,30 +215,36 @@ module.exports = class MergeView extends Mn.ItemView
         contact = new Contact merged, parse: true
 
         modelView = new ContactViewModel { new: true }, model: contact
+
+        next = =>
+            # modelView.attributes = contact.parse merged
+            console.log "merged contact"
+            console.log contact
+            console.log modelView
+
+            modelView.set 'edit', true
+
+            app  = require 'application'
+            CardView = require 'views/contacts/card'
+
+            contactView = new CardView model: modelView
+            app.layout.showChildView 'dialogs', contactView
+
+            @model.prepareLastStep contactView, modelView
+
+
         # Avatar picture
         if @model.has 'avatar'
             # get url :
-            uri = "/contacts/#{toMerge[@model.get('avatar')].id}/picture.png"
-
-            modelView.set 'avatar', @_imgUrl2DataUrl uri
+            uri = "contacts/#{toMerge[@model.get('avatar')].id}/picture.png"
 
 
+            @_imgUrl2DataUrl uri, (err, dataUrl) =>
+                modelView.set 'avatar', dataUrl
 
-            #     contact._attachments =
-            #         picture:
-            #             content_type: 'application/octet-stream'
-            #             data: dataUrl.split(',')[1]
-
-            #     callback null, cozyContact
-
-            # img.src = photo.value
-
-
-        # modelView.attributes = contact.parse merged
-        console.log "merged contact"
-        console.log contact
-        console.log modelView
-
+                next()
+        else
+            next()
 
         # TODO Deactivated!
         # contact.save contact.parse(merged),

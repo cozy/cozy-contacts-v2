@@ -11,10 +11,10 @@ block content
              value=option.index)
             label(for="#{fieldName}-#{ref}")= option.value
 
-    h1 Merge Contact
+    h1 t('merge title')
 
     if options.avatar != null
-        h2= t('choose an avatar')
+        h2= t('merge choose avatar')
         - for (var i=0; i< options.avatar.length; i++)
           -var option = options.avatar[i]
             input(type="radio", name="avatar", id="avatar-#{i}",
@@ -23,35 +23,35 @@ block content
               img(src=option.value, style="height: 250px;")
 
     if options.fn != null
-        h2= t('choose a name')
+        h2= t('merge choose name')
         +radio(options.fn, "fn")
 
     if options.nickname != null
-      h2= t('choose a nickname')
+      h2= t('merge choose nickname')
       +radio(options.nickname)
 
     if (options.org != null || options.department != null || options.title  != null)
-      h2= t('choose organisation')
+      h2= t('merge choose organisation')
 
       if options.org != null
-        h3= t('org')
+        h3= t('merge choose org')
         +radio(options.org, "org")
 
       if options.department != null
-        h3= t('department')
+        h3= t('merge choose department')
         +radio(options.department, "department")
 
       if options.title != null
-        h3= t('title')
+        h3= t('merge choose title')
         +radio(options.title, "title")
 
 
     if options.bday != null
-      h2= t('choose birthday')
+      h2= t('merge choose birthday')
       +radio(options.bday, "bday")
 
     if options.note != null
-      h2= t('choose note')
+      h2= t('merge choose note')
       +radio(options.note, "note")
 
 
