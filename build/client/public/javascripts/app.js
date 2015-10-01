@@ -1791,7 +1791,6 @@ module.exports = Router = (function(_super) {
     }
     if (this.importer != null) {
       this.importer.close();
-      this.importer.$el.remove();
       this.importer = null;
     }
     if (app.contactview) {
@@ -3192,12 +3191,6 @@ module.exports = ImporterView = (function(_super) {
   ImporterView.prototype.tagName = 'div';
 
   ImporterView.prototype.className = 'modal';
-
-  ImporterView.prototype.events = {
-    "change #vcfupload": 'onupload',
-    "click #confirm-btn": 'addcontacts',
-    "click #cancel-btn": 'close'
-  };
 
   ImporterView.prototype.afterRender = function() {
     this.$el.modal({
