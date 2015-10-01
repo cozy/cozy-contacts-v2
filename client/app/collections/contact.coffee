@@ -9,8 +9,8 @@ module.exports = class ContactCollection extends Backbone.Collection
 
     #sort by names
     comparator: (a,b) ->
-        nameA = a.getDisplayName().replace(/\ /g, '').toLowerCase()
-        nameB = b.getDisplayName().replace(/\ /g, '').toLowerCase()
+        nameA = a.getDisplayName().toLowerCase()
+        nameB = b.getDisplayName().toLowerCase()
         compare = nameA.localeCompare nameB
         out = if compare > 0 then 1
         else if compare < 0 then -1

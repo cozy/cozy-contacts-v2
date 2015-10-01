@@ -187,8 +187,8 @@ module.exports = ContactCollection = (function(_super) {
 
   ContactCollection.prototype.comparator = function(a, b) {
     var compare, nameA, nameB, out;
-    nameA = a.getDisplayName().replace(/\ /g, '').toLowerCase();
-    nameB = b.getDisplayName().replace(/\ /g, '').toLowerCase();
+    nameA = a.getDisplayName().toLowerCase();
+    nameB = b.getDisplayName().toLowerCase();
     compare = nameA.localeCompare(nameB);
     return out = compare > 0 ? 1 : compare < 0 ? -1 : 0;
   };
