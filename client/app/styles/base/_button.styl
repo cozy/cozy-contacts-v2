@@ -1,0 +1,83 @@
+button
+[role=button]
+    padding          em(8px) em(16px)
+
+    background-color blue
+    border           1px solid blue
+    border-radius    2px
+
+    font-size        em(14px)
+    color            white
+    text-transform   uppercase
+    text-decoration  none
+
+    transition-property        color, background-color
+    transition-timing-function ease-out
+    transition-duration        0.2s
+
+    &:hover
+        background-color darken(blue, 20%)
+        border-color     darken(blue, 20%)
+
+        transition none
+
+    &.outline
+        background-color transparent
+        color            blue
+
+        &:hover
+            background-color blue
+            color            white
+
+    &.secondary
+        background-color grey-04
+        border-color     grey-04
+
+        &:hover
+            background-color grey-05
+            border-color     grey-05
+
+        &.outline
+            background-color transparent
+            color            grey-05
+
+            &:hover
+                background-color grey-05
+                color            white
+
+    &.danger
+        background-color red
+        border-color     red
+
+        &:hover
+            background-color darken(red, 20%)
+            border-color     darken(red, 20%)
+
+        &.outline
+            background-color transparent
+            color            red
+
+            &.special
+                background-color transparent
+                border-color     grey-04
+                color            grey-05
+
+                &:hover
+                    border-color red
+
+            &:hover
+                background-color red
+                color            white
+
+    &.link
+        padding          0 (4/16)em
+        background-color transparent
+        border-color     transparent
+        color            blue
+
+        &:hover
+            color darken(blue, 20%)
+
+    &.caret i
+        float  right
+        margin 0

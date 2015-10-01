@@ -1,0 +1,19 @@
+{
+  "name": "cozy-contacts",
+  "homepage": "https://github.com/cozy/cozy-contacts",
+  "authors": [
+    "M4D <code@m4dz.net>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "marionette": "~2.4.2",
+    "polyglot": "~0.4.3",
+    "backbone.subroute": "~0.4.6"
+  }
+}

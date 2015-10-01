@@ -1,0 +1,73 @@
+mixin formatName(name)
+    if name.prefix
+        = name.prefix
+        | 
+    = name.first
+    | 
+    if name.middle
+        = name.middle
+        | 
+    b= name.given
+    if name.suffix
+        | 
+        = name.suffix
+
+
+mixin formatPoint(point, icon)
+    if icon
+        case point.type.toLowerCase()
+            when 'home'
+                - var icon = 'home'
+            when 'work'
+                - var icon = 'building'
+            default
+                case point.name
+                    when 'tel'
+                        - var icon = 'phone'
+                    when 'email'
+                        - var icon = 'envelope'
+                    default
+                        - var icon = false
+
+    i.type(class=icon? "fa fa-#{icon}" : false)
+        = point.type
+        | &nbsp;
+    span.value= point.value
+
+
+mixin formatJob(title, org, dept)
+    if title
+        = title
+    if title && org
+        |  - 
+    if org
+        = org
+    if org && dept || title && dept
+        |  
+    if dept
+        | (#{dept})
+
+
+mixin input(name, type)
+    - var label = t('datapoint label ' + name.replace('.', ' '))
+    - var fid = [name, ref].join('-')
+    - var placeholder = attributes.placeholder? t('datapoint placeholder ' + name) : false
+    - var value = attributes.value
+    label.group(for=fid)
+        span.type= label
+        if type == 'textarea'
+            textarea.value(id=fid, name=name)= value
+        else
+            input.value(class=value? void 0 : 'empty', id=fid, name=name, type='text', value=value, placeholder=placeholder)
+            button.link.clear
+                .fa.fa-times
+
+
+mixin groupInput(point, prefix, index)
+    - var placeholder = attributes.placeholder? t('datapoint placeholder ' + (entity == 'default'? point.name : entity)) : false
+    - var group = prefix + '.' + index
+    input.type(id="#{group}.type-#{ref}", name="#{group}.type", type='text', value=point.type, list="list-#{entity}")
+    input.value(class=point.value? void 0 : 'empty', id="#{group}.value-#{ref}", name="#{group}.value", type='text', value=point.value, placeholder=placeholder)
+    button.link.delete
+        .fa.fa-trash
+    input.name(id="#{group}.name-#{ref}", name="#{group}.name", type='hidden', value=point.name)

@@ -1,57 +1,52 @@
-ContactListener = require 'lib/contact_listener'
-IntentManager   = require 'lib/intent_manager'
+###
+application
 
-module.exports =
+Main application that create a Mn.Application singleton and exposes it. Needs
+router and app_layout view.
+###
 
+Router = require 'routes'
+
+ContactsCollection = require 'collections/contacts'
+TagsCollection     = require 'collections/tags'
+
+AppLayout    = require 'views/app_layout'
+AppViewModel = require 'views/models/app'
+
+
+class Application extends Mn.Application
+
+    ###
+    Sets application
+
+    We instanciate root application components
+    - router: we pass the app reference to it to easily get it without requiring
+              application module later.
+    - layout: the application layout view, rendered.
+    ###
     initialize: ->
-        window.app = @
+        # initialize components before loading app
+        @on 'before:start', =>
+            @model    = new AppViewModel()
 
-        @locale = window.locale
-        delete window.locale
+            @contacts = new ContactsCollection()
+            @tags     = new TagsCollection()
 
-        @polyglot = new Polyglot()
-        try
-            locales = require 'locales/'+ @locale
-        catch e
-            locales = require 'locales/en'
+            @layout   = new AppLayout model: @model
+            @router   = new Router()
 
-        @polyglot.extend locales
-        window.t = @polyglot.t.bind @polyglot
-
-        ContactsCollection = require('collections/contact')
-        TagCollection = require 'collections/tags'
-        ContactsList = require('views/contactslist')
-        Config = require('models/config')
-        Router = require('router')
-
-        @contacts = new ContactsCollection()
-        @tags = new TagCollection()
-        @contactslist = new ContactsList collection: @contacts
-        @contactslist.$el.appendTo $('body')
-        @contactslist.render()
-
-        @watcher = new ContactListener()
-        @watcher.watch @contacts
-
-        @config = new Config(window.config or {})
-        delete window.config
-
-        if window.initcontacts?
-            @contacts.reset window.initcontacts, parse: true
-            delete window.initcontacts
-        else
-            @contacts.fetch()
-
-        if window.inittags?
-            @tags.reset window.inittags, parse: true
-        else
-            @tags.fetch()
-
-        @router = new Router()
+            # prohibit pushState because URIs mapped from cozy-home rely on
+            # fragment
+            Backbone.history.start pushState: false if Backbone.history
+            Object.freeze @ if typeof Object.freeze is 'function'
 
 
-        Backbone.history.start()
+        # render components when app starts
+        @on 'start', =>
+            @layout.render()
+            @contacts.fetch reset: true
+            @tags.fetch reset: true
 
-        @intentManager = new IntentManager()
 
-
+# Exports Application singleton instance
+module.exports = new Application()

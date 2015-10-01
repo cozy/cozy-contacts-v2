@@ -1,0 +1,9 @@
+extends ./base/dialog.jade
+
+block content
+    h2= title
+    p= message
+
+    nav: ul.actions
+        li: button.ok= btn_ok
+        li: button.secondary.cancel= btn_cancel

@@ -1,5 +1,7 @@
-americano = require('americano')
+americano = require 'americano'
 Realtimer = require 'cozy-realtime-adapter'
+
+Contact = require './server/models/contact'
 
 
 start = (host, port, callback) ->
@@ -11,7 +13,7 @@ start = (host, port, callback) ->
     , (app, server) ->
 
         # Migration scripts
-        Contact = require './server/models/contact'
+        Contact = Contact
         Contact.migrateAll ->
 
             # start contact watch to upadte UI when new contact are added

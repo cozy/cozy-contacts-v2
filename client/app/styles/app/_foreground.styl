@@ -1,0 +1,43 @@
+.fa
+    right-spaced 10px
+    font-size    18px
+
+
+    input + &
+        color grey-05
+
+
+[aria-haspopup=true]
+    > :nth-child(2)
+        button
+            text-align left
+
+            &:hover
+                color white
+
+
+// TODO: To move to cozy-ui, global styles
+[role=dialog]
+    [role=separator]
+        cursor pointer
+
+    [role=contentinfo]
+        overflow initial
+
+        &::before
+            display block
+
+            position  absolute
+            top       0
+            right     0
+            transform translateX(115%) translateY(-110%)
+
+            content        "\f00d"
+            font-family    FontAwesome
+            font-size      em(24px)
+            text-rendering auto
+            font-smooth    antialiased
+
+            color white
+
+            cursor pointer

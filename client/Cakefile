@@ -1,0 +1,88 @@
+{spawn, exec} = require 'child_process'
+{print}       = require 'sys'
+path          = require 'path'
+open          = require 'opener'
+
+appPath  = path.resolve __dirname, 'app'
+testPath = path.resolve __dirname, 'test'
+mocha    = path.resolve __dirname, 'node_modules', '.bin', 'mocha'
+
+server = require path.join '..', 'server'
+
+
+log = (runner) ->
+    runner.stdout.on 'data', (data) -> print data.toString()
+    runner.stderr.on 'data', (data) -> process.stderr.write data.toString()
+
+
+# TODO: The tests part cannot be handled in headless mode due to restrictions in
+#       dependencies loading. While Brunch can correctly use NPM dependencies
+#       we should run tests in the browser instead. The console tests tasks are
+#       so commented during this time.
+#
+# task 'test:unit', 'run unit tests', ->
+#     cmd = [
+#         mocha
+#         '--compilers', 'coffee:coffee-script/register'
+#         '--ui', 'tdd'
+#         '--colors'
+#         path.join testPath, 'unit', '*.coffee'
+#     ].join ' '
+#     log exec cmd, cwd: appPath
+#
+#
+# task 'test:app', 'run app functional tests', ->
+#     cmd = [
+#         mocha
+#         '--compilers', 'coffee:coffee-script/register'
+#         '--ui', 'bdd'
+#         '--colors'
+#         path.join testPath, '*.coffee'
+#     ].join ' '
+#     log exec cmd, cwd: appPath
+#
+#
+# task 'test:watch', 'run tests watcher', ->
+#     log spawn './node_modules/.bin/mocha', [
+#         '--compilers', 'coffee:coffee-script/register'
+#         '--ui', 'bdd'
+#         '--colors'
+#         '--watch'
+#         './test/*.coffee'
+#     ]
+#
+#
+# task 'test', 'run all tests', ->
+#     invoke 'test:unit'
+#     invoke 'test:app'
+
+# TODO: remove the tests fake runner in favor of previous ones
+task 'test:watch', 'run tests in the browser through `brunch watch` server', ->
+    log spawn 'brunch', ['watch', '--server']
+    setTimeout ->
+        open 'http://localhost:3333/test/'
+    , 3000
+
+
+task 'test', 'alias for test:watch', ->
+    invoke 'test:watch'
+
+
+task 'server:watch', 'run server in background', ->
+    # nodemon
+    #     script: path.resolve __dirname, '..', 'server.coffee'
+    #     ignore: path.resolve __dirname, '..', 'client'
+    #     quiet:  true
+    # nodemon.once 'start', ->
+    #     setTimeout ->
+    #         open 'http://localhost:9114/'
+    #     , 3000
+    server '0.0.0.0', 9114, ->
+        setTimeout ->
+            open 'http://localhost:9114/'
+        , 3000
+
+
+task 'dev', 'run tests and brunch watchers', ->
+    invoke 'server:watch'
+    invoke 'test:watch'

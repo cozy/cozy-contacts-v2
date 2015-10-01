@@ -1,0 +1,28 @@
+include helpers.jade
+
+mixin formatDatapoints(points, prefix)
+    if points.length
+        - var pop = points.length > 1
+        dl(role="gridcell", class=prefix, aria-haspopup=(pop? 'true' : 'false'), aria-expanded="false", data-position='bottom left')
+            dt
+                +formatPoint(points[0])
+                if pop
+                    span.fa.fa-caret-down
+            if pop
+                dd: ul
+                    each point in points
+                        li: +formatPoint(point, true)
+    else
+        .placeholder(role="gridcell", class=prefix)
+
+
+a.name(role="gridcell", href="contacts/#{_id}")
+    if avatar
+       img.avatar(src=avatar)
+    else
+        span.avatar.initials= initials
+        
+    p: +formatName(name)
+    
++formatDatapoints(tel, 'tel')
++formatDatapoints(email, 'email')
