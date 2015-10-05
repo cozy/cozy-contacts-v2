@@ -8,6 +8,6 @@ module.exports = class LabelFilter extends Mn.ItemView
     serializeData: ->
         app      = require 'application'
         pattern  = new RegExp "tag:#{@model.get 'name'}", 'i'
-        filter   = (app.model.get('filter') or '').match pattern
+        filter   = app.model.get('filter')?.match pattern
 
         _.extend {}, super, selected: !!filter

@@ -30,8 +30,9 @@ module.exports = class Router extends Backbone.Router
         @listenTo app.model, 'change:dialog', (model, id) ->
             return if id
 
-            filter = (app.model.get('filter') or '').match /tag:(\w+)/i
-            @navigate if filter then "tags/#{filter[1]}" else 'contacts'
+            filter = app.model.get('filter')?.match /tag:(\w+)/i
+            path   = if filter then "tags/#{filter[1]}" else 'contacts'
+            @navigate path
 
 
     index: ->

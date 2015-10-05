@@ -10,7 +10,7 @@ module.exports = class SearchView extends Mn.ItemView
         'clear': 'button.clear'
 
     events: ->
-        updateSearch = _.debounce @updateSearch, 850
+        updateSearch = _.debounce @updateSearch, 450
         'keyup @ui.search': (event) ->
             value = event.currentTarget.value
             @toggleUi value

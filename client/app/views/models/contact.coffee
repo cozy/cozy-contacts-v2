@@ -31,8 +31,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     initialize: ->
-        @[method] = @model[method].bind @model for method in @proxy
-
         @onReset()
 
         @['xtras'] = @filterDatapoints null

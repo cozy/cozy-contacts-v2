@@ -43,16 +43,10 @@ module.exports = class Contact extends Backbone.Model
 
 
     toString: (opts = {}) ->
-        [gn, fn, mn, pf, sf] = @attributes.n.split ';'
-        str  = ''
-        str += "#{pf} " if pf
-        str += "#{fn} "
-        str += "#{mn} " if mn
-        str += opts.pre if opts.pre
-        str += gn
-        str += opts.post if opts.post
-        str += " #{sf}" if sf
-        return str
+        parts = @attributes.n.split ';'
+        # wrap given name (at index 0) in pre/post tags if provided
+        parts[0] = _.compact([opts.pre, parts[0], opts.post]).join ''
+        _.compact(parts).join ' '
 
 
     match: (pattern, opts = {}) ->

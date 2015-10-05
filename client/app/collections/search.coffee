@@ -6,7 +6,7 @@ module.exports = class Search extends Filtered
         app     = require 'application'
         @search = app.model.get 'filter'
 
-        options.filter = @filter.bind @
+        options.filter = @filter
 
         super underlying, options
 
@@ -15,7 +15,7 @@ module.exports = class Search extends Filtered
             @update()
 
 
-    filter: (model) ->
+    filter: (model) =>
         return true unless @search
 
         filters = @search.match /(\w+):(\w+)/gi
