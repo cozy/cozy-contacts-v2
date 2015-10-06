@@ -37,12 +37,16 @@ avatar(size)
         box-sizing border-box
         padded 30px
 
-        transform translateY(-50%)
+        transform translateY(calc((50vh + 55%) * -1))
+        transition transform 400ms ease-out
 
         background-color white
         border em(1px) solid grey-01
         border-radius em(5px)
         box-shadow 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)
+
+    &[aria-busy=true] [role=contentinfo]
+        transform translateY(-50%)
 
     h2
         top-spaced 0

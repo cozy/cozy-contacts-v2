@@ -48,8 +48,12 @@ module.exports = class Confirm extends Mn.Behavior
         viewOpts    = _.pick cfg, 'title', 'message', 'btn_ok', 'btn_cancel'
         confirmView = new ConfirmView model: new Backbone.Model viewOpts
 
+        @view.$el.attr 'aria-busy', true
+
         Mn.bindEntityEvents @, confirmView,
-            'confirm:close': -> @view.triggerMethod 'confirm:close'
+            'confirm:close': ->
+                @view.$el.attr 'aria-busy', false
+                @view.triggerMethod 'confirm:close'
             'confirm:true':  ->
                 @view.triggerMethod 'confirm:true'
                 @view.triggerMethod cfg.event if cfg.event

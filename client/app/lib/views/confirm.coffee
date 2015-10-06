@@ -6,6 +6,7 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
 
     attributes:
         role: 'alertdialog'
+        'aria-busy': false
 
 
     ui:
@@ -16,6 +17,12 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
         'click @ui.btn_ok':     'confirm:true'
         'click @ui.btn_cancel': 'confirm:false'
         'click button':         'confirm:close'
+
+
+    onDomRefresh: ->
+        setTimeout =>
+            @$el.attr 'aria-busy', true
+        , 50
 
 
     onConfirmClose: ->

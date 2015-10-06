@@ -1,11 +1,24 @@
 .card
     @extend $dialog
 
+    &[aria-busy=true] [role=contentinfo]
+        transform translateY(30%) scale(0.95)
+        transform-origin center bottom
+        opacity 0.8
+
+        transition-delay none
+
+
     [role=contentinfo]
         display flex
 
         background-color white
         border-radius 4px
+
+        transition-property transform opacity
+        transition-duration 300ms
+        transition-timing-function ease-out
+        transition-delay 80ms
 
 
     .avatar
