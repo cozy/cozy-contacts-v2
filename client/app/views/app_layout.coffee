@@ -86,4 +86,3 @@ module.exports = class AppLayout extends Mn.LayoutView
             @showChildView 'dialogs', new CardView model: modelView
         else
             @dialogs.empty()
-            @content.currentView.focus()

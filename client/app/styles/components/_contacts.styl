@@ -92,3 +92,26 @@
 
             span
                 flex 1
+
+
+    .counter
+        margin-top     2em
+        padding-bottom .3em
+
+        text-align center
+        color      grey-05
+
+        &:not(.important)
+            display flex
+            align-items center
+            font-style italic
+
+            &::before
+            &::after
+                content ''
+                flex 1
+                margin 0 1em
+                border-top 1px solid grey-02
+
+        &.important
+            font-weight bold
