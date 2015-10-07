@@ -1,19 +1,34 @@
+Duplicates = require 'collections/duplicates'
+
 t = require 'lib/i18n'
 
 CONFIG = require('config').contact
 
 
-module.exports = class DuplicatesView extends Mn.ItemView
+module.exports = class DuplicatesView extends Mn.CompositeView
 
     template: require 'views/templates/duplicates'
 
     tagName: 'section'
 
-    className: 'card'
+    className: 'duplicates'
 
     attributes:
         role: 'dialog'
 
+    childViewContainer: 'ul'
+
+    childView: require 'views/mergerow'
+
+    templateHelpers: ->
+        return size: @collection.size()
+
+    events:
+        'click [type=submit]': 'mergeAll'
+
+    # childViewOptions: (model) ->
+    #     console.log "childViewOptions"
+    #     model: model
 
     initialize: ->
         console.log 'initialize view'
@@ -22,16 +37,21 @@ module.exports = class DuplicatesView extends Mn.ItemView
 
         # Generate duplicates list.
 
-        CompareContacts = require "lib/compare_contacts"
+        # CompareContacts = require "lib/compare_contacts"
 
-        @duplicates = CompareContacts.findSimilars app.contacts.toJSON()
+        # @duplicates = CompareContacts.findSimilars app.contacts.toJSON()
+        @collection = new Duplicates()
+        @collection.findDuplicates app.contacts
+
 
         # @duplicates = [app.contacts.toJSON()[1..5]]
-        console.log @duplicates
+        console.log @collection
         # display it.
 
-    serializeData: ->
-        return duplicates: @duplicates
+    # serializeData: ->
+    #     console.log @duplicates.toJSON()
+    #     return duplicates: @duplicates.toJSON()
+
         # _.extend super, lists: CONFIG.datapoints.types
 
     behaviors: ->
@@ -74,62 +94,18 @@ module.exports = class DuplicatesView extends Mn.ItemView
     #     'form:key:enter': 'onFormKeyEnter'
 
 
+    mergeAll: ->
+        console.log 'mergeAll'
+
+        mergeStep = (model) =>
+            console.log 'mergeStep'
 
 
+            index = 1 + @collection.indexOf model
+            if index < @collection.size()
+                @listenTo model, 'merged', =>
+                    mergeStep @collection.at index
 
+            @children.findByModel(model).merge()
 
-
-    # onRender: ->
-    #     @$('.datapoints').each (index, el) =>
-    #         name = el.dataset.type
-    #         @addRegion name, "[data-type=#{name}]"
-    #         @showChildView name, new DatapointsView
-    #             collection:    @model[name]
-    #             name:          name
-    #             cardViewModel: @model
-
-    #     @addRegion 'xtras-infos', '[data-type=xtras-infos]'
-    #     @showChildView 'xtras-infos', new XtrasView model: @model
-
-    #     return unless @model.get 'edit'
-
-    #     @addRegion 'actions', '.actions'
-    #     @showChildView 'actions', new EditActionsView model: @model
-
-
-    # onDomRefresh: ->
-    #     if @model.get('edit') then @ui.inputs.first().focus()
-    #     else @ui.edit.focus()
-
-
-    # onSave: ->
-    #     return unless @model.get 'new'
-    #     app  = require 'application'
-    #     dest = "contacts/#{@model.get 'id'}"
-    #     app.router.navigate dest, trigger: true
-
-
-    # onEditCancel: ->
-    #     @triggerMethod 'dialog:close' if @model.get 'new'
-
-
-    # onFormKeyEnter: ->
-    #     inputs = @$ ':input:not(button):not([type=hidden])'
-    #     inputs.eq(inputs.index(document.activeElement) + 1).focus()
-
-
-    # onFormFieldAdd: (type) ->
-    #     return if type in CONFIG.xtras
-    #     @getRegion('xtras').currentView.addEmptyField type
-
-
-    # updateInitials: (model, value) ->
-    #     @$('.initials').text value
-
-
-    # syncDatapoints: ->
-    #     @regionManager.each (region) =>
-    #         return unless region.currentView?.getDatapoints
-    #         name       = region.currentView.options.name
-    #         datapoints = region.currentView.getDatapoints()
-    #         @model.syncDatapoints name, datapoints
+        mergeStep @collection.first()

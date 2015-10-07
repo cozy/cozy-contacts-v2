@@ -43,7 +43,8 @@ CC.findSimilars = (contacts) ->
 # Merge methods
 
 
-# Merge toMerge cozy contact in cozy's baseContact.
+# Merge cozy contact toMerge in base.
+# Mess up toMerge contact during the process.
 CC.mergeContacts = (base, toMerge) ->
     toMerge.datapoints.forEach (field) ->
         unless hasField field, base, true
@@ -53,12 +54,14 @@ CC.mergeContacts = (base, toMerge) ->
 
     base.tags = _union base.tags, toMerge.tags
     delete toMerge.tags
+
+    if toMerge.note? and toMerge.note isnt '' and
+    base.note? and base.note isnt ''
+        base.note += "\n" + toMerge.note
+    delete toMerge.note
+
     base = _extend base, toMerge
 
-    delete base._id
-    delete base.id
-    delete base.revision
-    delete base._rev
 
     return base
 

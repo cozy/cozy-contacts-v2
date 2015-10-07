@@ -1,8 +1,40 @@
-CHOICE_FIELDS =  ['fn', 'org', 'title', 'department', 'bday', 'nickname','note']
+Contact = require 'models/contact'
+ContactViewModel = require 'views/models/contact'
+CompareContacts = require 'lib/compare_contacts'
+ContactHelper = require 'lib/contact_helper'
+
+
+CHOICE_FIELDS =  ['fn', 'org', 'title', 'department', 'bday', 'nickname']
+
+# Merge a list of contact.
+# Merge choices stored in attributes of this.
 module.exports = class MergeViewModel extends Backbone.ViewModel
 
-    # defaults:
-    #     toMerge: []
+    initialize: (options) ->
+        if options.candidates?
+            @set 'toMerge', options.candidates.slice(0)
+            console.log @
+
+
+    selectCandidate: (index, select)->
+        if select
+            unless @isCandidateSelected index
+                # TODO : @set 'toMerge' transform Array into Object !?
+                @attributes.toMerge.push @get('candidates')[index]
+        else
+            @unselectCandidate index
+
+
+    unselectCandidate: (index)->
+        # TODO : @set 'toMerge' transform Array into Object !?
+        @attributes.toMerge = @attributes.toMerge.filter (contact) =>
+            return contact isnt @get('candidates')[index]
+
+
+
+    isCandidateSelected: (index) ->
+        return @get('candidates')[index] in @get('toMerge')
+
 
     toMergeAsJson: ->
         return @get('toMerge').map (contact) -> contact.toJSON()
@@ -38,80 +70,84 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             else if options.length > 1
                 mergeOptions[field] = options
 
+        @set 'mergeOptions', mergeOptions
         return mergeOptions
 
+    merge: (callback) ->
 
-    # merge: (callback) ->
-    #     console.log 'merge'
+        console.log 'merge'
+        # get form data about merging
 
-    #     # Do merge
-    #     # merged = new Contact()
-    #     toMerge = @toMergeAsJson()
+        # Do merge
+        # merged = new Contact()
+        toMerge = @toMergeAsJson()
 
-    #     # Initialize row data of the created merged contact.
-    #     merged =
-    #         datapoints: []
-    #         tags: []
+        merged =
+            datapoints: []
+            tags: []
+        # Merge DataPoints and not specific fields
+        toMerge.forEach (contact) ->
+            CompareContacts.mergeContacts merged, contact
 
-    #     # Merge DataPoints and not specific fields
-    #     toMerge.forEach (contact) ->
-    #         CompareContacts.mergeContacts merged, contact
+        # Handle specific fields
+        delete merged._id
+        delete merged.id
+        delete merged.revision
+        delete merged._rev
+        delete merged._attachments
 
-    #     console.log @model
+        # We rely on fn field to choose fn and n fields.
+        fields = CHOICE_FIELDS
+        if @has 'fn'
+            @set 'n', @get 'fn'
+            fields = fields.concat 'n'
 
-    #     # We rely on fn field to choose fn and n fields.
-    #     fields = CHOICE_FIELDS
-    #     if @has 'fn'
-    #         @set 'n', @get 'fn'
-    #         fields = fields.concat 'n'
-
-    #     for field in fields
-    #         if @model.has field
-    #             merged[field] = toMerge[@model.get field][field]
-    #             # merged[field] = @model.get field
-
-    #     # # Avatar picture
-    #     # if @model.has 'avatar'
-
-
-    #     console.log merged
-    #     # Create new
-    #     Contact = require 'models/contact'
-    #     ContactViewModel = require 'views/models/contact'
-
-    #     contact = new Contact merged, parse: true
-
-    #     modelView = new ContactViewModel { new: true }, model: contact
-
-    #     next = =>
-    #         # modelView.attributes = contact.parse merged
-    #         console.log "merged contact"
-    #         console.log contact
-    #         console.log modelView
-
-    #         modelView.set 'edit', true
-
-    #         app  = require 'application'
-    #         CardView = require 'views/contacts/card'
-
-    #         contactView = new CardView model: modelView
-    #         app.layout.showChildView 'dialogs', contactView
-
-    #         @model.prepareLastStep contactView, modelView
+        for field in fields
+            if @has field
+                merged[field] = toMerge[@get field][field]
 
 
-    #     # Avatar picture
-    #     if @model.has 'avatar'
-    #         # get url :
-    #         uri = "contacts/#{toMerge[@model.get('avatar')].id}/picture.png"
+        console.log merged
+        # Create new
+
+        contact = new Contact merged, parse: true
+        result = new ContactViewModel { new: true }, model: contact
 
 
-    #         @_imgUrl2DataUrl uri, (err, dataUrl) =>
-    #             modelView.set 'avatar', dataUrl
+        # next = =>
+        #     # modelView.attributes = contact.parse merged
+        #     console.log "merged contact"
+        #     console.log contact
+        #     console.log modelView
 
-    #             next()
-    #     else
-    #         next()
+        #     modelView.set 'edit', true
+
+        #     app  = require 'application'
+        #     CardView = require 'views/contacts/card'
+
+        #     contactView = new CardView model: modelView
+        #     app.layout.showChildView 'dialogs', contactView
+
+        #     @model.prepareLastStep contactView, modelView
+
+        end = (err) =>
+            @set 'result', result
+            @trigger 'merged', @
+            @saveResult()
+            callback err if callback?
+
+        # Avatar picture
+        if @has 'avatar'
+            uri = "contacts/#{toMerge[@get('avatar')].id}/picture.png"
+
+            ContactHelper.imgUrl2DataUrl uri, (err, dataUrl) =>
+                result.set 'avatar', dataUrl
+
+                end err
+        else
+            end()
+
+
 
     destroyToMerge: ->
         # Delete olds
@@ -128,15 +164,25 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             else
                 console.log "deleted"
 
+    saveResult: ->
+        console.log 'save result'
+        result = @get 'result'
+        @listenTo result, 'save', @destroyToMerge.bind @
+
+        result.save()
+
+    # Deprecated
     prepareLastStep: (contactView, contact) ->
         @listenTo contact, 'save', ()=>
             console.log "merge save contact, destroy toMerge"
             @destroyToMerge()
 
-        # TODO : my called before save ...
+        # TODO : may be called before save ...
         # when contact view close, merge is over, destroy
         @listenTo contactView, 'destroy', ()=>
             console.log "destroy merge viewmodel"
+            @trigger 'done'
+
             @stopListening()
 
 

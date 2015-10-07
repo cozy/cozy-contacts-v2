@@ -7,52 +7,73 @@ block content
     mixin radio(options, fieldName)
       - for (var i=0; i< options.length; i++)
           -var option = options[i]
-            input(type="radio", name=fieldName, id="#{fieldName}-#{ref}",
+            input(type="radio", name=fieldName, id="#{fieldName}-#{i}",
              value=option.index)
-            label(for="#{fieldName}-#{ref}")= option.value
+            label(for="#{fieldName}-#{i}")= option.value
 
-    h1 t('merge title')
+    h1= t('merge title')
 
     if options.avatar != null
+      div
         h2= t('merge choose avatar')
         - for (var i=0; i< options.avatar.length; i++)
           -var option = options.avatar[i]
             input(type="radio", name="avatar", id="avatar-#{i}",
              value=option.index)
             label(for="avatar-#{i}")
-              img(src=option.value, style="height: 250px;")
+              img.avatar(src=option.value, style="height: 250px;")
+        hr
+
 
     if options.fn != null
+      div
         h2= t('merge choose name')
         +radio(options.fn, "fn")
+        hr
+
 
     if options.nickname != null
-      h2= t('merge choose nickname')
-      +radio(options.nickname)
+      div
+        h2= t('merge choose nickname')
+        +radio(options.nickname)
+        hr
+
 
     if (options.org != null || options.department != null || options.title  != null)
-      h2= t('merge choose organisation')
+      div
+        h2= t('merge choose organisation')
 
       if options.org != null
-        h3= t('merge choose org')
-        +radio(options.org, "org")
+        div
+          h3= t('merge choose org')
+          +radio(options.org, "org")
 
       if options.department != null
-        h3= t('merge choose department')
-        +radio(options.department, "department")
+        div
+          h3= t('merge choose department')
+          +radio(options.department, "department")
 
       if options.title != null
-        h3= t('merge choose title')
-        +radio(options.title, "title")
+        div
+          h3= t('merge choose title')
+          +radio(options.title, "title")
+
+      hr
+
 
 
     if options.bday != null
-      h2= t('merge choose birthday')
-      +radio(options.bday, "bday")
+      div
+        h2= t('merge choose birthday')
+        +radio(options.bday, "bday")
+        hr
+
 
     if options.note != null
-      h2= t('merge choose note')
-      +radio(options.note, "note")
+      div
+        h2= t('merge choose note')
+        +radio(options.note, "note")
+        hr
 
 
     button(type="submit").outline

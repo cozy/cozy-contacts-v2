@@ -3,7 +3,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
     routes:
         'new':        'create'
         'merge': 'merge'
-        'duplicates': 'merge'
+        'duplicates': 'duplicates'
         ':slug':      'show'
         ':slug/edit': 'edit'
         '':           'index'

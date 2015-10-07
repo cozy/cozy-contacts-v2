@@ -74,8 +74,10 @@ module.exports = class Contact extends Backbone.Model
     savePicture: (dataURL, callback) ->
         callback = callback or ->
 
+        console.log "start savePicture"
+        console.log @toJSON()
         unless @has 'id'
-            return callback new Error 'Model should ahve been saved once.'
+            return callback new Error 'Model should have been saved once.'
 
         #transform into a blob
         binary = atob dataURL.split(',')[1]
@@ -89,12 +91,5 @@ module.exports = class Contact extends Backbone.Model
         data.append 'picture', blob
         data.append 'contact', JSON.stringify @toJSON()
 
-        markChanged = (err, body) =>
-            if err
-                console.error err
-            else
-                @set 'pictureRev', true
-
         path = "contacts/#{@get 'id'}/picture"
-        request.put path, data, markChanged, false
-        callback()
+        request.put path, data, callback, false

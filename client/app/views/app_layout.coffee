@@ -70,10 +70,14 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     showDialog: (viewModel, slug) ->
         if slug is 'duplicates'
-            @showChildView 'dialogs', new DuplicatesView()
+            setTimeout =>
+                @showChildView 'dialogs', new DuplicatesView()
+            , 500
 
         else if slug is 'merge'
-            @showChildView 'dialogs', new MergeView()
+            setTimeout =>
+                @showChildView 'dialogs', new MergeView()
+            , 500
 
         else
             @showContact viewModel, slug

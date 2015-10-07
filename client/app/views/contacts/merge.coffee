@@ -15,7 +15,7 @@ module.exports = class MergeView extends Mn.ItemView
 
     tagName: 'section'
 
-    className: 'card'
+    className: 'merge'
 
     attributes:
         role: 'dialog'
@@ -27,7 +27,7 @@ module.exports = class MergeView extends Mn.ItemView
     #     opts =
     #         name: @options.model.get 'fn'
 
-    #     Navigator: {}
+        Navigator: {}
         Dialog:    {}
         Form:      {}
     #     Dropdown:  {}
@@ -62,41 +62,42 @@ module.exports = class MergeView extends Mn.ItemView
 
     events:
     #     'form:key:enter': 'onFormKeyEnter'
-        'form:submit': 'merge'
+        # 'form:submit': 'onClose'
+        'click @ui.cancel': 'onCancel'
 
 
     initialize: ->
         console.log 'initialize view merge'
-        # STUB : take a to merge list automaticaly,
-        # think about transmission later
-
-
-
-
-        app = require 'application'
 
         # TODO : howto marionette fashion?
-        @listenTo @, 'form:submit', @merge.bind @
+        @listenTo @, 'form:submit', @onSubmit.bind @
 
-        # Generate duplicates list.
-        CompareContacts = require "lib/compare_contacts"
 
-        MergeViewModel = require('views/models/merge')
-        @model = new MergeViewModel()
-
-        toMerge = CompareContacts.findSimilars(app.contacts.toJSON())[0]
-
-        if toMerge?
-            toMerge = toMerge.map (contact) ->
-                console.log contact
-                return app.contacts.get(contact.id)
-
-            @model.set 'toMerge', toMerge
+        if @model
             Mn.bindEntityEvents @model, @, @model.viewEvents
-            @mergeOptions = @model.buildMergeOptions()
 
+        # Stubs !
         else
-            return
+            app = require 'application'
+            # Generate duplicates list.
+            CompareContacts = require "lib/compare_contacts"
+            MergeViewModel = require('views/models/merge')
+            @model = new MergeViewModel()
+
+
+            toMerge = CompareContacts.findSimilars(app.contacts.toJSON())[0]
+
+            if toMerge?
+                toMerge = toMerge.map (contact) ->
+                    console.log contact
+                    return app.contacts.get(contact.id)
+
+                @model.set 'toMerge', toMerge
+                Mn.bindEntityEvents @model, @, @model.viewEvents
+                @mergeOptions = @model.buildMergeOptions()
+
+            else
+                return
         # @model.attributes.toMerge =
 
         # @duplicates = [app.contacts.toJSON()[1..5]]
@@ -106,73 +107,31 @@ module.exports = class MergeView extends Mn.ItemView
         # @buildMergeChoices()
 
 
-    # buildMergeChoices: ->
-    #     @mergeOptions = {}
-    #     fields = CHOICE_FIELDS
-    #     # _attachments  : Object
-
-    #     toMerge = @model.get 'toMerge'
-    #     toMerge = toMerge.map (contact) -> contact.toJSON()
-    #     for field in fields
-    #         options = []
-    #         toMerge.forEach (contact, index) ->
-    #             value = contact[field]
-    #             # Remove useless values, and filter identical value.
-    #             if value? and value isnt '' and not (options.some (option)->
-    #                 option.value is value)
-    #                     options.push
-    #                         value: value
-    #                         index: index
-    #         # Ask for a choice if there is anything to choose.
-    #         if options.length > 1
-    #             @mergeOptions[field] = options
-
-    #     # Photo :
-    #     options = []
-    #     toMerge.forEach (contact, index) ->
-    #         if contact._attachments?
-    #             options.push
-    #                 value: "contacts/#{contact.id}/picture.png"
-    #                 index: index
-    #     # Ask for a choice if there is anything to choose.
-    #     if options.length > 1
-    #         @mergeOptions['avatar'] = options
-
-    #     console.log @mergeOptions
-    #     # TODO : if @mergeOptions empty --> do merge whitout prompt !
-    #     if Object.keys(@mergeOptions).length is 0
-
 
 
     serializeData: ->
-        return options: @mergeOptions
+        return options: @model.get 'mergeOptions'
         # _.extend super, lists: CONFIG.datapoints.types
 
-    onShow: ->
-        console.log "render"
-        if Object.keys(@mergeOptions).length is 0
-            console.log "empty merge options"
-            # go to merge directly
-            @merge()
+    # onShow: ->
+    #     console.log "render"
+    #     console.log @mergeOptions
+    #     if @mergeOptions? and (Object.keys(@mergeOptions).length is 0)
+    #         console.log "empty merge options"
+    #         # go to merge directly
+    #         @merge()
 
-    _imgUrl2DataUrl: (uri, callback) ->
-        img = new Image()
+    onSubmit: ->
+        @model.merge =>
+            @onClose()
 
-        img.onload = ->
-            IMAGE_DIMENSION = 600
-            ratiodim = if img.width > img.height then 'height' else 'width'
-            ratio = IMAGE_DIMENSION / img[ratiodim]
+    onClose: ->
+        app = require 'application'
+        app.layout.alerts.empty()
 
-            # use canvas to resize the image
-            canvas = document.createElement 'canvas'
-            canvas.height = canvas.width = IMAGE_DIMENSION
-            ctx = canvas.getContext '2d'
-            ctx.drawImage img, 0, 0, ratio * img.width, ratio * img.height
-            dataUrl = canvas.toDataURL 'image/jpeg'
+    # onCancel: ->
+    #     @triggerMethod 'dialog:close'
 
-            callback null, dataUrl
-
-        img.src = uri
 
     merge: ->
         console.log 'merge'

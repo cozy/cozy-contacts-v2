@@ -1,0 +1,36 @@
+include contacts/helpers.jade
+
+div
+    +formatName(candidates[0].get('name'))
+
+button.cancel.outline.secondary()
+        .fa.fa-times
+        span= t('mergerow actions dismiss')
+button(type="submit").outline
+    .fa.fa-plus
+    span= t('mergerow actions merge')
+
+if result
+    - var avatar = result.get('avatar')
+    - var initials = result.get('initials')
+    - var name = result.get('name')
+    - var tel = result.get('tel')
+    - var email = result.get('email')
+
+    include contacts/row.jade
+else
+    ul
+        for contact, index in candidates
+            - var avatar = contact.get('avatar')
+            - var initials = contact.get('initials')
+            - var name = contact.get('name')
+            - var tel = contact.get('tel')
+            - var email = contact.get('email')
+
+                li
+                    input(type='checkbox', name="mergecontact-#{index}",
+                        checked="checked", value="#{index}")
+
+                    include contacts/row.jade
+
+br
