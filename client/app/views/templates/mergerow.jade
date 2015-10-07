@@ -1,36 +1,51 @@
 include contacts/helpers.jade
 
-div
-    +formatName(candidates[0].get('name'))
+mixin formatDatapoints(points, prefix)
+    if points != null && points.length
+        dl(role="gridcell", class=prefix, aria-haspopup="true")
+            dt
+                +formatPoint(points[0])
 
-button.cancel.outline.secondary()
-        .fa.fa-times
-        span= t('mergerow actions dismiss')
-button(type="submit").outline
-    .fa.fa-plus
-    span= t('mergerow actions merge')
+    else
+        .placeholder(role="gridcell", class=prefix)
+
+
+mixin contactrow(contact)
+    .name(role="gridcell")
+        if contact.avatar
+           img.avatar(src=contact.avatar)
+        else
+            span.avatar.initials= contact.initials
+
+        p: +formatName(contact.name)
+
+    +formatDatapoints(contact.tel, 'tel')
+    +formatDatapoints(contact.email, 'email')
+
+
 
 if result
-    - var avatar = result.get('avatar')
-    - var initials = result.get('initials')
-    - var name = result.get('name')
-    - var tel = result.get('tel')
-    - var email = result.get('email')
+    ul(role='list')
+        li.ui-contactrow(role='listitem')
+            +contactrow(result.toJSON())
 
-    include contacts/row.jade
 else
-    ul
-        for contact, index in candidates
-            - var avatar = contact.get('avatar')
-            - var initials = contact.get('initials')
-            - var name = contact.get('name')
-            - var tel = contact.get('tel')
-            - var email = contact.get('email')
+    dt
+        +formatName(candidates[0].get('name'))
+        button.cancel.outline.secondary()
+                .fa.fa-times
+                span= t('mergerow actions dismiss')
+        button(type="submit").outline
+            .fa.fa-plus
+            span= t('mergerow actions merge')
 
-                li
-                    input(type='checkbox', name="mergecontact-#{index}",
-                        checked="checked", value="#{index}")
+    dd
+        ul(role='list')
+            for contact, index in candidates
+                    li(role='listitem')
+                        input(type='checkbox', name="mergecontact-#{index}",
+                            checked="checked", value="#{index}",
+                            id="mergecontact-#{contact.get('id')")
+                        label.ui-contactrow(for="mergecontact-#{contact.get('id')")
+                            +contactrow(contact.toJSON())
 
-                    include contacts/row.jade
-
-br

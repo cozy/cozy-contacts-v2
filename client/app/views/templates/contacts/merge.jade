@@ -5,75 +5,79 @@ block content
     include helpers.jade
 
     mixin radio(options, fieldName)
-      - for (var i=0; i< options.length; i++)
-          -var option = options[i]
-            input(type="radio", name=fieldName, id="#{fieldName}-#{i}",
-             value=option.index)
-            label(for="#{fieldName}-#{i}")= option.value
+      ul
+          - for (var i=0; i< options.length; i++)
+              -var option = options[i]
+                  li
+                      label
+                        if i == 0
+                            input(type="radio", name=fieldName,
+                                value=option.index, checked)
+                        else
+                            input(type="radio", name=fieldName,
+                                value=option.index)
+
+                        i
+                        = option.value
+
 
     h1= t('merge title')
 
-    if options.avatar != null
-      div
-        h2= t('merge choose avatar')
-        - for (var i=0; i< options.avatar.length; i++)
-          -var option = options.avatar[i]
-            input(type="radio", name="avatar", id="avatar-#{i}",
-             value=option.index)
-            label(for="avatar-#{i}")
-              img.avatar(src=option.value, style="height: 250px;")
-        hr
+    dl
+        if options.avatar != null
+          dt= t('merge choose avatar')
+          dd
+            ul.avatars
+                - for (var i=0; i< options.avatar.length; i++)
+                    -var option = options.avatar[i]
+                    li
+                        label
+                            if i == 0
+                                input(type="radio", name="avatar",
+                                    value=option.index, checked)
+                            else
+                                input(type="radio", name="avatar",
+                                    value=option.index)
+
+                            img.avatar(src=option.value)
 
 
-    if options.fn != null
-      div
-        h2= t('merge choose name')
-        +radio(options.fn, "fn")
-        hr
+        if options.fn != null
+          dt= t('merge choose name')
+          dd
+            +radio(options.fn, "fn")
+
+        if options.nickname != null
+          dt= t('merge choose nickname')
+          dd
+            +radio(options.nickname)
 
 
-    if options.nickname != null
-      div
-        h2= t('merge choose nickname')
-        +radio(options.nickname)
-        hr
+        if (options.org != null || options.department != null || options.title  != null)
+          dt
+            = t('merge choose organisation')
+          dd
+            dl
+              if options.org != null
+                dt= t('merge choose org')
+                dd
+                  +radio(options.org, "org")
+
+              if options.department != null
+                dt= t('merge choose department')
+                dd
+                  +radio(options.department, "department")
+
+              if options.title != null
+                dt= t('merge choose title')
+                dd
+                  +radio(options.title, "title")
 
 
-    if (options.org != null || options.department != null || options.title  != null)
-      div
-        h2= t('merge choose organisation')
-
-      if options.org != null
-        div
-          h3= t('merge choose org')
-          +radio(options.org, "org")
-
-      if options.department != null
-        div
-          h3= t('merge choose department')
-          +radio(options.department, "department")
-
-      if options.title != null
-        div
-          h3= t('merge choose title')
-          +radio(options.title, "title")
-
-      hr
-
-
-
-    if options.bday != null
-      div
-        h2= t('merge choose birthday')
-        +radio(options.bday, "bday")
-        hr
-
-
-    if options.note != null
-      div
-        h2= t('merge choose note')
-        +radio(options.note, "note")
-        hr
+        if options.bday != null
+          dt= t('merge choose birthday')
+          dd
+            +radio(options.bday, "bday")
 
 
     button(type="submit").outline

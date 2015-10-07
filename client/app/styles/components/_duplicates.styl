@@ -1,134 +1,61 @@
 .duplicates
 
     @extend $dialog
-    // TODO : copy from card actualy.
-    [role=contentinfo]
-        // display flex
 
-        background-color white
+    [role=contentinfo]
+        position relative
+        
+        padding 30px
         border-radius 4px
 
+        background-color white
 
-    .avatar
-        font-size 32px
-        avatar    128px
-        spaced()
+    h1
+        font-weight bold
+        font-size 20px
 
+    .ui-mergeall
+        position absolute
+        top 30px
+        right 30px
 
-    .initials
-        background-color grey-02
-        color            white
+    [role=mergegroup]
+        padding 15px
+        border 1px solid #DDE6EF
 
+        > dt
+            height 40px
+            position relative
 
-    .data
-        flex    1
-        padded 30px, 10px
+            border-bottom 1px solid #DDE6EF
 
-        .block
-            reset()
-            vertically-spaced 10px
-
-            li
-                bottom-spaced 4px
-
-                &:last-child
-                    bottom-spaced 0
-
-        .group
-            display flex
-
-        .type
-            width          8em
-
-            font-size      em(13px)
-            color          grey-05
-            font-style     normal
-            text-transform uppercase
-
-        .value
-            reset()
-            flex 1
-
-
-        .block[data-type] ul:not(:empty)
-        .block [data-type]:first-child ul:not(:empty)
-        &.edit .block
-            top-padded 10px
-            border-top 1px solid grey-02
-
-
-    // edition mode
-    .edit
-        input
-            background-color transparent
-
-        .group
-            position          relative
-            vertically-spaced 6px
-
-            &:hover
-                input
-                    background-color grey-01
-
-            input:focus
-                background-color grey-01
-
-            &:not(:hover) button
-            input.empty + button
-                hide()
-
-            input + button
-                padding                   0 .4em
-                background-color          grey-01
-                border-top-left-radius    0
-                border-bottom-left-radius 0
-                font-size                 .8em
-                color                     grey-06
-
-            input:not(.empty)
-                border-top-right-radius    0
-                border-bottom-right-radius 0
-
-            .fa
-                margin 0
-
-        .type
-            vertically-padded 6px
-            margin-right 2px
-
-            &:focus
-                color grey-08
-
-        .value
-            horizontally-padded 8px
-            border-radius       em(2px)
-
-        textarea.value
-            padded 8px
-
-        [aria-haspopup]
             button
-                display    block
-                box-sizing border-box
-                width      100%
-                padding    0.25em 1em
+                float right
 
+    [role=listitem]
+        display block
+        
+        &:not(:last-child)
+            border-bottom 1px solid grey-02
 
-    aside
-        padding em(30px)
+        > [type=checkbox]
+            float left
+            margin 10px
 
-        @media (max-width: (360/16)rem)
-            display none
+    .ui-contactrow
+        display flex
+        align-items center
+        padding .3em 0
 
-        li > *
-            display block
-            margin-bottom em(10px)
+        text-decoration none
 
-        button
-            // allow the button type to make 100% of the container (aside)
-            width 100%
+        > a
+            color           grey-08
+            text-decoration none
 
-            text-align left
+        > dl
+            color grey-05
 
-        .fa
-            margin-right em(10px)
+        > label
+            @media (max-width: (360/16)rem)
+                display none

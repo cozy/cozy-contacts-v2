@@ -1,12 +1,12 @@
 extends ../../lib/views/templates/base/dialog.jade
 
 block content
-    h1 find duplicates
+    h1= t('duplicates title')
 
-    button(type="submit").outline
+    button(type="submit").outline.ui-mergeall
         .fa.fa-plus
         span= t('duplicates actions mergeall')
-          | (#{size})
+          |  (#{size})
 
     ul
 

@@ -1,133 +1,95 @@
 .merge
     @extend $dialog
     // TODO : copy from card actualy.
+    
     [role=contentinfo]
-        // display flex
-
-        background-color white
+        transform translateY(0%) !important
+        flex-basis 30em !important
+        
+        position relative
+        
+        padding 30px
         border-radius 4px
 
+        background-color white
+
+
+    h1
+        font-weight bold
+        font-size 20px
+
+    dl
+        margin-bottom 2em
+
+    dt
+        font-weight bold
+        color grey-04
+        line-height 1.5em
+
+    ul
+        list-style-type none
+        padding 0
+        margin 0
+
+    li
+        line-height 2em
+
+    input
+        margin-right 0.5em
+
+    > dd
+        &:not(:last-child)
+            border-top 1px solid grey-02
+
+
+    ul.avatars
+
+        li
+            display inline-block
+
+        
+
+        img.avatar
+            border 5px solid white
+
+        input:checked+img
+            border 5px double blue
+
+    dd    
+        input
+            hide()
+
+
+        label
+            cursor pointer
+
+        input + i
+            display inline-block
+            width 1em
+            height 1em
+            margin -1px 4px 0 0
+            vertical-align middle
+            
+            -moz-border-radius 50%
+            border-radius 50%
+            border 2px double grey-05
+            
+            background-color white
+
+
+        input:checked + i
+            border 2px double blue
+
+            background-color blue
+
+
+    dl dl
+        margin-left 1em
+
+    .cancel
+        float right
 
     .avatar
         font-size 32px
         avatar    128px
         spaced()
-
-
-    .initials
-        background-color grey-02
-        color            white
-
-
-    .data
-        flex    1
-        padded 30px, 10px
-
-        .block
-            reset()
-            vertically-spaced 10px
-
-            li
-                bottom-spaced 4px
-
-                &:last-child
-                    bottom-spaced 0
-
-        .group
-            display flex
-
-        .type
-            width          8em
-
-            font-size      em(13px)
-            color          grey-05
-            font-style     normal
-            text-transform uppercase
-
-        .value
-            reset()
-            flex 1
-
-
-        .block[data-type] ul:not(:empty)
-        .block [data-type]:first-child ul:not(:empty)
-        &.edit .block
-            top-padded 10px
-            border-top 1px solid grey-02
-
-
-    // edition mode
-    .edit
-        input
-            background-color transparent
-
-        .group
-            position          relative
-            vertically-spaced 6px
-
-            &:hover
-                input
-                    background-color grey-01
-
-            input:focus
-                background-color grey-01
-
-            &:not(:hover) button
-            input.empty + button
-                hide()
-
-            input + button
-                padding                   0 .4em
-                background-color          grey-01
-                border-top-left-radius    0
-                border-bottom-left-radius 0
-                font-size                 .8em
-                color                     grey-06
-
-            input:not(.empty)
-                border-top-right-radius    0
-                border-bottom-right-radius 0
-
-            .fa
-                margin 0
-
-        .type
-            vertically-padded 6px
-            margin-right 2px
-
-            &:focus
-                color grey-08
-
-        .value
-            horizontally-padded 8px
-            border-radius       em(2px)
-
-        textarea.value
-            padded 8px
-
-        [aria-haspopup]
-            button
-                display    block
-                box-sizing border-box
-                width      100%
-                padding    0.25em 1em
-
-
-    aside
-        padding em(30px)
-
-        @media (max-width: (360/16)rem)
-            display none
-
-        li > *
-            display block
-            margin-bottom em(10px)
-
-        button
-            // allow the button type to make 100% of the container (aside)
-            width 100%
-
-            text-align left
-
-        .fa
-            margin-right em(10px)

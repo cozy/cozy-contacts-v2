@@ -47,5 +47,22 @@
     "datapoint placeholder other":      "add any information",
     "datapoint label bday":             "birthday",
     "datapoint placeholder bday":       "YYYY-MM-DD",
-    "datapoint label note":             "notes"
+    "datapoint label note":             "notes",
+
+    "duplicates title":                 "Find Duplicates",
+    "duplicates actions mergeall":      "merge all",
+    "mergerow actions merge":           "merge",
+    "mergerow actions dismiss":         "dismiss",
+
+    "merge title":                      "Merge contacts",
+    "merge choose avatar":              "Choose a profile picture:",
+    "merge choose name":                "Choose a name:",
+    "merge choose nickname":            "Choose a nickname:",
+    "merge choose organisation":        "Choose an organisation:",
+    "merge choose org":                 "company",
+    "merge choose department":          "department",
+    "merge choose title":               "title",
+    "merge choose birthday":            "Choose a birthday:",
+    "merge actions merge":              "merge contacts",
+    "merge actions cancel":             "cancel"
 }

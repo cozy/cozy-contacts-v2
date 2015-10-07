@@ -69,15 +69,17 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'content', new ContactsView()
 
     showDialog: (viewModel, slug) ->
+        # TODO stubs !
         if slug is 'duplicates'
             setTimeout =>
                 @showChildView 'dialogs', new DuplicatesView()
-            , 500
+            , 1000
 
+        # TODO stubs !
         else if slug is 'merge'
             setTimeout =>
                 @showChildView 'dialogs', new MergeView()
-            , 500
+            , 2000
 
         else
             @showContact viewModel, slug
