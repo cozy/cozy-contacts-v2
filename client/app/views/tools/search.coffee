@@ -23,7 +23,7 @@ module.exports = class SearchView extends Mn.ItemView
             value = null
             @toggleUi()
         app = require 'application'
-        app.search 'text', value
+        app.search 'text', value?.replace /\s/g, ''
 
 
     clearSearch: ->
