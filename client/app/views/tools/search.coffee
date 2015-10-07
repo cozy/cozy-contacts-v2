@@ -30,5 +30,9 @@ module.exports = class SearchView extends Mn.ItemView
         @updateSearch()
 
 
+    onDomRefresh: ->
+        @ui.search.focus()
+
+
     toggleUi: (value) ->
         @$('label').toggleClass 'empty', _.isEmpty value
