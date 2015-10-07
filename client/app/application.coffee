@@ -48,5 +48,25 @@ class Application extends Mn.Application
             @tags.fetch reset: true
 
 
+    search: (pattern, string) ->
+        filter  = @model.get 'filter'
+        input   = "#{pattern}:#{string}"
+        pattern = new RegExp "#{pattern}:(\\w+)", 'i'
+        prev    = filter?.match pattern or null
+
+        if string
+            if prev
+                filter = filter.replace pattern, input
+            else if filter?.length
+                filter += " #{input}"
+            else
+                filter = input
+
+        else if prev
+            filter = filter.replace(pattern, '').trim()
+
+        @model.set 'filter', filter
+
+
 # Exports Application singleton instance
 module.exports = new Application()

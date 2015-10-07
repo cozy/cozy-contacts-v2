@@ -1,46 +1,7 @@
-{Filtered, Sorted}  = BackboneProjections
-{asciize, alphabet} = require 'lib/diacritics'
-
 GroupViewModel = require 'views/models/group'
 
-
-class Tagged extends Filtered
-    constructor: (underlying, options = {}) ->
-        app  = require 'application'
-        @tag = app.model.get 'filter'
-
-        options.filter = (model) =>
-            if @tag then _.contains model.attributes.tags, @tag
-            else true
-        super underlying, options
-
-        @listenTo app.model, 'change:filter', (model, value) ->
-            @tag = value
-            @update()
-
-    update: ->
-        if @tag then @reset @underlying.models.filter @options.filter
-        else @reset @underlying.models
-
-
-class ByInitial extends Filtered
-    constructor: (underlying, options) ->
-        options.comparator = (a, b) ->
-            a.attributes.n.localeCompare b.attributes.n
-        options.comparator.induced = true
-
-        options.filter = (model) ->
-            n = asciize(model.attributes.n).toLowerCase()
-
-            [gn, fn, ...] = n.split ';'
-            initial = if gn then gn[0] else if fn then fn[0] else '#'
-
-            if options.char is '#'
-                not initial.match alphabet
-            else
-                options.char is initial
-
-        super
+Search    = require 'collections/search'
+CharIndex = require 'collections/charindex'
 
 
 module.exports = class Contacts extends Mn.CompositeView
@@ -68,7 +29,7 @@ module.exports = class Contacts extends Mn.CompositeView
 
     initialize: ->
         app = require 'application'
-        @taggedCollection = new Tagged app.contacts
+        @taggedCollection = new Search app.contacts
         @_buildFilteredCollections()
 
 
@@ -79,7 +40,7 @@ module.exports = class Contacts extends Mn.CompositeView
         for char in initials
             do (char) =>
                 attributes = name: char
-                collection = new ByInitial @taggedCollection, char: char
+                collection = new CharIndex @taggedCollection, char: char
                 @collection.add new GroupViewModel attributes,
                     compositeCollection: collection
 

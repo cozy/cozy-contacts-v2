@@ -1,5 +1,7 @@
 {Filtered}  = BackboneProjections
 
+PATTERN = /tag:(\w+)/i
+
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
@@ -38,8 +40,8 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
 
     toggleSelected: (model, value) ->
-        _id = if _ref = @collection.find(name: value) then _ref.get '_id'
-        else 'all'
+        tag = value?.match(PATTERN)?[1]
+        _id = if tag then @collection.find(name: tag).get('_id') else 'all'
 
         @$("[aria-checked]:not([for=filter-#{_id}])")
         .attr 'aria-checked', false

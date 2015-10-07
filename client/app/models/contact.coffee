@@ -40,3 +40,26 @@ module.exports = class Contact extends Backbone.Model
             options.attrs.url = mainUrl.value
 
         super
+
+
+    toString: (opts = {}) ->
+        parts = @attributes.n.split ';'
+        # wrap given name (at index 0) in pre/post tags if provided
+        parts[0] = _.compact([opts.pre, parts[0], opts.post]).join ''
+        _.compact(parts).join ' '
+
+
+    match: (pattern, opts = {}) ->
+        format = if opts.format
+            pre: '»'
+            post: '«'
+        else undefined
+
+        search = fuzzy.match pattern, @toString(format), opts
+
+        if search and format
+            search.rendered = search.rendered
+                .replace '»', opts.format.pre
+                .replace '«', opts.format.post
+
+        return search

@@ -22,7 +22,7 @@ a.name(role="gridcell", href="contacts/#{_id}")
     else
         span.avatar.initials= initials
         
-    p: +formatName(name)
+    p!= fullname
     
 +formatDatapoints(tel, 'tel')
 +formatDatapoints(email, 'email')

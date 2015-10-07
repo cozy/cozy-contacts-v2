@@ -1,18 +1,3 @@
-mixin formatName(name)
-    if name.prefix
-        = name.prefix
-        | 
-    = name.first
-    | 
-    if name.middle
-        = name.middle
-        | 
-    b= name.given
-    if name.suffix
-        | 
-        = name.suffix
-
-
 mixin formatPoint(point, icon)
     if icon
         case point.type.toLowerCase()

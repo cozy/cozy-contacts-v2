@@ -61,7 +61,18 @@ do (factory = (root, Backbone) ->
             super _.extend({}, attributes, mappedAttrs), options
 
             @listenTo @model, 'all', (args...) -> @trigger.apply @, args
+            @proxyMethods()
             @bindEntityEvents()
+
+
+        # Proxy a a simpler way to declare which model methods should be
+        # proxified through the ViewModel instance. Just add a `proxy` class
+        # property as an array (or a function tht returns an array) containing
+        # names of the methods to proxify.
+        proxyMethods: ->
+            return unless @model
+            proxy = _.result @, 'proxy', {}
+            @[method] = @model[method].bind @model for method in proxy
 
 
         # Simple and convenient wrapper inspired by Marionette to bind `events`
