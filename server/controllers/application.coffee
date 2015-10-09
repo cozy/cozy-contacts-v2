@@ -13,18 +13,9 @@ getImports = (callback) ->
     async.parallel [
         Config.getInstance
         (cb) -> cozydb.api.getCozyInstance cb
-        (cb) -> cozydb.api.getCozyTags cb # All tags values in cozy.
         (cb) -> WebDavAccount.first cb
     ], (err, res) ->
-        [config, instance, tags, webDavAccount] = res
-
-        # Remove this fix once cozydb is fixed:
-        # https://github.com/cozy/cozydb/issues/6
-        if tags?
-            tags = tags.filter (value) ->
-                Boolean(value)
-        else
-            tags = []
+        [config, instance, webDavAccount] = res
 
         locale = instance?.locale or 'en'
         if webDavAccount?
@@ -33,7 +24,6 @@ getImports = (callback) ->
         callback null,
             config:        config
             locale:        locale
-            tags:          tags
             webDavAccount: webDavAccount
 
 

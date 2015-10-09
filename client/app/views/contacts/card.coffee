@@ -1,6 +1,7 @@
 DatapointsView  = require 'views/contacts/components/datapoints'
 XtrasView       = require 'views/contacts/components/xtras'
 EditActionsView = require 'views/contacts/components/edit_actions'
+TagsActionsView = require 'views/contacts/components/edit_tags'
 
 t = require 'lib/i18n'
 
@@ -48,11 +49,14 @@ module.exports = class ContactCardView extends Mn.LayoutView
         clear:    '.clear'
         avatar:   '.avatar'
 
+    regions:
+        'tags': '.edit.tags'
+
 
     modelEvents:
         'change:edit':     'render'
         'change:initials': 'updateInitials'
-        'change':          -> @render() unless @model.get 'edit'
+        'change':          'onModelChange'
         'before:save':     'syncDatapoints'
         'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
@@ -67,12 +71,12 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     serializeData: ->
-        _.extend super,
+        _.extend {}, super,
             lists: CONFIG.datapoints.types
             fullname: @model.toString pre: '<b>', post: '</b>'
 
 
-    onRender: ->
+    _renderDatapoints: ->
         @$('.datapoints').each (index, el) =>
             name = el.dataset.type
             @addRegion name, "[data-type=#{name}]"
@@ -84,10 +88,16 @@ module.exports = class ContactCardView extends Mn.LayoutView
         @addRegion 'xtras-infos', '[data-type=xtras-infos]'
         @showChildView 'xtras-infos', new XtrasView model: @model
 
-        return unless @model.get 'edit'
 
+    _renderEditActions: ->
         @addRegion 'actions', '.actions'
         @showChildView 'actions', new EditActionsView model: @model
+
+
+    onRender: ->
+        @showChildView 'tags', new TagsActionsView model: @model
+        @_renderDatapoints()
+        @_renderEditActions() if @model.get 'edit'
 
 
     onDomRefresh: ->

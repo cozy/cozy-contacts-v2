@@ -25,19 +25,19 @@
         display flex
         align-items baseline
 
-    .tags
-        flex 1
-        display flex
-        left-spaced 2em
+        .tags
+            flex 1
+            display flex
+            left-spaced 2em
 
-        li
-            horizontally-spaced .25em
-            padded .25em .45em
-            border-radius 2px
-            background-color grey-01
-            font-size .85em
-            text-transform capitalize
-            color grey-07
+            li
+                horizontally-spaced .25em
+                padded .25em .45em
+                border-radius 2px
+                background-color grey-01
+                font-size .85em
+                text-transform capitalize
+                color grey-07
 
 
     .avatar
@@ -86,6 +86,27 @@
         &.edit .block
             top-padded 10px
             border-top 1px solid grey-02
+
+
+    // tags select dropdown
+    .tags
+        fieldset
+            horizontally-spaced 1em
+
+        li
+            white-space nowrap
+
+        button
+            width auto
+            min-width 100%
+
+        label
+            display flex
+            align-items flex-start
+            cursor pointer
+
+            span
+                flex 1
 
 
     // edition mode
@@ -137,13 +158,6 @@
         textarea.value
             padded 8px
 
-        [aria-haspopup]
-            button
-                display    block
-                box-sizing border-box
-                width      100%
-                padding    0.25em 1em
-
 
     aside
         padding em(30px)
@@ -151,14 +165,15 @@
         @media (max-width: (360/16)rem)
             display none
 
-        li > *
+        li:not(:last-child)
             display block
             margin-bottom em(10px)
 
         button
-            // allow the button type to make 100% of the container (aside)
+        [role=button]
+            display block
+            box-sizing border-box
             width 100%
-
             text-align left
 
         .fa

@@ -30,7 +30,7 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
         app     = require 'application'
         @collection = new Filtered app.tags,
             filter: (model) ->
-                return unless app.contacts.length
+                return false unless app.contacts.length
                 contacts = app.contacts.find (contact) ->
                     _.contains contact.attributes.tags, model.attributes.name
                 !!contacts

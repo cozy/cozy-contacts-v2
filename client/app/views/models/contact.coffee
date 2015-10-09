@@ -21,9 +21,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         reset: 'onReset'
 
     viewEvents:
+        'edit:cancel':    'reset'
+        'tags:update':    'updateTags'
         'form:field:add': 'addField'
         'form:submit':    -> @save()
-        'edit:cancel':    'reset'
         'delete':         -> @destroy()
 
 
@@ -109,6 +110,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         datapoints = @model.get 'datapoints'
         datapoints.remove _.difference @[name].models, collection
         datapoints.add _.difference collection, @[name].models
+
+
+    updateTags: (tags) ->
+        @model.save tags: tags
 
 
     onSave: ->

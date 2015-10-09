@@ -4,7 +4,7 @@ module.exports = class Contact extends Backbone.Model
 
     urlRoot: 'contacts'
 
-    defaults:
+    defaults: ->
         n:          ';;;;'
         datapoints: []
 
