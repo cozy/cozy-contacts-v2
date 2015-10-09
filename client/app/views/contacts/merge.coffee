@@ -28,8 +28,6 @@ module.exports = class MergeView extends Mn.ItemView
 
 
     initialize: ->
-        console.log 'initialize view merge'
-
         # TODO : howto marionette fashion?
         @listenTo @, 'form:submit', @onSubmit.bind @
 
@@ -58,12 +56,15 @@ module.exports = class MergeView extends Mn.ItemView
             else
                 return
 
+
     serializeData: ->
-        return options: @model.get 'mergeOptions'
+        return model: @model.toJSON()
+
 
     onSubmit: ->
         @model.merge =>
             @onClose()
+
 
     onClose: ->
         app = require 'application'

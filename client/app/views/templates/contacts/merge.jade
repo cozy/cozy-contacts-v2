@@ -10,7 +10,7 @@ block content
               -var option = options[i]
                   li
                       label
-                        if i == 0
+                        if model[fieldName] == option.index
                             input(type="radio", name=fieldName,
                                 value=option.index, checked)
                         else
@@ -24,15 +24,15 @@ block content
     h1= t('merge title')
 
     dl
-        if options.avatar != null
+        if model.mergeOptions.avatar != null
           dt= t('merge choose avatar')
           dd
             ul.avatars
-                - for (var i=0; i< options.avatar.length; i++)
-                    -var option = options.avatar[i]
+                - for (var i=0; i< model.mergeOptions.avatar.length; i++)
+                    -var option = model.mergeOptions.avatar[i]
                     li
                         label
-                            if i == 0
+                            if model.avatar == option.index
                                 input(type="radio", name="avatar",
                                     value=option.index, checked)
                             else
@@ -42,42 +42,42 @@ block content
                             img.avatar(src=option.value)
 
 
-        if options.fn != null
+        if model.mergeOptions.fn != null
           dt= t('merge choose name')
           dd
-            +radio(options.fn, "fn")
+            +radio(model.mergeOptions.fn, "fn")
 
-        if options.nickname != null
+        if model.mergeOptions.nickname != null
           dt= t('merge choose nickname')
           dd
-            +radio(options.nickname)
+            +radio(model.mergeOptions.nickname)
 
 
-        if (options.org != null || options.department != null || options.title  != null)
+        if (model.mergeOptions.org != null || model.mergeOptions.department != null || model.mergeOptions.title  != null)
           dt
             = t('merge choose organisation')
           dd
             dl
-              if options.org != null
+              if model.mergeOptions.org != null
                 dt= t('merge choose org')
                 dd
-                  +radio(options.org, "org")
+                  +radio(model.mergeOptions.org, "org")
 
-              if options.department != null
+              if model.mergeOptions.department != null
                 dt= t('merge choose department')
                 dd
-                  +radio(options.department, "department")
+                  +radio(model.mergeOptions.department, "department")
 
-              if options.title != null
+              if model.mergeOptions.title != null
                 dt= t('merge choose title')
                 dd
-                  +radio(options.title, "title")
+                  +radio(model.mergeOptions.title, "title")
 
 
-        if options.bday != null
+        if model.mergeOptions.bday != null
           dt= t('merge choose birthday')
           dd
-            +radio(options.bday, "bday")
+            +radio(model.mergeOptions.bday, "bday")
 
 
     button(type="submit").outline

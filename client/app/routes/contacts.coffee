@@ -3,6 +3,8 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
     routes:
         'new':        'create'
         'duplicates': 'duplicates'
+        # TODO : actually stub, reactivate later.
+        # 'merge': 'merge'
         ':slug':      'show'
         ':slug/edit': 'edit'
         '':           'index'
@@ -43,10 +45,9 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     duplicates: ->
         app = require 'application'
-        app.model.set 'dialog', 'duplicates'
-        # app.trigger 'mode:edit', true
+        @_ensureContacts -> app.model.set 'dialog', 'duplicates'
+
 
     merge: ->
-        # TODO
         app = require 'application'
-        app.model.set 'dialog', 'merge'
+        @_ensureContacts -> app.model.set 'dialog', 'merge'

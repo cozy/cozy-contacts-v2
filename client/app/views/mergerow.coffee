@@ -14,6 +14,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
+        'merged': 'end'
 
 
     events:
@@ -26,24 +27,26 @@ module.exports = class MergeRow extends Mn.ItemView
         elem = $(ev.target)
         @model.selectCandidate elem.val(), elem.is ':checked'
 
+
     dismiss: ->
         @destroy()
+
 
     merge: ->
         if @model.get('toMerge').length <= 1
             # cant merge one or 0 contact, pass
             console.log 'not enought contact to merge.'
+            @end()
             return
 
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0
-            console.log "empty merge options"
-            # go to merge directly
+            # No question to the user, go to merge directly
             @model.merge()
         else
-            console.log "choices to be done !"
-
             MergeView = require 'views/contacts/merge'
             app = require 'application'
-
             app.layout.showChildView 'alerts', new MergeView model: @model
+
+    end: ->
+        @trigger 'end'

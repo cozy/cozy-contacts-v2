@@ -13,10 +13,8 @@ DrawerLayout = require 'views/drawer_layout'
 SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 CardView     = require 'views/contacts/card'
-MergeView     = require 'views/contacts/merge'
-
-
 DuplicatesView = require 'views/duplicates'
+MergeView     = require 'views/contacts/merge'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -68,21 +66,18 @@ module.exports = class AppLayout extends Mn.LayoutView
     showContactsList: ->
         @showChildView 'content', new ContactsView()
 
-    showDialog: (viewModel, slug) ->
-        # TODO stubs !
-        if slug is 'duplicates'
-            setTimeout =>
-                @showChildView 'dialogs', new DuplicatesView()
-            , 1000
 
-        # TODO stubs !
+    showDialog: (viewModel, slug) ->
+        if slug is 'duplicates'
+            @showChildView 'dialogs', new DuplicatesView()
+
+        # TODO stub !
         else if slug is 'merge'
-            setTimeout =>
-                @showChildView 'dialogs', new MergeView()
-            , 2000
+            @showChildView 'dialogs', new MergeView()
 
         else
             @showContact viewModel, slug
+
 
     showContact: (viewModel, id) ->
         if id

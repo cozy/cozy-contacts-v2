@@ -43,9 +43,9 @@ else
         ul(role='list')
             for contact, index in candidates
                     li(role='listitem')
-                        input(type='checkbox', name="mergecontact-#{index}",
-                            checked="checked", value="#{index}",
-                            id="mergecontact-#{contact.get('id')")
-                        label.ui-contactrow(for="mergecontact-#{contact.get('id')")
-                            +contactrow(contact.toJSON())
+                        label
+                            input(type='checkbox', name="mergecontact-#{index}",
+                                checked="checked", value="#{index}")
+                            .ui-contactrow
+                                +contactrow(contact.toJSON())
 

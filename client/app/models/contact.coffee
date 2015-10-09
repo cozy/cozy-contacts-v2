@@ -74,8 +74,6 @@ module.exports = class Contact extends Backbone.Model
     savePicture: (dataURL, callback) ->
         callback = callback or ->
 
-        console.log "start savePicture"
-        console.log @toJSON()
         unless @has 'id'
             return callback new Error 'Model should have been saved once.'
 

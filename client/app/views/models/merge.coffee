@@ -13,7 +13,6 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
     initialize: (options) ->
         if options.candidates?
             @set 'toMerge', options.candidates.slice(0)
-            console.log @
 
 
     selectCandidate: (index, select)->
@@ -63,23 +62,19 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
                             value: value
                             index: index
 
-            if options.length is 1 # choice is done already
+            if options.length > 0
+                # Default choice
                 @set field, options[0].index
 
-            # Ask for a choice if there is anything to choose.
-            else if options.length > 1
+            # Ask for a choice if there multiple options.
+            if options.length > 1
                 mergeOptions[field] = options
 
         @set 'mergeOptions', mergeOptions
         return mergeOptions
 
+
     merge: (callback) ->
-
-        console.log 'merge'
-        # get form data about merging
-
-        # Do merge
-        # merged = new Contact()
         toMerge = @toMergeAsJson()
 
         merged =
@@ -106,29 +101,9 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             if @has field
                 merged[field] = toMerge[@get field][field]
 
-
-        console.log merged
-        # Create new
-
+        # Create the new contact and ContactViewModel
         contact = new Contact merged, parse: true
         result = new ContactViewModel { new: true }, model: contact
-
-
-        # next = =>
-        #     # modelView.attributes = contact.parse merged
-        #     console.log "merged contact"
-        #     console.log contact
-        #     console.log modelView
-
-        #     modelView.set 'edit', true
-
-        #     app  = require 'application'
-        #     CardView = require 'views/contacts/card'
-
-        #     contactView = new CardView model: modelView
-        #     app.layout.showChildView 'dialogs', contactView
-
-        #     @model.prepareLastStep contactView, modelView
 
         end = (err) =>
             @set 'result', result
@@ -149,10 +124,9 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
 
 
 
+    # Delete old contacts, now merged in 'result'.
     destroyToMerge: ->
-        # Delete olds
         toMerge = @get 'toMerge'
-        console.log toMerge
 
         async.each toMerge, (c, cb) ->
             c.destroy
@@ -161,28 +135,9 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         , (err) ->
             if err
                 console.log err
-            else
-                console.log "deleted"
 
     saveResult: ->
-        console.log 'save result'
         result = @get 'result'
         @listenTo result, 'save', @destroyToMerge.bind @
 
         result.save()
-
-    # Deprecated
-    prepareLastStep: (contactView, contact) ->
-        @listenTo contact, 'save', ()=>
-            console.log "merge save contact, destroy toMerge"
-            @destroyToMerge()
-
-        # TODO : may be called before save ...
-        # when contact view close, merge is over, destroy
-        @listenTo contactView, 'destroy', ()=>
-            console.log "destroy merge viewmodel"
-            @trigger 'done'
-
-            @stopListening()
-
-

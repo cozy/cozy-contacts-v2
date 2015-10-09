@@ -1,6 +1,5 @@
 module.exports = class PickAvatar extends Mn.Behavior
 
-
     events: ->
         'click @ui.avatar': 'choosePhoto'
 
