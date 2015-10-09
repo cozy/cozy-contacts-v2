@@ -14,9 +14,9 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
     ui: ->
         ui =
-            inputs: ':input:not(button)'
-            delete: '.delete'
-        ui.autoAdd = '.value' unless @options.name is 'xtras'
+            formInputs: ':input:not(button)'
+            formDelete: 'button.delete'
+        ui.formAutoAdd = '.value' unless @options.name is 'xtras'
         return ui
 
 
@@ -33,7 +33,8 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         @addEmptyField() unless @options.name is 'xtras'
 
 
-    onFormFieldAdd: (name) -> @addEmptyField name
+    onFormFieldAdd: (name) ->
+        @addEmptyField name
 
 
     onFormFieldUpdate: (el) ->
@@ -51,7 +52,7 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
 
     getDatapoints: ->
-        @collection.filter (model) -> model.get('value') isnt ''
+        @collection.filter (model) -> not _.isEmpty model.get('value')
 
 
     addEmptyField: (name) ->

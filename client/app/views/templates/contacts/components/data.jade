@@ -1,0 +1,45 @@
+include ../helpers.jade
+
+
+if edit
+    +input('name.prefix')(value=name.prefix)
+    +input('name.first')(value=name.first)
+    +input('name.middle')(value=name.middle)
+    +input('name.given')(value=name.given)
+    +input('name.suffix')(value=name.suffix)
+    
+    
+    fieldset.block(data-type="infos")
+        +input('org')(value=org, placeholder=true)
+        +input('department')(value=department, placeholder=true)
+        +input('title')(value=title, placeholder=true)
+
+
+else
+    header
+        h1!= fullname
+        ul.tags
+            for tag in tags
+                li= tag
+    
+    ul.block(data-type="infos")
+        if title || org || department || note
+            if title || org || department
+                li: +formatJob(title, org, department)
+            if note
+                li= note
+
+
+.block.datapoints(data-type="tel")
+.block.datapoints(data-type="email")
+.block.datapoints(data-type="adr")
+.block
+    div.datapoints(data-type="xtras")
+    div(data-type="xtras-infos")
+
+    if edit
+        +input('note', 'textarea')(value=note)
+
+
+if edit
+    .actions
