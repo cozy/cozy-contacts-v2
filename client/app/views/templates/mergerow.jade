@@ -1,5 +1,8 @@
 include contacts/helpers.jade
 
+mixin fullname(contact)
+    p!= contact.toString({pre: '<b>', post: '</b>'})
+
 mixin formatDatapoints(points, prefix)
     if points != null && points.length
         dl(role="gridcell", class=prefix, aria-haspopup="true")
@@ -11,33 +14,34 @@ mixin formatDatapoints(points, prefix)
 
 
 mixin contactrow(contact)
+    -var contactJson = contact.toJSON()
     .name(role="gridcell")
-        if contact.avatar
-           img.avatar(src=contact.avatar)
+        if contactJson.avatar
+           img.avatar(src=contactJson.avatar)
         else
-            span.avatar.initials= contact.initials
+            span.avatar.initials= contactJson.initials
 
-        p: +formatName(contact.name)
+        +fullname(contact)
 
-    +formatDatapoints(contact.tel, 'tel')
-    +formatDatapoints(contact.email, 'email')
+    +formatDatapoints(contactJson.tel, 'tel')
+    +formatDatapoints(contactJson.email, 'email')
 
 
 
 if result
     ul(role='list')
         li.ui-contactrow(role='listitem')
-            +contactrow(result.toJSON())
+            +contactrow(result)
 
 else
     dt
-        +formatName(candidates[0].get('name'))
-        button.cancel.outline.secondary()
-                .fa.fa-times
-                span= t('mergerow actions dismiss')
         button(type="submit").outline
             .fa.fa-plus
             span= t('mergerow actions merge')
+        button.cancel.outline.secondary()
+                .fa.fa-times
+                span= t('mergerow actions dismiss')
+        +fullname(candidates[0])
 
     dd
         ul(role='list')
@@ -47,5 +51,5 @@ else
                             input(type='checkbox', name="mergecontact-#{index}",
                                 checked="checked", value="#{index}")
                             .ui-contactrow
-                                +contactrow(contact.toJSON())
+                                +contactrow(contact)
 
