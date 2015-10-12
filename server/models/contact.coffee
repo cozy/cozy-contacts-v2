@@ -17,6 +17,17 @@ class DataPoint extends cozydb.Model
         value: cozydb.NoSchema
         type: String
 
+# A contact account in an external service (typically google contact).
+# An account is uniquely identified by the couple of its type and name.
+class Account extends cozydb.Model
+    @schema:
+        type: String
+        name: String
+        # Id of this contact in this service.
+        id: String
+        # Last update of this contact in this service.
+        lastUpdate: String
+
 
 module.exports = class Contact extends cozydb.CozyModel
     @docType: 'contact'
@@ -38,6 +49,7 @@ module.exports = class Contact extends cozydb.CozyModel
         note          : String
         tags          : [String]
         _attachments  : Object
+        accounts      : [Account]
 
     @cast: (attributes, target) ->
         target = super attributes, target

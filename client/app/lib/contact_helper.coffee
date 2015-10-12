@@ -87,6 +87,42 @@ CH.imgUrl2DataUrl = (uri, callback) ->
     img.src = uri
 
 
+# Return the account with specified type and name or null.
+CH.getAccount = (contact, accountType, accountName) ->
+    return null unless contact.accounts?
+
+    account = contact.accounts.filter (account) ->
+        return account.type is accountType and account.name is accountName
+
+    if account.length > 0
+        return account[0]
+    else
+        return null
+
+
+# Add or update specified account.
+CH.setAccount = (contact, account) ->
+    current = CH.getAccount contact, account.type, account.name
+    if current?
+        for k, v of account
+            current[k] = v
+    else
+        contact.accounts = contact.accounts or []
+        contact.accounts.push account
+
+
+# Unlink this contact from the specifie account.
+CH.deleteAccount = (contact, account) ->
+    for current, i in contact.accounts
+        if current.type is account.type and current.name is account.name
+            contacts.accounts.splice i, 1
+            return true
+
+    return false
+
+CH.hasAccount = (contact, accountType, accountName) ->
+    return CH.getAccount(contact, accountType, accountName)?
+
 # Construct a determinist revision string, based on data of the contact.
 # The "checksum " of a cozy contact.
 CH.intrinsicRev = (contact) ->

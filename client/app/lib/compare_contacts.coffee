@@ -1,4 +1,5 @@
 diacritics = require 'lib/diacritics'
+ContactHelper = require 'lib/contact_helper'
 
 module.exports = CC = {}
 
@@ -54,6 +55,13 @@ CC.mergeContacts = (base, toMerge) ->
 
     delete toMerge.datapoints
 
+    if toMerge.accounts?
+        toMerge.accounts.forEach (account) ->
+            unless ContactHelper.hasAccount(base, account.type, account.name)
+                ContactHelper.setAccount base, account
+
+        delete toMerge.accounts
+
     base.tags = _union base.tags, toMerge.tags
     delete toMerge.tags
 
@@ -64,68 +72,7 @@ CC.mergeContacts = (base, toMerge) ->
 
     base = _extend base, toMerge
 
-
     return base
-
-
-# Return the merge which would be automatically done.
-# for fields, true means use right, false means use left.
-# leftDatapoints and rightDatapoints: true means keep this index.
-CC.mergePlan = (left, right) ->
-    plan =
-        left: left
-        right: right
-
-    plan.leftDatapoints = []
-
-    for field in left.datapoints
-        plan.leftDatapoints.push true
-
-    plan.rightDatapoints = []
-    for field in right.datapoints
-        plan.rightDatapoints.push not hasField(field, left, true)
-
-    # Pay attention to tags !
-
-    for k, v of left
-        plan[k] = false
-
-    for k, v of right
-        if k of plan
-            continue
-
-        else
-            plan[k] = true
-
-    delete plan.datapoints
-    delete plan.tags
-
-    return plan
-
-# Merge right into left, accordingly with specified plan.
-CC.applyMergePlan = (left, right, plan) ->
-    datapoints = []
-    for keep, i in plan.leftDatapoints
-        if keep
-            datapoints.push left.datapoints[i]
-
-    for keep, i in plan.rightDatapoints
-        if keep
-            datapoints.push right.datapoints[i]
-
-    tags = _union left.tags, right.tags
-
-    for k, v of plan
-        if k in ['left', 'right', 'leftDatapoints', 'rightDatapoints']
-            continue
-
-        if v is true
-            left[k] = right[k]
-
-    left.tags = tags
-    left.datapoints = datapoints
-
-    return left
 
 
 # # # # # # # # # # # #
