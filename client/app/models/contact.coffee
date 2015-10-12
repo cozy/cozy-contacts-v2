@@ -4,9 +4,8 @@ module.exports = class Contact extends Backbone.Model
 
     urlRoot: 'contacts'
 
-    defaults: ->
-        n:          ';;;;'
-        datapoints: []
+    defaults:
+        n: ';;;;'
 
 
     parse: (attrs) ->
@@ -19,9 +18,9 @@ module.exports = class Contact extends Backbone.Model
                 type:  'main'
                 value: url
 
-        datapoints = new Backbone.Collection()
+        datapoints = @attributes.datapoints or new Backbone.Collection()
         datapoints.comparator = 'name'
-        datapoints.add attrs.datapoints if attrs.datapoints
+        datapoints.set attrs.datapoints if attrs.datapoints
         attrs.datapoints = datapoints
 
         attrs.tags = _.invoke attrs.tags, 'toLowerCase'

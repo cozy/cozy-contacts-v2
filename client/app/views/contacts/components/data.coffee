@@ -19,7 +19,6 @@ module.exports = class DataView extends Mn.LayoutView
 
 
     modelEvents:
-        'before:save': 'syncDatapoints'
         'change': -> @render() unless @model.get 'edit'
 
 
@@ -36,7 +35,7 @@ module.exports = class DataView extends Mn.LayoutView
             name = el.dataset.type
             @addRegion name, "[data-type=#{name}]"
             @showChildView name, new DatapointsView
-                collection:    @model[name]
+                collection:    @model.getDatapoints(name)
                 name:          name
                 cardViewModel: @model
 
@@ -55,18 +54,5 @@ module.exports = class DataView extends Mn.LayoutView
 
 
     onFormFieldAdd: (type) ->
-<<<<<<< HEAD
-        return if type in CONFIG.xtras
-        @getRegion('xtras').currentView.addEmptyField type
-
-
-    syncDatapoints: ->
-        @regionManager.each (region) =>
-            return unless region.currentView?.getDatapoints
-            name       = region.currentView.options.name
-            datapoints = region.currentView.getDatapoints()
-            @model.syncDatapoints name, datapoints
-=======
         xtrasView = @getRegion('xtras').currentView
         xtrasView.addEmptyField type unless type in CONFIG.xtras
->>>>>>> 333689a... Fixup datapoints revamp

@@ -17,13 +17,14 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     events:
-        save:  'onSave'
-        reset: 'onReset'
+        'before:save': 'syncDatapoints'
+        save:          'onSave'
+        reset:         'onReset'
 
     viewEvents:
         'edit:cancel':    'reset'
         'tags:update':    'updateTags'
-        'form:field:add': 'addField'
+        'form:field:add': 'onAddField'
         'form:submit':    -> @save()
         'delete':         -> @destroy()
 
@@ -33,17 +34,24 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     initialize: ->
         @onReset()
+        @_initializeDatapoints()
 
-        @['xtras'] = @filterDatapoints null
-        for attr in CONFIG.datapoints.main
-            @[attr] = @filterDatapoints attr
+
+    _initializeDatapoints: ->
+        @getDatapoints = _.memoize @getDatapoints, (key) ->
+            if @attributes.edit then "edit-#{key}" else key
+
+        @listenTo @, 'change:edit', (contactViewModel, edit) ->
+            return unless edit
+            cache = @getDatapoints.cache
+            delete cache[key] for key of cache when /^edit/.test key
 
 
     toJSON: ->
         datapoints = _.reduce CONFIG.datapoints.main, (memo, attr) =>
-            memo[attr] = @[attr].toJSON()
+            memo[attr] = @getDatapoints(attr).toJSON()
             return memo
-        , xtras: @xtras.toJSON()
+        , xtras: @getDatapoints('xtras').toJSON()
         _.extend {}, super, datapoints
 
 
@@ -93,23 +101,36 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         return attrs
 
 
-    addField: (type) ->
+    onAddField: (type) ->
         @set type, '' if type in CONFIG.xtras
 
 
-    filterDatapoints: (filter) ->
-        new Filtered @model.get('datapoints'),
-            filter: (datapoint) ->
-                if filter in CONFIG.datapoints.main
-                    datapoint.get('name') is filter
-                else
-                    datapoint.get('name') not in CONFIG.datapoints.main
+    getDatapoints: (name) ->
+        filter = (datapoint) ->
+            if name in CONFIG.datapoints.main
+                datapoint.get('name') is name
+            else
+                datapoint.get('name') not in CONFIG.datapoints.main
+
+        if @attributes.edit
+            models = @model.get 'datapoints'
+            .filter filter
+            .map (model) -> model.clone()
+            new Backbone.Collection models
+         else
+            new Filtered @model.get('datapoints'), filter: filter
 
 
-    syncDatapoints: (name, collection) ->
+    syncDatapoints: ->
+        cache      = @getDatapoints.cache
         datapoints = @model.get 'datapoints'
-        datapoints.remove _.difference @[name].models, collection
-        datapoints.add _.difference collection, @[name].models
+
+        models = _.reduce cache, (memo, collection, key) ->
+            return memo unless /^edit/.test key
+            memo.concat collection.filter (model) ->
+                not _.isEmpty model.get 'value'
+        , []
+        datapoints.reset models
 
 
     updateTags: (tags) ->

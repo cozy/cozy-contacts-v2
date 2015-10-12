@@ -26,10 +26,11 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
         _.extend _.pick(@options, 'name', 'cardViewModel'), index: index
 
 
-    initialize: (options) ->
-        return unless options.cardViewModel.get 'edit'
+    initialize: ->
+        @_initializeEditMode() if @options.cardViewModel.get 'edit'
 
-        @collection = new Backbone.Collection options.collection.models
+
+    _initializeEditMode: ->
         @addEmptyField() unless @options.name is 'xtras'
 
 
