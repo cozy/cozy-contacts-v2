@@ -29,7 +29,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     dismiss: ->
-        @destroy()
+        @model.collection.remove @model
 
 
     merge: ->
