@@ -10,6 +10,14 @@ avatar(size)
 [role=application]
     @extend $app-2panes-toolbar
 
+    &[aria-busy=true]::before
+        position fixed
+        top 10vh
+        left 50vw
+        margin-left -18px
+        @extend $icon-spinner-grey
+        @extend $icon-36
+
 
 [role=contentinfo]
     dl
