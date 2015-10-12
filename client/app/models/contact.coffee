@@ -1,5 +1,3 @@
-request = require 'lib/request'
-
 module.exports = class Contact extends Backbone.Model
 
     idAttribute: '_id'
@@ -89,5 +87,15 @@ module.exports = class Contact extends Backbone.Model
         data.append 'picture', blob
         data.append 'contact', JSON.stringify @toJSON()
 
-        path = "contacts/#{@get 'id'}/picture"
-        request.put path, data, callback, false
+        $.ajax
+            type: 'PUT'
+            url: "contacts/#{@get 'id'}/picture"
+            data: data
+            contentType: false
+            processData: false
+            success: (contact) -> callback null, contact
+            error: (data) ->
+                if data? and data.msg?
+                    callback new Error data.msg
+                else if callback?
+                    callback new Error "Server error occured"

@@ -56,11 +56,11 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
                     value = contact[field]
 
                 # Remove useless values, and filter identical value.
-                if value? and value isnt '' and not (options.some (option)->
-                    option.value is value)
-                        options.push
-                            value: value
-                            index: index
+                filterByValue = (option) -> option.value is value
+                if value? and value isnt '' and not options.some(filterByValue)
+                    options.push
+                        value: value
+                        index: index
 
             if options.length > 0
                 # Default choice
