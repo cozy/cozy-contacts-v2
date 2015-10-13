@@ -24,6 +24,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     viewEvents:
         'edit:cancel':    'reset'
         'tags:update':    'updateTags'
+        'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
         'form:submit':    -> @save()
         'delete':         -> @destroy()
@@ -117,7 +118,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             .filter filter
             .map (model) -> model.clone()
             new Backbone.Collection models
-         else
+        else
             new Filtered @model.get('datapoints'), filter: filter
 
 
@@ -135,6 +136,18 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     updateTags: (tags) ->
         @model.save tags: tags
+
+
+    addNewTag: (tag) ->
+        app = require 'application'
+
+        app.tags.create
+            name: tag
+        ,
+            wait: true
+            success: =>
+                tags = @model.get('tags').concat tag
+                @model.save tags: tags
 
 
     onSave: ->

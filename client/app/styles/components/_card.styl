@@ -26,7 +26,7 @@
         align-items center
 
         h1
-            margin 0
+            reset()
 
         .tags
             flex 1
@@ -108,6 +108,13 @@
 
             span
                 flex 1
+
+        .create
+            order 1
+
+            &[aria-expanded=false] [for=tag-new]
+            &[aria-expanded=true] button
+                hide()
 
 
     // edition mode

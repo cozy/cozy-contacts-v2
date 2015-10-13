@@ -6,11 +6,10 @@ dt.outline.secondary.caret(role="button")
 dd: fieldset
     legend= t("card actions labels add")
     ul
-        each tag in alltags
-            - var _ref = tag._id.slice(-6)
-            li: label(for="tag-#{_ref}")
-                input(type="checkbox", id="tag-#{_ref}", name="tags", value=tag._id, checked=_.contains(tags, tag.name))
-                span.label= tag.name
-        li: button
-            i.fa.fa-plus
-            = t("card actions labels create")
+        li.create(aria-expanded="false")
+            label(for="tag-new")
+                i.fa.fa-plus
+                input(type="text", name="name")
+            button
+                i.fa.fa-plus
+                = t("card actions labels create")
