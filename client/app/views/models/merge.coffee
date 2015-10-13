@@ -114,7 +114,7 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         if @has 'avatar'
             uri = "contacts/#{toMerge[@get('avatar')].id}/picture.png"
 
-            ContactHelper.imgUrl2DataUrl uri, (err, dataUrl) =>
+            ContactHelper.imgUrl2DataUrl uri, (err, dataUrl) ->
                 result.set 'avatar', dataUrl
 
                 end err
@@ -130,7 +130,7 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         # TODO : don't work, as no c.destroy success callback !
         # async.eachSeries toMerge, (c, cb) ->
         toMerge.forEach (c) -> c.destroy error: (model, response, option) ->
-                 console.log new Error response
+            console.log new Error response
 
         @trigger 'merged', @
 

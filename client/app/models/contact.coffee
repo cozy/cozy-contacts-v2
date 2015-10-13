@@ -30,6 +30,24 @@ module.exports = class Contact extends Backbone.Model
 
 
     sync: (method, model, options) ->
+
+        if model.has 'avatar'
+            avatar = model.get 'avatar'
+            model.unset 'avatar'
+
+            success = options.success
+            # Call savePicture after sync.
+            options.success = (data, textStatus, jqXHR) =>
+                @savePicture avatar, data,
+                    success: =>
+                        success.apply @, arguments
+                        # SavePicture (neither sync) doesn't update model,
+                        # we have to fetch it to get the accurate picture infos
+                        @fetch()
+
+                    error: options.error
+
+        # Handle specific attributes.
         options.attrs = model.toJSON()
 
         datapoints = model.attributes.datapoints.toJSON()
@@ -69,11 +87,9 @@ module.exports = class Contact extends Backbone.Model
         _.extend {}, super, datapoints: @attributes.datapoints.toJSON()
 
 
-    savePicture: (dataURL, callback) ->
-        callback = callback or ->
-
-        unless @has 'id'
-            return callback new Error 'Model should have been saved once.'
+    savePicture: (dataURL, attrs, options) ->
+        unless attrs.id
+            return options.error new Error 'Model should have been saved once.'
 
         #transform into a blob
         binary = atob dataURL.split(',')[1]
@@ -85,17 +101,14 @@ module.exports = class Contact extends Backbone.Model
 
         data = new FormData()
         data.append 'picture', blob
-        data.append 'contact', JSON.stringify @toJSON()
+        data.append 'contact', attrs
 
         $.ajax
             type: 'PUT'
-            url: "contacts/#{@get 'id'}/picture"
+            url: "contacts/#{attrs.id}/picture"
             data: data
             contentType: false
             processData: false
-            success: (contact) -> callback null, contact
-            error: (data) ->
-                if data? and data.msg?
-                    callback new Error data.msg
-                else if callback?
-                    callback new Error "Server error occured"
+            success: options.success
+            error: options.error
+
