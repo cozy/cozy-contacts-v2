@@ -127,22 +127,16 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
     destroyToMerge: ->
         toMerge = @get 'toMerge'
 
-        # TODO : don't work, as no c.destroy success callback !
-        # async.eachSeries toMerge, (c, cb) ->
-        toMerge.forEach (c) -> c.destroy error: (model, response, option) ->
-            console.log new Error response
+        async.eachSeries toMerge, (c, cb) ->
+            c.destroy
+                success: -> cb()
+                error: (model, response, option) -> cb response
+        , (err) =>
+            if err
+                console.log err
+            else
+                @trigger 'merged', @
 
-        @trigger 'merged', @
-
-            # c.destroy
-            #     success: (model, response, option) -> cb()
-            #     error: (model, response, option) -> cb response
-        # , (err) =>
-        #     if err
-        #         console.log err
-        #     else
-        #         console.log "delete done !"
-        #         @trigger 'merged', @
 
     saveResult: ->
         result = @get 'result'

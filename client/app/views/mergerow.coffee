@@ -1,3 +1,6 @@
+ContactViewModel = require 'views/models/contact'
+
+
 module.exports = class MergeRow extends Mn.ItemView
 
     template: require 'views/templates/mergerow'
@@ -22,6 +25,10 @@ module.exports = class MergeRow extends Mn.ItemView
         'click [type=checkbox]': 'check'
         'click @ui.dismiss': 'dismiss'
 
+    serializeData: ->
+        return _.extend super,
+            candidates: @model.get('candidates').map (contact) ->
+                new ContactViewModel { new: false }, { model: contact}
 
     check: (ev) ->
         elem = $(ev.target)

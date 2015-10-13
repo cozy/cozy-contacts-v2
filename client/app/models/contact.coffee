@@ -111,4 +111,3 @@ module.exports = class Contact extends Backbone.Model
             processData: false
             success: options.success
             error: options.error
-
