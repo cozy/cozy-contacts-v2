@@ -31,12 +31,12 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
         @collection = new Filtered app.tags,
             filter: (model) ->
                 return false unless app.contacts.length
-                contacts = app.contacts.find (contact) ->
-                    _.contains contact.attributes.tags, model.attributes.name
-                !!contacts
+                !!app.contacts.find (contact) ->
+                    _.contains contact.get('tags'), model.get('name')
         @collection.listenTo app.contacts,
-            'reset':  @collection.update
-            'update': @collection.update
+            'reset':       @collection.update
+            'update':      @collection.update
+            'change:tags': @collection.update
 
 
     toggleSelected: (model, value) ->
