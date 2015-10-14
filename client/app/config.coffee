@@ -7,3 +7,6 @@ module.exports =
                 default: ['main', 'work', 'home']
                 social:  ['twitter:social', 'skype:chat']
                 url:     ['website', 'blog']
+
+    settings:
+        sort: ['gn', 'fn']

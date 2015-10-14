@@ -36,20 +36,19 @@ class Application extends Mn.Application
             @layout   = new AppLayout model: @model
             @router   = new Router()
 
-            # prohibit pushState because URIs mapped from cozy-home rely on
-            # fragment
-            Backbone.history.start pushState: false if Backbone.history
-
             @intentManager = new IntentManager
 
             Object.freeze @ if typeof Object.freeze is 'function'
 
-
         # render components when app starts
         @on 'start', =>
-            @layout.render()
             @contacts.fetch reset: true
             @tags.fetch reset: true
+            @layout.render()
+
+            # prohibit pushState because URIs mapped from cozy-home rely on
+            # fragment
+            Backbone.history.start pushState: false if Backbone.history
 
 
     search: (pattern, string) ->

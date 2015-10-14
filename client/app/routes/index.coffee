@@ -12,7 +12,8 @@ TagsRouter     = require 'routes/tags'
 module.exports = class Router extends Backbone.Router
 
     routes:
-        '': 'index'
+        'settings': 'settings'
+        '':         'index'
 
 
     initialize: ->
@@ -37,3 +38,8 @@ module.exports = class Router extends Backbone.Router
 
     index: ->
         @navigate 'contacts', trigger: true
+
+
+    settings: ->
+        app = require 'application'
+        app.model.set 'dialog', 'settings'

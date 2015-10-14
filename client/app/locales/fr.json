@@ -10,6 +10,17 @@
     "tools labels filters":      "libellés",
     "tools labels filters all":  "tous les contacts",
 
+    "settings title":                "configuration",
+    "settings in-out title":         "importer / exporter les contacts",
+    "settings in-out import action": "importer une vcard",
+    "settings display title":        "affichage",
+    "settings display sort gn":      "trier sur le prénom",
+    "settings display sort fn":      "trier sur le nom",
+    "settings sync title":           "synchronisation mobile",
+    "settings sync gplay":           "Accédez à votre Cozy depuis votre mobile. Télécharger notre application sur le Google Play Store:",
+    "settings sync gplay get it":    "Disponible sur Google play",
+    "settings sync carddav":         "Besoin de synchronisation CardDav? Jetez un œil à [notre documentation](%{link}).",
+
     "card actions create":        "créer",
     "card actions save":          "enregistrer",
     "card actions labels":        "libellés",
