@@ -7,6 +7,8 @@ router and app_layout view.
 
 Router = require 'routes'
 
+ConfigModel = require 'models/config'
+
 ContactsCollection = require 'collections/contacts'
 TagsCollection     = require 'collections/tags'
 
@@ -28,7 +30,8 @@ class Application extends Mn.Application
     initialize: ->
         # initialize components before loading app
         @on 'before:start', =>
-            @model    = new AppViewModel()
+            config    = new ConfigModel require('imports').config
+            @model    = new AppViewModel null, model: config
 
             @contacts = new ContactsCollection()
             @tags     = new TagsCollection()

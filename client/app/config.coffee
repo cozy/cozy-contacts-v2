@@ -9,4 +9,4 @@ module.exports =
                 url:     ['website', 'blog']
 
     settings:
-        sort: ['gn', 'fn']
+        sortkeys: ['gn', 'fn']

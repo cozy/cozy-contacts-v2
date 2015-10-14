@@ -73,7 +73,7 @@ module.exports = class AppLayout extends Mn.LayoutView
             @content.currentView.focus()
         else
             dialogView = switch slug
-                when 'settings'   then new SettingsView()
+                when 'settings'   then new SettingsView model: @model
                 when 'duplicates' then new DuplicatesView()
                 else                   @_buildContactView slug
 

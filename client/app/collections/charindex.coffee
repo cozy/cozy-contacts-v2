@@ -4,19 +4,22 @@
 
 module.exports = class CharIndex extends Filtered
     constructor: (underlying, options) ->
-        options.comparator = (a, b) ->
-            a.attributes.n.localeCompare b.attributes.n
-        options.comparator.induced = true
+        app      = require('application')
 
         options.filter = (model) ->
             n = asciize(model.attributes.n).toLowerCase()
+            if options.filter.sort is 'fn' then [snd, fst, ...] = n.split ';'
+            else [fst, snd, ...] = n.split ';'
 
-            [gn, fn, ...] = n.split ';'
-            initial = if gn then gn[0] else if fn then fn[0] else '#'
+            initial = if fst then fst[0] else if snd then snd[0] else '#'
 
-            if options.char is '#'
-                not initial.match alphabet
-            else
-                options.char is initial
+            if options.char is '#' then not initial.match alphabet
+            else options.char is initial
+        options.filter.sort = app.model.get 'sort'
 
         super
+
+        @stopListening @underlying, 'sort'
+        @listenTo underlying, 'sort', ->
+            options.filter.sort = app.model.get 'sort'
+            @reset @underlying.models.filter @options.filter

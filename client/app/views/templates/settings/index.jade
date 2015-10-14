@@ -13,14 +13,14 @@ block content
     div
         h2= t('settings display title')
         select(name="sort")
-            each key in sort
-                option(value=key)= t('settings display sort ' + key)
+            each key in sortkeys
+                option(value=key selected=(sort == key))= t('settings display sort ' + key)
 
     div
         h2= t('settings sync title')
         p
             = t('settings sync gplay')
-            a(href="https://play.google.com/store/apps/details?id=io.cozy.files_client")
+            a(target="_blank", href="https://play.google.com/store/apps/details?id=io.cozy.files_client")
               img(alt=t('settings sync gplay get it'), src="https://developer.android.com/images/brand/#{locale}_generic_rgb_wo_60.png")
 
         p!= t('settings sync carddav', {link: 'https://cozy.io/mobile/contacts.html'}).replace(/\[(.+)\]\((.+)\)/i, '<a target="_blank" href="$2">$1</a>')

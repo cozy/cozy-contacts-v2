@@ -60,9 +60,11 @@ module.exports = class Contact extends Backbone.Model
 
 
     toString: (opts = {}) ->
-        parts = @attributes.n.split ';'
+        [gn, fn, ...] = parts = @attributes.n.split ';'
         # wrap given name (at index 0) in pre/post tags if provided
-        parts[0] = _.compact([opts.pre, parts[0], opts.post]).join ''
+        gn = _.compact([opts.pre, gn, opts.post]).join ''
+        parts[0] = fn
+        parts[1] = gn
         _.compact(parts).join ' '
 
 
