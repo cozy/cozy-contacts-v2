@@ -6,12 +6,11 @@ module.exports = CC = {}
 # Find similar contacts methods.
 
 CC.isSamePerson = (contact1, contact2) ->
-    return contact1.fn is contact2.fn and
-        contact1.datapoints.some (field) ->
-            if field.name in ['tel', 'adr', 'email', 'chat']
-                return hasField field, contact2
-            else
-                return false
+    return contact1.fn is contact2.fn and contact1.datapoints.some (field) ->
+        if field.name in ['tel', 'adr', 'email', 'chat']
+            hasField field, contact2
+        else false
+
 
 # Names have similarities regardless :
 # - special chars,
@@ -40,7 +39,6 @@ CC.findSimilars = (contacts) ->
             similars.push similar
 
     return similars
-
 
 
 # Merge methods

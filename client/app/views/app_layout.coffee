@@ -14,7 +14,6 @@ SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 CardView     = require 'views/contacts/card'
 DuplicatesView = require 'views/duplicates'
-MergeView     = require 'views/contacts/merge'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -70,10 +69,6 @@ module.exports = class AppLayout extends Mn.LayoutView
     showDialog: (viewModel, slug) ->
         if slug is 'duplicates'
             @showChildView 'dialogs', new DuplicatesView()
-
-        # TODO stub !
-        else if slug is 'merge'
-            @showChildView 'dialogs', new MergeView()
 
         else
             @showContact viewModel, slug
