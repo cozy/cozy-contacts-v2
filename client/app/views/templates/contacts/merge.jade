@@ -5,21 +5,24 @@ block content
     include helpers.jade
 
     mixin radio(options, fieldName)
-      ul
+      ul(class=(fieldName == 'avatar') ? 'avatars' : '')
           - for (var i=0; i< options.length; i++)
               -var option = options[i]
                   li
-                      label
+                      label(for="merge-#{fieldName}-#{i}")
                         if model[fieldName] == option.index
                             input(type="radio", name=fieldName,
-                                value=option.index, checked)
+                                value=option.index, id="merge-#{fieldName}-#{i}"
+                                , checked)
                         else
                             input(type="radio", name=fieldName,
-                                value=option.index)
+                                value=option.index, id="merge-#{fieldName}-#{i}")
 
-                        i
-                        = option.value
-
+                        if fieldName == 'avatar'
+                            img.avatar(src=option.value)
+                        else
+                            i
+                            = option.value
 
     h1= t('merge title')
 
@@ -27,20 +30,7 @@ block content
         if model.mergeOptions.avatar != null
           dt= t('merge choose avatar')
           dd
-            ul.avatars
-                - for (var i=0; i< model.mergeOptions.avatar.length; i++)
-                    -var option = model.mergeOptions.avatar[i]
-                    li
-                        label
-                            if model.avatar == option.index
-                                input(type="radio", name="avatar",
-                                    value=option.index, checked)
-                            else
-                                input(type="radio", name="avatar",
-                                    value=option.index)
-
-                            img.avatar(src=option.value)
-
+            +radio(model.mergeOptions.avatar, "avatar")
 
         if model.mergeOptions.fn != null
           dt= t('merge choose name')

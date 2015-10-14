@@ -17,7 +17,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
-        'contacts:merged': 'end'
+        'contacts:merge': 'end'
 
 
     events:
@@ -59,4 +59,4 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     end: ->
-        @trigger 'end'
+        @trigger 'contacts:group:merge'

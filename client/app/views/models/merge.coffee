@@ -142,4 +142,4 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
                 @attributes.toMerge = []
                 @attributes.candidates = []
 
-                @trigger 'contacts:merged', @
+                @trigger 'contacts:merge', @
