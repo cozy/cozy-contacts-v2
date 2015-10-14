@@ -48,9 +48,19 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     getMappedAvatar: (attachments) ->
         if attachments?.picture
-            "contacts/#{@model.id}/picture.png"
+            return "contacts/#{@model.id}/picture.png" +
+                # Force refresh on change picture with dummy parameter.
+                "?revpos=#{attachments.picture.revpos}"
         else
             null
+
+
+    saveMappedAvatar: ->
+        attrs = {}
+        avatar = @get 'avatar'
+        if avatar? and not avatar.match(/contacts\/.+\/picture.png/)?
+            attrs.avatar = avatar
+        return attrs
 
 
     getMappedInitials: (n) ->
@@ -102,9 +112,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onSave: ->
-        return unless @get 'new'
-        app = require 'application'
-        app.contacts.add @model
+        require('application').contacts.add @model if @get 'new'
 
 
     onReset: ->

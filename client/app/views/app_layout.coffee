@@ -13,6 +13,7 @@ DrawerLayout = require 'views/drawer_layout'
 SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 CardView     = require 'views/contacts/card'
+DuplicatesView = require 'views/duplicates'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -40,7 +41,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     modelEvents:
-        'change:dialog': 'showContact'
+        'change:dialog': 'showDialog'
 
     childEvents:
         'dialog:close': -> @model.set 'dialog', false
@@ -63,6 +64,14 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     showContactsList: ->
         @showChildView 'content', new ContactsView()
+
+
+    showDialog: (viewModel, slug) ->
+        if slug is 'duplicates'
+            @showChildView 'dialogs', new DuplicatesView()
+
+        else
+            @showContact viewModel, slug
 
 
     showContact: (viewModel, id) ->

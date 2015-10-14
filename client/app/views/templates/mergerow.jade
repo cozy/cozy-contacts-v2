@@ -1,0 +1,55 @@
+include contacts/helpers.jade
+
+mixin fullname(contact)
+    p!= contact.toString({pre: '<b>', post: '</b>'})
+
+mixin formatDatapoints(points, prefix)
+    if points != null && points.length
+        dl(role="gridcell", class=prefix, aria-haspopup="true")
+            dt
+                +formatPoint(points[0])
+
+    else
+        .placeholder(role="gridcell", class=prefix)
+
+
+mixin contactrow(contact)
+    -var contactJson = contact.toJSON()
+    .name(role="gridcell")
+        if contactJson.avatar
+           img.avatar(src=contactJson.avatar)
+        else
+            span.avatar.initials= contactJson.initials
+
+        +fullname(contact)
+
+    +formatDatapoints(contactJson.tel, 'tel')
+    +formatDatapoints(contactJson.email, 'email')
+
+
+
+if result
+    ul(role='list')
+        li.ui-contactrow(role='listitem')
+            +contactrow(result)
+
+else
+    dt
+        +fullname(candidates[0])
+        .btn-group
+            button.cancel.outline.secondary()
+                span= t('mergerow actions dismiss')
+            button(type="submit")
+                .fa.fa-code-fork
+                span= t('mergerow actions merge')
+
+    dd
+        ul(role='list')
+            for contact, index in candidates
+                    li(role='listitem')
+                        label
+                            input(type='checkbox', name="mergecontact-#{index}",
+                                checked="checked", value="#{index}")
+                            .ui-contactrow
+                                +contactrow(contact)
+

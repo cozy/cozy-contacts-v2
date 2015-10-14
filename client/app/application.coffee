@@ -12,6 +12,7 @@ TagsCollection     = require 'collections/tags'
 
 AppLayout    = require 'views/app_layout'
 AppViewModel = require 'views/models/app'
+IntentManager   = require 'lib/intent_manager'
 
 
 class Application extends Mn.Application
@@ -38,6 +39,9 @@ class Application extends Mn.Application
             # prohibit pushState because URIs mapped from cozy-home rely on
             # fragment
             Backbone.history.start pushState: false if Backbone.history
+
+            @intentManager = new IntentManager
+
             Object.freeze @ if typeof Object.freeze is 'function'
 
 

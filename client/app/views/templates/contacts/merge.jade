@@ -1,0 +1,78 @@
+extends ../../../lib/views/templates/base/dialog.jade
+
+
+block content
+    include helpers.jade
+
+    mixin radio(options, fieldName)
+      ul(class=(fieldName == 'avatar') ? 'avatars' : '')
+          - for (var i=0; i< options.length; i++)
+              -var option = options[i]
+                  li
+                      label(for="merge-#{fieldName}-#{i}")
+                        if model[fieldName] == option.index
+                            input(type="radio", name=fieldName,
+                                value=option.index, id="merge-#{fieldName}-#{i}"
+                                , checked)
+                        else
+                            input(type="radio", name=fieldName,
+                                value=option.index, id="merge-#{fieldName}-#{i}")
+
+                        if fieldName == 'avatar'
+                            img.avatar(src=option.value)
+                        else
+                            i
+                            = option.value
+
+    h1= t('merge title')
+
+    dl
+        if model.mergeOptions.avatar != null
+          dt= t('merge choose avatar')
+          dd
+            +radio(model.mergeOptions.avatar, "avatar")
+
+        if model.mergeOptions.fn != null
+          dt= t('merge choose name')
+          dd
+            +radio(model.mergeOptions.fn, "fn")
+
+        if model.mergeOptions.nickname != null
+          dt= t('merge choose nickname')
+          dd
+            +radio(model.mergeOptions.nickname)
+
+
+        if (model.mergeOptions.org != null || model.mergeOptions.department != null || model.mergeOptions.title  != null)
+          dt
+            = t('merge choose organisation')
+          dd
+            dl
+              if model.mergeOptions.org != null
+                dt= t('merge choose org')
+                dd
+                  +radio(model.mergeOptions.org, "org")
+
+              if model.mergeOptions.department != null
+                dt= t('merge choose department')
+                dd
+                  +radio(model.mergeOptions.department, "department")
+
+              if model.mergeOptions.title != null
+                dt= t('merge choose title')
+                dd
+                  +radio(model.mergeOptions.title, "title")
+
+
+        if model.mergeOptions.bday != null
+          dt= t('merge choose birthday')
+          dd
+            +radio(model.mergeOptions.bday, "bday")
+
+
+    button(type="submit")
+        .fa.fa-code-fork
+        span= t('merge actions merge')
+
+    button.cancel.outline.secondary()
+        span= t('merge actions cancel')

@@ -30,6 +30,24 @@ module.exports = class Contact extends Backbone.Model
 
 
     sync: (method, model, options) ->
+
+        if model.has 'avatar'
+            avatar = model.get 'avatar'
+            model.unset 'avatar'
+
+            success = options.success
+            # Call savePicture after sync.
+            options.success = (data, textStatus, jqXHR) =>
+                @savePicture avatar, data,
+                    success: =>
+                        success.apply @, arguments
+                        # SavePicture (neither sync) doesn't update model,
+                        # we have to fetch it to get the accurate picture infos
+                        @fetch()
+
+                    error: options.error
+
+        # Handle specific attributes.
         options.attrs = model.toJSON()
 
         datapoints = model.attributes.datapoints.toJSON()
@@ -63,3 +81,33 @@ module.exports = class Contact extends Backbone.Model
                 .replace '«', opts.format.post
 
         return search
+
+
+    toJSON: ->
+        _.extend {}, super, datapoints: @attributes.datapoints.toJSON()
+
+
+    savePicture: (dataURL, attrs, options) ->
+        unless attrs.id
+            return options.error new Error 'Model should have been saved once.'
+
+        #transform into a blob
+        binary = atob dataURL.split(',')[1]
+        array = []
+        for i in [0..binary.length]
+            array.push binary.charCodeAt i
+
+        blob = new Blob [new Uint8Array(array)], type: 'image/jpeg'
+
+        data = new FormData()
+        data.append 'picture', blob
+        data.append 'contact', attrs
+
+        $.ajax
+            type: 'PUT'
+            url: "contacts/#{attrs.id}/picture"
+            data: data
+            contentType: false
+            processData: false
+            success: options.success
+            error: options.error

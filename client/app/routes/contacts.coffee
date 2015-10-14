@@ -2,6 +2,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     routes:
         'new':        'create'
+        'duplicates': 'duplicates'
         ':slug':      'show'
         ':slug/edit': 'edit'
         '':           'index'
@@ -38,3 +39,8 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     create: ->
         @_setCardState 'new', true
+
+
+    duplicates: ->
+        app = require 'application'
+        @_ensureContacts -> app.model.set 'dialog', 'duplicates'
