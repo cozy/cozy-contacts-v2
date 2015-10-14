@@ -35,13 +35,13 @@ if result
 
 else
     dt
-        button(type="submit").outline
-            .fa.fa-code-fork
-            span= t('mergerow actions merge')
-        button.cancel.outline.secondary()
-                .fa.fa-times
-                span= t('mergerow actions dismiss')
         +fullname(candidates[0])
+        .btn-group
+            button.cancel.outline.secondary()
+                span= t('mergerow actions dismiss')
+            button(type="submit")
+                .fa.fa-code-fork
+                span= t('mergerow actions merge')
 
     dd
         ul(role='list')
