@@ -96,9 +96,15 @@ avatar(size)
         > :nth-child(2)
             hide()
 
+    legend
+        horizontally-padded em(16px)
+        bottom-padded em(8px)
+
     ul
         display flex
         flex-direction column
+        max-height 30vh
+        overflow-y scroll
 
         button
         [role=button]

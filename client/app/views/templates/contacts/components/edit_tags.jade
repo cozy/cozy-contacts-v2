@@ -6,10 +6,9 @@ dt.outline.secondary.caret(role="button")
 dd: fieldset
     legend= t("card actions labels add")
     ul
-        li.create(aria-expanded="false")
-            label(for="tag-new")
-                i.fa.fa-plus
-                input(type="text", name="name")
-            button
-                i.fa.fa-plus
-                = t("card actions labels create")
+    .create(aria-expanded="false")
+        label(for="tag-new")
+            input(type="text", name="name")
+        button
+            i.fa.fa-plus
+            = t("card actions labels create")

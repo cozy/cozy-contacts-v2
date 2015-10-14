@@ -22,7 +22,6 @@
 
 
     header
-        display flex
         align-items center
 
         h1
@@ -31,10 +30,11 @@
         .tags
             flex 1
             display flex
-            left-spaced 2em
+            flex-wrap wrap
 
             li
-                horizontally-spaced .25em
+                right-spaced .25em
+                bottom-spaced .25em
                 padded .25em .45em
                 border-radius 2px
                 background-color grey-01
@@ -91,30 +91,44 @@
 
     // tags select dropdown
     .tags
-        fieldset
-            horizontally-spaced 1em
 
-        li
+        [aria-haspopup=true] li
+            margin 0
             white-space nowrap
 
         button
             width auto
             min-width 100%
 
-        label
+        ul label
             display flex
-            align-items flex-start
+            align-items center
             cursor pointer
+            horizontally-padded em(16px)
+            vertically-padded em(8px)
+
+            &:hover
+                background-color grey-01
 
             span
                 flex 1
+                left-padded 0.5em
 
         .create
             order 1
+            horizontally-spaced em(8px)
+            // ul comes on top of the create button for no reason
+            top-spaced em(2px)
 
             &[aria-expanded=false] [for=tag-new]
             &[aria-expanded=true] button
                 hide()
+
+            input
+                padding em(7px)
+                width 100%
+                box-sizing border-box
+                border-radius 3px
 
 
     // edition mode
