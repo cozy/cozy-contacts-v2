@@ -20,7 +20,6 @@ module.exports = class DuplicatesView extends Mn.CompositeView
 
     childView: require 'views/mergerow'
 
-
     templateHelpers: ->
         return size: @collection.size()
 

@@ -11,7 +11,6 @@ module.exports = class MergeView extends Mn.ItemView
     attributes:
         role: 'alertdialog'
 
-
     behaviors: ->
         Navigator: {}
         Dialog:    {}
@@ -22,15 +21,14 @@ module.exports = class MergeView extends Mn.ItemView
         cancel:   '.cancel'
         inputs:   'input'
 
+    modelEvents:
+        'contacts:merge': 'onClose'
 
     events:
         'click @ui.cancel': 'onClose'
 
 
     initialize: ->
-        # TODO : howto marionette fashion?
-        @listenTo @, 'form:submit', @onSubmit.bind @
-
         if @model
             Mn.bindEntityEvents @model, @, @model.viewEvents
 
@@ -46,7 +44,6 @@ module.exports = class MergeView extends Mn.ItemView
 
             if toMerge?
                 toMerge = toMerge.map (contact) ->
-                    console.log contact
                     return app.contacts.get(contact.id)
 
                 @model.set 'toMerge', toMerge
@@ -61,12 +58,9 @@ module.exports = class MergeView extends Mn.ItemView
         return model: @model.toJSON()
 
 
-    onSubmit: ->
-        @model.merge =>
-            @onClose()
+    onFormSubmit: ->
+        @model.merge()
 
 
     onClose: ->
-        app = require 'application'
-        app.layout.alerts.empty()
-
+        require('application').layout.alerts.empty()

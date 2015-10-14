@@ -106,9 +106,14 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         result = new ContactViewModel { new: true }, model: contact
 
         end = (err) =>
+            return callback err if err
+
             @set 'result', result
-            @saveResult()
-            callback err if callback?
+            result = @get 'result'
+            @listenToOnce result, 'save', @destroyToMerge.bind @
+            result.save()
+
+            callback() if callback?
 
         # Avatar picture
         if @has 'avatar'
@@ -125,21 +130,16 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
 
     # Delete old contacts, now merged in 'result'.
     destroyToMerge: ->
-        toMerge = @get 'toMerge'
-
-        async.eachSeries toMerge, (c, cb) ->
-            c.destroy
+        async.eachSeries @get('toMerge'), (contact, cb) ->
+            contact.destroy
                 success: -> cb()
                 error: (model, response, option) -> cb response
+
         , (err) =>
             if err
-                console.log err
+                console.error err
             else
-                @trigger 'merged', @
+                @attributes.toMerge = []
+                @attributes.candidates = []
 
-
-    saveResult: ->
-        result = @get 'result'
-        @listenToOnce result, 'save', @destroyToMerge.bind @
-
-        result.save()
+                @trigger 'contacts:merged', @

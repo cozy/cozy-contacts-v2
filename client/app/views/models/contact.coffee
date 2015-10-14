@@ -54,6 +54,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         else
             null
 
+
     saveMappedAvatar: ->
         attrs = {}
         avatar = @get 'avatar'
@@ -111,9 +112,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onSave: ->
-        if @get 'new'
-            app = require 'application'
-            app.contacts.add @model
+        require('application').contacts.add @model if @get 'new'
 
 
     onReset: ->

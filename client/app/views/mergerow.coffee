@@ -17,7 +17,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
-        'merged': 'end'
+        'contacts:merged': 'end'
 
 
     events:
@@ -25,10 +25,12 @@ module.exports = class MergeRow extends Mn.ItemView
         'click [type=checkbox]': 'check'
         'click @ui.dismiss': 'dismiss'
 
+
     serializeData: ->
         return _.extend super,
             candidates: @model.get('candidates').map (contact) ->
                 new ContactViewModel { new: false }, { model: contact}
+
 
     check: (ev) ->
         elem = $(ev.target)
@@ -54,6 +56,7 @@ module.exports = class MergeRow extends Mn.ItemView
             MergeView = require 'views/contacts/merge'
             app = require 'application'
             app.layout.showChildView 'alerts', new MergeView model: @model
+
 
     end: ->
         @trigger 'end'
