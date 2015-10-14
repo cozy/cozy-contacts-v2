@@ -12,7 +12,7 @@ block content
             
     div
         h2= t('settings display title')
-        select(name="sort")
+        select.btn.outline.secondary(name="sort")
             each key in sortkeys
                 option(value=key selected=(sort == key))= t('settings display sort ' + key)
 
