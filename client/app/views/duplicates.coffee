@@ -44,8 +44,8 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         mergeStep = (model) =>
             index = 1 + @collection.indexOf model
             if index < @collection.size()
-                @listenTo @children.findByModel(model), 'end', =>
-                    mergeStep @collection.at index
+                @listenTo @children.findByModel(model)
+                , 'contacts:group:merge', => mergeStep @collection.at index
 
             @children.findByModel(model).merge()
 
