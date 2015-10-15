@@ -26,20 +26,11 @@ getImports = function(callback) {
     Config.getInstance, function(cb) {
       return cozydb.api.getCozyInstance(cb);
     }, function(cb) {
-      return cozydb.api.getCozyTags(cb);
-    }, function(cb) {
       return WebDavAccount.first(cb);
     }
   ], function(err, res) {
-    var config, instance, locale, tags, webDavAccount;
-    config = res[0], instance = res[1], tags = res[2], webDavAccount = res[3];
-    if (tags != null) {
-      tags = tags.filter(function(value) {
-        return Boolean(value);
-      });
-    } else {
-      tags = [];
-    }
+    var config, instance, locale, webDavAccount;
+    config = res[0], instance = res[1], webDavAccount = res[2];
     locale = (instance != null ? instance.locale : void 0) || 'en';
     if (webDavAccount != null) {
       webDavAccount.domain = (instance != null ? instance.domain : void 0) || '';
@@ -47,7 +38,6 @@ getImports = function(callback) {
     return callback(null, {
       config: config,
       locale: locale,
-      tags: tags,
       webDavAccount: webDavAccount
     });
   });

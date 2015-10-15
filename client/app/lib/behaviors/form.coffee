@@ -7,15 +7,15 @@ module.exports = class Form extends Mn.Behavior
 
 
     events: ->
-        'click @ui.add':     'addField'
-        'keyup @ui.autoAdd': 'addField'
-        'keyup @ui.inputs':  _.debounce @updateFields, 250
-        'change @ui.inputs': 'updateFields'
-        'click @ui.clear':   'clearField'
-        'click @ui.delete':  'deleteField'
+        'click @ui.formAdd':     'addField'
+        'keyup @ui.formAutoAdd': 'addField'
+        'keyup @ui.formInputs':  _.debounce @updateFields, 250
+        'change @ui.formInputs': 'updateFields'
+        'click @ui.formClear':   'clearField'
+        'click @ui.formDelete':  'deleteField'
 
     triggers:
-        'click @ui.submit': 'form:submit'
+        'click @ui.formSubmit': 'form:submit'
 
 
     updateFields: (event, el) ->

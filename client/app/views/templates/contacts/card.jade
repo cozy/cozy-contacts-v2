@@ -1,8 +1,6 @@
 extends ../../../lib/views/templates/base/dialog.jade
 
 block content
-    include helpers.jade
-
     if edit
         each list, listname in lists
             datalist(id="list-#{listname}")
@@ -10,68 +8,31 @@ block content
                     - var opt = item.split(':')
                     option(value=opt[0], data-name=opt[1])
 
-
-    div
-        if avatar
-            img.avatar(src=avatar)
-
-        else
-            span.avatar.initials= initials
+    div(role="img")
 
     .data(class=edit? 'edit' : '')
-        if edit
-            +input('name.prefix')(value=name.prefix)
-            +input('name.first')(value=name.first)
-            +input('name.middle')(value=name.middle)
-            +input('name.given')(value=name.given)
-            +input('name.suffix')(value=name.suffix)
-            
-            
-            fieldset.block(data-type="infos")
-                +input('org')(value=org, placeholder=true)
-                +input('department')(value=department, placeholder=true)
-                +input('title')(value=title, placeholder=true)
-        else
-            h1!= fullname
-            
-            ul.block(data-type="infos")
-                if title || org || department || note
-                    if title || org || department
-                        li: +formatJob(title, org, department)
-                    if note
-                        li= note
-        
-        .block.datapoints(data-type="tel")
-        .block.datapoints(data-type="email")
-        .block.datapoints(data-type="adr")
-        .block
-            div.datapoints(data-type="xtras")
-            div(data-type="xtras-infos")
-            if edit
-                +input('note', 'textarea')(value=note)
-
-        if edit
-            .actions
 
     aside
         ul
             if edit
                 if id
                     li: button(type="submit", data-next="contacts/#{_id}").outline
-                        .fa.fa-check
+                        i.fa.fa-check
                         span= t('card actions save')
                 else
                     li: button(type="submit").outline
-                        .fa.fa-plus
+                        i.fa.fa-plus
                         span= t('card actions create')
                         
                 li: a.cancel.outline.secondary(role="button", href=(id? "contacts/#{_id}" : 'contacts'), data-confirm='{"event":"edit:cancel","title":"#{t("card confirm cancel title")}","message":"#{t("card confirm cancel message")}","btn_ok":"#{t("card confirm cancel ok")}","btn_cancel":"#{t("card confirm cancel cancel")}"}')
-                        .fa.fa-times
+                        i.fa.fa-times
                         span= t('card actions cancel')
             else
                 li: a.edit.outline.secondary(role="button", href="contacts/#{_id}/edit")
-                    .fa.fa-pencil
+                    i.fa.fa-pencil
                     span= t('card actions edit')
                 li: button.delete.outline.danger.special
-                    .fa.fa-trash
+                    i.fa.fa-trash
                     span= t('card actions delete')
+                    
+            li.tags

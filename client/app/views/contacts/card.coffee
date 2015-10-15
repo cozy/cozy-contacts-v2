@@ -1,6 +1,6 @@
-DatapointsView  = require 'views/contacts/components/datapoints'
-XtrasView       = require 'views/contacts/components/xtras'
-EditActionsView = require 'views/contacts/components/edit_actions'
+AvatarView      = require 'views/contacts/components/avatar'
+DataView        = require 'views/contacts/components/data'
+TagsActionsView = require 'views/contacts/components/edit_tags'
 
 t = require 'lib/i18n'
 
@@ -20,40 +20,32 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     behaviors: ->
-        opts =
-            name: @options.model.get 'fn'
-
         Navigator: {}
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
         PickAvatar: {}
-        Confirm:
-            triggers:
-                'click @ui.delete':
-                    event:      'delete'
-                    title:      t 'card confirm delete title', opts
-                    message:    t 'card confirm delete message', opts
-                    btn_ok:     t 'card confirm delete ok'
-                    btn_cancel: t 'card confirm delete cancel'
+        Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg()
+
 
     ui:
-        navigate: '[href^=contacts], [data-next]'
-        edit:     '.edit'
-        delete:   '.delete'
-        submit:   '[type=submit]'
-        cancel:   '.cancel'
-        inputs:   '.group:not([data-cid]) :input:not(button)'
-        add:      '.add button'
-        clear:    '.clear'
-        avatar:   '.avatar'
+        btnEdit:    '.edit[role=button]'
+        btnDelete:  'button.delete'
+        # NavigatorBehavior Ui
+        navigate:   '[href^=contacts], [data-next]'
+        # FormBehavior Ui
+        formSubmit: '[type=submit]'
+        formClear:  'button.clear'
+        formInputs: '.group:not([data-cid]) :input:not(button)'
+
+    regions:
+        'avatar': '[role=img]'
+        'data':   '.data'
+        'tags':   'aside .tags'
 
 
     modelEvents:
         'change:edit':     'render'
-        'change:initials': 'updateInitials'
-        'change':          -> @render() unless @model.get 'edit'
-        'before:save':     'syncDatapoints'
         'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
 
@@ -67,34 +59,29 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     serializeData: ->
-        _.extend super,
-            lists: CONFIG.datapoints.types
-            fullname: @model.toString pre: '<b>', post: '</b>'
+        _.extend {}, super, lists: CONFIG.datapoints.types
+
+
+    _deleteModalCfg: ->
+        opts = name: @options.model.get 'fn'
+
+        return cfg =
+            event:      'delete'
+            title:      t 'card confirm delete title', opts
+            message:    t 'card confirm delete message', opts
+            btn_ok:     t 'card confirm delete ok'
+            btn_cancel: t 'card confirm delete cancel'
 
 
     onRender: ->
-        @$('.datapoints').each (index, el) =>
-            name = el.dataset.type
-            @addRegion name, "[data-type=#{name}]"
-            @showChildView name, new DatapointsView
-                collection:    @model[name]
-                name:          name
-                cardViewModel: @model
-
-        @addRegion 'xtras-infos', '[data-type=xtras-infos]'
-        @showChildView 'xtras-infos', new XtrasView model: @model
-
-        return unless @model.get 'edit'
-
-        @addRegion 'actions', '.actions'
-        @showChildView 'actions', new EditActionsView model: @model
+        @showChildView 'avatar', new AvatarView model: @model
+        @showChildView 'data', new DataView model: @model
+        @showChildView 'tags', new TagsActionsView model: @model
 
 
     onDomRefresh: ->
-        if @model.get('edit')
-            @ui.inputs.filter('[name="name.first"]').focus()
-        else
-            @ui.edit.focus()
+        if @model.get('edit') then @ui.formInputs.first().focus()
+        else @ui.btnEdit.focus()
 
 
     onSave: ->
@@ -111,20 +98,3 @@ module.exports = class ContactCardView extends Mn.LayoutView
     onFormKeyEnter: ->
         inputs = @$ ':input:not(button):not([type=hidden])'
         inputs.eq(inputs.index(document.activeElement) + 1).focus()
-
-
-    onFormFieldAdd: (type) ->
-        return if type in CONFIG.xtras
-        @getRegion('xtras').currentView.addEmptyField type
-
-
-    updateInitials: (model, value) ->
-        @$('.initials').text value
-
-
-    syncDatapoints: ->
-        @regionManager.each (region) =>
-            return unless region.currentView?.getDatapoints
-            name       = region.currentView.options.name
-            datapoints = region.currentView.getDatapoints()
-            @model.syncDatapoints name, datapoints

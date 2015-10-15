@@ -1,0 +1,14 @@
+dt.outline.secondary.caret(role="button")
+    i.fa.fa-tags.fa-flip-horizontal
+    = t('card actions labels')
+    i.fa.fa-caret-down
+
+dd: fieldset
+    legend= t("card actions labels add")
+    ul
+    .create(aria-expanded="false")
+        label(for="tag-new")
+            input(type="text", name="name")
+        button
+            i.fa.fa-plus
+            = t("card actions labels create")

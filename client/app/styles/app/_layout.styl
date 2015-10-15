@@ -37,12 +37,16 @@ avatar(size)
         box-sizing border-box
         padded 30px
 
-        transform translateY(-50%)
+        transform translateY(calc((50vh + 55%) * -1))
+        transition transform 400ms ease-out
 
         background-color white
         border em(1px) solid grey-01
         border-radius em(5px)
         box-shadow 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)
+
+    &[aria-busy=true] [role=contentinfo]
+        transform translateY(-50%)
 
     h2
         top-spaced 0
@@ -91,3 +95,21 @@ avatar(size)
     &[aria-expanded=false]
         > :nth-child(2)
             hide()
+
+    legend
+        horizontally-padded em(16px)
+        bottom-padded em(8px)
+
+    ul
+        display flex
+        flex-direction column
+        max-height 30vh
+        overflow-y scroll
+
+        button
+        [role=button]
+            display block
+            width auto
+            min-width 100%
+            box-sizing border-box
+            padding    0.25em 1em
