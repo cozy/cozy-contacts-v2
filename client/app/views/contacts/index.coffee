@@ -3,6 +3,8 @@ GroupViewModel = require 'views/models/group'
 Search    = require 'collections/search'
 CharIndex = require 'collections/charindex'
 
+t = require 'lib/i18n'
+
 
 module.exports = class Contacts extends Mn.CompositeView
 
@@ -28,8 +30,9 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     initialize: ->
-        app = require 'application'
-        @taggedCollection = new Search app.contacts
+        app     = require 'application'
+        @search = new Search app.contacts
+        @search.on 'reset update', @updateCounterLabel
         @_buildFilteredCollections()
 
 
@@ -40,15 +43,28 @@ module.exports = class Contacts extends Mn.CompositeView
         for char in initials
             do (char) =>
                 attributes = name: char
-                collection = new CharIndex @taggedCollection, char: char
+                collection = new CharIndex @search, char: char
                 @collection.add new GroupViewModel attributes,
                     compositeCollection: collection
 
 
-    scroll: (down) ->
-        dir  = if down then 1 else -1
-        incr = @_parent.$el.scrollTop() + @_parent.$el.innerHeight() * dir
-        @_parent.$el.scrollTop incr
+    _counterLabel: ->
+        if @search.length
+            t('list counter', {smart_count: @search.length})
+        else if @search.search
+            t('list counter no-search')
+        else
+            t('list counter empty')
+
+
+    updateCounterLabel: =>
+        @$('.counter')
+            .text @_counterLabel()
+            .toggleClass 'important', @search.isEmpty()
+
+    onRenderCollection: ->
+        $('<div/>', class: 'counter').appendTo @$el
+        @updateCounterLabel()
 
 
     onShow: ->
@@ -56,8 +72,10 @@ module.exports = class Contacts extends Mn.CompositeView
         @listenTo app.layout,
             'key:pageup':   @scroll.bind @, false
             'key:pagedown': @scroll.bind @, true
-        @focus()
 
 
-    focus: ->
+    scroll: (down) ->
+        dir  = if down then 1 else -1
+        incr = @_parent.$el.scrollTop() + @_parent.$el.innerHeight() * dir
+        @_parent.$el.scrollTop incr
         @$el.focus()

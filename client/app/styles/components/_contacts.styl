@@ -3,7 +3,8 @@
         hide()
 
     .search
-        color red
+        background-color blue + 80%
+        color black
 
     [role=columnheader]
         padding-left 1.5em
@@ -83,7 +84,7 @@
             li
                 display     flex
                 align-items center
-                padding     0.25em 1em
+                padding     .25em 1em
 
             i
                 font-size  .8em
@@ -92,3 +93,27 @@
 
             span
                 flex 1
+
+
+    .counter
+        margin-top 1.5em
+        padding    0 1em .5em
+
+        text-align  left
+        line-height 1em
+        color       grey-05
+
+        &:not(.important)
+            display     flex
+            margin-top  em(8px)
+            align-items center
+            font-style  italic
+            font-size   em(13px)
+            color       grey-04
+
+            &::before
+            &::after
+                content ''
+                flex 1
+                margin 0 1em
+                border-top 1px solid grey-01

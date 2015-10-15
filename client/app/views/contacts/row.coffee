@@ -14,7 +14,7 @@ module.exports = class ContactRow extends Mn.ItemView
 
     serializeData: ->
         app        = require 'application'
-        filter     = app.model.get('filter')?.match /text:(\w+)/i
+        filter     = app.model.get('filter')?.match /text:([^\s]+)/i
         formatOpts =
             pre: '<b>'
             post: '</b>'

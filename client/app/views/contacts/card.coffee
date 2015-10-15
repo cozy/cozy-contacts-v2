@@ -91,8 +91,10 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     onDomRefresh: ->
-        if @model.get('edit') then @ui.inputs.first().focus()
-        else @ui.edit.focus()
+        if @model.get('edit')
+            @ui.inputs.filter('[name="name.first"]').focus()
+        else
+            @ui.edit.focus()
 
 
     onSave: ->

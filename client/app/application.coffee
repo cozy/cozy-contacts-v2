@@ -55,7 +55,7 @@ class Application extends Mn.Application
     search: (pattern, string) ->
         filter  = @model.get 'filter'
         input   = "#{pattern}:#{string}"
-        pattern = new RegExp "#{pattern}:(\\w+)", 'i'
+        pattern = new RegExp "#{pattern}:([^\\s]+)", 'i'
         prev    = filter?.match pattern or null
 
         if string

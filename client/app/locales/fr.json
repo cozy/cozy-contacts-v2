@@ -1,4 +1,8 @@
 {
+    "list counter":           "%{smart_count} contact |||| %{smart_count} contacts",
+    "list counter no-search": "aucun contact ne correspond à votre recherche",
+    "list counter empty":     "aucun contact disponible",
+
     "tools subactions settings": "configuration",
     "tools actions add contact": "ajouter un contact",
     "tools actions find duplicates": "doublons",
