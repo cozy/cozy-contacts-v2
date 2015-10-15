@@ -70,7 +70,7 @@ module.exports = class AppLayout extends Mn.LayoutView
     showDialog: (appViewModel, slug) ->
         unless slug
             @dialogs.empty()
-            @content.currentView.focus()
+            @content.currentView.$el.focus()
         else
             dialogView = switch slug
                 when 'settings'   then new SettingsView model: @model

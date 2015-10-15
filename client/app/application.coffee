@@ -12,9 +12,9 @@ ConfigModel = require 'models/config'
 ContactsCollection = require 'collections/contacts'
 TagsCollection     = require 'collections/tags'
 
-AppLayout    = require 'views/app_layout'
-AppViewModel = require 'views/models/app'
-IntentManager   = require 'lib/intent_manager'
+AppLayout     = require 'views/app_layout'
+AppViewModel  = require 'views/models/app'
+IntentManager = require 'lib/intent_manager'
 
 
 class Application extends Mn.Application
@@ -56,20 +56,20 @@ class Application extends Mn.Application
 
     search: (pattern, string) ->
         filter  = @model.get 'filter'
-        input   = "#{pattern}:#{string}"
-        pattern = new RegExp "#{pattern}:([^\\s]+)", 'i'
-        prev    = filter?.match pattern or null
+        input   = "`#{pattern}:#{string}`"
+        pattern = new RegExp "`#{pattern}:([\\w\\s]+)`", 'i'
+        prev    = filter?.match pattern
 
         if string
             if prev
                 filter = filter.replace pattern, input
             else if filter?.length
-                filter += " #{input}"
+                filter += input
             else
                 filter = input
 
         else if prev
-            filter = filter.replace(pattern, '').trim()
+            filter = filter.replace(pattern, '')
 
         @model.set 'filter', filter
 

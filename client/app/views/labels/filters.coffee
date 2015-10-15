@@ -1,6 +1,6 @@
 {Filtered}  = BackboneProjections
 
-PATTERN = /tag:(\w+)/i
+PATTERN = /`tag:([\w\s]+)`/i
 
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
