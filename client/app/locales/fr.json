@@ -6,7 +6,7 @@
     "tools subactions settings": "configuration",
     "tools actions add contact": "ajouter un contact",
     "tools actions find duplicates": "doublons",
-    "tools search placeholder":  "rechercher des contacts, libellés…",
+    "tools search placeholder":  "rechercher des contacts",
     "tools labels filters":      "libellés",
     "tools labels filters all":  "tous les contacts",
 
