@@ -15,6 +15,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     className: 'card'
 
+
     attributes:
         role: 'dialog'
 
@@ -24,7 +25,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
-        PickAvatar: {}
         Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg()
 
 
@@ -77,6 +77,8 @@ module.exports = class ContactCardView extends Mn.LayoutView
         @showChildView 'avatar', new AvatarView model: @model
         @showChildView 'data', new DataView model: @model
         @showChildView 'tags', new TagsActionsView model: @model
+
+        @$('[role=contentinfo]').toggleClass 'edit', !!@model.get 'edit'
 
 
     onDomRefresh: ->
