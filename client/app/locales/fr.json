@@ -59,6 +59,7 @@
 
     "duplicates title":                 "Doublons",
     "duplicates actions mergeall":      "tout fusionner",
+    "duplicates empty":                 "Aucun doublon détecté",
     "mergerow actions merge":           "fusionner",
     "mergerow actions dismiss":         "abandonner",
 

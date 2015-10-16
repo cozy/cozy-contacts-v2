@@ -20,8 +20,11 @@ module.exports = class DuplicatesView extends Mn.CompositeView
 
     childView: require 'views/mergerow'
 
+    emptyView: Backbone.Marionette.ItemView.extend
+        template: "<p>#{t('duplicates empty')}</p>"
+
     templateHelpers: ->
-        return size: @collection.size()
+        return size: @toMerge.size()
 
     behaviors: ->
         Dialog:    {}
@@ -37,16 +40,34 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         @collection = new Duplicates()
         @collection.findDuplicates app.contacts
 
+        @toMerge = new BackboneProjections.Filtered @collection,
+            filter: (merge) -> merge.isMergeable()
+
+        @listenTo @toMerge, 'all', =>
+
+            @$('.mergeallcount').text @toMerge.size()
+
 
     mergeAll: ->
-        # Register on merged event, to perform merge on next item ;
-        # merge current item.
-        mergeStep = (model) =>
-            index = 1 + @collection.indexOf model
-            if index < @collection.size()
-                @listenTo @children.findByModel(model)
-                , 'contacts:group:merge', => mergeStep @collection.at index
+        console.log 'mergeAll'
+        # Block any input during mergeall.
+        @$('button,input').attr 'disabled', 'disabled'
 
-            @children.findByModel(model).merge()
+        window.setImmediate = window.setImmediate or (callback) ->
+            setTimeout callback, 1
 
-        mergeStep @collection.first()
+        async.eachSeries @toMerge.toArray(), (merge, callback) =>
+            # After a Mergerow::merge, a the merge ViewModel always trigger a
+            # contacts:merge event:
+            # * when merge went well
+            # * when an error occurs inn merge (error as second arg)
+            # * when the user cancel the merge (abort error as second arg).
+            @listenTo merge, 'contacts:merge', (model, err) ->
+                setImmediate ->
+                # setTimeout ->
+                    callback err
+
+            @children.findByModel(merge).merge()
+
+        , (err) =>
+            @$('button,input').removeAttr 'disabled'

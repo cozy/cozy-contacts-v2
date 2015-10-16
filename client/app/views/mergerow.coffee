@@ -17,8 +17,6 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
-        'contacts:merge': 'end'
-
 
     events:
         'click @ui.submit': 'merge'
@@ -30,6 +28,9 @@ module.exports = class MergeRow extends Mn.ItemView
         return _.extend super,
             candidates: @model.get('candidates').map (contact) ->
                 new ContactViewModel { new: false }, { model: contact}
+            selected: @model.get('candidates').map (contact) =>
+                contact in @model.get('toMerge')
+            isMergeable: @model.isMergeable()
 
 
     check: (ev) ->
@@ -42,12 +43,6 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     merge: ->
-        if @model.get('toMerge').length <= 1
-            # cant merge one or 0 contact, pass
-            console.log 'not enought contact to merge.'
-            @end()
-            return
-
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0
             # No question to the user, go to merge directly
@@ -56,7 +51,3 @@ module.exports = class MergeRow extends Mn.ItemView
             MergeView = require 'views/contacts/merge'
             app = require 'application'
             app.layout.showChildView 'alerts', new MergeView model: @model
-
-
-    end: ->
-        @trigger 'contacts:group:merge'

@@ -6,7 +6,9 @@ block content
     button(type="submit").ui-mergeall
         .fa.fa-code-fork
         span= t('duplicates actions mergeall')
-          |  (#{size})
+        |  (
+        span.mergeallcount= size
+        | )
 
     ul
 

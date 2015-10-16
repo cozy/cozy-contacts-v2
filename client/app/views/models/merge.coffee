@@ -4,7 +4,7 @@ CompareContacts = require 'lib/compare_contacts'
 ContactHelper = require 'lib/contact_helper'
 
 
-CHOICE_FIELDS =  ['fn', 'org', 'title', 'department', 'bday', 'nickname']
+CHOICE_FIELDS =  ['org', 'title', 'department', 'bday', 'nickname']
 
 # Merge a list of contact.
 # Merge choices stored in attributes of this.
@@ -23,12 +23,14 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         else
             @unselectCandidate index
 
+        # Trigger manually as we set value trough @attributes.
+        @trigger 'change', @
+
 
     unselectCandidate: (index)->
         # TODO : @set 'toMerge' transform Array into Object !?
         @attributes.toMerge = @attributes.toMerge.filter (contact) =>
             return contact isnt @get('candidates')[index]
-
 
 
     isCandidateSelected: (index) ->
@@ -39,21 +41,26 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         return @get('toMerge').map (contact) -> contact.toJSON()
 
 
+    isMergeable: ->
+        return not @has('result') and @get('toMerge').length > 1
+
+
     buildMergeOptions: ->
         mergeOptions = {}
-        fields = CHOICE_FIELDS.concat 'avatar'
+        fields = CHOICE_FIELDS.concat ['avatar', 'fullname']
 
-        toMerge = @toMergeAsJson()
         for field in fields
             options = []
-            toMerge.forEach (contact, index) ->
+            @get('toMerge').forEach (contact, index) ->
                 if field is 'avatar'
-                    if contact._attachments?
-                        value = "contacts/#{contact.id}/picture.png"
+                    if contact.has '_attachments'
+                        value = "contacts/#{contact.get('id')}/picture.png"
                     else
                         value = null
+                else if field is 'fullname'
+                    value = contact.toString pre: '<b>', post: '</b>'
                 else
-                    value = contact[field]
+                    value = contact.get field
 
                 # Remove useless values, and filter identical value.
                 filterByValue = (option) -> option.value is value
@@ -77,6 +84,10 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
     merge: (callback) ->
         toMerge = @toMergeAsJson()
 
+        # Defensive: merge shouldn't be called with nothing to do.
+        if toMerge.length <= 1
+            return callback new Error 'not enought contact to merge.'
+
         merged =
             datapoints: []
             tags: []
@@ -91,11 +102,12 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         delete merged._rev
         delete merged._attachments
 
-        # We rely on fn field to choose fn and n fields.
+        # We rely on fullname choice to choose fn and n fields.
         fields = CHOICE_FIELDS
-        if @has 'fn'
-            @set 'n', @get 'fn'
-            fields = fields.concat 'n'
+        if @has 'fullname'
+            @set 'n', @get 'fullname'
+            @set 'fn', @get 'fullname'
+            fields = fields.concat ['n', 'fn']
 
         for field in fields
             if @has field
@@ -138,8 +150,10 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
         , (err) =>
             if err
                 console.error err
+                # TODO : passing err as second arguments may be confusing ?
+                @trigger 'contacts:merge', @, err
             else
                 @attributes.toMerge = []
                 @attributes.candidates = []
 
-                @trigger 'contacts:merge', @
+                @trigger 'contacts:merge', @, null

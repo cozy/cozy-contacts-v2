@@ -59,6 +59,7 @@
 
     "duplicates title":                 "Find Duplicates",
     "duplicates actions mergeall":      "merge all",
+    "duplicates empty":                 "No duplicates found",
     "mergerow actions merge":           "merge",
     "mergerow actions dismiss":         "dismiss",
 

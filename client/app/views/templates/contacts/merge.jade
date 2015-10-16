@@ -10,19 +10,18 @@ block content
               -var option = options[i]
                   li
                       label(for="merge-#{fieldName}-#{i}")
-                        if model[fieldName] == option.index
-                            input(type="radio", name=fieldName,
-                                value=option.index, id="merge-#{fieldName}-#{i}"
-                                , checked)
-                        else
-                            input(type="radio", name=fieldName,
-                                value=option.index, id="merge-#{fieldName}-#{i}")
+                          input(type="radio", name=fieldName,
+                              value=option.index, id="merge-#{fieldName}-#{i}",
+                              checked=(model[fieldName] == option.index))
 
-                        if fieldName == 'avatar'
-                            img.avatar(src=option.value)
-                        else
-                            i
-                            = option.value
+                          if fieldName == 'avatar'
+                              img.avatar(src=option.value)
+                          else
+                              i
+                              if fieldName == 'fullname'
+                                  span!= option.value
+                              else
+                                  = option.value
 
     h1= t('merge title')
 
@@ -32,10 +31,10 @@ block content
           dd
             +radio(model.mergeOptions.avatar, "avatar")
 
-        if model.mergeOptions.fn != null
+        if model.mergeOptions.fullname != null
           dt= t('merge choose name')
           dd
-            +radio(model.mergeOptions.fn, "fn")
+            +radio(model.mergeOptions.fullname, "fullname")
 
         if model.mergeOptions.nickname != null
           dt= t('merge choose nickname')
