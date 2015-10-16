@@ -10,11 +10,12 @@ module.exports = class ContactRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
+        'sync':   'render'
 
 
     serializeData: ->
         app        = require 'application'
-        filter     = app.model.get('filter')?.match /text:([^\s]+)/i
+        filter     = app.model.get('filter')?.match /`text:([\w\s]+)`/i
         formatOpts =
             pre: '<b>'
             post: '</b>'

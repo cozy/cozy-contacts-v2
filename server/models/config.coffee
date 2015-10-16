@@ -2,6 +2,7 @@ americano = require 'cozydb'
 
 module.exports = Config = americano.getModel 'ContactConfig',
     nameOrder: type: String, default: 'not-set'
+    sort: type: String, default: 'fn'
 
 Config.getInstance = (callback) ->
     Config.request 'all', (err, configs) ->

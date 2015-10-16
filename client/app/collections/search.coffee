@@ -16,10 +16,11 @@ module.exports = class Search extends Filtered
 
 
     filter: (model) =>
-        return true unless @search
-        filters = @search.match /(\w+:[^\s]+)/gi
+        filters = @search?.match /`\w+:[\w\s]+`/gi
+        return true unless filters
+
         filters.reduce (memo, filter) ->
-            [pattern, string] = filter.split ':'
+            [pattern, string] = filter.slice(1, -1).split ':'
             pass = switch pattern
                 when 'tag'  then _.contains model.attributes.tags, string
                 when 'text' then model.match string

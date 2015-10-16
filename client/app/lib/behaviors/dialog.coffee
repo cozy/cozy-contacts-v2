@@ -26,7 +26,11 @@ module.exports = class Dialog extends Mn.Behavior
 
 
     detectClickOutside: (event) ->
+        # Chrome consider pageX and pageY = 0 when clicking on components such
+        # <select>. So we perform the outside test only if pageX and pageY > 0.
+        return unless event.pageX or event.pageY
+        
         box = @ui.content[0].getBoundingClientRect()
-        if (event.pageX < box.left or event.pageX > box.right) and
-        (event.pageY < box.top or event.pageY > box.bottom)
-            @close()
+        inW = event.pageX < box.left or event.pageX > box.right
+        inH = event.pageY < box.top or event.pageY > box.bottom
+        @close() if inH and inW

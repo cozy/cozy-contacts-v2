@@ -1,0 +1,35 @@
+extends ../../../lib/views/templates/base/dialog.jade
+
+block content
+    h1= t('settings title')
+
+    .group
+        h2= t('settings in-out title')
+        nav: ul
+            li
+                input(type="file", name="upload")
+                button.import
+                    i.fa.fa-download
+                    = t('settings in-out import action')
+            li
+                button.export(disabled)
+                    i.fa.fa-upload
+                    = t('settings in-out export action')
+        div.feedback(class=errors? 'error' : '')
+            if errors && errors.upload
+                = t(errors.upload)
+
+    .group
+        h2= t('settings display title')
+        select.btn.outline.secondary(name="sort")
+            each key in sortkeys
+                option(value=key selected=(sort == key))= t('settings display sort ' + key)
+
+    .group
+        h2= t('settings sync title')
+        p
+            = t('settings sync gplay')
+            a(target="_blank", href="https://play.google.com/store/apps/details?id=io.cozy.files_client")
+              img(alt=t('settings sync gplay get it'), src="//developer.android.com/images/brand/#{locale}_generic_rgb_wo_60.png")
+
+        p!= t('settings sync carddav', {link: 'https://cozy.io/mobile/contacts.html'}).replace(/\[(.+)\]\((.+)\)/i, '<a target="_blank" href="$2">$1</a>')

@@ -14,6 +14,7 @@ SearchView   = require 'views/tools/search'
 ContactsView = require 'views/contacts'
 CardView     = require 'views/contacts/card'
 DuplicatesView = require 'views/duplicates'
+SettingsView = require 'views/settings'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -66,23 +67,25 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'content', new ContactsView()
 
 
-    showDialog: (viewModel, slug) ->
-        if slug is 'duplicates'
-            @showChildView 'dialogs', new DuplicatesView()
-
-        else
-            @showContact viewModel, slug
-
-
-    showContact: (viewModel, id) ->
-        if id
-            app = require 'application'
-            model = if id is 'new' then new ContactModel null, parse: true
-            else app.contacts.get id
-
-            modelView = new ContactViewModel {new: id is 'new'}, model: model
-            app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
-
-            @showChildView 'dialogs', new CardView model: modelView
-        else
+    showDialog: (appViewModel, slug) ->
+        unless slug
             @dialogs.empty()
+            @content.currentView.$el.focus()
+        else
+            dialogView = switch slug
+                when 'settings'   then new SettingsView model: @model
+                when 'duplicates' then new DuplicatesView()
+                else                   @_buildContactView slug
+
+            @showChildView 'dialogs', dialogView
+
+
+    _buildContactView: (id) ->
+        app = require 'application'
+        model = if id is 'new' then new ContactModel null, parse: true
+        else app.contacts.get id
+
+        modelView = new ContactViewModel {new: id is 'new'}, model: model
+        app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
+
+        new CardView model: modelView

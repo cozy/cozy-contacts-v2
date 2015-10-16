@@ -69,7 +69,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         attrs = {}
         avatar = @get 'avatar'
         if avatar? and not avatar.match(/contacts\/.+\/picture.png/)?
-            attrs.avatar = avatar
+            attrs.avatar = avatar.split(',')[1]
         return attrs
 
 

@@ -3,21 +3,24 @@
     @extend $dialog
 
     [role=contentinfo]
-        position relative
+        flex-wrap wrap
 
         padding 30px
         border-radius 4px
 
         background-color white
 
+        > ul
+            flex 1
+            top-spaced 1em
+
+
     h1
+        flex 1 1 30em
+        reset()
         font-weight bold
         font-size 20px
 
-    .ui-mergeall
-        position absolute
-        top 30px
-        right 30px
 
     [role=mergegroup]
         horizontally-padded em(16px)

@@ -22,9 +22,16 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     className: 'tools'
 
+    behaviors:
+        Navigator: {}
+
+
     regions:
         actions: '.tool-actions'
         labels:  '.tool-labels'
+
+    ui:
+        navigate: '[role=button]'
 
 
     initialize: ->

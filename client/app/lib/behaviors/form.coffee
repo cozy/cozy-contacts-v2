@@ -3,7 +3,9 @@ module.exports = class Form extends Mn.Behavior
     behaviors:
         Keyboard:
             keymaps:
-                '13': 'form:key:enter'
+                '13':
+                    event: 'form:key:enter'
+                    preventDefault: false
 
 
     events: ->

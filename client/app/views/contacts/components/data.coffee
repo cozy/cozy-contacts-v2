@@ -21,6 +21,11 @@ module.exports = class DataView extends Mn.LayoutView
     modelEvents:
         'change': -> @render() unless @model.get 'edit'
 
+    # Force child events bubbling
+    # NOTE: Mn doesn't give a proper way to do this?
+    childEvents:
+        'form:key:enter': -> @triggerMethod 'form:key:enter'
+
 
     initialize: ->
         Mn.bindEntityEvents @model, @, @model.viewEvents
@@ -51,6 +56,10 @@ module.exports = class DataView extends Mn.LayoutView
     onRender: ->
         @_renderDatapoints()
         @_renderEditActions() if @model.get 'edit'
+
+    onDomRefresh: ->
+        return unless @model.get('edit')
+        @$(':input:not(button):not([type=hidden])').eq(1).focus()
 
 
     onFormFieldAdd: (type) ->

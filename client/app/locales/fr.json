@@ -6,9 +6,22 @@
     "tools subactions settings": "configuration",
     "tools actions add contact": "ajouter un contact",
     "tools actions find duplicates": "doublons",
-    "tools search placeholder":  "rechercher des contacts, libellés…",
+    "tools search placeholder":  "rechercher des contacts",
     "tools labels filters":      "libellés",
     "tools labels filters all":  "tous les contacts",
+
+    "settings title":                "configuration",
+    "settings in-out title":         "importer / exporter les contacts",
+    "settings in-out import action": "importer un fichier vcard",
+    "settings in-out export action": "exporter vos contacts",
+    "settings in-out import result": "Vous avez importé %{smart_count} contact. |||| Vous avez importé %{smart_count} contacts.",
+    "settings display title":        "affichage",
+    "settings display sort gn":      "trier sur le nom",
+    "settings display sort fn":      "trier sur le prénom",
+    "settings sync title":           "synchronisation mobile",
+    "settings sync gplay":           "Accédez à votre Cozy depuis votre mobile. Télécharger notre application sur le Google Play Store:",
+    "settings sync gplay get it":    "Disponible sur Google play",
+    "settings sync carddav":         "Besoin de synchronisation CardDav? Jetez un œil à [notre documentation](%{link}).",
 
     "card actions create":        "créer",
     "card actions save":          "enregistrer",
@@ -72,5 +85,7 @@
     "merge choose title":               "poste",
     "merge choose birthday":            "Choisissez un anniversaire :",
     "merge actions merge":              "fusionner",
-    "merge actions cancel":             "annuler"
+    "merge actions cancel":             "annuler",
+
+    "error upload wrong filetype": "Le fichier sélectioné n'est pas un format VCard/VCF valide. Essayez avec un autre fichier."
 }

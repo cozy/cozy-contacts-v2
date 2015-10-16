@@ -30,9 +30,10 @@ module.exports = class Contact extends Backbone.Model
 
     sync: (method, model, options) ->
 
-        if model.has 'avatar'
-            avatar = model.get 'avatar'
-            model.unset 'avatar'
+        avatar = model.get('avatar') or model.get('photo')
+        if avatar
+            model.unset 'avatar', silent: true
+            model.unset 'photo', silent: true
 
             success = options.success
             # Call savePicture after sync.
@@ -60,9 +61,11 @@ module.exports = class Contact extends Backbone.Model
 
 
     toString: (opts = {}) ->
-        parts = @attributes.n.split ';'
+        [gn, fn, ...] = parts = @attributes.n.split ';'
         # wrap given name (at index 0) in pre/post tags if provided
-        parts[0] = _.compact([opts.pre, parts[0], opts.post]).join ''
+        gn = _.compact([opts.pre, gn, opts.post]).join ''
+        parts[0] = fn
+        parts[1] = gn
         _.compact(parts).join ' '
 
 
@@ -91,7 +94,7 @@ module.exports = class Contact extends Backbone.Model
             return options.error new Error 'Model should have been saved once.'
 
         #transform into a blob
-        binary = atob dataURL.split(',')[1]
+        binary = atob dataURL
         array = []
         for i in [0..binary.length]
             array.push binary.charCodeAt i

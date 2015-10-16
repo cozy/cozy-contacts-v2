@@ -15,6 +15,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     className: 'card'
 
+
     attributes:
         role: 'dialog'
 
@@ -24,7 +25,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
-        PickAvatar: {}
         Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg()
 
 
@@ -78,10 +78,12 @@ module.exports = class ContactCardView extends Mn.LayoutView
         @showChildView 'data', new DataView model: @model
         @showChildView 'tags', new TagsActionsView model: @model
 
+        @$('[role=contentinfo]').toggleClass 'edit', !!@model.get 'edit'
+
 
     onDomRefresh: ->
-        if @model.get('edit') then @ui.formInputs.first().focus()
-        else @ui.btnEdit.focus()
+        return if @model.get('edit')
+        @ui.btnEdit.focus()
 
 
     onSave: ->
@@ -96,5 +98,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     onFormKeyEnter: ->
-        inputs = @$ ':input:not(button):not([type=hidden])'
-        inputs.eq(inputs.index(document.activeElement) + 1).focus()
+        inputs = @$('.data.edit').find('input:not([type=hidden]), textarea')
+        if document.activeElement.tagName.toLowerCase() isnt 'textarea'
+            inputs.eq(inputs.index(document.activeElement) + 1).focus()

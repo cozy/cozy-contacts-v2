@@ -1,7 +1,7 @@
 .drawer
     display flex
-    padded  10px, 20px
-    padding-right 0
+    vertically-padded .5em
+    left-padded 20px
 
     background-color grey-01
     border-right     1px solid grey-03
@@ -14,6 +14,10 @@
         vertically-spaced 10px
 
 
+    [class$=actions]
+        padding-right 1.25em
+
+
     .tools
         flex           1
         display        flex
@@ -21,37 +25,28 @@
 
         legend
         button
-            display    block
-            width      100%
+        [role=button]
+            display       block
+            box-sizing    border-box
+            width         100%
 
             text-align left
 
-            font-weight bold
+        li:not(:last-child)
+            button
+            [role=button]
+                bottom-spaced .5em
 
-    .tool-actions
-        padding-right em(20px)
-
-    [role=button]
-        display block
-        width 100%
-        bottom-spaced .5em
 
     .tool-labels
         vertically-spaced()
         flex 1
-        overflow hidden
-
-        fieldset
-            height 100%
+        overflow-y auto
 
         legend
             color          grey-05
             font-size      14px
             text-transform uppercase
-
-        nav
-            height     100%
-            overflow-y auto
 
         label
             display           flex
@@ -63,6 +58,6 @@
             hide()
 
         ul
-            height calc(100vh - 12em)
+            // height calc(100vh - 12em)
             padding-right em(20px)
-            overflow-y auto
+            // overflow-y auto

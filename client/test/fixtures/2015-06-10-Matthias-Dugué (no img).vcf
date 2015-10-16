@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:d33fc7939f11ed728cf6fd523f00e379
+FN:Matthias Dugué
+ORG:Cozy Cloud
+NOTE:notes
+N:Dugué;Matthias;;;
+TEL;TYPE=HOME:+33612345678
+EMAIL;TYPE=HOME:m4dz@cozycloud.cc
+ADR;TYPE=HOME:;;8 rue des nuages;;;;
+END:VCARD
