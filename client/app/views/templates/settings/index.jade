@@ -2,21 +2,30 @@ extends ../../../lib/views/templates/base/dialog.jade
 
 block content
     h1= t('settings title')
-    
-    div
+
+    .group
         h2= t('settings in-out title')
         nav: ul
-            li: button
-                i.fa.fa-download
-                = t('settings in-out import action')
-            
-    div
+            li
+                input(type="file", name="upload")
+                button.import
+                    i.fa.fa-download
+                    = t('settings in-out import action')
+            li
+                button.export(disabled)
+                    i.fa.fa-upload
+                    = t('settings in-out export action')
+        div.feedback(class=errors? 'error' : '')
+            if errors && errors.upload
+                = t(errors.upload)
+
+    .group
         h2= t('settings display title')
         select.btn.outline.secondary(name="sort")
             each key in sortkeys
                 option(value=key selected=(sort == key))= t('settings display sort ' + key)
 
-    div
+    .group
         h2= t('settings sync title')
         p
             = t('settings sync gplay')

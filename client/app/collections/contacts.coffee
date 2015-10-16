@@ -26,3 +26,25 @@ module.exports = class Contacts extends Backbone.Collection
         @listenTo app.model, 'change:sort', (appViewModel, sort)->
             @comparator.sort = sort
             @sort()
+
+
+    importFromVCF: (vcard) ->
+        current = 0
+        cards  = vcard.split /\nEND:VCARD\n?/gi
+            .filter (vcard) -> not _.isEmpty vcard
+            .map (vcard) -> "#{vcard}\nEND:VCARD"
+
+        @trigger 'before:import:progress', cards.length
+
+        processCards = =>
+            card = cards.pop()
+            if card
+                parser = new VCardParser()
+                parser.read card
+                @create parser.contacts[0], parse: true
+                @trigger 'import:progress', ++current
+                setTimeout processCards
+            else
+                @trigger 'import', current
+
+        setTimeout processCards, 35

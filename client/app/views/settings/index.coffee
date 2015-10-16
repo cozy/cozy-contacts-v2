@@ -1,5 +1,7 @@
 {settings} = require 'config'
 
+t = require 'lib/i18n'
+
 
 module.exports = class SettingsView extends Mn.ItemView
 
@@ -17,15 +19,28 @@ module.exports = class SettingsView extends Mn.ItemView
         Dialog: {}
 
     ui:
-        sort: '[name=sort]'
+        sort:     '[name=sort]'
+        import:   'button.import'
+        upload:   '[type=file]'
+        feedback: '.feedback'
 
 
     events:
-        'change @ui.sort': 'updateSort'
+        'change @ui.sort':   'updateSort'
+        'click @ui.import':  'triggerUploader'
+        'change @ui.upload': 'onUploadFile'
+
+    modelEvents:
+        'change:errors': 'render'
+        'before:import': 'onBeforeImport'
 
 
     initialize: ->
         Mn.bindEntityEvents @model, @, @model.viewEvents
+        @listenTo require('application').contacts,
+            'before:import:progress': @onBeforeImportProgress
+            'import:progress':        @onProgressImport
+            'import':                 @onProgressEnd
 
 
     serializeData: ->
@@ -36,3 +51,40 @@ module.exports = class SettingsView extends Mn.ItemView
         event.preventDefault()
         event.stopPropagation()
         @triggerMethod 'settings:sort', event.currentTarget.value
+
+
+    triggerUploader: (event) ->
+        event.preventDefault()
+        event.stopPropagation()
+        @ui.upload.trigger 'click'
+
+
+    onUploadFile: (event) ->
+        event.preventDefault()
+        event.stopPropagation()
+        @triggerMethod 'settings:upload', event.currentTarget.files[0]
+
+
+    onBeforeImport: ->
+        @ui.import.prop 'disabled', true
+
+
+    onBeforeImportProgress: (total) ->
+        @ui.progress = $ '<progress/>', max: total, value: 0
+        @ui.counter = $ '<span/>', text: 0
+        status = $('<div/>', text: "/#{total}").prepend @ui.counter
+
+        @ui.progress.appendTo @ui.feedback
+        status.appendTo @ui.feedback
+
+
+    onProgressImport: (state) ->
+        @ui.progress.val state
+        @ui.counter.text state
+
+
+    onProgressEnd: (total) ->
+        @ui.feedback
+            .empty()
+            .text t 'settings in-out import result', smart_count: total
+        @ui.import.prop 'disabled', false

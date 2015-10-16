@@ -10,6 +10,7 @@ module.exports = class ContactRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
+        'sync':   'render'
 
 
     serializeData: ->

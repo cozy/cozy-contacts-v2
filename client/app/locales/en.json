@@ -13,6 +13,8 @@
     "settings title":                "settings",
     "settings in-out title":         "import/export contacts",
     "settings in-out import action": "import vcard",
+    "settings in-out export action": "export vcard",
+    "settings in-out import result": "You've just successfully imported %{smart_count} contact. |||| You've just successfully imported %{smart_count} contacts.",
     "settings display title":        "display settings",
     "settings display sort gn":      "sort by last name",
     "settings display sort fn":      "sort by first name",
@@ -83,5 +85,7 @@
     "merge choose title":               "title",
     "merge choose birthday":            "Choose a birthday:",
     "merge actions merge":              "merge contacts",
-    "merge actions cancel":             "cancel"
+    "merge actions cancel":             "cancel",
+
+    "error upload wrong filetype": "The uploaded file isn't a valid VCF/VCard format. Please try with another file."
 }

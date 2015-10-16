@@ -12,7 +12,9 @@
 
     "settings title":                "configuration",
     "settings in-out title":         "importer / exporter les contacts",
-    "settings in-out import action": "importer une vcard",
+    "settings in-out import action": "importer une archive vcard",
+    "settings in-out export action": "exporter au format vcard",
+    "settings in-out import result": "Vous avez importé %{smart_count} contact. |||| Vous avez importé %{smart_count} contacts.",
     "settings display title":        "affichage",
     "settings display sort gn":      "trier sur le nom",
     "settings display sort fn":      "trier sur le prénom",
@@ -83,5 +85,7 @@
     "merge choose title":               "poste",
     "merge choose birthday":            "Choisissez un anniversaire :",
     "merge actions merge":              "fusionner",
-    "merge actions cancel":             "annuler"
+    "merge actions cancel":             "annuler",
+
+    "error upload wrong filetype": "Le fichier sélectioné n'est pas un format VCard/VCF valide. Essayez avec un autre fichier."
 }

@@ -11,7 +11,7 @@ module.exports =
         use: [
             americano.static path.resolve(__dirname, '../client/public'),
                 maxAge: 86400000
-            americano.bodyParser keepExtensions: true
+            americano.bodyParser limit: '1mb', keepExtensions: true
             require('./helpers/shortcut')
         ]
         afterStart: (app, server) ->
