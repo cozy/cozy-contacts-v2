@@ -52,9 +52,6 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         # Block any input during mergeall.
         @$('button,input').attr 'disabled', 'disabled'
 
-        window.setImmediate = window.setImmediate or (callback) ->
-            setTimeout callback, 1
-
         async.eachSeries @toMerge.toArray(), (merge, callback) =>
             # After a Mergerow::merge, a the merge ViewModel always trigger a
             # contacts:merge event:
@@ -62,9 +59,11 @@ module.exports = class DuplicatesView extends Mn.CompositeView
             # * when an error occurs inn merge (error as second arg)
             # * when the user cancel the merge (abort error as second arg).
             @listenTo merge, 'contacts:merge', (model, err) ->
-                setImmediate ->
-                # setTimeout ->
+                # Let the UI breath.
+                # TODO: replace with a cleaner setImmediate call.
+                setTimeout ->
                     callback err
+                , 1
 
             @children.findByModel(merge).merge()
 

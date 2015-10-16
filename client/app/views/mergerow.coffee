@@ -25,12 +25,19 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     serializeData: ->
+        if @model.has 'result'
+            result = new  ContactViewModel { new: false }
+            , { model: @model.get('result')}
+        else
+            result = undefined
+
         return _.extend super,
             candidates: @model.get('candidates').map (contact) ->
                 new ContactViewModel { new: false }, { model: contact}
             selected: @model.get('candidates').map (contact) =>
                 contact in @model.get('toMerge')
             isMergeable: @model.isMergeable()
+            result: result
 
 
     check: (ev) ->

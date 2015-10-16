@@ -114,15 +114,13 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
                 merged[field] = toMerge[@get field][field]
 
         # Create the new contact and ContactViewModel
-        contact = new Contact merged, parse: true
-        result = new ContactViewModel { new: true }, model: contact
+        # contact = new Contact merged, parse: true
+        result = new Contact merged, parse: true
+        #result = new ContactViewModel { new: true }, model: contact
 
         end = (err) =>
             return callback err if err
-
-            @set 'result', result
-            result = @get 'result'
-            @listenToOnce result, 'save', @destroyToMerge.bind @
+            @listenToOnce result, 'sync', @afterSyncResult.bind @
             result.save()
 
             callback() if callback?
@@ -139,10 +137,12 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             end()
 
 
-
-    # Delete old contacts, now merged in 'result'.
-    destroyToMerge: ->
-        async.eachSeries @get('toMerge'), (contact, cb) ->
+    # Delete old contacts, now merged in 'result',
+    # clean toMerge and candidates fields,
+    # trigger contacts:merged
+    # and add the new merged result to the cmain contacts collection.
+    afterSyncResult: (result)->
+        async.each @get('toMerge'), (contact, cb) ->
             contact.destroy
                 success: -> cb()
                 error: (model, response, option) -> cb response
@@ -155,5 +155,9 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             else
                 @attributes.toMerge = []
                 @attributes.candidates = []
-
+                @set 'result', result
                 @trigger 'contacts:merge', @, null
+
+            # Add the contacts after trigger, because add to main contacts
+            # collection is a sensitive overhead (~1s)
+            require('application').contacts.add result
