@@ -37,6 +37,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         formSubmit: '[type=submit]'
         formClear:  'button.clear'
         formInputs: '.group:not([data-cid]) :input:not(button)'
+        avatar:     '.avatar'
 
     regions:
         'avatar': '[role=img]'

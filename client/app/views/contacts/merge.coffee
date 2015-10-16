@@ -17,15 +17,15 @@ module.exports = class MergeView extends Mn.ItemView
         Form:      {}
 
     ui:
-        submit:   '[type=submit]'
-        cancel:   '.cancel'
-        inputs:   'input'
+        formSubmit: '[type=submit]'
+        formInputs: 'input'
+        cancel: '.cancel'
 
     modelEvents:
         'contacts:merge': 'onClose'
 
     events:
-        'click @ui.cancel': 'onClose'
+        'click @ui.cancel': 'onCancel'
 
 
     initialize: ->
@@ -38,6 +38,14 @@ module.exports = class MergeView extends Mn.ItemView
 
     onFormSubmit: ->
         @model.merge()
+        # Close directly here, to give reactivity feeling.
+        @onClose()
+
+
+    onCancel: ->
+        # Trigger merge procedure ended, with 'abort' error.
+        @model.trigger 'contacts:merge', @model, "abort"
+        @onClose()
 
 
     onClose: ->

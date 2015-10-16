@@ -27,7 +27,6 @@ mixin contactrow(contact)
     +formatDatapoints(contactJson.email, 'email')
 
 
-
 if result
     ul(role='list')
         li.ui-contactrow(role='listitem')
@@ -39,7 +38,7 @@ else
         .btn-group
             button.cancel.outline.secondary()
                 span= t('mergerow actions dismiss')
-            button(type="submit")
+            button(type="submit", disabled=!isMergeable)
                 .fa.fa-code-fork
                 span= t('mergerow actions merge')
 
@@ -48,8 +47,10 @@ else
             for contact, index in candidates
                     li(role='listitem')
                         label
-                            input(type='checkbox', name="mergecontact-#{index}",
-                                checked="checked", value="#{index}")
+                            input(type='checkbox',
+                                name="mergecontact-#{index}",
+                                value="#{index}",
+                                checked=selected[index])
+
                             .ui-contactrow
                                 +contactrow(contact)
-
