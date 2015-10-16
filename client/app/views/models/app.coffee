@@ -23,7 +23,12 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             reader.readAsText file
             reader.onloadend = =>
                 res = reader.result
-                if /^BEGIN:VCARD\n(?:.+\n)+END:VCARD\n?$/i.test res
+                validVCF = ///
+                    ^BEGIN:VCARD[\r\n]{1,2}
+                    (?:.+[\r\n]{1,2})+
+                    END:VCARD[\r\n]{0,2}$
+                ///
+                if validVCF.test res
                     app = require 'application'
                     app.contacts.importFromVCF res
                 else

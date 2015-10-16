@@ -67,6 +67,7 @@ module.exports = class SettingsView extends Mn.ItemView
 
     onBeforeImport: ->
         @ui.import.prop 'disabled', true
+        @ui.feedback.empty()
 
 
     onBeforeImportProgress: (total) ->
