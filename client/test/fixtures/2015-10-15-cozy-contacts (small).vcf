@@ -1,0 +1,126 @@
+BEGIN:VCARD
+VERSION:3.0
+UID:6a39c390e35995c64120c5e533000ba7
+FN:Louis Fuller
+BDAY:1989-09-19
+N:Fuller;Louis;;;
+CHAT;TYPE=SKYPE:lfuller1m
+EMAIL;TYPE=HOME:lfullerf@hexun.com
+TEL;TYPE=HOME:5-(882)492-4222
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:6a39c390e35995c64120c5e533000ffd
+FN:foo
+N:SDS;foo;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:6a39c390e35995c64120c5e53300185e
+FN:Foo M4D
+ORG:Cozy
+N:M4D;Foo;;;
+EMAIL;TYPE=WORK:foo@bar.com
+TEL;TYPE=MAIN:12345789
+TEL;TYPE=MAIN:098765432
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:c5f7f0a13dc4fd1e1bc8a708bf00ae2b
+FN:Chris Fernandez
+BDAY:2006-03-29
+N:Fernandez;Chris;;;
+ADR;TYPE=HOME:;;8 Forest Dale Trail\,  Boroon\, Philippines;;;;
+ADR;TYPE=HOME:;;11843 Thierer Hill\,  Boyu\, China;;;;
+CHAT;TYPE=SKYPE:cfernandezz
+TEL;TYPE=HOME:0-(721)298-0787
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a037591
+FN:Andrew Romero
+N:Romero;Andrew;;;
+ADR;TYPE=WORK:;;88 Forest Terrace\,  Lugo\, Philippines;;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a0376a2
+FN:Anne Rice
+N:Rice;Anne;;;
+TEL;TYPE=WORK:7-(530)254-7833
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a0377f5
+FN:Wanda Gardner
+N:Gardner;Wanda;;;
+TEL;TYPE=WORK:4-(329)217-8122
+ADR;TYPE=HOME:;;39 Aberg Trail\,  Grojec\, Poland;;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a03867f
+FN:Robin Miller
+BDAY:1978-01-02
+N:Miller;Robin;;;
+ADR;TYPE=HOME:;;52 Lake View Terrace\, 112 60 Stockholm\, Sweden;;;;
+TEL;TYPE=HOME:0-(551)961-3661
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a0386c2
+FN:Daniel Riley
+ORG:Skalith
+TITLE:General Manager
+N:Riley;Daniel;adipiscing;Mrs;Sr
+EMAIL;TYPE=HOME:driley4@webnode.com
+ADR;TYPE=HOME:;;2653 Delladonna Road\,  Boconó\, Venezuela;;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a038fd3
+FN:Patricia Long
+BDAY:1999-05-01
+N:Long;Patricia;;;
+TEL;TYPE=WORK:4-(021)636-3933
+TEL;TYPE=HOME:4-(021)636-3933
+EMAIL;TYPE=HOME:plong5@themeforest.net
+EMAIL;TYPE=HOME:plong5@ustream.tv
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a03976a
+ADR;TYPE=HOME:;;593 Oak Drive\,  Plátanos\, Greece;;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a03a074
+FN:Laura Lynch
+BDAY:1952-10-25
+NOTE:Proin leo odio\, porttitor id\, consequat in\, consequat ut\, nulla.
+N:Lynch;Laura;;;
+CHAT;TYPE=SKYPE:llynch7
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a03af43
+FN:Angela Ford
+NOTE:Donec diam neque\, vestibulum eget\, vulputate ut\, ultrices vel\, augue.
+N:Ford;Angela;;;
+ADR;TYPE=HOME:;;2958 Troy Junction\,  Tepusteca\, Honduras;;;;
+ADR;TYPE=HOME:;;2958 Troy Junction\,  Tepusteca\, Honduras;;;;
+SOCIAL;TYPE=TWITTER:@aford8
+CHAT;TYPE=SKYPE:aford8
+ADR;TYPE=WORK:;;2958 Troy Junction\,  Tepusteca\, Honduras;;;;
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+UID:e481cea87e4fd10ef69a3e782a03b8b1
+FN:Walter Long
+BDAY:1960-07-27
+N:Long;Walter;;;
+TEL;TYPE=WORK:5-(688)563-4378
+SOCIAL;TYPE=TWITTER:@wlong9
+ADR;TYPE=HOME:;;88331 Banding Parkway\,  Yeghegnut\, Armenia;;;;
+CHAT;TYPE=SKYPE:wlong9
+END:VCARD
