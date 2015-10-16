@@ -17,9 +17,9 @@ module.exports = class MergeView extends Mn.ItemView
         Form:      {}
 
     ui:
-        submit:   '[type=submit]'
-        cancel:   '.cancel'
-        inputs:   'input'
+        formSubmit: '[type=submit]'
+        formInputs: 'input'
+        cancel: '.cancel'
 
     modelEvents:
         'contacts:merge': 'onClose'

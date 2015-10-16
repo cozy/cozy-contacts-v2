@@ -49,7 +49,6 @@ module.exports = class DuplicatesView extends Mn.CompositeView
 
 
     mergeAll: ->
-        console.log 'mergeAll'
         # Block any input during mergeall.
         @$('button,input').attr 'disabled', 'disabled'
 
