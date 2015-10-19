@@ -89,12 +89,12 @@ module.exports = class Contact extends Backbone.Model
         _.extend {}, super, datapoints: @attributes.datapoints.toJSON()
 
 
-    savePicture: (dataURL, attrs, options) ->
+    savePicture: (imgData, attrs, options) ->
         unless attrs.id
             return options.error new Error 'Model should have been saved once.'
 
         #transform into a blob
-        binary = atob dataURL
+        binary = atob imgData
         array = []
         for i in [0..binary.length]
             array.push binary.charCodeAt i

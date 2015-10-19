@@ -30,7 +30,7 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         Dialog:    {}
 
     events:
-        'click [type=submit]': 'mergeAll'
+        'click .mergeall': 'mergeAll'
 
 
     initialize: ->
@@ -53,10 +53,10 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         @$('button,input').attr 'disabled', 'disabled'
 
         async.eachSeries @toMerge.toArray(), (merge, callback) =>
-            # After a Mergerow::merge, a the merge ViewModel always trigger a
+            # After a Mergerow::merge, the merge ViewModel always trigger a
             # contacts:merge event:
             # * when merge went well
-            # * when an error occurs inn merge (error as second arg)
+            # * when an error occurs in merge (error as second arg)
             # * when the user cancel the merge (abort error as second arg).
             @listenTo merge, 'contacts:merge', (model, err) ->
                 # Let the UI breath.

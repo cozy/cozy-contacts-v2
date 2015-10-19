@@ -130,7 +130,7 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
             uri = "contacts/#{toMerge[@get('avatar')].id}/picture.png"
 
             ContactHelper.imgUrl2DataUrl uri, (err, dataUrl) ->
-                result.set 'avatar', dataUrl
+                result.set 'avatar', dataUrl.split(',')[1]
 
                 end err
         else
