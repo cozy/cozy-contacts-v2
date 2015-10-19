@@ -22,6 +22,17 @@ button
 
         transition none
 
+    &[aria-busy=true]
+        text-indent -999em
+        display inline-flex
+
+        .fa
+            display none
+
+        &:before
+            @extend $icon-spinner-white
+            @extend $icon-16
+
     &.outline
         background-color transparent
         color            blue
