@@ -29,8 +29,10 @@ module.exports = class DuplicatesView extends Mn.CompositeView
     behaviors: ->
         Dialog:    {}
 
+    ui:
+        'mergeAll': '.mergeall'
     events:
-        'click .mergeall': 'mergeAll'
+        'click @ui.mergeAll': 'mergeAll'
 
 
     initialize: ->
@@ -44,14 +46,14 @@ module.exports = class DuplicatesView extends Mn.CompositeView
             filter: (merge) -> merge.isMergeable()
 
         @listenTo @toMerge, 'all', =>
-
             @$('.mergeallcount').text @toMerge.size()
 
 
     mergeAll: ->
         # Block any input during mergeall.
         @$('button,input').attr 'disabled', 'disabled'
-        @$('.mergeall').attr 'aria-busy', 'true'
+        # Hack to help firefox to display the spinner.
+        _.defer => @ui.mergeAll.attr 'aria-busy', 'true'
 
         async.eachSeries @toMerge.toArray(), (merge, callback) =>
             # After a Mergerow::merge, the merge ViewModel always trigger a
@@ -62,11 +64,12 @@ module.exports = class DuplicatesView extends Mn.CompositeView
             @listenTo merge, 'contacts:merge', (model, err) ->
                 # Let the UI breath.
                 # TODO: replace with a cleaner setImmediate call.
-                setTimeout ->
-                    callback err
-                , 1
+                _.defer callback, err
 
             @children.findByModel(merge).merge()
 
         , (err) =>
             @$('button,input').removeAttr 'disabled'
+            @ui.mergeAll.attr 'aria-busy', 'false'
+
+            console.error err if err

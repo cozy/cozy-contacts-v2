@@ -17,7 +17,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
-        'contacts:merge': 'render'
+        'contacts:merge': 'onContactsMerge'
 
     events:
         'click @ui.submit': 'merge'
@@ -32,6 +32,7 @@ module.exports = class MergeRow extends Mn.ItemView
         else
             result = undefined
 
+        console.log @merging
         return _.extend super,
             candidates: @model.get('candidates').map (contact) ->
                 new ContactViewModel { new: false }, { model: contact}
@@ -39,6 +40,7 @@ module.exports = class MergeRow extends Mn.ItemView
                 contact in @model.get('toMerge')
             isMergeable: @model.isMergeable()
             result: result
+            merging: @merging
 
 
     check: (ev) ->
@@ -49,10 +51,15 @@ module.exports = class MergeRow extends Mn.ItemView
     dismiss: ->
         @model.collection.remove @model
 
+    onContactsMerge: ->
+        @merging = false
+        @render()
 
     merge: ->
+        @merging = true
         @$('button,input').attr 'disabled', 'disabled'
-        @ui.submit.attr 'aria-busy', 'true'
+        # Hack to help firefox to display the spinner.
+        _.defer => @ui.submit.attr 'aria-busy', 'true'
 
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0
