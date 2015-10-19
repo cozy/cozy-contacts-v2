@@ -17,6 +17,7 @@ module.exports = {
       americano["static"](path.resolve(__dirname, '../client/public'), {
         maxAge: 86400000
       }), americano.bodyParser({
+        limit: '1mb',
         keepExtensions: true
       }), require('./helpers/shortcut')
     ],

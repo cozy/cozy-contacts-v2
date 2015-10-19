@@ -12,7 +12,7 @@ module.exports = {
     get: application.index
   },
   'config': {
-    post: application.setConfig
+    put: application.setConfig
   },
   'contactid': {
     param: contact.fetch
