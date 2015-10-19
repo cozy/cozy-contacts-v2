@@ -17,10 +17,10 @@ describe 'Config', ->
                 expect(@err).to.not.exist
                 expect(config.nameOrder).to.eql 'not-set'
 
-    describe 'Change config (first) - POST /config', ->
+    describe 'Change config (first) - PUT /config', ->
 
         it 'should allow requests', (done) ->
-            @client.post 'config', nameOrder: 'given-initial-familly', done
+            @client.put 'config', nameOrder: 'given-initial-familly', done
 
         it 'should reply with updated config', ->
             expect(@err).to.not.exist
@@ -32,10 +32,10 @@ describe 'Config', ->
                 expect(config.nameOrder).to.eql 'given-initial-familly'
                 done()
 
-    describe 'Change config (again) - POST /config', ->
+    describe 'Change config (again) - PUT /config', ->
 
         it 'should allow requests', (done) ->
-            @client.post 'config', nameOrder: 'familly-given', done
+            @client.put 'config', nameOrder: 'familly-given', done
 
         it 'should reply with updated config', ->
             expect(@err).to.not.exist
