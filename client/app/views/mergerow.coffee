@@ -17,6 +17,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     modelEvents:
         'change': 'render'
+        'contacts:merge': 'render'
 
     events:
         'click @ui.submit': 'merge'
@@ -50,6 +51,9 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     merge: ->
+        @$('button,input').attr 'disabled', 'disabled'
+        @ui.submit.attr 'aria-busy', 'true'
+
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0
             # No question to the user, go to merge directly

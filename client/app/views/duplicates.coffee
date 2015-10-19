@@ -51,6 +51,7 @@ module.exports = class DuplicatesView extends Mn.CompositeView
     mergeAll: ->
         # Block any input during mergeall.
         @$('button,input').attr 'disabled', 'disabled'
+        @$('.mergeall').attr 'aria-busy', 'true'
 
         async.eachSeries @toMerge.toArray(), (merge, callback) =>
             # After a Mergerow::merge, the merge ViewModel always trigger a
