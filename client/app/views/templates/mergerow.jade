@@ -38,7 +38,7 @@ else
         .btn-group
             button.cancel.outline.secondary()
                 span= t('mergerow actions dismiss')
-            button(type="submit", disabled=!isMergeable)
+            button(type="submit", disabled=!isMergeable, aria-busy=merging)
                 .fa.fa-code-fork
                 span= t('mergerow actions merge')
 
