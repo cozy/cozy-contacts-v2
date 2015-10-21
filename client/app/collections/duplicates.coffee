@@ -12,7 +12,10 @@ module.exports = class Duplicates extends Backbone.Collection
 
     # Initialize the collection with duplicates fund in the sepcified contacts
     # collection.
-    findDuplicates: (collection) ->
+    initialize: ([], options) ->
+        collection = options.collection
+        return unless collection
+
         duplicates = CompareContacts.findSimilars collection.toJSON()
         duplicates.forEach (candidates) =>
             candidates = candidates.map (c) -> collection.get c.id

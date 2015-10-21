@@ -5,10 +5,14 @@ module.exports = class MergeRow extends Mn.ItemView
 
     template: require 'views/templates/duplicates/row'
 
-    tagName: 'dl'
+    tagName: ->
+        if @model.has 'result' then 'div' else 'dl'
 
-    attributes:
-        role: 'rowgroup'
+    className: ->
+        if @model.has 'result' then 'merged' else ''
+
+    attributes: ->
+        role: if @model.has 'result' then 'row' else 'rowgroup'
 
 
     ui:
@@ -58,10 +62,11 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     merge: ->
+        @triggerMethod 'merge'
         @merging = true
-        @$('button,input').attr 'disabled', 'disabled'
+        @$('button, input').prop 'disabled', true
         # Hack to help firefox to display the spinner.
-        _.defer => @ui.submit.attr 'aria-busy', 'true'
+        _.defer => @ui.submit.attr 'aria-busy', true
 
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0

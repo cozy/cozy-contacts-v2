@@ -1,95 +1,61 @@
 .merge
-    @extend $dialog
-    // TODO : copy from card actualy.
-
-    [role=contentinfo]
-        transform translateY(0%) !important
-        flex-basis 30em !important
-
-        position relative
-
-        padding 30px
-        border-radius 4px
-
-        background-color white
-
 
     h1
-        font-weight bold
-        font-size 20px
+        bottom-spaced .5em
+        font-size     20px
 
     dl
-        margin-bottom 2em
+        bottom-spaced 2em
 
     dt
-        color grey-05
+        top-spaced  .5em
+        color       grey-05
         line-height 1.5em
 
     ul
+        reset()
         list-style-type none
-        padding 0
-        margin 0
 
     li
-        line-height 2em
-
-    input
-        margin-right 0.5em
-
-    > dd
-        &:not(:last-child)
-            border-top 1px solid grey-02
-
-
-    ul.avatars
-
-        li
-            display inline-block
-
-
-
-        img.avatar
-            border 5px solid white
-
-        input:checked+img
-            border 5px double blue
+        line-height 1.8em
 
     dd
+        &:not(:last-child)
+            bottom-padded .5em
+            border-bottom 1px solid grey-02
+
+        label
+            display     flex
+            align-items center
+            cursor      pointer
+
         input
             hide()
 
+            & + i
+                flex         none
+                width        1em
+                height       1em
+                right-spaced 8px
 
-        label
-            display flex
-            align-items center
-            cursor pointer
+                border-radius 50%
+                border        2px double grey-04
 
-        input + i
-            flex none
-            width 1em
-            height 1em
-            right-spaced em(8px)
+                background-color white
 
-            border-radius 50%
-            border 2px double grey-04
+            &:checked + i
+                box-shadow       inset 0 0 0 3px white
+                background-color blue
 
-            background-color white
+        ul.avatars
+            li
+                display inline-block
 
+            img.avatar
+                font-size 32px
+                spaced()
+                avatar    128px
+                border 5px solid white
 
-        input:checked + i
-            border 2px solid grey-04
-            box-shadow inset 0 0 0 3px white
-
-            background-color blue
-
-
-    dl dl
-        margin-left 1em
-
-    .cancel
-        float right
-
-    .avatar
-        font-size 32px
-        avatar    128px
-        spaced()
+            input:checked + img
+                border 5px solid blue

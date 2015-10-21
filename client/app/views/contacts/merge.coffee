@@ -11,8 +11,7 @@ module.exports = class MergeView extends Mn.ItemView
     attributes:
         role: 'alertdialog'
 
-    behaviors: ->
-        Navigator: {}
+    behaviors:
         Dialog:    {}
         Form:      {}
 
@@ -36,6 +35,10 @@ module.exports = class MergeView extends Mn.ItemView
         return model: @model.toJSON()
 
 
+    onDomRefresh: ->
+        _.defer => @$el.attr('aria-busy', true)
+
+
     onFormSubmit: ->
         @model.merge()
         # Close directly here, to give reactivity feeling.
@@ -45,7 +48,6 @@ module.exports = class MergeView extends Mn.ItemView
     onCancel: ->
         # Trigger merge procedure ended, with 'abort' error.
         @model.trigger 'contacts:merge', @model, "abort"
-        @onClose()
 
 
     onClose: ->

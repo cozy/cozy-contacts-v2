@@ -3,11 +3,13 @@ extends /lib/views/templates/base/dialog.jade
 block content
     h1= t('duplicates title')
 
-    button(type="submit").mergeall
-        .fa.fa-code-fork
-        span= t('duplicates actions mergeall')
-        |  (
-        span.mergeallcount= size
-        | )
+    if size > 0
+        button(type="submit").mergeall
+            .fa.fa-code-fork
+            span= t('duplicates actions mergeall')
+            |  (#{size})
 
-    div(role="grid")
+        div(role="grid")
+
+    else
+        p.empty= t("duplicates empty")

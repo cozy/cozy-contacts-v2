@@ -7,6 +7,7 @@
 
 
     [role=grid]
+    .empty
         flex 1 0 100%
         top-spaced 1em
 
@@ -19,11 +20,14 @@
 
 
     [role=rowgroup]
+    .merged
         border 1px solid grey-02
 
         &:not(:last-child)
             bottom-spaced (20px)
 
+
+    [role=rowgroup]
         li[role=presentation]:last-child [role=row]
             border none
 
