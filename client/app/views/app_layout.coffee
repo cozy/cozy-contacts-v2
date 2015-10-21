@@ -9,12 +9,13 @@ ContactModel = require 'models/contact'
 
 ContactViewModel = require 'views/models/contact'
 
-DrawerLayout = require 'views/drawer_layout'
-SearchView   = require 'views/tools/search'
-ContactsView = require 'views/contacts'
-CardView     = require 'views/contacts/card'
-DuplicatesView = require 'views/duplicates'
-SettingsView = require 'views/settings'
+DefaultActionsTool = require 'views/tools/default_actions'
+LabelsFiltersTool  = require 'views/labels'
+SearchView         = require 'views/tools/search'
+ContactsView       = require 'views/contacts'
+CardView           = require 'views/contacts/card'
+DuplicatesView     = require 'views/duplicates'
+SettingsView       = require 'views/settings'
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -24,14 +25,20 @@ module.exports = class AppLayout extends Mn.LayoutView
     el: '[role=application]'
 
     behaviors:
+        Navigator: {}
         Keyboard:
             keymaps:
                 '33': 'key:pageup'
                 '34': 'key:pagedown'
 
+    ui:
+        navigate: 'aside [role=button]'
+
+
     regions:
+        actions: 'aside .tool-actions'
+        labels:  'aside .tool-labels'
         content: 'main [role=contentinfo]'
-        drawer:  'aside'
         toolbar: 'main [role=toolbar]'
         dialogs:
             selector: '.dialogs'
@@ -53,14 +60,21 @@ module.exports = class AppLayout extends Mn.LayoutView
         @listenToOnce app.contacts, 'sync', ->
             @showContactsList()
             @disableBusyState()
+        @listenToOnce app.tags, 'sync', ->
+            @showFilters()
 
 
     onRender: ->
-        @showChildView 'drawer', new DrawerLayout()
         @showChildView 'toolbar', new SearchView()
+        @showChildView 'actions', new DefaultActionsTool()
+
 
     disableBusyState: ->
         @$el.attr 'aria-busy', false
+
+
+    showFilters: ->
+        @showChildView 'labels', new LabelsFiltersTool model: @model
 
 
     showContactsList: ->

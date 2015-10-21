@@ -11,7 +11,7 @@ module.exports = class Contacts extends Mn.CompositeView
     template: ->
 
     attributes:
-        role: 'list'
+        role: 'grid'
         tabindex: 0
 
 

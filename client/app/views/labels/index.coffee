@@ -5,7 +5,7 @@ PATTERN = /`tag:([\w\s]+)`/i
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
-    template: require 'views/templates/labels/filters'
+    template: require 'views/templates/labels'
 
     tagName: 'fieldset'
 

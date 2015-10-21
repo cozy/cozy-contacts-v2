@@ -1,119 +1,38 @@
-[role=list]
-    .empty
-        hide()
+[role=grid]
 
     .search
         background-color blue + 80%
         color black
 
     [role=columnheader]
-        padding-left 1.5em
-
         background-color grey-01
-
         font-size      14px
         font-weight    bold
         text-transform uppercase
 
+    [role=row]:last-child
+        border none
 
-    [role=rowgroup]
-        padding 0 1em
 
+.counter
+    margin-top 1.5em
+    padding    0 1em .5em
 
-    [role=listitem]
-        display flex
+    text-align  left
+    line-height 1em
+    color       grey-05
+
+    &:not(.important)
+        display     flex
+        margin-top  em(8px)
         align-items center
-        padding .3em 0
+        font-style  italic
+        font-size   em(13px)
+        color       grey-04
 
-        text-decoration none
-
-        &:not(:last-child)
-            border-bottom 1px solid grey-02
-
-        > a
-            color           grey-08
-            text-decoration none
-
-        > dl
-            color grey-05
-
-        > label
-            @media (max-width: (360/16)rem)
-                display none
-
-        // TODO : may a remove this ?
-        //[type=checkbox]
-        //    hide()
-
-
-    [role=gridcell]
-        flex 3
-        margin 0 .5em
-
-        &.name
-            flex 4
-            display flex
-            align-items center
-
-            color grey-08
-
-            @media (max-width: (360/16)rem)
-                margin-left 0
-
-        .initials
-            flex-shrink 0
-
-            background-color grey-03 // TO DO: remove it
-            border-radius    50%
-
-            color white
-
-        .avatar
-            avatar(40px)
-
-
-    .fa-caret-down
-        margin 0 .3em
-
-
-    [aria-haspopup]
-        dt .type
-            hide()
-
-        dd
-            li
-                display     flex
-                align-items center
-                padding     .25em 1em
-
-            i
-                font-size  .8em
-                font-style normal
-                color      grey-05
-
-            span
-                flex 1
-
-
-    .counter
-        margin-top 1.5em
-        padding    0 1em .5em
-
-        text-align  left
-        line-height 1em
-        color       grey-05
-
-        &:not(.important)
-            display     flex
-            margin-top  em(8px)
-            align-items center
-            font-style  italic
-            font-size   em(13px)
-            color       grey-04
-
-            &::before
-            &::after
-                content ''
-                flex 1
-                margin 0 1em
-                border-top 1px solid grey-01
+        &::before
+        &::after
+            content ''
+            flex 1
+            margin 0 1em
+            border-top 1px solid grey-01

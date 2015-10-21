@@ -7,6 +7,9 @@ module.exports = class Group extends Mn.CompositeView
 
     tagName: 'dl'
 
+    attributes:
+        role: 'rowgroup'
+
     className: ->
         return 'empty' if @model.get 'isEmpty'
 

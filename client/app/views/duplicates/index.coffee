@@ -16,21 +16,22 @@ module.exports = class DuplicatesView extends Mn.CompositeView
     attributes:
         role: 'dialog'
 
-    childViewContainer: 'ul'
 
-    childView: require 'views/mergerow'
+    childViewContainer: '[role=grid]'
 
-    emptyView: Backbone.Marionette.ItemView.extend
-        template: "<p>#{t('duplicates empty')}</p>"
+    childView: require 'views/duplicates/row'
 
     templateHelpers: ->
-        return size: @toMerge.size()
+        size: @toMerge.size()
 
-    behaviors: ->
-        Dialog:    {}
+
+    behaviors:
+        Dialog: {}
 
     ui:
         'mergeAll': '.mergeall'
+
+
     events:
         'click @ui.mergeAll': 'mergeAll'
 
@@ -47,6 +48,11 @@ module.exports = class DuplicatesView extends Mn.CompositeView
 
         @listenTo @toMerge, 'all', =>
             @$('.mergeallcount').text @toMerge.size()
+
+
+    # TODO: NO TEMPLATING IN VIEWS
+    emptyView: Backbone.Marionette.ItemView.extend
+        template: "<p>#{t('duplicates empty')}</p>"
 
 
     mergeAll: ->

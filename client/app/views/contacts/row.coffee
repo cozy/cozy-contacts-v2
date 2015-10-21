@@ -5,7 +5,7 @@ module.exports = class ContactRow extends Mn.ItemView
     tagName: 'li'
 
     attributes:
-        role: 'listitem'
+        role: 'row'
 
 
     modelEvents:

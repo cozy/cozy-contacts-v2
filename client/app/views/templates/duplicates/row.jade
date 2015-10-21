@@ -1,7 +1,9 @@
-include contacts/helpers.jade
+include /views/templates/contacts/helpers.jade
+
 
 mixin fullname(contact)
     p!= contact.toString({pre: '<b>', post: '</b>'})
+
 
 mixin formatDatapoints(points, prefix)
     if points != null && points.length
@@ -33,7 +35,7 @@ if result
             +contactrow(result)
 
 else
-    dt
+    dt(role="columnheader")
         +fullname(candidates[0])
         .btn-group
             button.cancel.outline.secondary()
@@ -42,15 +44,14 @@ else
                 .fa.fa-code-fork
                 span= t('mergerow actions merge')
 
-    dd
-        ul(role='list')
-            for contact, index in candidates
-                    li(role='listitem')
-                        label
-                            input(type='checkbox',
-                                name="mergecontact-#{index}",
-                                value="#{index}",
-                                checked=selected[index])
+    dd: ul
+        each contact, index in candidates
+            li(role="presentation")
+                label(for=contact.cid, role="row")
+                    input(type='checkbox',
+                          id=contact.cid
+                          name="mergecontact-#{index}",
+                          value="#{index}",
+                          checked=selected[index])
 
-                            .ui-contactrow
-                                +contactrow(contact)
+                    +contactrow(contact)

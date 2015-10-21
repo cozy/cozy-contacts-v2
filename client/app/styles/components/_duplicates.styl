@@ -1,18 +1,14 @@
 .duplicates
-
-    @extend $dialog
-
     [role=contentinfo]
         flex-wrap wrap
+        align-items baseline
 
         padding 30px
-        border-radius 4px
 
-        background-color white
 
-        > ul
-            flex 1 0 100%
-            top-spaced 1em
+    [role=grid]
+        flex 1 0 100%
+        top-spaced 1em
 
 
     h1
@@ -22,49 +18,28 @@
         font-size 20px
 
 
-    [role=mergegroup]
-        horizontally-padded em(16px)
-        border 1px solid #DDE6EF
+    [role=rowgroup]
+        border 1px solid grey-02
 
         &:not(:last-child)
             bottom-spaced (20px)
 
-        > dt
-            display flex
-            align-items center
-            justify-content space-between
-            vertically-padded em(10px)
+        li[role=presentation]:last-child [role=row]
+            border none
 
-            border-bottom 1px solid #DDE6EF
 
-    [role=listitem]
-        [type=checkbox]
-            right-spaced em(10px)
-
-        label
-            display flex
-            align-items center
-            width 100%
-
-    .btn-group button:not(:last-child)
-        right-spaced em(4px)
-
-    .ui-contactrow
-        flex 1
+    [role=columnheader]
         display flex
         align-items center
-        padding .3em 0
-        width 100%
+        justify-content space-between
+        padded 10px 1em
 
-        text-decoration none
+        border-bottom 1px solid grey-02
 
-        > a
-            color           grey-08
-            text-decoration none
+        button:not(:last-child)
+            right-spaced em(4px)
 
-        > dl
-            color grey-05
 
-        > label
-            @media (max-width: (360/16)rem)
-                display none
+    [role=row]
+        [type=checkbox]
+            right-spaced em(10px)

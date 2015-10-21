@@ -39,17 +39,12 @@
     .avatar
         font-size 32px
         avatar    128px
-        spaced()
-
-
-    .initials
-        background-color grey-02
-        color            white
+        spaced    1em
 
 
     .data
         flex    1
-        padded 30px, 10px
+        padded 30px 10px
 
         .block
             reset()
@@ -84,47 +79,47 @@
 
     // tags select dropdown
     .tags
-
-        [aria-haspopup=true]
+        [aria-haspopup]
             dd
                 white-space nowrap
 
+            legend
+                horizontally-padded 16px
+
+            ul
+                vertically-spaced 8px
+                max-height 30vh
+                overflow-x hidden
+                overflow-y auto
+
             li
-                margin 0
+                vertically-spaced   8px
+                horizontally-padded 16px
 
-        button
-            width auto
-            min-width 100%
+            label
+                display     flex
+                align-items center
 
-        ul label
-            display flex
-            align-items center
-            cursor pointer
-            horizontally-padded em(16px)
-            vertically-padded em(8px)
+                cursor pointer
 
-            &:hover
-                background-color grey-01
+                span
+                    flex 1
+                    left-padded 0.5em
 
-            span
-                flex 1
-                left-padded 0.5em
+            .create
 
-        .create
-            order 1
-            horizontally-spaced em(8px)
-            // ul comes on top of the create button for no reason
-            top-spaced em(2px)
+                horizontally-spaced em(8px)
 
-            &[aria-expanded=false] [for=tag-new]
-            &[aria-expanded=true] button
-                hide()
+                &[aria-expanded=false] [for=tag-new]
+                &[aria-expanded=true] button
+                    hide()
 
-            input
-                padding em(7px)
-                width 100%
-                box-sizing border-box
-                border-radius 3px
+                input
+                button
+                    width         100%
+                    box-sizing    border-box
+                    padded        7px
+                    border-radius 4px
 
 
     // edition mode

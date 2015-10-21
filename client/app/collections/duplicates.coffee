@@ -7,7 +7,8 @@ module.exports = class Duplicates extends Backbone.Collection
 
     model: require 'views/models/merge'
 
-    url: null # Local collection.
+    # Local collection
+    url: null
 
     # Initialize the collection with duplicates fund in the sepcified contacts
     # collection.

@@ -1,4 +1,4 @@
-extends ../../lib/views/templates/base/dialog.jade
+extends /lib/views/templates/base/dialog.jade
 
 block content
     h1= t('duplicates title')
@@ -10,5 +10,4 @@ block content
         span.mergeallcount= size
         | )
 
-    ul
-
+    div(role="grid")
