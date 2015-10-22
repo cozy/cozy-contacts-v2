@@ -12,8 +12,9 @@ TagsRouter     = require 'routes/tags'
 module.exports = class Router extends Backbone.Router
 
     routes:
-        'settings': 'settings'
-        '':         'index'
+        'settings':      'settings'
+        'contact/:slug': 'legacyContactRedirect'
+        '':              'index'
 
 
     initialize: ->
@@ -43,3 +44,7 @@ module.exports = class Router extends Backbone.Router
     settings: ->
         app = require 'application'
         app.model.set 'dialog', 'settings'
+
+
+    legacyContactRedirect: (slug) ->
+        @navigate "contacts/#{slug}", trigger: true
