@@ -36,19 +36,22 @@ avatar(size)
 
 .card
 .duplicates
+    [role=contentinfo]
+        transition-property transform opacity
+        transition-duration 300ms
+        transition-timing-function ease-out
+        transition-delay 80ms
+
+        @media (max-width: (800/16)rem)
+            flex-direction column
+            height 90vh
+
     &[aria-busy=true] [role=contentinfo]
         transform translateY(30%) scale(0.95)
         transform-origin center bottom
         opacity 0.8
 
         transition-delay none
-
-
-    [role=contentinfo]
-        transition-property transform opacity
-        transition-duration 300ms
-        transition-timing-function ease-out
-        transition-delay 80ms
 
 
 [role=alertdialog]
