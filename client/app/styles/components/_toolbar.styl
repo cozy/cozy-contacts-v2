@@ -1,5 +1,19 @@
 [role=toolbar]
+
+    > div
+        display flex
+
+
+    .drawer-toggle
+        @media (min-width: (1024/basefont)rem)
+            hide()
+
+        i
+            reset()
+
+
     [for=contacts-search]
+        flex 1
         display flex
         align-items center
         position relative

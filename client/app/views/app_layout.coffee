@@ -11,7 +11,7 @@ ContactViewModel = require 'views/models/contact'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 LabelsFiltersTool  = require 'views/labels'
-SearchView         = require 'views/tools/search'
+ToolbarView        = require 'views/tools/toolbar'
 ContactsView       = require 'views/contacts'
 CardView           = require 'views/contacts/card'
 DuplicatesView     = require 'views/duplicates'
@@ -52,7 +52,8 @@ module.exports = class AppLayout extends Mn.LayoutView
         'change:dialog': 'showDialog'
 
     childEvents:
-        'dialog:close': -> @model.set 'dialog', false
+        'drawer:toggle': 'toggleDrawer'
+        'dialog:close':  -> @model.set 'dialog', false
 
 
     initialize: ->
@@ -65,7 +66,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     onRender: ->
-        @showChildView 'toolbar', new SearchView()
+        @showChildView 'toolbar', new ToolbarView()
         @showChildView 'actions', new DefaultActionsTool()
 
 
@@ -103,3 +104,8 @@ module.exports = class AppLayout extends Mn.LayoutView
         app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
 
         new CardView model: modelView
+
+
+    toggleDrawer: ->
+        isVisible = @drawer.$el.attr('aria-expanded') is 'true'
+        @drawer.$el.attr 'aria-expanded', not isVisible
