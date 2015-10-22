@@ -45,11 +45,8 @@ else
     dd: ul
         each contact, index in candidates
             li(role="presentation")
-                label(for=contact.cid, role="row")
-                    input(type='checkbox',
-                          id=contact.cid
-                          name="mergecontact-#{index}",
-                          value="#{index}",
-                          checked=selected[index])
-
+                label(for=contact.cid role="row")
+                    span(data-input="checkbox")
+                        input(type='checkbox' id=contact.cid name="mergecontact-#{index}" value="#{index}" checked=selected[index])
+                        label(for=contact.cid)
                     +contactrow(contact)

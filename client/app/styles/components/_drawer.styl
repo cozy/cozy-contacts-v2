@@ -41,16 +41,18 @@
             font-size      14px
             text-transform uppercase
 
-        label
-            display           flex
-            align-items       center
+        ul
+            padding-right em(20px)
+
+        li
             vertically-spaced .5em
             text-transform    capitalize
 
-        input
-            hide()
+        label
+            right-spaced .5em
 
-        ul
-            // height calc(100vh - 12em)
-            padding-right em(20px)
-            // overflow-y auto
+        a
+            color grey-06
+
+            &[aria-checked=true]
+                color grey-08
