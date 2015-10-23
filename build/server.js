@@ -17,7 +17,7 @@ start = function(host, port, callback) {
     Contact = Contact;
     return Contact.migrateAll(function() {
       var realtime;
-      realtime = Realtimer(server, ['contact.*']);
+      realtime = Realtimer(server, ['contact.*', 'tag.*']);
       return typeof callback === "function" ? callback(null, app, server) : void 0;
     });
   });
