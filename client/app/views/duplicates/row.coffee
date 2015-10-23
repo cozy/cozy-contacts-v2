@@ -3,12 +3,17 @@ ContactViewModel = require 'views/models/contact'
 
 module.exports = class MergeRow extends Mn.ItemView
 
-    template: require 'views/templates/mergerow'
+    template: require 'views/templates/duplicates/row'
 
-    tagName: 'dl'
+    tagName: ->
+        if @model.has 'result' then 'div' else 'dl'
 
-    attributes:
-        role: 'mergegroup'
+    className: ->
+        if @model.has 'result' then 'merged' else ''
+
+    attributes: ->
+        role: if @model.has 'result' then 'row' else 'rowgroup'
+
 
     ui:
         submit:   '[type=submit]'
@@ -16,13 +21,13 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     modelEvents:
-        'change': 'render'
+        'change':         'render'
         'contacts:merge': 'onContactsMerge'
 
     events:
-        'click @ui.submit': 'merge'
+        'click @ui.submit':      'merge'
         'click [type=checkbox]': 'check'
-        'click @ui.dismiss': 'dismiss'
+        'click @ui.dismiss':     'dismiss'
 
 
     serializeData: ->
@@ -32,7 +37,6 @@ module.exports = class MergeRow extends Mn.ItemView
         else
             result = undefined
 
-        console.log @merging
         return _.extend super,
             candidates: @model.get('candidates').map (contact) ->
                 new ContactViewModel { new: false }, { model: contact}
@@ -51,15 +55,18 @@ module.exports = class MergeRow extends Mn.ItemView
     dismiss: ->
         @model.collection.remove @model
 
+
     onContactsMerge: ->
         @merging = false
         @render()
 
+
     merge: ->
+        @triggerMethod 'merge'
         @merging = true
-        @$('button,input').attr 'disabled', 'disabled'
+        @$('button, input').prop 'disabled', true
         # Hack to help firefox to display the spinner.
-        _.defer => @ui.submit.attr 'aria-busy', 'true'
+        _.defer => @ui.submit.attr 'aria-busy', true
 
         mergeOptions = @model.buildMergeOptions()
         if Object.keys(mergeOptions).length is 0

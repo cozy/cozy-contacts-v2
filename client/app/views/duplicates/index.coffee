@@ -16,44 +16,45 @@ module.exports = class DuplicatesView extends Mn.CompositeView
     attributes:
         role: 'dialog'
 
-    childViewContainer: 'ul'
 
-    childView: require 'views/mergerow'
+    childViewContainer: '[role=grid]'
 
-    emptyView: Backbone.Marionette.ItemView.extend
-        template: "<p>#{t('duplicates empty')}</p>"
+    childView: require 'views/duplicates/row'
 
     templateHelpers: ->
-        return size: @toMerge.size()
+        size: @toMerge.size()
 
-    behaviors: ->
-        Dialog:    {}
+
+    behaviors:
+        Dialog: {}
 
     ui:
         'mergeAll': '.mergeall'
+
+
     events:
         'click @ui.mergeAll': 'mergeAll'
+
+    collectionEvents:
+        'contacts:merge': 'render'
 
 
     initialize: ->
         app = require 'application'
 
         # Generate duplicates list.
-        @collection = new Duplicates()
-        @collection.findDuplicates app.contacts
-
+        @collection = new Duplicates null, collection: app.contacts
         @toMerge = new BackboneProjections.Filtered @collection,
             filter: (merge) -> merge.isMergeable()
 
-        @listenTo @toMerge, 'all', =>
-            @$('.mergeallcount').text @toMerge.size()
+        @bindEntityEvents @collection, @getOption 'collectionEvents'
 
 
     mergeAll: ->
         # Block any input during mergeall.
-        @$('button,input').attr 'disabled', 'disabled'
+        @$('button,input').prop 'disabled', true
         # Hack to help firefox to display the spinner.
-        _.defer => @ui.mergeAll.attr 'aria-busy', 'true'
+        _.defer => @ui.mergeAll.attr 'aria-busy', true
 
         async.eachSeries @toMerge.toArray(), (merge, callback) =>
             # After a Mergerow::merge, the merge ViewModel always trigger a
@@ -62,8 +63,6 @@ module.exports = class DuplicatesView extends Mn.CompositeView
             # * when an error occurs in merge (error as second arg)
             # * when the user cancel the merge (abort error as second arg).
             @listenTo merge, 'contacts:merge', (model, err) ->
-                # Let the UI breath.
-                # TODO: replace with a cleaner setImmediate call.
                 _.defer callback, err
 
             @children.findByModel(merge).merge()

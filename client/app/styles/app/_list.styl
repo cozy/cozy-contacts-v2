@@ -1,0 +1,59 @@
+[role=grid]
+    .empty
+        hide()
+
+
+    [role=columnheader]
+        left-padded 1.5em
+
+
+    dd
+        horizontally-padded 1em
+
+
+    [role=row]
+        display flex
+        align-items center
+
+        vertically-padded .3em
+
+        text-decoration none
+        border-bottom 1px solid grey-02
+
+
+    [role=gridcell]
+        flex 3
+        horizontally-spaced .5em
+
+        color grey-05
+
+
+    .name
+        flex 4
+        display flex
+        align-items center
+
+        color grey-08
+        text-decoration none
+
+
+    .avatar
+        avatar(50px)
+
+
+    [aria-haspopup]
+        dt
+            .type
+                hide()
+
+        dd
+            padded .5em 1em
+
+        li
+            display flex
+            align-items center
+            vertically-spaced .25em
+
+        .type
+            font-size .8em
+            color grey-05

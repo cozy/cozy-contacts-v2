@@ -1,4 +1,4 @@
-extends ../../../lib/views/templates/base/dialog.jade
+extends /lib/views/templates/base/dialog.jade
 
 
 block content
@@ -69,9 +69,10 @@ block content
             +radio(model.mergeOptions.bday, "bday")
 
 
-    button(type="submit")
-        .fa.fa-code-fork
-        span= t('merge actions merge')
+    nav: ul.actions
+        li: button(type="submit")
+            .fa.fa-code-fork
+            span= t('merge actions merge')
 
-    button.cancel.outline.secondary()
-        span= t('merge actions cancel')
+        li: button.cancel.outline.secondary()
+            span= t('merge actions cancel')

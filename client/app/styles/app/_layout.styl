@@ -1,13 +1,16 @@
-*
-    box-sizing border-box
-
 avatar(size)
     @extend $content-center
 
     width         em(size)
     height        em(size)
+    flex-shrink 0
+
     right-spaced  .5em
     border-radius 50%
+
+    &.initials
+        background-color grey-03
+        color white
 
 
 [role=application]
@@ -27,35 +30,29 @@ avatar(size)
     dd
         reset()
 
+
 .dialogs [role=dialog]
     @extend $dialog
 
-    [role=contentinfo]
-        display flex
-
-        background-color white
-        border-radius 4px
-
-
-// TODO: move those defs to cozy-ui
-[role=alertdialog]
-    @extend $dialog
-
-    [role=contentinfo]
-        flex-basis em(420px)
-        box-sizing border-box
-        padded 30px
-
-        transform translateY(calc((50vh + 55%) * -1))
-        transition transform 400ms ease-out
-
-        background-color white
-        border em(1px) solid grey-01
-        border-radius em(5px)
-        box-shadow 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)
-
+.card
+.duplicates
     &[aria-busy=true] [role=contentinfo]
-        transform translateY(-50%)
+        transform translateY(30%) scale(0.95)
+        transform-origin center bottom
+        opacity 0.8
+
+        transition-delay none
+
+
+    [role=contentinfo]
+        transition-property transform opacity
+        transition-duration 300ms
+        transition-timing-function ease-out
+        transition-delay 80ms
+
+
+[role=alertdialog]
+    @extend $alertdialog
 
     h2
         top-spaced 0
@@ -63,62 +60,10 @@ avatar(size)
     p
         bottom-spaced em(30px)
 
-    .actions
-        display flex
-        flex-direction row-reverse
-
-        li
-            flex 1
-            margin-right 10px
-
-            &:first-child
-                margin-right 0
-
-        button
-            height 100%
-            width 100%
-
-
 
 [aria-haspopup=true]
-    position relative
+    @extend $dropdown
 
-    > :nth-child(1)
-        cursor: pointer
 
-    > :nth-child(2)
-        z-index 1
-        position absolute
-        padding em(8px) 0
-        min-width 100%
-
-    &[data-position*=top] > :nth-child(2)
-        bottom 100%
-    &[data-position*=bottom] > :nth-child(2)
-        top 100%
-    &[data-position*=left] > :nth-child(2)
-        left 0
-    &[data-position*=right] > :nth-child(2)
-        right 0
-
-    &[aria-expanded=false]
-        > :nth-child(2)
-            hide()
-
-    legend
-        horizontally-padded em(16px)
-        bottom-padded em(8px)
-
-    ul
-        display flex
-        flex-direction column
-        max-height 30vh
-        overflow-y scroll
-
-        button
-        [role=button]
-            display block
-            width auto
-            min-width 100%
-            box-sizing border-box
-            padding    0.25em 1em
+[role=listbox]
+    @extend $selectbox

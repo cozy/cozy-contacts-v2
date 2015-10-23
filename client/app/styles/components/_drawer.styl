@@ -1,5 +1,7 @@
 .drawer
     display flex
+    flex-direction column
+
     vertically-padded .5em
     left-padded 20px
 
@@ -18,24 +20,19 @@
         padding-right 1.25em
 
 
-    .tools
-        flex           1
-        display        flex
-        flex-direction column
+    legend
+    button
+    [role=button]
+        display       block
+        box-sizing    border-box
+        width         100%
 
-        legend
+        text-align left
+
+    li:not(:last-child)
         button
         [role=button]
-            display       block
-            box-sizing    border-box
-            width         100%
-
-            text-align left
-
-        li:not(:last-child)
-            button
-            [role=button]
-                bottom-spaced .5em
+            bottom-spaced .5em
 
 
     .tool-labels

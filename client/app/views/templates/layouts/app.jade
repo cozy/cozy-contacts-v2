@@ -1,4 +1,13 @@
 aside.drawer
+    .tool-actions
+    .tool-labels
+    if mode != 'select'
+        footer.tool-subactions
+            nav: ul
+                li: a.secondary(href="settings", role="button")
+                    .fa.fa-cog
+                    span= t('tools subactions settings')
+
 main
     div(role="toolbar")
     div(role="contentinfo")
