@@ -2,10 +2,18 @@ module.exports = class SearchView extends Mn.ItemView
 
     template: require 'views/templates/tools/search'
 
+    tagName: 'label'
+
+    className: 'empty'
+
+    attributes:
+        for: 'contacts-search'
+
 
     ui:
         'search': 'input'
         'clear': 'button.clear'
+
 
     events: ->
         _updateSearch = _.debounce @updateSearch, 450
@@ -35,4 +43,4 @@ module.exports = class SearchView extends Mn.ItemView
 
 
     toggleUi: (value) ->
-        @$('label').toggleClass 'empty', _.isEmpty value
+        @$el.toggleClass 'empty', _.isEmpty value

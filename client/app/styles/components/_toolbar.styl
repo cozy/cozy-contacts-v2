@@ -1,5 +1,27 @@
 [role=toolbar]
+
+    > div
+        display flex
+
+
+    .drawer-toggle
+        background-color grey-01
+        border-color grey-03
+        border-top 0
+        border-left 0
+        border-radius 0
+        outline none
+        color grey-05
+
+        @media (min-width: (1023/basefont)rem)
+            hide()
+
+        i
+            reset()
+
+
     [for=contacts-search]
+        flex 1
         display flex
         align-items center
         position relative

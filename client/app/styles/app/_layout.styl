@@ -31,24 +31,25 @@ avatar(size)
         reset()
 
 
-.dialogs [role=dialog]
-    @extend $dialog
+.dialogs
+    [role=dialog]
+        @extend $dialog
 
-.card
-.duplicates
-    &[aria-busy=true] [role=contentinfo]
-        transform translateY(30%) scale(0.95)
-        transform-origin center bottom
-        opacity 0.8
+    .card
+    .duplicates
+        [role=contentinfo]
+            transition-property transform opacity
+            transition-duration 300ms
+            transition-timing-function ease-out
+            transition-delay 80ms
 
-        transition-delay none
 
+        &[aria-busy=true] [role=contentinfo]
+            transform translateY(30%) scale(0.95)
+            transform-origin center bottom
+            opacity 0.8
 
-    [role=contentinfo]
-        transition-property transform opacity
-        transition-duration 300ms
-        transition-timing-function ease-out
-        transition-delay 80ms
+            transition-delay none
 
 
 [role=alertdialog]
