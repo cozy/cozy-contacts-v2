@@ -107,5 +107,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     toggleDrawer: ->
-        isVisible = @drawer.$el.attr('aria-expanded') is 'true'
-        @drawer.$el.attr 'aria-expanded', not isVisible
+        $drawer = @$ 'aside.drawer'
+        isVisible = $drawer.attr('aria-expanded') is 'true'
+        $drawer.attr 'aria-expanded', not isVisible

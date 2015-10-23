@@ -16,29 +16,6 @@ avatar(size)
 [role=application]
     @extend $app-2panes-toolbar
 
-    // TODO: Export drawer toggling into Cozy-Ui
-    @media (max-width: (1023/basefont)rem)
-        toggle-width = em(44px)
-
-        .drawer
-            z-index       1
-            position      absolute
-            top           0
-            left          0
-            width         100vw
-            height        100vh
-            padding-right toggle-width
-
-            &[aria-expanded=true] + main
-                transform translateX("calc(100vw - %s)" % toggle-width)
-
-        main
-            z-index    2
-            position   relative
-            transform  translateX(0)
-            transition transform 350ms ease-out
-
-
     &[aria-busy=true]::before
         position fixed
         top 10vh
@@ -54,27 +31,25 @@ avatar(size)
         reset()
 
 
-.dialogs [role=dialog]
-    @extend $dialog
+.dialogs
+    [role=dialog]
+        @extend $dialog
 
-.card
-.duplicates
-    [role=contentinfo]
-        transition-property transform opacity
-        transition-duration 300ms
-        transition-timing-function ease-out
-        transition-delay 80ms
+    .card
+    .duplicates
+        [role=contentinfo]
+            transition-property transform opacity
+            transition-duration 300ms
+            transition-timing-function ease-out
+            transition-delay 80ms
 
-        @media (max-width: (800/16)rem)
-            flex-direction column
-            height 90vh
 
-    &[aria-busy=true] [role=contentinfo]
-        transform translateY(30%) scale(0.95)
-        transform-origin center bottom
-        opacity 0.8
+        &[aria-busy=true] [role=contentinfo]
+            transform translateY(30%) scale(0.95)
+            transform-origin center bottom
+            opacity 0.8
 
-        transition-delay none
+            transition-delay none
 
 
 [role=alertdialog]
