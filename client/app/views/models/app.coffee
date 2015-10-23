@@ -1,15 +1,41 @@
 module.exports = class AppViewModel extends Backbone.ViewModel
 
-    defaults: ->
-        selected: []
-        dialog:   false
-        filter:   null
-        errors:    null
+    defaults:
+        dialog: false
+        filter: null
+        errors: null
 
 
     viewEvents:
         'settings:sort':   'updateSortSetting'
         'settings:upload': 'onUploadFile'
+        'select:all':      'selectAll'
+        'select:none':     'unselectAll'
+
+
+    initialize: ->
+        @set 'selected', []
+
+
+    select: (id) ->
+        select = @attributes.selected.slice(0)
+        select.push id
+        @set selected: select
+
+
+    unselect: (id) ->
+        select = _.without @attributes.selected, id
+        @set selected: select
+
+
+    selectAll: ->
+        app = require 'application'
+        select = app.contacts.map (contact) -> contact.id
+        @set selected: select
+
+
+    unselectAll: ->
+        @set selected: []
 
 
     updateSortSetting: (value) ->

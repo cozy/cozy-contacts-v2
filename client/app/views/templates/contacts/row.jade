@@ -16,7 +16,7 @@ mixin formatDatapoints(points, prefix)
         .placeholder(role="gridcell", class=prefix)
 
 span(data-input="checkbox")
-    input(type="checkbox" id=ref name="bulk" value=id)
+    input(type="checkbox" id=ref name="bulk" value=id checked=selected)
     label(for=ref)
 
 a.name(role="gridcell", href="contacts/#{_id}")

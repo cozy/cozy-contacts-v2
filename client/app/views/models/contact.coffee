@@ -34,11 +34,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     initialize: ->
-        @onReset()
-        @_initializeDatapoints()
+        @_setRef()
 
-
-    _initializeDatapoints: ->
         @getDatapoints = _.memoize @getDatapoints, (key) ->
             if @attributes.edit then "edit-#{key}" else key
 
@@ -102,6 +99,10 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         return attrs
 
 
+    _setRef: ->
+        @set 'ref', @model.cid
+
+
     onAddField: (type) ->
         @set type, '' if type in CONFIG.xtras
 
@@ -154,5 +155,4 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         require('application').contacts.add @model if @get 'new'
 
 
-    onReset: ->
-        @set 'ref', @model.cid
+    onReset: -> @_setRef()

@@ -255,9 +255,8 @@ do (factory = (root, Backbone) ->
 
             unless options.reset
                 for attr, value of attrs
-                    if value and
-                    typeof value is 'object' and
-                    typeof @attributes[attr] is 'object'
+                    toExt = value and _.isObject(value) and not _.isArray(value)
+                    if  toExt and _.isObject(@attributes[attr])
                         attrs[attr] = _.extend {}, @attributes[attr], value
 
             super(attrs, options)

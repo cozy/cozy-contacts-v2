@@ -6,7 +6,7 @@ CharIndex = require 'collections/charindex'
 t = require 'lib/i18n'
 
 
-module.exports = class Contacts extends Mn.CompositeView
+module.exports = class Contacts extends Mn.CollectionView
 
     template: ->
 
@@ -29,16 +29,18 @@ module.exports = class Contacts extends Mn.CompositeView
         Dropdown:  {}
 
 
+    events:
+        'change [type=checkbox]': 'updateBulkSelection'
+
+
     initialize: ->
-        app     = require 'application'
+        app      = require 'application'
+        initials = '#abcdefghijklmnopqrstuvwxyz'
+
+        @collection = new Backbone.Collection()
+
         @search = new Search app.contacts
         @search.on 'reset update', @updateCounterLabel
-        @_buildFilteredCollections()
-
-
-    _buildFilteredCollections: ->
-        initials    = '#abcdefghijklmnopqrstuvwxyz'
-        @collection = new Backbone.Collection()
 
         for char in initials
             do (char) =>
@@ -79,3 +81,11 @@ module.exports = class Contacts extends Mn.CompositeView
         incr = @_parent.$el.scrollTop() + @_parent.$el.innerHeight() * dir
         @_parent.$el.scrollTop incr
         @$el.focus()
+
+
+    updateBulkSelection: (event) ->
+        selected = event.currentTarget.checked
+        id       = event.currentTarget.value
+        method   = if selected then 'contacts:select' else 'contacts:unselect'
+
+        @triggerMethod method, id
