@@ -16,6 +16,11 @@
     "tools contextual export":       "exporter",
     "tools contextual delete":       "supprimer",
 
+    "bulk confirm delete title":     "Supprimer le contact |||| Supprimer les contacts",
+    "bulk confirm delete message":   "Vous allez supprimer un contact. Êtes-vous sûr ? |||| Vous aller supprimer %{smart_count} contacts. Êtes vous sûr ?",
+    "bulk confirm delete ok":        "Supprimer",
+    "bulk confirm delete cancel":    "Conserver",
+
     "settings title":                "configuration",
     "settings in-out title":         "importer / exporter les contacts",
     "settings in-out import action": "importer un fichier vcard",

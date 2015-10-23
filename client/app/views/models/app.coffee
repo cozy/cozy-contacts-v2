@@ -11,6 +11,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         'settings:upload': 'onUploadFile'
         'select:all':      'selectAll'
         'select:none':     'unselectAll'
+        'bulk:delete':     'bulkDelete'
 
 
     initialize: ->
@@ -36,6 +37,15 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     unselectAll: ->
         @set selected: []
+
+
+    bulkDelete: ->
+        app = require 'application'
+
+        _.each @attributes.selected, (id) =>
+            _.defer => app.contacts.get(id).destroy
+                wait: true
+                success: => @unselect id
 
 
     updateSortSetting: (value) ->

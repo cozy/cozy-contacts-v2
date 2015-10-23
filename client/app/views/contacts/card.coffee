@@ -25,7 +25,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
-        Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg()
+        Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg
 
 
     ui:
@@ -63,8 +63,8 @@ module.exports = class ContactCardView extends Mn.LayoutView
         _.extend {}, super, lists: CONFIG.datapoints.types
 
 
-    _deleteModalCfg: ->
-        opts = name: @options.model.get 'fn'
+    _deleteModalCfg: =>
+        opts = name: @model.get 'fn'
 
         return cfg =
             event:      'delete'

@@ -5,14 +5,19 @@ module.exports = class DefaultActionsView extends Mn.ItemView
     tagName: 'fieldset'
 
 
+    behaviors: ->
+        Confirm: triggers: 'click @ui.delete': @_deleteModalCfg
+
+
     ui:
-        selectAll:  '[formaction="select/all"]'
-        selectNone: '[formaction="select/none"]'
+        select:     '[formaction="select/all"]'
+        unselect:   '[formaction="select/none"]'
+        delete:     '[formaction="contacts/delete"]'
 
 
     triggers:
-        'click @ui.selectAll':  'select:all'
-        'click @ui.selectNone': 'select:none'
+        'click @ui.select':   'select:all'
+        'click @ui.unselect': 'select:none'
 
     modelEvents:
         'change:selected': (nil, selected) -> @render() if selected.length
@@ -20,3 +25,13 @@ module.exports = class DefaultActionsView extends Mn.ItemView
 
     initialize: ->
         Mn.bindEntityEvents @model, @, @model.viewEvents
+
+
+    _deleteModalCfg: =>
+        opts = smart_count: @model.get('selected').length
+        return cfg =
+            event:      'bulk:delete'
+            title:      t 'bulk confirm delete title', opts
+            message:    t 'bulk confirm delete message', opts
+            btn_ok:     t 'bulk confirm delete ok'
+            btn_cancel: t 'bulk confirm delete cancel'

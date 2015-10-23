@@ -16,6 +16,10 @@
     "tools contextual export":       "export",
     "tools contextual delete":       "delete",
 
+    "bulk confirm delete title":     "Delete contact |||| Delete contacts",
+    "bulk confirm delete message":   "You'll delete a contact. Are you sure? |||| You'll delete %{smart_count} contacts. Are you sure?",
+    "bulk confirm delete ok":        "delete",
+    "bulk confirm delete cancel":    "keep 'em safe",
 
     "settings title":                "settings",
     "settings in-out title":         "import/export contacts",

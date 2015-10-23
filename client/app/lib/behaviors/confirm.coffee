@@ -25,12 +25,17 @@ module.exports = class Confirm extends Mn.Behavior
     _buildTriggers: ->
         view = @view
 
-        _.reduce @options.triggers, (memo, value, eventName) ->
-            options = _.defaults {}, value,
-                preventDefault:  true
-                stopPropagation: true
+        _.reduce @options.triggers, (memo, opts, eventName) ->
+            _buildOptions = ->
+                _.defaults {}, (if _.isFunction opts then opts() else opts),
+                    preventDefault:  true
+                    stopPropagation: true
+
+            options = _buildOptions() unless _.isFunction opts
 
             memo[eventName] = (event) ->
+                options = _buildOptions() if _.isFunction opts
+
                 if event
                     if event.preventDefault and options.preventDefault
                         event.preventDefault()
