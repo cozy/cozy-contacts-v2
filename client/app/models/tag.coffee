@@ -1,7 +1,6 @@
 module.exports = class Tag extends Backbone.Model
 
-    idAttribute: '_id'
-
+    urlRoot: 'tags'
 
     parse: (attrs) ->
         attrs.name = attrs.name.toLowerCase()

@@ -1,3 +1,6 @@
+ContactsListener = require 'lib/contacts_listener'
+
+
 comparator = (a, b) ->
     a = a.get('n').split ';'
     b = b.get('n').split ';'
@@ -26,6 +29,8 @@ module.exports = class Contacts extends Backbone.Collection
         @listenTo app.model, 'change:sort', (appViewModel, sort)->
             @comparator.sort = sort
             @sort()
+
+        @listenToOnce @, 'sync', -> (new ContactsListener()).watch @
 
 
     importFromVCF: (vcard) ->

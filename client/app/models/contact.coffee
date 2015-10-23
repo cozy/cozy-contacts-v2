@@ -1,7 +1,5 @@
 module.exports = class Contact extends Backbone.Model
 
-    idAttribute: '_id'
-
     urlRoot: 'contacts'
 
     defaults:
@@ -29,7 +27,6 @@ module.exports = class Contact extends Backbone.Model
 
 
     sync: (method, model, options) ->
-
         avatar = model.get('avatar') or model.get('photo')
         if avatar
             model.unset 'avatar', silent: true
@@ -50,8 +47,8 @@ module.exports = class Contact extends Backbone.Model
         # Handle specific attributes.
         options.attrs = model.toJSON()
 
-        datapoints = model.attributes.datapoints.toJSON()
-        mainUrl = _.findWhere datapoints, {name: 'url'}
+        datapoints = model.attributes.datapoints?.toJSON() or []
+        mainUrl = _.findWhere datapoints, name: 'url'
 
         if mainUrl
             options.attrs.datapoints = _.without datapoints, mainUrl
@@ -86,7 +83,7 @@ module.exports = class Contact extends Backbone.Model
 
 
     toJSON: ->
-        _.extend {}, super, datapoints: @attributes.datapoints.toJSON()
+        _.extend {}, super, datapoints: @attributes.datapoints?.toJSON() or []
 
 
     savePicture: (imgData, attrs, options) ->

@@ -16,9 +16,9 @@ start = (host, port, callback) ->
         Contact = Contact
         Contact.migrateAll ->
 
-            # start contact watch to upadte UI when new contact are added
+            # start contact watch to update UI when new contact are added
             # or modified
-            realtime = Realtimer server, ['contact.*']
+            realtime = Realtimer server, ['contact.*', 'tag.*']
             callback? null, app, server
 
 
