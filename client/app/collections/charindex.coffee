@@ -20,6 +20,6 @@ module.exports = class CharIndex extends Filtered
         super
 
         @stopListening @underlying, 'sort'
-        @listenTo underlying, 'sort', ->
+        @listenTo underlying, 'sort', -> _.defer =>
             options.filter.sort = app.model.get 'sort'
             @reset @underlying.models.filter @options.filter
