@@ -42,6 +42,7 @@
     "card actions cancel":        "cancel",
     "card actions edit":          "edit",
     "card actions delete":        "delete",
+    "card actions export":        "export",
     "card actions add select":    "add field",
     "card actions add birthday":  "birthday",
     "card actions add social":    "social media",

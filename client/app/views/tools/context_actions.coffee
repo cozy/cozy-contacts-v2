@@ -12,12 +12,15 @@ module.exports = class DefaultActionsView extends Mn.ItemView
     ui:
         select:     '[formaction="select/all"]'
         unselect:   '[formaction="select/none"]'
+        merge:      '[formaction="contacts/merge"]'
+        export:     '[formaction="contacts/export"]'
         delete:     '[formaction="contacts/delete"]'
 
 
     triggers:
         'click @ui.select':   'select:all'
         'click @ui.unselect': 'select:none'
+        'click @ui.export':   'bulk:export'
 
     modelEvents:
         'change:selected': (nil, selected) -> @render() if selected.length

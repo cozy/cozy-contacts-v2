@@ -27,6 +27,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
         'form:submit':    -> @save()
+        'export':         'downloadAsVCF'
         'delete':         -> @destroy()
 
 
@@ -156,3 +157,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onReset: -> @_setRef()
+
+
+    downloadAsVCF: ->
+        @model.toVCF (card) =>
+            blob = new Blob [card], type: "text/plain;charset=utf-8"
+            saveAs blob, "#{@model.get 'fn'}.vcf"

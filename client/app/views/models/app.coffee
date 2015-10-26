@@ -12,6 +12,8 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         'select:all':      'selectAll'
         'select:none':     'unselectAll'
         'bulk:delete':     'bulkDelete'
+        'bulk:export':     -> @bulkExport()
+        'contacts:export': -> @bulkExport true
 
 
     initialize: ->
@@ -46,6 +48,22 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             _.defer => app.contacts.get(id).destroy
                 wait: true
                 success: => @unselect id
+
+
+    bulkExport: (all) ->
+        app = require 'application'
+        len = if all then app.contacts.size() else @attributes.selected.length
+        toExport = []
+
+        save = _.after len, ->
+            blob = new Blob toExport, type: "text/plain;charset=utf-8"
+            saveAs blob, "contacts (#{toExport.length}).vcf"
+
+        app.contacts.chain()
+            .filter (contact) => all or (contact.id in @attributes.selected)
+            .invoke 'toVCF', (card) ->
+                toExport.push card
+                save()
 
 
     updateSortSetting: (value) ->

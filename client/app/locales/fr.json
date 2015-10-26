@@ -42,6 +42,7 @@
     "card actions cancel":        "annuler",
     "card actions edit":          "éditer",
     "card actions delete":        "supprimer",
+    "card actions export":        "exporter",
     "card actions add select":    "ajouter un champ",
     "card actions add birthday":  "date de naissance",
     "card actions add social":    "réseau social",

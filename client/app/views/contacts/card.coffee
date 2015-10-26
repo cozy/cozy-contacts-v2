@@ -31,6 +31,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
     ui:
         btnEdit:    '.edit[role=button]'
         btnDelete:  'button.delete'
+        btnExport:  '[formaction="contact/export"]'
         # NavigatorBehavior Ui
         navigate:   '[href^=contacts], [data-next]'
         # FormBehavior Ui
@@ -45,11 +46,13 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'tags':   'aside .tags'
 
 
+    triggers:
+        'click @ui.btnExport': 'export'
+
     modelEvents:
         'change:edit':     'render'
         'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
-
 
     childEvents:
         'form:key:enter': 'onFormKeyEnter'
