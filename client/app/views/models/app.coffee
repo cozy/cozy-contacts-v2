@@ -1,3 +1,7 @@
+MergeView = require 'views/contacts/merge'
+MergeModel = require 'views/models/merge'
+
+
 module.exports = class AppViewModel extends Backbone.ViewModel
 
     defaults:
@@ -13,6 +17,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         'select:none':     'unselectAll'
         'bulk:delete':     'bulkDelete'
         'bulk:export':     -> @bulkExport()
+        'bulk:merge':      'bulkMerge'
         'contacts:export': -> @bulkExport true
 
 
@@ -48,6 +53,22 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             _.defer => app.contacts.get(id).destroy
                 wait: true
                 success: => @unselect id
+
+
+    # TODO: probably need to be revamped when doing it for the whole merge
+    # feature
+    bulkMerge: ->
+        app = require 'application'
+        candidates = app.contacts.filter (contact) =>
+            contact.id in @attributes.selected
+
+        toMerge = new MergeModel { candidates }
+        mergeOptions = toMerge.buildMergeOptions()
+        if Object.keys(mergeOptions).length is 0
+            toMerge.merge()
+        else
+            app.layout.showChildView 'alerts', new MergeView model: toMerge
+
 
 
     bulkExport: (all) ->

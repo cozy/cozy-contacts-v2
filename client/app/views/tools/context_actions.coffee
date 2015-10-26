@@ -21,6 +21,7 @@ module.exports = class DefaultActionsView extends Mn.ItemView
         'click @ui.select':   'select:all'
         'click @ui.unselect': 'select:none'
         'click @ui.export':   'bulk:export'
+        'click @ui.merge':    'bulk:merge'
 
     modelEvents:
         'change:selected': (nil, selected) -> @render() if selected.length
