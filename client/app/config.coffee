@@ -10,3 +10,8 @@ module.exports =
 
     settings:
         sortkeys: ['gn', 'fn']
+
+    search:
+        pattern: (pattern, flags) ->
+            flags = if pattern then 'i' else 'ig'
+            new RegExp "`#{pattern or '\\w+'}:([^`]+)`", flags

@@ -1,3 +1,6 @@
+PATTERN = require('config').search.pattern 'text'
+
+
 module.exports = class ContactRow extends Mn.ItemView
 
     template: require 'views/templates/contacts/row'
@@ -15,7 +18,7 @@ module.exports = class ContactRow extends Mn.ItemView
 
     serializeData: ->
         app        = require 'application'
-        filter     = app.model.get('filter')?.match /`text:([\w\s]+)`/i
+        filter     = app.model.get('filter')?.match PATTERN
         formatOpts =
             pre: '<b>'
             post: '</b>'

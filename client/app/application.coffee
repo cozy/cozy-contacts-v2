@@ -57,7 +57,7 @@ class Application extends Mn.Application
     search: (pattern, string) ->
         filter  = @model.get 'filter'
         input   = "`#{pattern}:#{string}`"
-        pattern = new RegExp "`#{pattern}:([\\w\\s]+)`", 'i'
+        pattern = require('config').search.pattern pattern
         prev    = filter?.match pattern
 
         if string

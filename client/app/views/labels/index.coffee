@@ -1,6 +1,6 @@
 {Filtered}  = BackboneProjections
 
-PATTERN = /`tag:([\w\s]+)`/i
+PATTERN = require('config').search.pattern 'tag'
 
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
