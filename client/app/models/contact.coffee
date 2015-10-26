@@ -1,3 +1,10 @@
+class Datapoint extends Backbone.Model
+    defaults:
+        name: 'other'
+        type: 'other'
+        value: ''
+
+
 module.exports = class Contact extends Backbone.Model
 
     urlRoot: 'contacts'
@@ -16,9 +23,10 @@ module.exports = class Contact extends Backbone.Model
                 type:  'main'
                 value: url
 
-        datapoints = @attributes.datapoints or new Backbone.Collection()
+        # Ensure Datapoints consistency
+        datapoints = @attributes.datapoints or
+            new Backbone.Collection attrs.datapoints or [], model: Datapoint
         datapoints.comparator = 'name'
-        datapoints.set attrs.datapoints if attrs.datapoints
         attrs.datapoints = datapoints
 
         attrs.tags = _.invoke attrs.tags, 'toLowerCase'
