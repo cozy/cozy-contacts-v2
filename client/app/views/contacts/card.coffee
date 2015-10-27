@@ -25,12 +25,13 @@ module.exports = class ContactCardView extends Mn.LayoutView
         Dialog:    {}
         Form:      {}
         Dropdown:  {}
-        Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg()
+        Confirm: triggers: 'click @ui.btnDelete': @_deleteModalCfg
 
 
     ui:
         btnEdit:    '.edit[role=button]'
         btnDelete:  'button.delete'
+        btnExport:  '[formaction="contact/export"]'
         # NavigatorBehavior Ui
         navigate:   '[href^=contacts], [data-next]'
         # FormBehavior Ui
@@ -45,11 +46,13 @@ module.exports = class ContactCardView extends Mn.LayoutView
         'tags':   'aside .tags'
 
 
+    triggers:
+        'click @ui.btnExport': 'export'
+
     modelEvents:
         'change:edit':     'render'
         'save':            'onSave'
         'destroy':         -> @triggerMethod 'dialog:close'
-
 
     childEvents:
         'form:key:enter': 'onFormKeyEnter'
@@ -63,8 +66,8 @@ module.exports = class ContactCardView extends Mn.LayoutView
         _.extend {}, super, lists: CONFIG.datapoints.types
 
 
-    _deleteModalCfg: ->
-        opts = name: @options.model.get 'fn'
+    _deleteModalCfg: =>
+        opts = name: @model.get 'fn'
 
         return cfg =
             event:      'delete'

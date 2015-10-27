@@ -22,8 +22,12 @@ module.exports = class SettingsView extends Mn.ItemView
         sort:     '[name=sort]'
         import:   'button.import'
         upload:   '[type=file]'
+        export:   '[formaction="contacts/export"]'
         feedback: '.feedback'
 
+
+    triggers:
+        'click @ui.export': 'contacts:export'
 
     events:
         'change @ui.sort':   'updateSort'

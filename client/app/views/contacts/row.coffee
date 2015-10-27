@@ -13,6 +13,11 @@ module.exports = class ContactRow extends Mn.ItemView
         'sync':   'render'
 
 
+    initialize: ->
+        app = require 'application'
+        @listenTo app.model, 'change:selected', @refreshChecked
+
+
     serializeData: ->
         app        = require 'application'
         filter     = app.model.get('filter')?.match /`text:([\w\s]+)`/i
@@ -29,4 +34,10 @@ module.exports = class ContactRow extends Mn.ItemView
         else
             fullname = @model.toString formatOpts
 
-        _.extend {}, super(), fullname: fullname
+        _.extend {}, super(),
+            fullname: fullname
+            selected: @model.id in app.model.get 'selected'
+
+
+    refreshChecked: (appViewModel, selected)->
+        @$('[type=checkbox]').prop 'checked', @model.id in selected

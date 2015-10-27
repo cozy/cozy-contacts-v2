@@ -41,10 +41,12 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
     toggleSelected: (model, value) ->
         tag = value?.match(PATTERN)?[1]
-        _id = if tag then @collection.find(name: tag).id else 'all'
+        _ref = if tag then @collection.find(name: tag).id else 'all'
 
-        @$("[aria-checked]:not([for=filter-#{_id}])")
+        @$ "a:not([data-id=#{_ref}])"
         .attr 'aria-checked', false
+        .find('input').prop 'checked', false
 
-        @$("[for=filter-#{_id}]")
+        @$("a[data-id=#{_ref}]")
         .attr 'aria-checked', true
+        .find('input').prop 'checked', true

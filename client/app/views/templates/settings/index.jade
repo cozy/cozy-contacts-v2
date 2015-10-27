@@ -12,7 +12,7 @@ block content
                     i.fa.fa-download
                     = t('settings in-out import action')
             li
-                button.export(disabled)
+                button.export(formaction="contacts/export")
                     i.fa.fa-upload
                     = t('settings in-out export action')
         div.feedback(class=errors? 'error' : '')
