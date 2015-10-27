@@ -1,6 +1,5 @@
 {Filtered}  = BackboneProjections
 
-
 module.exports = class Search extends Filtered
     constructor: (underlying, options = {}) ->
         app     = require 'application'
@@ -16,7 +15,7 @@ module.exports = class Search extends Filtered
 
 
     filter: (model) =>
-        filters = @search?.match /`\w+:[\w\s]+`/gi
+        filters = @search?.match require('config').search.pattern()
         return true unless filters
 
         filters.reduce (memo, filter) ->

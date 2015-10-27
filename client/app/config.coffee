@@ -31,3 +31,9 @@ module.exports =
         '7190AB'
         '51658D'
     ]
+
+    search:
+        pattern: (pattern, flags) ->
+            flags = if pattern then 'i' else 'ig'
+            new RegExp "`#{pattern or '\\w+'}:([^`]+)`", flags
+
