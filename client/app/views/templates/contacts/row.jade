@@ -23,7 +23,8 @@ a.name(role="gridcell", href="contacts/#{_id}")
     if avatar
        img.avatar(src=avatar)
     else
-        span.avatar.initials= initials
+        - var bg = ColorHash.getColor(n, 'cozy')
+        span.avatar.initials(style="background-color:#{bg}")= initials
 
     p!= fullname
 
