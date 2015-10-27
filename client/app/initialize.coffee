@@ -14,6 +14,7 @@ Starts
 Trigger locale initilization and starts application singleton.
 ###
 $ ->
+    ColorHash.addScheme 'cozy', require('config').colorSet
     Mn.Behaviors.behaviorsLookup = require 'lib/behaviors'
     # Temporary use a global variable to store the `t` helpers, waiting for
     # Marionette allow to register global helpers.

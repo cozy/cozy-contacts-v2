@@ -15,5 +15,15 @@ module.exports = class AvatarView extends Mn.ItemView
         'change:avatar':   'render'
 
 
+    getInitialsColor: ->
+        ColorHash.getColor @model.get('n'), 'cozy'
+
+
+    serializeData: ->
+        _.extend {}, super, bg: @getInitialsColor()
+
+
     updateInitials: (model, value) ->
-        @$('.initials').text value
+        @$('.initials')
+            .text value
+            .css 'background-color', @getInitialsColor()

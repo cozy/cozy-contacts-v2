@@ -37,7 +37,7 @@ exports.config =
                     level: 'error'
 
         jade:
-            globals: ['t', 'moment', '_']
+            globals: ['t', 'moment', '_', 'ColorHash']
 
         stylus:
             plugins: [
