@@ -65,6 +65,11 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
         toMerge = new MergeModel { candidates }
         mergeOptions = toMerge.buildMergeOptions()
+
+        toMerge.on 'contacts:merge', =>
+            @unselectAll()
+            @select toMerge.get('result').id
+
         if Object.keys(mergeOptions).length is 0
             toMerge.merge()
         else
