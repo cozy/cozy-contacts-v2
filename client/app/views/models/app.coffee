@@ -23,6 +23,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     initialize: ->
         @set 'selected', []
+        @listenTo @, 'change:filter', @unselectAll
 
 
     select: (id) ->
