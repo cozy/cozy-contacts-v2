@@ -23,7 +23,7 @@ module.exports = class Search extends Filtered
             [pattern, string] = filter.slice(1, -1).split ':'
             pass = switch pattern
                 when 'tag'  then _.contains model.attributes.tags, string
-                when 'text' then model.match string
+                when 'text' then model.match string, fullsearch: true
                 else true
 
             @scores[model.id] = pass.score if pass?.score

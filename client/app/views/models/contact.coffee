@@ -31,7 +31,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'delete':         -> @destroy()
 
 
-    proxy: ['toString', 'match']
+    proxy: ['toString', 'toHighlightedString', 'match']
 
 
     initialize: ->
