@@ -59,6 +59,11 @@
     "card confirm cancel ok":      "Leave",
     "card confirm cancel cancel":  "Stay on Edit Mode",
 
+    "datapoints section tel":   "Phone numbers",
+    "datapoints section email": "Email addresses",
+    "datapoints section adr":   "Postal addresses",
+    "datapoints section xtras": "Additional informations",
+
     "datapoint label name prefix":      "prefix",
     "datapoint label name first":       "first name",
     "datapoint label name middle":      "middle name",

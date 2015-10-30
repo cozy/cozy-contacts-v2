@@ -133,6 +133,14 @@
 
     // edition mode
     .edit
+        legend
+            display       block
+            width         100%
+            top-spaced    16px
+            bottom-padded 8px
+            font-weight   normal
+            border-bottom 1px solid grey-01
+
         input
             background-color transparent
 
@@ -140,6 +148,7 @@
             cursor pointer
 
         .group
+            align-items       stretch
             position          relative
             vertically-spaced 6px
 
@@ -170,7 +179,6 @@
                 margin 0
 
         .type
-            vertically-padded 6px
             right-spaced 2px
 
             &:focus
