@@ -6,11 +6,14 @@ comparator = (a, b) ->
     b = b.get('n').split ';'
 
     index = switch @comparator.sort
-        when 'gn' then 0
-        when 'fn' then 1
-        else           0
+        when 'gn'
+            l = "#{a[0]}#{a[1]}"
+            r = "#{b[0]}#{b[1]}"
+        when 'fn'
+            l = "#{a[1]}#{a[0]}"
+            r = "#{b[1]}#{b[0]}"
 
-    a[index].localeCompare b[index]
+    l.localeCompare r
 
 
 module.exports = class Contacts extends Backbone.Collection
@@ -21,7 +24,7 @@ module.exports = class Contacts extends Backbone.Collection
 
 
     initialize: ->
-        app = require('application')
+        app = require 'application'
 
         @comparator      = comparator
         @comparator.sort = app.model.get 'sort'
