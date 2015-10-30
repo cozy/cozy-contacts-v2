@@ -59,6 +59,11 @@
     "card confirm cancel ok":      "Quitter",
     "card confirm cancel cancel":  "Rester",
 
+    "datapoints section tel":   "Numéros de téléphone",
+    "datapoints section email": "Adresses email",
+    "datapoints section adr":   "Adresses postales",
+    "datapoints section xtras": "Informations complémentaires",
+
     "datapoint label name prefix":      "civilité",
     "datapoint label name first":       "prénom",
     "datapoint label name middle":      "surnom",

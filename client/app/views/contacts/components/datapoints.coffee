@@ -1,12 +1,18 @@
+t = require 'lib/i18n'
+
 ContactDatapointView = require 'views/contacts/components/datapoint'
 
 CONFIG = require('config').contact
 
 
-module.exports = class ContactDatapointsView extends Mn.CollectionView
+module.exports = class ContactDatapointsView extends Mn.CompositeView
 
     tagName: ->
         if @options.cardViewModel.get 'edit' then 'fieldset' else 'ul'
+
+    template: (data) ->
+        name = t "datapoints section #{data.name}"
+        "<legend>#{name}</legend>" if data.edit
 
 
     behaviors:
@@ -28,6 +34,11 @@ module.exports = class ContactDatapointsView extends Mn.CollectionView
 
     initialize: ->
         @_initializeEditMode() if @options.cardViewModel.get 'edit'
+
+
+    serializeData: ->
+        name: @options.name
+        edit: @options.cardViewModel.get 'edit'
 
 
     _initializeEditMode: ->
