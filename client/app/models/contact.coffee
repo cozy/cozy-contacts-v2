@@ -81,7 +81,6 @@ module.exports = class Contact extends Backbone.Model
         else undefined
 
         search = fuzzy.match pattern, @toString(format), opts
-
         if search and format
             search.rendered = search.rendered
                 .replace '»', opts.format.pre

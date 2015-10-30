@@ -7,6 +7,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
     defaults:
         dialog: false
         filter: null
+        scored: false
         errors: null
 
 
@@ -23,7 +24,9 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     initialize: ->
         @set 'selected', []
-        @listenTo @, 'change:filter', @unselectAll
+        @listenTo @, 'change:filter', (nil, value)->
+            @unselectAll()
+            @set 'scored', require('config').search.pattern('text').test value
 
 
     select: (id) ->

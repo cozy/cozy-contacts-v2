@@ -33,7 +33,7 @@ module.exports = class ContactRow extends Mn.ItemView
                 pre: '<span class="search">'
                 post: '</span>'
                 format: formatOpts
-            fullname = match.rendered
+            fullname = match?.rendered
         else
             fullname = @model.toString formatOpts
 
