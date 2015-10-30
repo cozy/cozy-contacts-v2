@@ -23,6 +23,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     initialize: ->
         @set 'selected', []
+        @listenTo @, 'change:filter', @unselectAll
 
 
     select: (id) ->
@@ -38,7 +39,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     selectAll: ->
         app = require 'application'
-        select = app.contacts.map (contact) -> contact.id
+        select = app.filtered.map (contact) -> contact.id
         @set selected: select
 
 
@@ -64,6 +65,11 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
         toMerge = new MergeModel { candidates }
         mergeOptions = toMerge.buildMergeOptions()
+
+        toMerge.on 'contacts:merge', =>
+            @unselectAll()
+            @select toMerge.get('result').id
+
         if Object.keys(mergeOptions).length is 0
             toMerge.merge()
         else
