@@ -11,8 +11,10 @@ module.exports = class ContactDatapointsView extends Mn.CompositeView
         if @options.cardViewModel.get 'edit' then 'fieldset' else 'ul'
 
     template: (data) ->
-        name = t "datapoints section #{data.name}"
-        "<legend>#{name}</legend>" if data.edit
+        if data.edit
+            name = t "datapoints section #{data.name}"
+            "<legend>#{name}</legend>"
+        else undefined
 
 
     behaviors:
