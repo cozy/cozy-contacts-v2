@@ -77,8 +77,9 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         toExport = []
 
         save = _.after len, ->
+            date = moment().format('YYYYMMDD')
             blob = new Blob toExport, type: "text/plain;charset=utf-8"
-            saveAs blob, "contacts (#{toExport.length}).vcf"
+            saveAs blob, "#{date}_cozy_contacts_#{toExport.length}.vcf"
 
         app.contacts.chain()
             .filter (contact) => all or (contact.id in @attributes.selected)
