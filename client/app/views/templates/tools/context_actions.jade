@@ -1,16 +1,16 @@
 legend= t('tools contextual selected', {smart_count: selected.length})
 
-nav: ul
+nav.select: ul
     li: button(formaction="select/all")= t('tools contextual select all')
     li: button(formaction="select/none")= t('tools contextual select none')
 
 nav: ul
-    li: button(formaction="contacts/merge")
+    li: button.secondary(formaction="contacts/merge")
         i.fa.fa-code-fork
         = t('tools contextual merge')
-    li: button(formaction="contacts/export")
+    li: button.secondary(formaction="contacts/export")
         i.fa.fa-upload
         = t('tools contextual export')
-    li: button(formaction="contacts/delete")
+    li: button.secondary(formaction="contacts/delete")
         i.fa.fa-trash
         = t('tools contextual delete')
