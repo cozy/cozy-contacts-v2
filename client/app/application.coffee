@@ -11,6 +11,8 @@ ConfigModel = require 'models/config'
 
 ContactsCollection = require 'collections/contacts'
 TagsCollection     = require 'collections/tags'
+Search             = require 'collections/search'
+
 
 AppLayout     = require 'views/app_layout'
 AppViewModel  = require 'views/models/app'
@@ -29,12 +31,13 @@ class Application extends Mn.Application
     ###
     initialize: ->
         # initialize components before loading app
-        @on 'before:start', =>
+        @on 'before:start', ->
             config    = new ConfigModel require('imports').config
             @model    = new AppViewModel null, model: config
 
             @contacts = new ContactsCollection()
             @tags     = new TagsCollection()
+            @filtered = new Search @contacts
 
             @layout   = new AppLayout model: @model
             @router   = new Router()
@@ -44,9 +47,10 @@ class Application extends Mn.Application
             Object.freeze @ if typeof Object.freeze is 'function'
 
         # render components when app starts
-        @on 'start', =>
+        @on 'start', ->
             @contacts.fetch reset: true
             @tags.fetch reset: true
+
             @layout.render()
 
             # prohibit pushState because URIs mapped from cozy-home rely on

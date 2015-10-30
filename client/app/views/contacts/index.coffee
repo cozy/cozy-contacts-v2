@@ -1,6 +1,5 @@
 GroupViewModel = require 'views/models/group'
 
-Search    = require 'collections/search'
 CharIndex = require 'collections/charindex'
 
 t = require 'lib/i18n'
@@ -39,7 +38,7 @@ module.exports = class Contacts extends Mn.CollectionView
 
         @collection = new Backbone.Collection()
 
-        @search = new Search app.contacts
+        @search = app.filtered
         @search.on 'reset update', @updateCounterLabel
 
         for char in initials

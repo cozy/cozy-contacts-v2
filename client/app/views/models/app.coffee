@@ -38,7 +38,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     selectAll: ->
         app = require 'application'
-        select = app.contacts.map (contact) -> contact.id
+        select = app.filtered.map (contact) -> contact.id
         @set selected: select
 
 
