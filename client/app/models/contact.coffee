@@ -74,18 +74,48 @@ module.exports = class Contact extends Backbone.Model
         _.compact(parts).join ' '
 
 
-    match: (pattern, opts = {}) ->
+    toHighlightedString: (pattern, opts= {})->
         format = if opts.format
             pre: '»'
             post: '«'
         else undefined
 
-        search = fuzzy.match pattern, @toString(format), opts
+        name  = @toString format
+        match = fuzzy.match pattern, name, opts if pattern
 
-        if search and format
-            search.rendered = search.rendered
+        res = if match then match.rendered else name
+
+        if format
+            res = res
                 .replace '»', opts.format.pre
                 .replace '«', opts.format.post
+
+        return res
+
+
+    match: (pattern, opts = {}) ->
+        search = false
+        format = if opts.format
+            pre: '»'
+            post: '«'
+        else undefined
+
+        targets = [@toString(format)]
+
+        if opts.fullsearch
+            points = _.compact @attributes.datapoints.map (item) ->
+                item.get 'value' unless item.get('name') is 'adr'
+            targets = targets.concat(points).concat @attributes.tags
+
+        for value, index in targets
+            res = fuzzy.match pattern, value, opts
+            if res
+                search = res
+                if index is 0 and format
+                    search.rendered = res.rendered
+                        .replace '»', opts.format.pre
+                        .replace '«', opts.format.post
+                break
 
         return search
 

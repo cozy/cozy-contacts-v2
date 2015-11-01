@@ -1,23 +1,32 @@
-GroupViewModel = require 'views/models/group'
+{Sorted} = BackboneProjections
+t = require 'lib/i18n'
+
+ContactViewModel = require 'views/models/contact'
+GroupViewModel   = require 'views/models/group'
 
 CharIndex = require 'collections/charindex'
 
-t = require 'lib/i18n'
+
+module.exports = class Contacts extends Mn.CompositeView
+
+    template: (data) ->
+        container = if data.scored then 'ul' else 'div'
+        "<#{container} role=\"grid\" tabindex=\"0\"/><div class=\"counter\"/>"
 
 
-module.exports = class Contacts extends Mn.CollectionView
-
-    template: ->
-
-    attributes:
-        role: 'grid'
-        tabindex: 0
-
-
-    childView: require 'views/contacts/group'
+    getChildView: ->
+        if @options.scored
+            require 'views/contacts/row'
+        else
+            require 'views/contacts/group'
 
     childViewOptions: (model) ->
-        collection: model.compositeCollection
+        if @options.scored
+            model: new ContactViewModel {}, model: model
+        else
+            collection: model.compositeCollection
+
+    childViewContainer: '[role=grid]'
 
 
     ui:
@@ -27,45 +36,34 @@ module.exports = class Contacts extends Mn.CollectionView
         Navigator: {}
         Dropdown:  {}
 
-
     events:
         'change [type=checkbox]': 'updateBulkSelection'
 
 
     initialize: ->
-        app      = require 'application'
-        initials = '#abcdefghijklmnopqrstuvwxyz'
+        app = require 'application'
+        search = app.filtered
 
-        @collection = new Backbone.Collection()
+        if @options.scored
+            @collection = new Sorted search, comparator: (m) ->
+                search.scores[m.id] * -1
 
-        @search = app.filtered
-        @search.on 'reset update', @updateCounterLabel
-
-        for char in initials
-            do (char) =>
-                attributes = name: char
-                collection = new CharIndex @search, char: char
-                @collection.add new GroupViewModel attributes,
-                    compositeCollection: collection
-
-
-    _counterLabel: ->
-        if @search.length
-            t('list counter', {smart_count: @search.length})
-        else if @search.search
-            t('list counter no-search')
         else
-            t('list counter empty')
+            initials   = '#abcdefghijklmnopqrstuvwxyz'
+            @collection = new Backbone.Collection()
 
+            for char in initials
+                do (char) =>
+                    attributes = name: char
+                    charCollection = new CharIndex search, char: char
+                    @collection.add new GroupViewModel attributes,
+                        compositeCollection: charCollection
 
-    updateCounterLabel: =>
-        @$('.counter')
-            .text @_counterLabel()
-            .toggleClass 'important', @search.isEmpty()
+        @listenTo @collection, 'reset', @updateCounter
+
 
     onRenderCollection: ->
-        $('<div/>', class: 'counter').appendTo @$el
-        @updateCounterLabel()
+        @updateCounter()
 
 
     onShow: ->
@@ -73,6 +71,26 @@ module.exports = class Contacts extends Mn.CollectionView
         @listenTo app.layout,
             'key:pageup':   @scroll.bind @, false
             'key:pagedown': @scroll.bind @, true
+
+
+    serializeData: ->
+        scored: @options.scored
+
+
+    updateCounter: ->
+        app  = require 'application'
+        size = app.filtered.size()
+
+        label = if size
+            t('list counter', {smart_count: size})
+        else if app.contacts.size()
+            t('list counter no-search')
+        else
+            t('list counter empty')
+
+        @$('.counter')
+            .text label
+            .toggleClass 'important', app.filtered.isEmpty()
 
 
     scroll: (down) ->

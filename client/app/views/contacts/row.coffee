@@ -28,14 +28,10 @@ module.exports = class ContactRow extends Mn.ItemView
             pre: '<b>'
             post: '</b>'
 
-        if filter
-            match = @model.match filter[1],
-                pre: '<span class="search">'
-                post: '</span>'
-                format: formatOpts
-            fullname = match.rendered
-        else
-            fullname = @model.toString formatOpts
+        fullname = @model.toHighlightedString filter?[1] or null,
+            pre: '<span class="search">'
+            post: '</span>'
+            format: formatOpts
 
         _.extend {}, super(),
             fullname: fullname

@@ -13,7 +13,6 @@ ContactsCollection = require 'collections/contacts'
 TagsCollection     = require 'collections/tags'
 Search             = require 'collections/search'
 
-
 AppLayout     = require 'views/app_layout'
 AppViewModel  = require 'views/models/app'
 IntentManager = require 'lib/intent_manager'

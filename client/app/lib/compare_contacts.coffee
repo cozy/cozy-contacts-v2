@@ -31,7 +31,6 @@ CC.findSimilars = (contacts) ->
         for contact2 in contacts
             if contact2._id not of viewed and
             CC.mayBeSamePerson(contact, contact2)
-                # console.log 'similar !'
                 viewed[contact2._id] = true
                 similar.push contact2
 

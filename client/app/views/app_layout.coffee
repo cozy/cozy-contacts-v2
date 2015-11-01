@@ -67,6 +67,8 @@ module.exports = class AppLayout extends Mn.LayoutView
             @disableBusyState()
         @listenToOnce app.tags, 'sync', ->
             @showFilters()
+        @listenTo @model, 'change:scored', (appViewModel, scored)->
+            @showContactsList scored
 
 
     onRender: ->
@@ -82,8 +84,8 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'labels', new LabelsFiltersTool model: @model
 
 
-    showContactsList: ->
-        @showChildView 'content', new ContactsView()
+    showContactsList: (scored = false)->
+        @showChildView 'content', new ContactsView scored: scored
 
 
     showDialog: (appViewModel, slug) ->
