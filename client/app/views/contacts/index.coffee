@@ -59,7 +59,7 @@ module.exports = class Contacts extends Mn.CompositeView
                     @collection.add new GroupViewModel attributes,
                         compositeCollection: charCollection
 
-        @listenTo @collection, 'reset', @updateCounter
+        @listenTo search, 'reset', @updateCounter
 
 
     onRenderCollection: ->
