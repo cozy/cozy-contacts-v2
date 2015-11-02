@@ -24,7 +24,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     initialize: ->
         @set 'selected', []
-        @listenTo @, 'change:filter', (nil, value)->
+        @listenTo @, 'change:filter', (nil, value) ->
             @unselectAll()
             @set 'scored', require('config').search.pattern('text').test value
 

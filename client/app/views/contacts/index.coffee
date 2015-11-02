@@ -11,7 +11,7 @@ module.exports = class Contacts extends Mn.CompositeView
 
     template: (data) ->
         container = if data.scored then 'ul' else 'div'
-        "<#{container} role=\"grid\" tabindex=\"0\"/><div class=\"counter\"/>"
+        "<#{container} role='grid' tabindex='0'/><div class='counter'/>"
 
 
     getChildView: ->
@@ -45,20 +45,19 @@ module.exports = class Contacts extends Mn.CompositeView
         search = app.filtered
 
         if @options.scored
-            @collection = new Sorted search, comparator: (m) ->
-                search.scores[m.id] * -1
+            @collection = new Sorted search, comparator: (model) ->
+                search.scores[model.id] * -1
             @bindEntityEvents @collection, 'update': 'render'
 
         else
-            initials   = '#abcdefghijklmnopqrstuvwxyz'
-            @collection = new Backbone.Collection()
+            addGroupViewModel = (char) ->
+                attributes = name: char
+                collection = new CharIndex search, char: char
+                new GroupViewModel attributes, compositeCollection: collection
 
-            for char in initials
-                do (char) =>
-                    attributes = name: char
-                    charCollection = new CharIndex search, char: char
-                    @collection.add new GroupViewModel attributes,
-                        compositeCollection: charCollection
+            initials    = '#abcdefghijklmnopqrstuvwxyz'
+            collection  = (addGroupViewModel char for char in initials)
+            @collection = new Backbone.Collection collection
 
         @bindEntityEvents search, 'update reset': 'updateCounter'
 
