@@ -47,6 +47,7 @@ module.exports = class Contacts extends Mn.CompositeView
         if @options.scored
             @collection = new Sorted search, comparator: (m) ->
                 search.scores[m.id] * -1
+            @bindEntityEvents @collection, 'update': 'render'
 
         else
             initials   = '#abcdefghijklmnopqrstuvwxyz'
@@ -59,7 +60,7 @@ module.exports = class Contacts extends Mn.CompositeView
                     @collection.add new GroupViewModel attributes,
                         compositeCollection: charCollection
 
-        @listenTo search, 'reset', @updateCounter
+        @bindEntityEvents search, 'update reset': 'updateCounter'
 
 
     onRenderCollection: ->
