@@ -84,7 +84,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'labels', new LabelsFiltersTool model: @model
 
 
-    showContactsList: (scored = false)->
+    showContactsList: (scored = false) ->
         @showChildView 'content', new ContactsView scored: scored
 
 

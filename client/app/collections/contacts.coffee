@@ -2,18 +2,12 @@ ContactsListener = require 'lib/contacts_listener'
 
 
 comparator = (a, b) ->
-    a = a.get('n').split ';'
-    b = b.get('n').split ';'
+    sort = @comparator.sort
+    [a, b] = [a, b].map (model) ->
+        name = model.get('n').split(';')
+        if sort is 'gn' then "#{name[0]}#{name[1]}" else "#{name[1]}#{name[0]}"
 
-    index = switch @comparator.sort
-        when 'gn'
-            l = "#{a[0]}#{a[1]}"
-            r = "#{b[0]}#{b[1]}"
-        when 'fn'
-            l = "#{a[1]}#{a[0]}"
-            r = "#{b[1]}#{b[0]}"
-
-    l.localeCompare r
+    a.localeCompare b
 
 
 module.exports = class Contacts extends Backbone.Collection
