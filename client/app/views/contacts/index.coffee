@@ -55,7 +55,7 @@ module.exports = class Contacts extends Mn.CompositeView
                 collection = new CharIndex search, char: char
                 new GroupViewModel attributes, compositeCollection: collection
 
-            initials    = '#abcdefghijklmnopqrstuvwxyz'
+            initials    = 'abcdefghijklmnopqrstuvwxyz#'
             collection  = (addGroupViewModel char for char in initials)
             @collection = new Backbone.Collection collection
 
