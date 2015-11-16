@@ -4,6 +4,11 @@ class Datapoint extends Backbone.Model
         type: 'other'
         value: ''
 
+    parse: (attrs) ->
+        if attrs.name is 'adr' and _.isArray attrs.value
+            attrs.value = VCardParser.adrArrayToString attrs.value
+        return attrs
+
 
 module.exports = class Contact extends Backbone.Model
 
@@ -25,7 +30,9 @@ module.exports = class Contact extends Backbone.Model
 
         # Ensure Datapoints consistency
         datapoints = @attributes.datapoints or
-            new Backbone.Collection attrs.datapoints or [], model: Datapoint
+            new Backbone.Collection attrs.datapoints or [],
+                model: Datapoint
+                parse: true
         datapoints.comparator = 'name'
         attrs.datapoints = datapoints
 
@@ -53,15 +60,20 @@ module.exports = class Contact extends Backbone.Model
                     error: options.error
 
         # Handle specific attributes.
-        options.attrs = model.toJSON()
+        attrs = model.toJSON()
 
-        datapoints = model.attributes.datapoints?.toJSON() or []
-        mainUrl = _.findWhere datapoints, name: 'url'
+        datapoints = (model.attributes.datapoints?.toJSON() or [])
+        attrs.datapoints = datapoints.map (point) ->
+            if point.name is 'adr'
+                point.value = VCardParser.adrStringToArray point.value
+            return point
 
+        mainUrl = _.findWhere attrs.datapoints, name: 'url'
         if mainUrl
-            options.attrs.datapoints = _.without datapoints, mainUrl
-            options.attrs.url = mainUrl.value
+            attrs.datapoints = _.without attrs.datapoints, mainUrl
+            attrs.url = mainUrl.value
 
+        options.attrs = attrs
         super
 
 
