@@ -1,5 +1,6 @@
 {Filtered}  = BackboneProjections
-{asciize, alphabet} = require 'lib/diacritics'
+
+alphabet = /[\u0041-\u005A\u0061-\u007A]/g
 
 
 module.exports = class CharIndex extends Filtered
@@ -7,7 +8,7 @@ module.exports = class CharIndex extends Filtered
         app      = require('application')
 
         options.filter = (model) ->
-            n = asciize(model.attributes.n).toLowerCase()
+            n = model.attributes.n.toAscii().toLowerCase()
             if options.filter.sort is 'fn' then [snd, fst, ...] = n.split ';'
             else [fst, snd, ...] = n.split ';'
 

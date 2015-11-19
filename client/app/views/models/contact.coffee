@@ -1,5 +1,4 @@
 Filtered = BackboneProjections.Filtered
-{asciize} = require 'lib/diacritics'
 
 CONFIG = require('config').contact
 
@@ -73,8 +72,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     getMappedInitials: (n) ->
         [gn, fn, ...] = n.split ';'
-        """#{if fn then asciize(fn)[0] else ''}\
-           #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
+        """#{if fn then fn.toAscii()[0] else ''}\
+           #{if gn then gn.toAscii()[0] else ''}""".toUpperCase()
 
 
     getMappedName: (n) ->
