@@ -13,6 +13,9 @@ module.exports = class Contacts extends Mn.CompositeView
         container = if data.scored then 'ul' else 'div'
         "<#{container} role='grid' tabindex='0'/><div class='counter'/>"
 
+    attributes:
+        tabindex: 1
+
 
     getChildView: ->
         if @options.scored
@@ -26,7 +29,7 @@ module.exports = class Contacts extends Mn.CompositeView
         else
             collection: model.compositeCollection
 
-    childViewContainer: '[role=grid]'
+    childViewContainer: '[role="grid"]'
 
 
     ui:
@@ -37,7 +40,7 @@ module.exports = class Contacts extends Mn.CompositeView
         Dropdown:  {}
 
     events:
-        'change [type=checkbox]': 'updateBulkSelection'
+        'change [type="checkbox"]': 'updateBulkSelection'
 
 
     initialize: ->
@@ -62,15 +65,12 @@ module.exports = class Contacts extends Mn.CompositeView
         @bindEntityEvents search, 'update reset': 'updateCounter'
 
 
+    onDomRefresh: ->
+        @$el.trigger 'focus'
+
+
     onRenderCollection: ->
         @updateCounter()
-
-
-    onShow: ->
-        app = require('application')
-        @listenTo app.layout,
-            'key:pageup':   @scroll.bind @, false
-            'key:pagedown': @scroll.bind @, true
 
 
     serializeData: ->
@@ -91,13 +91,6 @@ module.exports = class Contacts extends Mn.CompositeView
         @$('.counter')
             .text label
             .toggleClass 'important', app.filtered.isEmpty()
-
-
-    scroll: (down) ->
-        dir  = if down then 1 else -1
-        incr = @_parent.$el.scrollTop() + @_parent.$el.innerHeight() * dir
-        @_parent.$el.scrollTop incr
-        @$el.focus()
 
 
     updateBulkSelection: (event) ->

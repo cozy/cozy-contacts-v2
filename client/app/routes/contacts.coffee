@@ -21,7 +21,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         app    = require 'application'
         dialog = if app.contacts.get(id) or id is 'new' then id else false
         app.model.set 'dialog', dialog
-        app.trigger 'mode:edit', edit
+        app.vent.trigger 'mode:edit', edit
 
 
     index: ->

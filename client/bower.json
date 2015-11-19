@@ -13,9 +13,7 @@
   ],
   "dependencies": {
     "async": "~1.4.2",
-    "backbone.subroute": "~0.4.6",
     "fuzzy": "~0.1.1",
-    "marionette": "~2.4.2",
     "moment": "~2.10.6",
     "polyglot": "~0.4.3"
   }

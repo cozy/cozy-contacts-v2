@@ -43,10 +43,10 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
         tag = value?.match(PATTERN)?[1]
         _ref = if tag then @collection.find(name: tag).id else 'all'
 
-        @$ "a:not([data-id=#{_ref}])"
+        @$ "a:not([data-id='#{_ref}'])"
         .attr 'aria-checked', false
         .find('input').prop 'checked', false
 
-        @$("a[data-id=#{_ref}]")
+        @$("a[data-id='#{_ref}']")
         .attr 'aria-checked', true
         .find('input').prop 'checked', true

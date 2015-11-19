@@ -30,4 +30,4 @@ module.exports = class ContactXtrasView extends Mn.ItemView
     setFocus: (model) ->
         ref   = @model.get 'ref'
         field = _.keys(model.changed)[0]
-        @$("##{field}-#{ref}").focus()
+        @$("##{field}-#{ref}").trigger 'focus'

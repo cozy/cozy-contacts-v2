@@ -23,7 +23,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     template: require 'views/templates/layouts/app'
 
-    el: '[role=application]'
+    el: '[role="application"]'
 
     behaviors:
         Navigator: {}
@@ -33,14 +33,14 @@ module.exports = class AppLayout extends Mn.LayoutView
                 '34': 'key:pagedown'
 
     ui:
-        navigate: 'aside [role=button]'
+        navigate: 'aside [role="button"]'
 
 
     regions:
         actions: 'aside .tool-actions'
         labels:  'aside .tool-labels'
-        content: 'main [role=contentinfo]'
-        toolbar: 'main [role=toolbar]'
+        content: 'main [role="contentinfo"]'
+        toolbar: 'main [role="toolbar"]'
         dialogs:
             selector: '.dialogs'
             regionClass: require 'lib/regions/dialogs'
@@ -50,7 +50,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     modelEvents:
-        'change:dialog': 'showDialog'
+        'change:dialog':   'showDialog'
         'change:selected': 'swapContextualMenu'
 
     childEvents:
@@ -76,6 +76,16 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'actions', new DefaultActionsTool()
 
 
+    onKeyPageup: ->
+        el = @content.el
+        el.scrollTop -= el.offsetHeight
+
+
+    onKeyPagedown: ->
+        el = @content.el
+        el.scrollTop += el.offsetHeight
+
+
     disableBusyState: ->
         @$el.attr 'aria-busy', false
 
@@ -91,7 +101,6 @@ module.exports = class AppLayout extends Mn.LayoutView
     showDialog: (appViewModel, slug) ->
         unless slug
             @dialogs.empty()
-            @content.currentView.$el.focus()
         else
             dialogView = switch slug
                 when 'settings'   then new SettingsView model: @model
@@ -107,7 +116,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         else app.contacts.get id
 
         modelView = new ContactViewModel {new: id is 'new'}, model: model
-        app.on 'mode:edit', (edit) -> modelView.set 'edit', edit
+        modelView.listenTo app.vent, 'mode:edit', (edit) -> @set 'edit', edit
 
         new CardView model: modelView
 

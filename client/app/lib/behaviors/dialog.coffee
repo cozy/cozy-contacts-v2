@@ -6,8 +6,8 @@ module.exports = class Dialog extends Mn.Behavior
                 '27': 'key:escape'
 
     ui:
-        backdrop: '[role=separator]'
-        content:  '[role=contentinfo]'
+        backdrop: '[role="separator"]'
+        content:  '[role="contentinfo"]'
 
     triggers:
         'click @ui.backdrop': 'click:backdrop'
@@ -29,7 +29,7 @@ module.exports = class Dialog extends Mn.Behavior
         # Chrome consider pageX and pageY = 0 when clicking on components such
         # <select>. So we perform the outside test only if pageX and pageY > 0.
         return unless event.pageX or event.pageY
-        
+
         box = @ui.content[0].getBoundingClientRect()
         inW = event.pageX < box.left or event.pageX > box.right
         inH = event.pageY < box.top or event.pageY > box.bottom

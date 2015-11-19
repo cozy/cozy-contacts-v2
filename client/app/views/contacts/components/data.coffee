@@ -38,13 +38,13 @@ module.exports = class DataView extends Mn.LayoutView
     _renderDatapoints: ->
         @$('.datapoints').each (index, el) =>
             name = el.dataset.type
-            @addRegion name, "[data-type=#{name}]"
+            @addRegion name, "[data-type='#{name}']"
             @showChildView name, new DatapointsView
                 collection:    @model.getDatapoints(name)
                 name:          name
                 cardViewModel: @model
 
-        @addRegion 'xtras-infos', '[data-type=xtras-infos]'
+        @addRegion 'xtras-infos', '[data-type="xtras-infos"]'
         @showChildView 'xtras-infos', new XtrasView model: @model
 
 
@@ -57,9 +57,10 @@ module.exports = class DataView extends Mn.LayoutView
         @_renderDatapoints()
         @_renderEditActions() if @model.get 'edit'
 
+
     onDomRefresh: ->
         return unless @model.get('edit')
-        @$(':input:not(button):not([type=hidden])').eq(1).focus()
+        @$('input:not([type="hidden"])').eq(1).trigger 'focus'
 
 
     onFormFieldAdd: (type) ->

@@ -22,7 +22,7 @@ module.exports = class ContactDatapointsView extends Mn.CompositeView
 
     ui: ->
         ui =
-            formInputs: ':input:not(button)'
+            formInputs: 'input, textarea'
             formDelete: 'button.delete'
         ui.formAutoAdd = '.value' unless @options.name is 'xtras'
         return ui
@@ -54,7 +54,7 @@ module.exports = class ContactDatapointsView extends Mn.CompositeView
     onFormFieldUpdate: (el) ->
         $item = @$(el).parents '[data-cid]'
         model = @collection.get $item.data 'cid'
-        attrs = _.reduce $item.find(':input').serializeArray(), (memo, input) ->
+        attrs = _.reduce $item.find('input, textarea'), (memo, input) ->
             memo[_.last(input.name.split '.')] = input.value
             return memo
         , {}
@@ -77,4 +77,4 @@ module.exports = class ContactDatapointsView extends Mn.CompositeView
 
         return if name in CONFIG.datapoints.main
 
-        @$("[data-cid=#{model.cid}] input.value").focus()
+        @$("[data-cid='#{model.cid}'] input.value").trigger 'focus'

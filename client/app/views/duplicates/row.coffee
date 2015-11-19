@@ -16,7 +16,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
 
     ui:
-        submit:   '[type=submit]'
+        submit:   '[type="submit"]'
         dismiss:  '.cancel'
 
 
@@ -26,7 +26,7 @@ module.exports = class MergeRow extends Mn.ItemView
 
     events:
         'click @ui.submit':      'merge'
-        'click [type=checkbox]': 'check'
+        'click [type="checkbox"]': 'check'
         'click @ui.dismiss':     'dismiss'
 
 

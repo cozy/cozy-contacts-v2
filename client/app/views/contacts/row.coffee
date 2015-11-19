@@ -39,4 +39,4 @@ module.exports = class ContactRow extends Mn.ItemView
 
 
     refreshChecked: (appViewModel, selected)->
-        @$('[type=checkbox]').prop 'checked', @model.id in selected
+        @$('[type="checkbox"]').prop 'checked', @model.id in selected
