@@ -11,6 +11,9 @@ module.exports = class ContactRow extends Mn.ItemView
         role: 'row'
 
 
+    ui:
+        avatar: 'img.avatar'
+
     modelEvents:
         'change': 'render'
         'sync':   'render'
@@ -19,6 +22,7 @@ module.exports = class ContactRow extends Mn.ItemView
     initialize: ->
         app = require 'application'
         @listenTo app.model, 'change:selected', @refreshChecked
+        @listenTo app.vent, 'content:scroll', @lazyLoadAvatar
 
 
     serializeData: ->
@@ -38,5 +42,17 @@ module.exports = class ContactRow extends Mn.ItemView
             selected: @model.id in app.model.get 'selected'
 
 
+    onShow: ->
+        @lazyLoadAvatar()
+
+
     refreshChecked: (appViewModel, selected)->
         @$('[type="checkbox"]').prop 'checked', @model.id in selected
+
+
+    lazyLoadAvatar: ->
+        docEl          = document.documentElement
+        rect           = @el.getBoundingClientRect()
+        isElInViewport = rect.top <= (window.innerHeight or docEl.clientHeight)
+
+        @ui.avatar.attr 'src', @ui.avatar.data 'src' if isElInViewport

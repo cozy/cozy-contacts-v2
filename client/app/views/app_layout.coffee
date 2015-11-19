@@ -62,11 +62,14 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     initialize: ->
         app = require 'application'
+
         @listenToOnce app.contacts, 'sync', ->
             @showContactsList()
             @disableBusyState()
+
         @listenToOnce app.tags, 'sync', ->
             @showFilters()
+
         @listenTo @model, 'change:scored', (appViewModel, scored)->
             @showContactsList scored
 
@@ -95,7 +98,12 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showContactsList: (scored = false) ->
+        app = require 'application'
+
         @showChildView 'content', new ContactsView scored: scored
+
+        scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
+        @content.$el.on 'scroll', scroller
 
 
     showDialog: (appViewModel, slug) ->
