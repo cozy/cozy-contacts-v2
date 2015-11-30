@@ -20,9 +20,6 @@ module.exports = class Contacts extends Mn.CompositeView
         return false if @model
         'change [type="checkbox"]': 'updateBulkSelection'
 
-    collectionEvents:
-        'add remove reset': 'toggleEmpty'
-
 
     attachElContent: (html) ->
         @el.innerHTML = html
@@ -106,9 +103,12 @@ module.exports = class Contacts extends Mn.CompositeView
 
         @hasContacts = @collection.model is ContactViewModel
 
-        @listenTo @, 'render', ->
-            if @hasContacts
-                setTimeout => @children.call 'lazyLoadAvatar'
+        if @hasContacts
+            @listenTo @,
+                'render': -> setTimeout => @children.call 'lazyLoadAvatar'
+
+            @listenTo @collection,
+                'update': @toggleEmpty
 
         @listenTo app.vent,
             'filter:tag': (value) ->

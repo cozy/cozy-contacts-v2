@@ -9,7 +9,7 @@ module.exports = class Tags extends Backbone.Collection
 
 
     initialize: ->
-        # @listenToOnce @, 'sync', -> (new TagsListener()).watch @
+        @listenToOnce @, 'sync', -> (new TagsListener()).watch @
 
 
     parse: (tags) ->

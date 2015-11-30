@@ -29,7 +29,7 @@ module.exports = class Contacts extends Backbone.Collection
 
         @listenTo @, 'change:n', @sort
 
-        # @listenToOnce @, 'sync', -> (new ContactsListener()).watch @
+        @listenToOnce @, 'sync', -> (new ContactsListener()).watch @
 
 
     importFromVCF: (vcard) ->

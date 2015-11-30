@@ -107,6 +107,9 @@ module.exports = class AppLayout extends Mn.LayoutView
 
         view = new ContactsView collection: @underlyingContacts
 
+        @listenTo @underlyingContacts,
+            'update': @updateCounter
+
         @listenTo view,
             'dom:refresh': ->
                 app.vent.trigger 'busy:disable'
