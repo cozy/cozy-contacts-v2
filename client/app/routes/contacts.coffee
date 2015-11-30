@@ -19,8 +19,8 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
     _setCardState: (id, edit) ->
         app    = require 'application'
-        dialog = if app.contacts.get(id) or id is 'new' then id else false
-        app.model.set 'dialog', dialog
+        dialog = id in app.contacts.pluck('id') or id is 'new'
+        app.model.set 'dialog', if dialog then id else false
         app.vent.trigger 'mode:edit', edit
 
 

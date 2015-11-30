@@ -11,10 +11,10 @@ ConfigModel = require 'models/config'
 
 ContactsCollection = require 'collections/contacts'
 TagsCollection     = require 'collections/tags'
-Search             = require 'collections/search'
 
-AppLayout     = require 'views/app_layout'
-AppViewModel  = require 'views/models/app'
+AppLayout    = require 'views/app_layout'
+AppViewModel = require 'views/models/app'
+
 IntentManager = require 'lib/intent_manager'
 
 
@@ -36,7 +36,6 @@ class Application extends Mn.Application
 
             @contacts = new ContactsCollection()
             @tags     = new TagsCollection()
-            @filtered = new Search @contacts
 
             @layout   = new AppLayout model: @model
             @router   = new Router()
@@ -47,34 +46,49 @@ class Application extends Mn.Application
 
         # render components when app starts
         @on 'start', ->
+            @layout.render()
+
             @contacts.fetch reset: true
             @tags.fetch reset: true
-
-            @layout.render()
 
             # prohibit pushState because URIs mapped from cozy-home rely on
             # fragment
             Backbone.history.start pushState: false if Backbone.history
 
 
+    getSelected: ->
+        view = @layout.getChildView 'content'
+        view.children.reduce (memo, view) ->
+            if view.hasContacts
+                models = view.children.map (view) -> view.model.model
+                memo   = memo.concat models
+            else
+                memo.push view.model.model
+
+            return memo
+        , []
+
+
+
     search: (pattern, string) ->
         filter  = @model.get 'filter'
         input   = "`#{pattern}:#{string}`"
-        pattern = require('config').search.pattern pattern
-        prev    = filter?.match pattern
+        _pattern = require('config').search.pattern pattern
+        prev    = filter?.match _pattern
 
         if string
             if prev
-                filter = filter.replace pattern, input
+                filter = filter.replace _pattern, input
             else if filter?.length
                 filter += input
             else
                 filter = input
 
         else if prev
-            filter = filter.replace(pattern, '')
+            filter = filter.replace(_pattern, '')
 
         @model.set 'filter', filter
+        setTimeout => @vent.trigger "filter:#{pattern}", string
 
 
 # Exports Application singleton instance

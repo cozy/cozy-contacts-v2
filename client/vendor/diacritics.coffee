@@ -92,6 +92,8 @@ diacritics =
 
 
 String::toAscii = ->
+    return @slice() if @match(/[a-zA-Z\s]/g).length is @length
+
     Object.keys(diacritics).reduce (str, letter) ->
         str.replace diacritics[letter], letter
     , @

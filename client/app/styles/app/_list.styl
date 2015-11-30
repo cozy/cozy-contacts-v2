@@ -7,19 +7,17 @@
         left-padded 1.5em
 
 
-    dd
-    ul&
-        horizontally-padded 1em
-
-
     [role=row]
         display flex
         align-items center
 
-        vertically-padded .3em
+        horizontally-spaced 1em
 
         text-decoration none
-        border-bottom 1px solid grey-02
+
+        &:not(:empty)
+            vertically-padded .3em
+            border-bottom 1px solid grey-02
 
 
     [role=gridcell]

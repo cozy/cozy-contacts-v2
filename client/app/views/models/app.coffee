@@ -6,9 +6,9 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     defaults:
         dialog: false
-        filter: null
+        filter: undefined
         scored: false
-        errors: null
+        errors: undefined
 
 
     viewEvents:
@@ -42,7 +42,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     selectAll: ->
         app = require 'application'
-        select = app.filtered.map (contact) -> contact.id
+        select = app.getSelected().map (contact) -> contact.id
         @set selected: select
 
 
@@ -51,12 +51,16 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     bulkDelete: ->
-        app = require 'application'
+        app      = require 'application'
+        selected = @attributes.selected
 
-        _.each @attributes.selected, (id) =>
-            _.defer => app.contacts.get(id).destroy
-                wait: true
-                success: => @unselect id
+        success = (model) => @unselect model.id
+
+        app.contacts.chain()
+            .filter (contact) ->
+                contact.id in selected
+            .invoke 'destroy', {wait:true, success: success}
+            .value()
 
 
     # TODO: probably need to be revamped when doing it for the whole merge
@@ -82,8 +86,9 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     bulkExport: (all) ->
-        app = require 'application'
-        len = if all then app.contacts.size() else @attributes.selected.length
+        app      = require 'application'
+        selected = @attributes.selected
+        len      = if all then app.contacts.size() else selected.length
         toExport = []
 
         save = _.after len, ->
@@ -92,10 +97,12 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             saveAs blob, "#{date}_cozy_contacts_#{toExport.length}.vcf"
 
         app.contacts.chain()
-            .filter (contact) => all or (contact.id in @attributes.selected)
+            .filter (contact) ->
+                all or (contact.id in selected)
             .invoke 'toVCF', (card) ->
                 toExport.push card
                 save()
+            .value()
 
 
     updateSortSetting: (value) ->

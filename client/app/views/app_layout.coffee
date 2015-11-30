@@ -7,7 +7,8 @@ main region for its subviews.
 
 ContactModel = require 'models/contact'
 
-ContactViewModel = require 'views/models/contact'
+ContactViewModel            = require 'views/models/contact'
+ContactViewModelsCollection = require 'views/collections/contacts'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
@@ -18,6 +19,8 @@ CardView           = require 'views/contacts/card'
 DuplicatesView     = require 'views/duplicates'
 SettingsView       = require 'views/settings'
 
+t = require 'lib/i18n'
+
 
 module.exports = class AppLayout extends Mn.LayoutView
 
@@ -27,19 +30,21 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     behaviors:
         Navigator: {}
+        Dropdown:  {}
         Keyboard:
             keymaps:
                 '33': 'key:pageup'
                 '34': 'key:pagedown'
 
     ui:
-        navigate: 'aside [role="button"]'
-
+        navigate: 'aside [role="button"], .name'
+        content:  'main [role="contentinfo"] '
+        counter:  'main .counter'
 
     regions:
         actions: 'aside .tool-actions'
         labels:  'aside .tool-labels'
-        content: 'main [role="contentinfo"]'
+        content: '@ui.content [role="grid"]'
         toolbar: 'main [role="toolbar"]'
         dialogs:
             selector: '.dialogs'
@@ -52,6 +57,7 @@ module.exports = class AppLayout extends Mn.LayoutView
     modelEvents:
         'change:dialog':   'showDialog'
         'change:selected': 'swapContextualMenu'
+        'change:scored':   'showContactsList'
 
     childEvents:
         'drawer:toggle':     'toggleDrawer'
@@ -63,15 +69,18 @@ module.exports = class AppLayout extends Mn.LayoutView
     initialize: ->
         app = require 'application'
 
+        @underlyingContacts = new ContactViewModelsCollection app.contacts
+
         @listenToOnce app.contacts, 'sync', ->
             @showContactsList()
-            @disableBusyState()
+            scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
+            @ui.content.on 'scroll', scroller
 
-        @listenToOnce app.tags, 'sync', ->
-            @showFilters()
+        @listenToOnce app.tags, 'sync', @showFilters
 
-        @listenTo @model, 'change:scored', (appViewModel, scored)->
-            @showContactsList scored
+        @bindEntityEvents app.vent,
+            'busy:enable':  -> @$el.attr 'aria-busy', true
+            'busy:disable': -> @$el.attr 'aria-busy', false
 
 
     onRender: ->
@@ -80,30 +89,33 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     onKeyPageup: ->
-        el = @content.el
+        el = @ui.content[0]
         el.scrollTop -= el.offsetHeight
 
 
     onKeyPagedown: ->
-        el = @content.el
+        el = @ui.content[0]
         el.scrollTop += el.offsetHeight
-
-
-    disableBusyState: ->
-        @$el.attr 'aria-busy', false
 
 
     showFilters: ->
         @showChildView 'labels', new LabelsFiltersTool model: @model
 
 
-    showContactsList: (scored = false) ->
+    showContactsList: ->
         app = require 'application'
 
-        @showChildView 'content', new ContactsView scored: scored
+        view = new ContactsView collection: @underlyingContacts
 
-        scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
-        @content.$el.on 'scroll', scroller
+        @listenTo view,
+            'dom:refresh': ->
+                app.vent.trigger 'busy:disable'
+                @ui.content.trigger 'focus' unless app.model.get 'scored'
+                @updateCounter()
+            'filter': ->
+                setTimeout => @updateCounter()
+
+        setTimeout => @showChildView 'content', view
 
 
     showDialog: (appViewModel, slug) ->
@@ -120,13 +132,30 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     _buildContactView: (id) ->
         app = require 'application'
-        model = if id is 'new' then new ContactModel null, parse: true
-        else app.contacts.get id
+        if id is 'new'
+            model = new ContactModel null, parse: true
+        else
+            model = app.contacts.get id
 
-        modelView = new ContactViewModel {new: id is 'new'}, model: model
-        modelView.listenTo app.vent, 'mode:edit', (edit) -> @set 'edit', edit
+        viewModel = new ContactViewModel {new: id is 'new'}, model: model
+        viewModel.listenTo app.vent, 'mode:edit', (edit) -> @set 'edit', edit
 
-        new CardView model: modelView
+        new CardView model: viewModel
+
+
+    updateCounter: ->
+        size = require('application').getSelected().length
+
+        label = if size
+            t('list counter', {smart_count: size})
+        else unless @underlyingContacts.isEmpty()
+            t('list counter no-search')
+        else
+            t('list counter empty')
+
+        @ui.counter
+            .text label
+            .toggleClass 'important', not size
 
 
     toggleDrawer: ->

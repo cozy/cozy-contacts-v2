@@ -1,96 +1,127 @@
 {Sorted} = BackboneProjections
-t = require 'lib/i18n'
 
 ContactViewModel = require 'views/models/contact'
-GroupViewModel   = require 'views/models/group'
 
-CharIndex = require 'collections/charindex'
+# CharIndex = require 'collections/charindex'
 
 
 module.exports = class Contacts extends Mn.CompositeView
 
-    template: (data) ->
-        container = if data.scored then 'ul' else 'div'
-        "<#{container} role='grid' tabindex='0'/><div class='counter'/>"
+    tagName: ->
+        if @model then 'dl' else 'div'
 
-    attributes:
-        tabindex: 1
+    attributes: ->
+        role: 'rowgroup' if @model
 
-
-    getChildView: ->
-        if @options.scored
-            require 'views/contacts/row'
-        else
-            require 'views/contacts/group'
-
-    childViewOptions: (model) ->
-        if @options.scored
-            model: new ContactViewModel {}, model: model
-        else
-            collection: model.compositeCollection
-
-    childViewContainer: '[role="grid"]'
+    template: require 'views/templates/contacts'
 
 
-    ui:
-        navigate: '.name'
-
-    behaviors:
-        Navigator: {}
-        Dropdown:  {}
-
-    events:
+    events: ->
+        return false if @model
         'change [type="checkbox"]': 'updateBulkSelection'
+
+    collectionEvents:
+        'add remove reset': 'toggleEmpty'
+
+
+    attachElContent: (html) ->
+        @el.innerHTML = html
+        return @
+
+
+    attachBuffer: (compositeView, buffer) ->
+        @toggleEmpty()
+        if @hasContacts
+            @el.querySelector('ul').appendChild buffer
+        else
+            @el.innerHTML = '' unless @model
+            @el.appendChild buffer
+
+
+    buildChildView: (child) ->
+        if child instanceof ContactViewModel
+            ChildView = require 'views/contacts/row'
+        else
+            ChildView = @constructor
+
+        new ChildView model: child
+
+
+    showCollection: ->
+        @$el.removeClass 'empty'
+
+        @_filteredSortedModels().map (model, index) =>
+            view  = @buildChildView model
+
+            @_updateIndices view, true, index
+            @children.add view
+            @renderChildView view, index
+            view._parent = @
+
+
+    _createBuffer: ->
+        elBuffer = document.createDocumentFragment()
+        @_bufferedChildren.map (buffer) ->
+            elBuffer.appendChild buffer.el
+        return elBuffer
+
+
+    filter: (model, index, collection) ->
+        return true unless model instanceof ContactViewModel
+
+        app = require 'application'
+
+        if @tag and @tag not in model.get('tags')
+            return false
+
+        if app.model.get 'scored'
+            model.model.cid in Object.keys @collection.filtered
+        else
+            char    = @model.get 'name'
+            idx     = if app.model.get('sort') is 'fn' then 0 else 1
+            initial = model.get('initials')[idx]
+
+            if char is '#' then (initial is null)
+            else char is initial.toLowerCase()
 
 
     initialize: ->
         app = require 'application'
-        search = app.filtered
 
-        if @options.scored
-            @collection = new Sorted search, comparator: (model) ->
-                search.scores[model.id] * -1
-            @bindEntityEvents @collection, 'update': 'render'
+        if @model?._attachedCollection
+            @collection = @model._attachedCollection
 
-        else
-            addGroupViewModel = (char) ->
-                attributes = name: char
-                collection = new CharIndex search, char: char
-                new GroupViewModel attributes, compositeCollection: collection
+        else unless @model or app.model.get 'scored'
+            collection = @collection
+            groups = [].map.call 'abcdefghijklmnopqrstuvwxyz#', (char) ->
+                group = new Backbone.Model name: char
+                group._attachedCollection = collection
+                return group
+            @collection = new Backbone.Collection groups
 
-            initials    = 'abcdefghijklmnopqrstuvwxyz#'
-            collection  = (addGroupViewModel char for char in initials)
-            @collection = new Backbone.Collection collection
+        return unless @collection
 
-        @bindEntityEvents search, 'update reset': 'updateCounter'
+        pattern = require('config').search.pattern 'tag'
+        @tag = app.model.get('filter')?.match(pattern)?[1]
+
+        @hasContacts = @collection.model is ContactViewModel
+
+        @listenTo @, 'render', ->
+            if @hasContacts
+                setTimeout => @children.call 'lazyLoadAvatar'
+
+        @listenTo app.vent,
+            'filter:tag': (value) ->
+                @tag = value
+                @render() if @hasContacts
+                @triggerMethod 'filter'
+            'filter:text': (value) ->
+                @render() if app.model.get 'scored'
+                @triggerMethod 'filter'
 
 
-    onDomRefresh: ->
-        @$el.trigger 'focus'
-
-
-    onRenderCollection: ->
-        @updateCounter()
-
-
-    serializeData: ->
-        scored: @options.scored
-
-
-    updateCounter: ->
-        app  = require 'application'
-        size = app.filtered.size()
-
-        label = if size
-            t('list counter', {smart_count: size})
-        else if app.contacts.size()
-            t('list counter no-search')
-        else
-            t('list counter empty')
-
-        @$('.counter')
-            .text label
-            .toggleClass 'important', app.filtered.isEmpty()
+    toggleEmpty: ->
+        @$el.toggleClass 'empty', not @children.length
 
 
     updateBulkSelection: (event) ->
