@@ -21,11 +21,8 @@ module.exports = class ContactRow extends Backbone.View
         el   = @el
         data = @serializeData()
 
-        setTimeout ->
-            template     = require 'views/templates/contacts/row'
-            el.innerHTML = template data
-
-        return @
+        template     = require 'views/templates/contacts/row'
+        el.innerHTML = template data
 
 
     serializeData: ->

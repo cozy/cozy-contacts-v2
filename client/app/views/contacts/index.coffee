@@ -78,8 +78,8 @@ module.exports = class Contacts extends Mn.CompositeView
             idx     = if app.model.get('sort') is 'fn' then 0 else 1
             initial = model.get('initials')[idx]
 
-            if char is '#' then (initial is null)
-            else char is initial.toLowerCase()
+            if char is '#' then not initial?.match(/[a-zA-Z]/)
+            else char is initial?.toLowerCase()
 
 
     initialize: ->
