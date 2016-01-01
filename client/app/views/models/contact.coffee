@@ -1,6 +1,7 @@
 Filtered = BackboneProjections.Filtered
 
 CONFIG = require('config').contact
+CH = require('lib/contact_helper')
 
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
@@ -118,15 +119,23 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             new Filtered @model.get('datapoints'), filter: filter
 
 
+    # Extract datapoints from the view model to store them in the data model.
     syncDatapoints: ->
+
+        # The getDatapoints function has been memoized, it means it keeps all
+        # its returned values in a cache.
+        # Here we deal directly with this cache because this function has
+        # already been called for all fields and edited fields were already
+        # marked.
         cache      = @getDatapoints.cache
         datapoints = @model.get 'datapoints'
 
-        models = _.reduce cache, (memo, collection, key) ->
-            return memo unless /^edit/.test key
-            memo.concat collection.filter (model) ->
-                not _.isEmpty model.get 'value'
-        , []
+        # It grabs all datapoints that has been edited.
+        models = []
+        for key, collection of cache.__data__ when /^edit/.test key
+            models = models.concat CH.getNonEmptyDatapoints collection
+
+        # Load new datapoints in the data model.
         datapoints.reset models
 
 
