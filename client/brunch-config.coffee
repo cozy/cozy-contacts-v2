@@ -8,7 +8,9 @@ exports.config =
                 'test/scripts/test-vendor.js': /^test\/(?=vendor)/
             order:
                 before: [
-                    'bower_components/jquery/dist/jquery.js'
+                    'vendor/marionette/lodash.js'
+                    'vendor/marionette/jquery.js'
+                    'vendor/marionette/backbone.js'
                 ]
 
         stylesheets:

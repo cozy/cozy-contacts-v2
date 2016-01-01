@@ -31,12 +31,14 @@ html(lang="#{locale}")
         link(rel="stylesheet", href="/fonts/fonts.css")
         link(rel="stylesheet", href="stylesheets/app.css")
 
+        script(src="scripts/vendor.js" defer=true)
+        script(src="scripts/app.js", onload="load()", defer=true)
+        script.
+            function load() {
+                require.register('imports', function(exports, require, module) {
+                  module.exports = !{imports}
+                })
+                require('initialize')
+            }
     body
         div(role='application', aria-busy='true')
-
-        script(src="scripts/vendor.js")
-        script.
-            require.register('imports', function(exports, require, module) {
-              module.exports = !{imports}
-            })
-        script(src="scripts/app.js", onload="require('initialize');")

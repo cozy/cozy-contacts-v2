@@ -27,6 +27,8 @@ module.exports = class Contacts extends Backbone.Collection
             @comparator.sort = sort
             @sort()
 
+        @listenTo @, 'change:n', @sort
+
         @listenToOnce @, 'sync', -> (new ContactsListener()).watch @
 
 

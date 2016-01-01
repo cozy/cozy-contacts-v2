@@ -1,4 +1,3 @@
-diacritics = require 'lib/diacritics'
 ContactHelper = require 'lib/contact_helper'
 
 module.exports = CC = {}
@@ -84,14 +83,10 @@ compareN = (n1, n2) ->
     [lastName1, firstName1, dummy, dummy, dummy] = n1.split ';'
     [lastName2, firstName2, dummy, dummy, dummy] = n2.split ';'
 
-    simplify = (s) ->
-        s = diacritics.asciize s
-        return s.toLowerCase()
-
-    lastName1 = simplify lastName1
-    firstName1 = simplify firstName1
-    lastName2 = simplify lastName2
-    firstName2 = simplify firstName2
+    lastName1  = lastName1.toAscii().toLowerCase()
+    firstName1 = firstName1.toAscii().toLowerCase()
+    lastName2  = lastName2.toAscii().toLowerCase()
+    firstName2 = firstName2.toAscii().toLowerCase()
 
     if (lastName1 isnt '' or firstName1 isnt '') and
     (lastName2 isnt '' or firstName2 isnt '') and

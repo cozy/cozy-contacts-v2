@@ -19,13 +19,29 @@ avatar(size)
     aside.drawer
         flex-basis (260/16)rem
 
-    &[aria-busy=true]::before
-        position fixed
-        top 10vh
-        left 50vw
-        margin-left -18px
-        @extend $icon-spinner-grey
-        @extend $icon-36
+    &[aria-busy=true] main
+        position relative
+
+        &::before
+            content ''
+            display block
+            position absolute
+            z-index 999
+            top 0
+            bottom 0
+            left 0
+            right 0
+            background-color grey-01
+            opacity .8
+
+        &::after
+            position absolute
+            z-index 1000
+            top 4em
+            left 50%
+            transform translateX(-50%)
+            @extend $icon-spinner-grey
+            @extend $icon-36
 
 
 [role=contentinfo]

@@ -1,5 +1,4 @@
 Filtered = BackboneProjections.Filtered
-{asciize} = require 'lib/diacritics'
 
 CONFIG = require('config').contact
 
@@ -11,9 +10,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         edit: false
 
     map:
-        avatar:     '_attachments'
-        initials:   'n'
-        name:       'n'
+        avatar: '_attachments'
+        name:   'n'
 
 
     events:
@@ -47,11 +45,13 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     toJSON: ->
-        datapoints = _.reduce CONFIG.datapoints.main, (memo, attr) =>
+        data = super
+        delete data.datapoints
+        data.xtras = @getDatapoints('xtras').toJSON()
+        _.reduce CONFIG.datapoints.main, (memo, attr) =>
             memo[attr] = @getDatapoints(attr).toJSON()
             return memo
-        , xtras: @getDatapoints('xtras').toJSON()
-        _.extend {}, super, datapoints
+        , data
 
 
     getMappedAvatar: (attachments) ->
@@ -69,12 +69,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         if avatar? and not avatar.match(/contacts\/.+\/picture.png/)?
             attrs.avatar = avatar.split(',')[1]
         return attrs
-
-
-    getMappedInitials: (n) ->
-        [gn, fn, ...] = n.split ';'
-        """#{if fn then asciize(fn)[0] else ''}\
-           #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
     getMappedName: (n) ->

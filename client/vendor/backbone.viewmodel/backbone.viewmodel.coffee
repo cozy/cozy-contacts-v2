@@ -47,8 +47,8 @@ do (factory = (root, Backbone) ->
     #
     Backbone.ViewModel = class ViewModel extends Backbone.Model
 
-        # ViewModel can has `model` and / or `compositeCollection` passed at
-        # construct to refers to an underlying data model / collection set.
+        # ViewModel can has `model` passed at construct to refers to an
+        # underlying data model set.
         #
         # Extend the givem attributes (like ay Backbone.Model) with the mapped
         # attributes onto the underlying model.
@@ -56,7 +56,6 @@ do (factory = (root, Backbone) ->
         # Proxying any underlying model events to keep the events cascade safe.
         constructor: (attributes, options) ->
             @model               = options?.model or null
-            @compositeCollection = options?.compositeCollection or null
             mappedAttrs          = @_buildMappedAttributes()
             super _.extend({}, attributes, mappedAttrs), options
 
@@ -174,24 +173,26 @@ do (factory = (root, Backbone) ->
         # properties `change:property` event to ensure mapped values are
         # automatically updated when the properties it depends on updates.
         _buildMappedAttributes: ->
-            props = _.reduce @map, (memo, attrs, prop) =>
+            return {} unless @map
+
+            Object.keys(@map).reduce (memo, prop) =>
                 method = "getMapped#{prop[0].toUpperCase()}#{prop[1..]}"
-                return unless _.isFunction @[method]
+                return memo unless _.isFunction @[method]
+
+                attrs = @map[prop].split ' '
 
                 callback = (options) =>
-                    opts = _.defaults {}, options,
+                    opts  = _.defaults {}, options,
                         immediate: true
                         reset:     true
-
-                    args  = attrs.split(' ').map (attr) => @model.get attr
+                    args  = attrs.map (attr) => @model.get attr
                     value = @[method].apply @, args
 
                     @set prop, value, reset: opts.reset if opts.immediate
-
                     return value
 
                 @listenTo @, 'reset', callback
-                _.each attrs.split(' '), (attr) =>
+                attrs.map (attr) =>
                     @listenTo @model, "change:#{attr}", callback
 
                 memo[prop] = callback immediate: false

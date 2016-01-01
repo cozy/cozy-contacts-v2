@@ -19,9 +19,9 @@ module.exports = class SettingsView extends Mn.ItemView
         Dialog: {}
 
     ui:
-        sort:     '[name=sort]'
+        sort:     '[name="sort"]'
         import:   'button.import'
-        upload:   '[type=file]'
+        upload:   '[type="file"]'
         export:   '[formaction="contacts/export"]'
         feedback: '.feedback'
 

@@ -21,7 +21,7 @@ span(data-input="checkbox")
 
 a.name(role="gridcell", href="contacts/#{_id}")
     if avatar
-       img.avatar(src=avatar)
+       img.avatar(data-src=avatar, src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")
     else
         - var bg = ColorHash.getColor(n, 'cozy')
         span.avatar.initials(style="background-color:#{bg}")= initials

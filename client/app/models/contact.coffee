@@ -21,6 +21,14 @@ module.exports = class Contact extends Backbone.Model
     parse: (attrs) ->
         delete attrs[key] for key, value of attrs when value is ''
 
+        if attrs.n
+            [gn, fn, ...] = attrs.n.split ';'
+            attrs.initials = _.chain([fn, gn])
+                .compact()
+                .map (name) -> name[0].toAscii()[0]
+                .join ''
+                .value()
+
         if (url = attrs.url)
             delete attrs.url
             attrs.datapoints.unshift
@@ -130,10 +138,6 @@ module.exports = class Contact extends Backbone.Model
                 break
 
         return search
-
-
-    toJSON: ->
-        _.extend {}, super, datapoints: @attributes.datapoints?.toJSON() or []
 
 
     savePicture: (imgData, attrs, options) ->

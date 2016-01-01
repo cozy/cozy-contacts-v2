@@ -17,7 +17,7 @@ mixin formatPoint(point, icon)
     i.type(class=icon? "fa fa-#{icon}" : false)
         = point.type
         | &nbsp;
-    span.value!= point.value.replace("\n", '<br>', 'g')
+    span.value!= point.value.replace(/\n/g, '<br>')
 
 
 mixin formatJob(title, org, dept)

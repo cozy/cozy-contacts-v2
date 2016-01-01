@@ -29,21 +29,22 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     ui:
-        btnEdit:    '.edit[role=button]'
+        btnEdit:    '.edit[role="button"]'
         btnDelete:  'button.delete'
         btnExport:  '[formaction="contact/export"]'
         # NavigatorBehavior Ui
         navigate:   '[href^=contacts], [data-next]'
         # FormBehavior Ui
-        formSubmit: '[type=submit]'
+        formSubmit: '[type="submit"]'
         formClear:  'button.clear'
-        formInputs: '.group:not([data-cid]) :input:not(button)'
+        formInputs: '.group:not([data-cid]) input,
+                     .group:not([data-cid]) textarea'
         avatar:     '.avatar'
 
     regions:
-        'avatar': '[role=img]'
-        'data':   '.data'
-        'tags':   'aside .tags'
+        avatar: '[role="img"]'
+        infos:  '.data'
+        tags:   'aside .tags'
 
 
     triggers:
@@ -79,15 +80,15 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     onRender: ->
         @showChildView 'avatar', new AvatarView model: @model
-        @showChildView 'data', new DataView model: @model
+        @showChildView 'infos', new DataView model: @model
         @showChildView 'tags', new TagsActionsView model: @model
 
-        @$('[role=contentinfo]').toggleClass 'edit', !!@model.get 'edit'
+        @$('[role="contentinfo"]').toggleClass 'edit', !!@model.get 'edit'
 
 
     onDomRefresh: ->
         return if @model.get('edit')
-        @ui.btnEdit.focus()
+        @ui.btnEdit.trigger 'focus'
 
 
     onSave: ->
@@ -102,6 +103,6 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     onFormKeyEnter: ->
-        inputs = @$('.data.edit').find('input:not([type=hidden]), textarea')
+        inputs = @$('.data.edit').find('input:not([type="hidden"]), textarea')
         if document.activeElement.tagName.toLowerCase() isnt 'textarea'
-            inputs.eq(inputs.index(document.activeElement) + 1).focus()
+            inputs.eq(inputs.index(document.activeElement) + 1).trigger 'focus'

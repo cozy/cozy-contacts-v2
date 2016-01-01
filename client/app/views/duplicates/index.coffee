@@ -17,7 +17,7 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         role: 'dialog'
 
 
-    childViewContainer: '[role=grid]'
+    childViewContainer: '[role="grid"]'
 
     childView: require 'views/duplicates/row'
 

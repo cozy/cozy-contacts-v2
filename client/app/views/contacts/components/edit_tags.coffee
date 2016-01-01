@@ -22,7 +22,7 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
 
 
     ui:
-        tags:     'li:not(.create) :input'
+        tags:     'li:not(.create) input'
         create:   '.create'
         dropdown: 'dd'
 
@@ -30,7 +30,7 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
         'change @ui.tags':                'onClickTag'
         'click @ui.dropdown':             (event) -> event.stopPropagation()
         'click @ui.create button':        'toggleCreate'
-        'keydown @ui.create [name=name]': 'addNewTag'
+        'keydown @ui.create [name="name"]': 'addNewTag'
 
     modelEvents:
         'change:tags': (model) ->
@@ -47,7 +47,7 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
     onClickTag: (event) ->
         app = require 'application'
 
-        tags = @$('li:not(.create) :input')
+        tags = @$('li:not(.create) input')
             .serializeArray()
             .map (tag) -> app.tags.get(tag.value).get 'name'
 
@@ -59,9 +59,9 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
             toggle = @ui.create.attr('aria-expanded') isnt 'true'
 
         @ui.create.attr 'aria-expanded', toggle
-        @ui.create.find('[name=name]').val ''
+        @ui.create.find('[name="name"]').val ''
 
-        @ui.create.find('input[name=name]').focus() if toggle
+        @ui.create.find('input[name="name"]').trigger 'focus' if toggle
 
 
     addNewTag: (event) ->

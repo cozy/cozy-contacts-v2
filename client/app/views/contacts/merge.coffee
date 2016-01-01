@@ -16,7 +16,7 @@ module.exports = class MergeView extends Mn.ItemView
         Form:      {}
 
     ui:
-        formSubmit: '[type=submit]'
+        formSubmit: '[type="submit"]'
         formInputs: 'input'
         cancel: '.cancel'
 
