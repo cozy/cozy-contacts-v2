@@ -26,13 +26,13 @@ module.exports = class ContactsListener extends CozySocketListener
             else
                 action  = 'add'
                 options = merge: true
-                
+
         @collection[action] @queues[queue], options
         @queues[queue].length = 0
 
 
     constructor: ->
-        @_bulk = _.debounce @_bulk, 350
+        @_bulk = _.debounce @_bulk, 1000
         super
 
 
