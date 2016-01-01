@@ -166,3 +166,12 @@ CH.intrinsicRev = (contact) ->
     # shasum = crypto.createHash('sha1')
     # shasum.update asStr
     # return shasum.digest 'base64'
+    #
+
+
+# For a datapoint collection (tel, email, etc.), it return fields with a non
+# empty value.
+CH.getNonEmptyDatapoints = (collection) ->
+    return collection.filter (model) ->
+        not _.isEmpty model.get 'value'
+
