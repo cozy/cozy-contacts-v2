@@ -87,7 +87,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     onDomRefresh: ->
-        return if @model.get('edit')
+        return if @model.get 'edit'
         @ui.btnEdit.trigger 'focus'
 
 
@@ -106,3 +106,4 @@ module.exports = class ContactCardView extends Mn.LayoutView
         inputs = @$('.data.edit').find('input:not([type="hidden"]), textarea')
         if document.activeElement.tagName.toLowerCase() isnt 'textarea'
             inputs.eq(inputs.index(document.activeElement) + 1).trigger 'focus'
+

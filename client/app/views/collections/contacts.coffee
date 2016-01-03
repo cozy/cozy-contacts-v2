@@ -74,3 +74,4 @@ module.exports = class ContactViewModelsCollection extends Backbone.Collection
             _.find @models, (viewModel) -> viewModel.model is model
 
         super models, options
+

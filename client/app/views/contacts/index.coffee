@@ -130,3 +130,4 @@ module.exports = class Contacts extends Mn.CompositeView
         method   = if selected then 'contacts:select' else 'contacts:unselect'
 
         @triggerMethod method, id
+

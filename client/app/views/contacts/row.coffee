@@ -57,3 +57,4 @@ module.exports = class ContactRow extends Backbone.View
 
         if isElInViewport and imgEl
             imgEl.setAttribute 'src', imgEl.dataset.src
+

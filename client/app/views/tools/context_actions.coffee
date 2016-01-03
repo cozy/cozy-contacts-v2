@@ -39,3 +39,4 @@ module.exports = class DefaultActionsView extends Mn.ItemView
             message:    t 'bulk confirm delete message', opts
             btn_ok:     t 'bulk confirm delete ok'
             btn_cancel: t 'bulk confirm delete cancel'
+
