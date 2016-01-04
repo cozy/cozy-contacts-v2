@@ -33,7 +33,7 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
         # collection level. It avoids to do too many checkings while looking
         # for available tags.
         @collection = new Filtered app.tags,
-            filter: (model) =>
+            filter: (model) ->
                 app.contacts.tagMap[model.get('name')]?
 
         @collection.listenTo app.contacts,
