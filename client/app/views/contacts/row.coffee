@@ -1,9 +1,7 @@
 PATTERN = require('config').search.pattern 'text'
 
 
-module.exports = class ContactRow extends Mn.ItemView
-
-    template: require 'views/templates/contacts/row'
+module.exports = class ContactRow extends Backbone.View
 
     tagName: 'li'
 
@@ -11,32 +9,52 @@ module.exports = class ContactRow extends Mn.ItemView
         role: 'row'
 
 
-    modelEvents:
-        'change': 'render'
-        'sync':   'render'
-
-
     initialize: ->
         app = require 'application'
+
+        @listenTo @model, 'change', @render
         @listenTo app.model, 'change:selected', @refreshChecked
+        @listenTo app.vent, 'content:scroll', @lazyLoadAvatar
+
+
+    render: ->
+        el   = @el
+        data = @serializeData()
+
+        template     = require 'views/templates/contacts/row'
+        el.innerHTML = template data
 
 
     serializeData: ->
-        app        = require 'application'
-        filter     = app.model.get('filter')?.match PATTERN
-        formatOpts =
+        app    = require 'application'
+        filter = app.model.get('filter')?.match PATTERN
+        format =
             pre: '<b>'
             post: '</b>'
 
-        fullname = @model.toHighlightedString filter?[1] or null,
-            pre: '<span class="search">'
-            post: '</span>'
-            format: formatOpts
+        data = @model.toJSON()
+        data.selected = @model.id in app.model.get 'selected'
+        data.fullname = if filter
+            @model.toHighlightedString filter[1],
+                pre: '<span class="search">'
+                post: '</span>'
+                format: format
+        else
+            @model.toString format
 
-        _.extend {}, super(),
-            fullname: fullname
-            selected: @model.id in app.model.get 'selected'
+        return data
 
 
     refreshChecked: (appViewModel, selected)->
-        @$('[type=checkbox]').prop 'checked', @model.id in selected
+        @$('[type="checkbox"]').prop 'checked', @model.id in selected
+
+
+    lazyLoadAvatar: ->
+        docEl          = document.documentElement
+        imgEl          = @el.querySelector 'img.avatar'
+        rect           = @el.getBoundingClientRect()
+        isElInViewport = rect.top <= (window.innerHeight or docEl.clientHeight)
+
+        if isElInViewport and imgEl
+            imgEl.setAttribute 'src', imgEl.dataset.src
+

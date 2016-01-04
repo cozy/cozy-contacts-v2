@@ -1,3 +1,4 @@
+{Filtered}  = BackboneProjections
 TagView = require 'views/contacts/components/tag'
 
 
@@ -22,7 +23,7 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
 
 
     ui:
-        tags:     'li:not(.create) :input'
+        tags:     'li:not(.create) input'
         create:   '.create'
         dropdown: 'dd'
 
@@ -30,7 +31,7 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
         'change @ui.tags':                'onClickTag'
         'click @ui.dropdown':             (event) -> event.stopPropagation()
         'click @ui.create button':        'toggleCreate'
-        'keydown @ui.create [name=name]': 'addNewTag'
+        'keydown @ui.create [name="name"]': 'addNewTag'
 
     modelEvents:
         'change:tags': (model) ->
@@ -40,14 +41,21 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
 
     initialize: ->
         app         = require 'application'
-        @collection = app.tags
+
+        # Tag collection filtering is based on the tag map built at the contact
+        # collection level. It avoids to do too many checkings while looking
+        # for available tags.
+        @collection = new Filtered app.tags,
+            filter: (model) ->
+                app.contacts.tagMap[model.get('name')]?
+
         Mn.bindEntityEvents @model, @, @model.viewEvents
 
 
     onClickTag: (event) ->
         app = require 'application'
 
-        tags = @$('li:not(.create) :input')
+        tags = @$('li:not(.create) input')
             .serializeArray()
             .map (tag) -> app.tags.get(tag.value).get 'name'
 
@@ -59,9 +67,9 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
             toggle = @ui.create.attr('aria-expanded') isnt 'true'
 
         @ui.create.attr 'aria-expanded', toggle
-        @ui.create.find('[name=name]').val ''
+        @ui.create.find('[name="name"]').val ''
 
-        @ui.create.find('input[name=name]').focus() if toggle
+        @ui.create.find('input[name="name"]').trigger 'focus' if toggle
 
 
     addNewTag: (event) ->

@@ -1,7 +1,7 @@
 module.exports = class DropdownBehavior extends Mn.Behavior
 
     ui:
-        trigger: '[aria-haspopup=true] > :first-child'
+        trigger: '[aria-haspopup="true"] > :first-child'
 
 
     events:
@@ -18,4 +18,4 @@ module.exports = class DropdownBehavior extends Mn.Behavior
 
 
     closeAll: (el) ->
-        @$('[aria-haspopup=true]').not(el).attr('aria-expanded', false)
+        @$('[aria-haspopup="true"]').not(el).attr('aria-expanded', false)

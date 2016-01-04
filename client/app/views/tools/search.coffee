@@ -39,7 +39,7 @@ module.exports = class SearchView extends Mn.ItemView
 
 
     onDomRefresh: ->
-        @ui.search.focus()
+        @ui.search.trigger 'focus'
 
 
     toggleUi: (value) ->

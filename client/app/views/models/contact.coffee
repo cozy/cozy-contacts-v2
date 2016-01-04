@@ -1,7 +1,7 @@
 Filtered = BackboneProjections.Filtered
-{asciize} = require 'lib/diacritics'
 
 CONFIG = require('config').contact
+CH = require('lib/contact_helper')
 
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
@@ -11,9 +11,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         edit: false
 
     map:
-        avatar:     '_attachments'
-        initials:   'n'
-        name:       'n'
+        avatar: '_attachments'
+        name:   'n'
 
 
     events:
@@ -47,11 +46,13 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     toJSON: ->
-        datapoints = _.reduce CONFIG.datapoints.main, (memo, attr) =>
+        data = super
+        delete data.datapoints
+        data.xtras = @getDatapoints('xtras').toJSON()
+        _.reduce CONFIG.datapoints.main, (memo, attr) =>
             memo[attr] = @getDatapoints(attr).toJSON()
             return memo
-        , xtras: @getDatapoints('xtras').toJSON()
-        _.extend {}, super, datapoints
+        , data
 
 
     getMappedAvatar: (attachments) ->
@@ -69,12 +70,6 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         if avatar? and not avatar.match(/contacts\/.+\/picture.png/)?
             attrs.avatar = avatar.split(',')[1]
         return attrs
-
-
-    getMappedInitials: (n) ->
-        [gn, fn, ...] = n.split ';'
-        """#{if fn then asciize(fn)[0] else ''}\
-           #{if gn then asciize(gn)[0] else ''}""".toUpperCase()
 
 
     getMappedName: (n) ->
@@ -124,15 +119,23 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             new Filtered @model.get('datapoints'), filter: filter
 
 
+    # Extract datapoints from the view model to store them in the data model.
     syncDatapoints: ->
+
+        # The getDatapoints function has been memoized, it means it keeps all
+        # its returned values in a cache.
+        # Here we deal directly with this cache because this function has
+        # already been called for all fields and edited fields were already
+        # marked.
         cache      = @getDatapoints.cache
         datapoints = @model.get 'datapoints'
 
-        models = _.reduce cache, (memo, collection, key) ->
-            return memo unless /^edit/.test key
-            memo.concat collection.filter (model) ->
-                not _.isEmpty model.get 'value'
-        , []
+        # It grabs all datapoints that has been edited.
+        models = []
+        for key, collection of cache.__data__ when /^edit/.test key
+            models = models.concat CH.getNonEmptyDatapoints collection
+
+        # Load new datapoints in the data model.
         datapoints.reset models
 
 
@@ -142,6 +145,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     addNewTag: (tag) ->
         app = require 'application'
+
+        # Update tag map used to filter quickly available tags.
+        app.contacts.tagMap[tag] = true
 
         app.tags.create
             name: tag

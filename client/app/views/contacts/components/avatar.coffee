@@ -11,8 +11,8 @@ module.exports = class AvatarView extends Mn.ItemView
 
 
     modelEvents:
-        'change:initials': 'updateInitials'
-        'change:avatar':   'render'
+        'change:n':      'updateInitials'
+        'change:avatar': 'render'
 
 
     getInitialsColor: ->
@@ -24,6 +24,8 @@ module.exports = class AvatarView extends Mn.ItemView
 
 
     updateInitials: (model, value) ->
-        @$('.initials')
-            .text value
-            .css 'background-color', @getInitialsColor()
+        el = @el.querySelector '.initials'
+
+        if el
+            el.innerHTML = @model.get 'initials'
+            el.style['background-color'] = @getInitialsColor()
