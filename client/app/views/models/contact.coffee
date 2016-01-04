@@ -146,6 +146,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     addNewTag: (tag) ->
         app = require 'application'
 
+        # Update tag map used to filter quickly available tags.
+        app.contacts.tagMap[tag] = true
+
         app.tags.create
             name: tag
         ,
