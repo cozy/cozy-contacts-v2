@@ -81,7 +81,7 @@ Contact::updateAttributes = (changes, callback) ->
 
 
 # Update revision each time a change occurs
-Contact::save = (callback) ->
+Contact::save = (changes, callback) ->
     changes.revision = new Date().toISOString()
     super
 
@@ -95,7 +95,7 @@ Contact::savePicture = (path, callback) ->
             callback err
         else
             fs.unlink path, (err) ->
-                log.error "failed to purge #{file.path}" if err
+                log.error "failed to purge #{path}" if err
                 callback()
 
 

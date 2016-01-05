@@ -15,7 +15,7 @@ Config.set = (hash, callback) ->
     Config.request 'all', (err, configs) ->
         return callback err if err
 
-        if config = configs?[0]
+        if (config = configs?[0])
             config.updateAttributes hash, callback
         else
             Config.create hash, callback
