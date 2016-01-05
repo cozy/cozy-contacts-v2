@@ -1,32 +1,24 @@
 {
-  "scripts": {
-    "start": "cake dev",
-    "test": "cake test"
+  "dependencies": {
+    "backbone": "1.2.3",
+    "backbone.marionette": "2.4.4",
+    "backbone.projections": "1.0.0",
+    "backbone.subroute": "0.4.6"
   },
-  "dependencies": {},
   "devDependencies": {
-    "autoprefixer-core": "^5.2.1",
-    "backbone": "^1.2.1",
-    "backbone.marionette": "^2.4.2",
-    "backbone.projections": "^1.0.0",
-    "backbone.subroute": "^0.4.6",
+    "autoprefixer": "6.2.3",
     "browser-sync-brunch": "0.0.9",
-    "chai": "^3.2.0",
-    "coffee-script-brunch": "1.8.0",
-    "coffeelint-brunch": "^1.7.0",
+    "coffee-script-brunch": "1.8.3",
+    "coffeelint-brunch": "1.7.1",
     "cozy-ui": "0.1.4",
     "css-brunch": "1.7.0",
-    "css-mqpacker": "^3.1.0",
-    "csswring": "^3.0.5",
-    "jade-brunch": "1.8.1",
-    "javascript-brunch": "1.7.1",
-    "json-brunch": "^1.5.4",
-    "mocha": "^2.2.5",
-    "opener": "^1.4.1",
-    "postcss-brunch": "^0.4.2",
-    "printit": "^0.1.8",
-    "sinon": "^1.15.4",
-    "stylus-brunch": "^1.8.1",
-    "uglify-js-brunch": "^1.7.8"
+    "css-mqpacker": "4.0.0",
+    "csswring": "4.1.1",
+    "jade-brunch": "1.8.2",
+    "javascript-brunch": "1.8.0",
+    "json-brunch": "1.5.4",
+    "postcss-brunch": "0.5.0",
+    "stylus-brunch": "1.8.1",
+    "uglify-js-brunch": "1.7.8"
   }
 }
