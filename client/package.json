@@ -3,7 +3,8 @@
     "backbone": "1.2.3",
     "backbone.marionette": "2.4.4",
     "backbone.projections": "1.0.0",
-    "backbone.subroute": "0.4.6"
+    "backbone.subroute": "0.4.6",
+    "cozy-realtime-adapter": "1.0.1"
   },
   "devDependencies": {
     "autoprefixer": "6.2.3",

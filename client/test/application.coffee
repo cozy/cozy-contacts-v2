@@ -1,3 +1,4 @@
+chai = require 'chai'
 should = chai.should()
 
 application = require 'application'

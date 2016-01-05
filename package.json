@@ -54,7 +54,7 @@
     "copy:views": "mkdir -p build/server/views && cp -r server/views/* build/server/views/",
     "build": "npm-run-all --parallel 'build:*'",
     "test:server": "env NODE_ENV=test mocha test --globals setTimmediate,clearImmediate --reporter spec --compilers coffee:coffee-script/register --colors",
-    "test:client": "mocha client/test --compilers coffee:coffee-script/register --ui bdd --colors",
+    "test:client": "env NODE_PATH=\"./client/app:$NODE_PATH\" mocha client/test --compilers coffee:coffee-script/register --ui bdd --colors",
     "test:build": "env USE_JS=true npm run test",
     "test": "npm run test:server",
     "fixtures:generate": "cozy-fixtures load -g -l -n 1000 client/test/fixtures/contacts-model.json",

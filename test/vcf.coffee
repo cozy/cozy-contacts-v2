@@ -28,9 +28,9 @@ describe 'VCF Import/Export', ->
             expect(body).to.equal """
 BEGIN:VCARD
 VERSION:3.0
+N:Smith;John;;;
 FN:John Smith
 NOTE:notes
-N:Smith;John;;;
 TEL;TYPE=HOME:+331234567
 TEL;TYPE=WORK:12584367
 EMAIL;TYPE=HOME:jsmith@test.com
