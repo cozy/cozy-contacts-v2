@@ -26,8 +26,8 @@ cozy-monitor install contacts
 
 You can contribute to the Cozy Contacts in many ways:
 
-* Pick up an [issue](https://github.com/mycozycloud/cozy-contacts/issues?state=open) and solve it.
-* Translate it in [a new language](https://github.com/mycozycloud/cozy-contacts/tree/master/client/app/locales).
+* Pick up an [issue](https://github.com/cozy/cozy-contacts/issues?q=is%3Aissue+is%3Aopen) and solve it.
+* Translate it in [a new language](https://www.transifex.com/cozy/cozy-contacts/dashboard/).
 * Allow to share contacts
 * Allow to subscribe to a CardDAV Contact Book.
 
@@ -36,43 +36,77 @@ You can contribute to the Cozy Contacts in many ways:
 
 Hacking the Contacts app requires you [setup a dev environment](http://cozy.io/hack/getting-started/). Once it's done you can hack Cozy Contact just like it was your own app.
 
+
 ```sh
-git clone https://github.com/mycozycloud/cozy-contacts.git
+$ git clone https://github.com/cozy/cozy-contacts.git
+$ cd cozy-contacts
+$ npm install
 ```
+
+### Development
 
 Run it with:
 
 ```sh
-node server.js
+$ npm run watch
 ```
 
-Each modification of the server requires a new build, here is how to run a build:
+The `watch` task starts 3 daemons:
+
+- the server one, running coffee-script server-side code through a [nodemon](https://github.com/remy/nodemon) process that reload the server part each time you make a change
+- a [node-inspector](https://github.com/node-inspector/node-inspector) process, that let you use the Chome/Chromium devtools applied to your node process and debug it directly [in your browser](http://127.0.0.1:8080/?ws=127.0.0.1:8080&port=5858)
+- a [brunch](https://github.com/brunch/brunch) watcher which recompiles and reload through browser-sync your front-end app in your browser each time you make a change
+
+It also ensures that the client dependencies are well resolved.
+
+### Build
+
+[![Build Status](https://travis-ci.org/cozy/cozy-emails.png?branch=master)](https://travis-ci.org/cozy/cozy-emails)
+
+The build is a part of the publication process, and you'll probably never need it explicitly. If you want to build you app anyway (e.g. to deploy it in a sandboxed cozy for tests purposes), you can achieve a build by running:
 
 ```sh
-cake build
+$ npm run build
 ```
 
-Each modification of the client requires a specific build too.
+Please, do not push your local builds in your PR, as long as we make the build process when we release the app.
+
+If you need to run the tests suite to your build:
 
 ```sh
-cd client
-brunch build
+$ npm run test:build
 ```
 
 
 ## Tests
 
-![Build
-Status](https://travis-ci.org/mycozycloud/cozy-contacts.png?branch=master)
+_NOTE:_ In order to run the tests, you must only have the Data System started.
 
-To run tests type the following command into the Cozy Contacts folder:
+A tests suite is available. You can run it with:
 
 ```sh
-cake tests
+npm run test
 ```
 
-In order to run the tests, you must only have the Data System started.
+Feel free to adapt/fix/add your own tests in your PR ;).
 
+### Fixtures
+
+Tests data are loaded by [cozy-fixtures](https://github.com/cozy/cozy-fixtures). A NPM script is pre-setted to help you to load fixtures.
+
+Contacts fixtures are generated through the [Mockaroo](http://mockaroo.com/) service, so you need an API key to use it ([create an account](https://mockaroo.com/users/sign_in) on the Mockaroo service and use the api key provided in the [my account](https://mockaroo.com/profile) page)
+
+```sh
+$ MOCKAROO_API_KEY="your_api_key" npm run fixtures
+```
+
+### Backend
+
+Running tests requires a Vagrant. Tests load a Dovecot instance in a Vagrant virtual machine. Make sure your Vagrant box is running, then run:
+
+```sh
+$ npm run test:server
+```
 
 ## Contribute with Transifex
 
