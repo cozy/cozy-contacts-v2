@@ -1,4 +1,5 @@
-{ "name": "cozy-contacts",
+{ 
+  "name": "cozy-contacts",
   "version": "2.1.3",
   "author": "Cozy Cloud <contact@cozycloud.cc> (http://cozycloud.cc)",
   "licenses": [
