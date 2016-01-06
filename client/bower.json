@@ -15,7 +15,7 @@
     "async": "~1.4.2",
     "fuzzy": "~0.1.1",
     "moment": "~2.10.6",
-    "polyglot": "~0.4.3",
+    "polyglot": "~0.4.5",
     "quoted-printable": "~0.2.1",
     "utf8": "~2.0.0"
   }
