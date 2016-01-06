@@ -50,6 +50,9 @@ module.exports = class ContactCardView extends Mn.LayoutView
     triggers:
         'click @ui.btnExport': 'export'
 
+    events:
+        'click @ui.formSubmit': 'showSaving'
+
     modelEvents:
         'change:edit':     'render'
         'save':            'onSave'
@@ -95,6 +98,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
         return unless @model.get 'new'
         app  = require 'application'
         dest = "contacts/#{@model.get 'id'}"
+        @hideSaving()
         app.router.navigate dest, trigger: true
 
 
@@ -106,4 +110,16 @@ module.exports = class ContactCardView extends Mn.LayoutView
         inputs = @$('.data.edit').find('input:not([type="hidden"]), textarea')
         if document.activeElement.tagName.toLowerCase() isnt 'textarea'
             inputs.eq(inputs.index(document.activeElement) + 1).trigger 'focus'
+
+
+    # Display saving by changing aria state of save button to true (save button
+    # is called form submit).
+    showSaving: ->
+        @ui.formSubmit.attr 'aria-busy', true
+
+
+    # Display saving by changing aria state of save button to false (save
+    # button is called form submit).
+    hideSaving: ->
+        @ui.formSubmit.attr 'aria-busy', false
 

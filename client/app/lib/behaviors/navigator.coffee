@@ -22,3 +22,4 @@ module.exports = class Navigator extends Mn.Behavior
                 'confirm:close': -> Mn.unbindEntityEvents @, @view
         else
             callback()
+
