@@ -14,10 +14,11 @@ logs
 results
 
 node_modules
-uploads
-
 npm-debug.log
+
+client/bower_components
 client/public
-server/views/*.js
+client/app/locales/*.json
+!client/app/locales/en.json
+
 picture.jpg
-*.transifex.coffee

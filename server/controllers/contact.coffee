@@ -21,7 +21,7 @@ module.exports =
         default: path.resolve __dirname, '../assets/defaultpicture.png'
 
 
-    create: (req, res) ->
+    create: (req, res, next) ->
 
         # support both JSON and multipart for upload
         model = if req.body.contact then JSON.parse req.body.contact
