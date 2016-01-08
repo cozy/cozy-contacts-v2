@@ -50,3 +50,4 @@ module.exports = class Form extends Mn.Behavior
     deleteField: (event) ->
         cid = @$(event.currentTarget).parents('[data-cid]').data 'cid'
         @view.triggerMethod 'form:field:delete', cid, event
+
