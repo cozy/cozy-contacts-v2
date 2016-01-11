@@ -1,16 +1,11 @@
 {
   "name": "cozy-contacts",
   "version": "2.1.4",
-  "author": "Cozy Cloud <contact@cozycloud.cc> (http://cozycloud.cc)",
-  "licenses": [
-    {
-      "type": "AGPL v3",
-      "url": "http://www.gnu.org/licenses/agpl-3.0.html"
-    }
-  ],
+  "author": "Cozy Cloud <contact@cozycloud.cc> (https://cozy.io/)",
+  "license": "AGPL-3.0",
   "description": "A cozy application to manage your contacts.",
   "engines": [
-    "node = 0.10.x"
+    "node >= 0.10.x"
   ],
   "main": "server.coffee",
   "dependencies": {
@@ -66,7 +61,7 @@
     "watch": "npm-run-all --parallel 'watch:*'",
     "start": "node build/server.js"
   },
-  "repository": "https://github.com/mycozycloud/cozy-contacts",
+  "repository": "https://github.com/cozy/cozy-contacts",
   "readmeFilename": "README.md",
   "cozy-permissions": {
     "Contact": {
