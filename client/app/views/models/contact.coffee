@@ -25,7 +25,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'tags:update':    'updateTags'
         'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
-        'form:submit':    -> @save()
+        'form:submit':    ->
+            @save()
         'export':         'downloadAsVCF'
         'delete':         -> @destroy()
 
