@@ -1,4 +1,4 @@
-# [Cozy](http://cozy.io) Contacts
+# [Cozy](https://cozy.io) Contacts
 
 Cozy Contacts makes your contact management easy. Main features are:
 
@@ -11,9 +11,9 @@ Cozy Contacts makes your contact management easy. Main features are:
 
 ## Install
 
-We assume here that the Cozy platform is correctly [installed](http://cozy.io/host/install) on your server.
+We assume here that the Cozy platform is correctly [installed](https://docs.cozy.io/en/host/install) on your server.
 
-You can simply install the Contacts application via the app registry. Click on ythe *Chose Your Apps* button located on the right of your Cozy Home.
+You can simply install the Contacts application via the app registry. Click on the *Chose Your Apps* button located on the right of your Cozy Home.
 
 From the command line you can type this command:
 
@@ -34,7 +34,7 @@ You can contribute to the Cozy Contacts in many ways:
 
 ## Hack
 
-Hacking the Contacts app requires you [setup a dev environment](http://cozy.io/hack/getting-started/). Once it's done you can hack Cozy Contact just like it was your own app.
+Hacking the Contacts app requires you [setup a dev environment](https://docs.cozy.io/en/hack/getting-started/). Once it's done you can hack Cozy Contact just like it was your own app.
 
 
 ```sh
@@ -61,7 +61,7 @@ It also ensures that the client dependencies are well resolved.
 
 ### Build
 
-[![Build Status](https://travis-ci.org/cozy/cozy-emails.png?branch=master)](https://travis-ci.org/cozy/cozy-emails)
+[![Build Status](https://travis-ci.org/cozy/cozy-contacts.png?branch=master)](https://travis-ci.org/cozy/cozy-contacts)
 
 The build is a part of the publication process, and you'll probably never need it explicitly. If you want to build you app anyway (e.g. to deploy it in a sandboxed cozy for tests purposes), you can achieve a build by running:
 
@@ -134,4 +134,4 @@ You can reach the Cozy Community by:
 * Chatting with us on IRC #cozycloud on irc.freenode.net
 * Posting on our [Forum](https://forum.cozy.io/)
 * Posting issues on the [Github repos](https://github.com/cozy/)
-* Mentioning us on [Twitter](http://twitter.com/mycozycloud)
+* Mentioning us on [Twitter](https://twitter.com/mycozycloud)
