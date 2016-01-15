@@ -1,24 +1,36 @@
-{Sorted} = BackboneProjections
-
 ContactViewModel = require 'views/models/contact'
+ContactRowView   = require 'views/contacts/row'
 
-# CharIndex = require 'collections/charindex'
+Indexes = Backbone.Collection
+
+{indexes} = require 'config'
 
 
 module.exports = class Contacts extends Mn.CompositeView
 
+    sort: false
+
+    # backbone dom node dynamics are called before initialize, internal sets are
+    # so unavailable, so fallback to root method for detection
     tagName: ->
-        if @model then 'dl' else 'div'
+        {model} = require 'application'
+        if model.get('scored')
+            'ul'
+        else if @model?.has('char')
+            'dl'
+        else
+            'div'
 
     attributes: ->
-        role: 'rowgroup' if @model
+        {model} = require 'application'
+        role: 'rowgroup' if model.get('scored') or @model?.has('char')
 
     template: require 'views/templates/contacts'
 
 
     events: ->
-        return false if @model
-        'change [type="checkbox"]': 'updateBulkSelection'
+        # if there isn't any model, it's the root tree, so delegate list events
+        'change [type="checkbox"]': 'updateBulkSelection' unless @model?
 
 
     attachElContent: (html) ->
@@ -27,17 +39,15 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     attachBuffer: (compositeView, buffer) ->
+        selector = Mn._getValue @childViewContainer, @
+        el  = if _.isString selector then @el.querySelector selector else @el
+        el.appendChild buffer
         @toggleEmpty()
-        if @hasContacts
-            @el.querySelector('ul').appendChild buffer
-        else
-            @el.innerHTML = '' unless @model
-            @el.appendChild buffer
 
 
     buildChildView: (child) ->
-        if child instanceof ContactViewModel
-            ChildView = require 'views/contacts/row'
+        if @_hasContacts
+            ChildView = ContactRowView
         else
             ChildView = @constructor
 
@@ -45,9 +55,17 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     showCollection: ->
-        @$el.removeClass 'empty'
+        # scored mode, render a filtered collection
+        models = if @_mode is 'scored'
+            @collection.get()
+        # indexed mode, char chunk branch
+        else if @_hasContacts
+            @collection.get index: @model.get 'char'
+        # indexed mode, root indexes collection
+        else
+            @collection.models
 
-        @_filteredSortedModels().map (model, index) =>
+        models.forEach (model, index) =>
             view  = @buildChildView model
 
             @_updateIndices view, true, index
@@ -58,70 +76,96 @@ module.exports = class Contacts extends Mn.CompositeView
 
     _createBuffer: ->
         elBuffer = document.createDocumentFragment()
-        @_bufferedChildren.map (buffer) ->
-            elBuffer.appendChild buffer.el
+        @_bufferedChildren.forEach (buffer) -> elBuffer.appendChild buffer.el
         return elBuffer
 
 
-    filter: (model, index, collection) ->
-        return true unless model instanceof ContactViewModel
-
-        app = require 'application'
-
-        if @tag and @tag not in model.get('tags')
-            return false
-
-        if app.model.get 'scored'
-            model.model.cid in Object.keys @collection.filtered
-        else
-            char    = @model.get 'name'
-            idx     = if app.model.get('sort') is 'fn' then 0 else 1
-            initial = model.get('initials')[idx]
-
-            if char is '#' then not initial?.match(/[a-zA-Z]/)
-            else char is initial?.toLowerCase()
+    # To prevents inconsistencies on filetered collection, we find the view to
+    # remove base on its underlying model rather on its viewModel
+    _onCollectionRemove: (vmodel) ->
+        baseModel = vmodel.model
+        view = @children.find (view) -> view.model.model is baseModel
+        @removeChildView view
+        @checkEmpty()
 
 
+    # This CompositeView can be used in two different mode:
+    # 1. an _indexed_ mode, in which the contacts' collection is splitted in
+    # chunks of subcollection, one by `[a-z#]` chars
+    # 2. a _scored_ mode, in which all the collection is rendered in one block
+    # and sorted by a score instead of by initials
+    #
+    # Initialize detects the relevant mode and adapt its internal configuration.
+    #
+    # The mode is related to the part of the branch/leaf tree: if the rendered
+    # leaf contains `ContactsViewModel`s, the actual view _must_ knows it for
+    # internal purposes.
+    #
     initialize: ->
-        app = require 'application'
+        {model, filtered} = require 'application'
 
-        if @model?._attachedCollection
-            @collection = @model._attachedCollection
+        @_mode = if model.get('scored') then 'scored' else 'indexed'
+        # If we're on a branch (char chunk), or mode's `scored`, we assume we
+        # render `ContactView` leafs
+        @_hasContacts = (@model?.has('char') or @_mode is 'scored')
 
-        else unless @model or app.model.get 'scored'
-            collection = @collection
-            groups = [].map.call 'abcdefghijklmnopqrstuvwxyz#', (char) ->
-                group = new Backbone.Model name: char
-                group._attachedCollection = collection
-                return group
-            @collection = new Backbone.Collection groups
 
-        return unless @collection
+        # We've Contacts and we're in indexed mode > it's a chunk char branch
+        if @_hasContacts and @_mode is 'indexed'
+            @collection = filtered
+            @childViewContainer = 'ul'
+            @filter = (vmodel) =>
+                _.contains @collection.get(index: @model.get 'char'), vmodel
 
-        pattern = require('config').search.pattern 'tag'
-        @tag = app.model.get('filter')?.match(pattern)?[1]
+        # We're in indexed mode and hadn't any contact > chunks char root
+        else if @_mode is 'indexed' and not @_hasContacts
+            @collection = new Indexes Array::map.call indexes, (char) -> {char}
 
-        @hasContacts = @collection.model is ContactViewModel
+        # Add listener to update tags classes if view displays contacts
+        if @_hasContacts
+            @sort = true
+            @listenTo @collection, 'update': @updateTagClasses
+            @listenTo @collection.underlying, 'change:tags': @updateTagClasses
 
-        if @hasContacts
-            @listenTo @,
-                'render': -> setTimeout => @children.call 'lazyLoadAvatar'
+        # Force highlight refresh when filter is updated
+        if @_mode is 'scored'
+            @listenTo model, 'change:filter': -> @children.invoke 'highlight'
 
-            @listenTo @collection,
-                'update': @toggleEmpty
+        # Temporary disable events reacts when scored view is in front
+        if @_mode is 'indexed'
+            @listenTo model, 'change:scored': @toggleEvents
 
-        @listenTo app.vent,
-            'filter:tag': (value) ->
-                @tag = value
-                @render() if @hasContacts
-                @triggerMethod 'filter'
-            'filter:text': (value) ->
-                @render() if app.model.get 'scored'
-                @triggerMethod 'filter'
+
+    toggleEvents: (nil, disable) ->
+        # appViewModel.scored == disable filtered collection events
+        if disable
+            @stopListening @collection, 'add'
+            @stopListening @collection, 'remove'
+            @stopListening @collection, 'reset'
+            @stopListening @collection, 'sort'
+        else
+            setTimeout =>
+                @_initialEvents()
+                @updateTagClasses()
 
 
     toggleEmpty: ->
-        @$el.toggleClass 'empty', not @children.length
+        @el.classList.toggle 'empty', not @children.length
+
+
+    updateTagClasses: ->
+        tags = _.chain @collection.get index: @model?.get 'char'
+            .invoke 'get', 'tags'
+            .flatten()
+            .compact()
+            .map (tag) -> "tag_#{tag}"
+            .join ' '
+            .value()
+        if tags.length
+            @el.className = tags
+        else
+            @el.removeAttribute 'class'
+        @toggleEmpty()
 
 
     updateBulkSelection: (event) ->
@@ -131,3 +175,6 @@ module.exports = class Contacts extends Mn.CompositeView
 
         @triggerMethod method, id
 
+
+    # methods aliases
+    onRender: @::updateTagClasses

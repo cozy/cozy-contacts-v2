@@ -9,6 +9,11 @@ module.exports = class ContactRow extends Backbone.View
         role: 'row'
 
 
+    _format:
+        pre: '<b>'
+        post: '</b>'
+
+
     initialize: ->
         app = require 'application'
 
@@ -21,28 +26,30 @@ module.exports = class ContactRow extends Backbone.View
         el   = @el
         data = @serializeData()
 
+        el.className = @model.get('tags')?.map((tag) -> "tag_#{tag}").join(' ')
+
         template     = require 'views/templates/contacts/row'
         el.innerHTML = template data
 
+        @highlight()
+
 
     serializeData: ->
-        app    = require 'application'
+        _.extend @model.toJSON(),
+            selected: @model.id in app.model.get 'selected'
+            fullname: @model.toString @_format
+
+
+    highlight: ->
         filter = app.model.get('filter')?.match PATTERN
-        format =
-            pre: '<b>'
-            post: '</b>'
+        return unless filter
 
-        data = @model.toJSON()
-        data.selected = @model.id in app.model.get 'selected'
-        data.fullname = if filter
-            @model.toHighlightedString filter[1],
-                pre: '<span class="search">'
-                post: '</span>'
-                format: format
-        else
-            @model.toString format
+        fullname = @model.toHighlightedString filter[1],
+            pre: '<span class="search">'
+            post: '</span>'
+            format: @_format
 
-        return data
+        @el.querySelector('.name p').innerHTML = fullname
 
 
     refreshChecked: (appViewModel, selected)->
@@ -58,3 +65,6 @@ module.exports = class ContactRow extends Backbone.View
         if isElInViewport and imgEl
             imgEl.setAttribute 'src', imgEl.dataset.src
 
+
+    # methods aliases
+    onShow: @::lazyLoadAvatar

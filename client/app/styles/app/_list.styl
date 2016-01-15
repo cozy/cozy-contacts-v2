@@ -17,7 +17,9 @@
 
         &:not(:empty)
             vertically-padded .3em
-            border-bottom 1px solid grey-02
+
+            &:not(:first-child)
+                border-top 1px solid grey-02
 
 
     [role=gridcell]

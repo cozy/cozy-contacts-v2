@@ -1,13 +1,19 @@
 ContactsListener = require 'lib/contacts_listener'
 
 
-comparator = (a, b) ->
-    sort = @comparator.sort
-    [a, b] = [a, b].map (model) ->
-        name = model.get('n').split(';')
-        if sort is 'gn' then "#{name[0]}#{name[1]}" else "#{name[1]}#{name[0]}"
+comparator = (sort) ->
+    fn = (a, b) ->
+        [a, b] = [a, b].map (model) ->
+            name = model.get('n').split(';')
+            if fn.sort is 'gn'
+                "#{name[0]}#{name[1]}"
+            else
+                "#{name[1]}#{name[0]}"
 
-    a.localeCompare b
+        a.localeCompare b
+
+    fn.sort = sort
+    return fn
 
 
 module.exports = class Contacts extends Backbone.Collection
@@ -20,10 +26,9 @@ module.exports = class Contacts extends Backbone.Collection
     initialize: ->
         app = require 'application'
 
-        @comparator      = comparator
-        @comparator.sort = app.model.get 'sort'
+        @comparator = comparator app.model.get 'sort'
 
-        @listenTo app.model, 'change:sort', (appViewModel, sort)->
+        @listenTo app.model, 'change:sort', (nil, sort) =>
             @comparator.sort = sort
             @sort()
 
@@ -76,4 +81,3 @@ module.exports = class Contacts extends Backbone.Collection
                 @trigger 'import', current
 
         setTimeout processCards, 35
-
