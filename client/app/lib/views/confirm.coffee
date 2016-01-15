@@ -26,5 +26,5 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
 
 
     onConfirmClose: ->
-        app = require 'application'
-        app.layout.alerts.empty()
+        {layout} = require 'application'
+        layout.alerts.empty()

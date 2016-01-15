@@ -1,6 +1,9 @@
 ContactViewModel = require 'views/models/contact'
 
 {indexes} = require 'config'
+tagRegExp = require('config').search.pattern 'tag'
+app       = null
+
 
 ordering = (underlying, scores) ->
     fn = (a, b) ->
@@ -59,7 +62,7 @@ module.exports = class FilteredCollection
         initial = vmodel.get('initials')[@sortIdx]?.toLowerCase() or ''
         set = @indexes.get( if /[a-z]/.test initial then initial else '#' )
 
-        return vmodel if _.contains set, vmodel
+        return vmodel if _.includes set, vmodel
 
         if sorted
             idx = _.sortedIndex set, vmodel, @comparator
@@ -118,7 +121,7 @@ module.exports = class FilteredCollection
 
     remove: (vmodels) ->
         vmodels.forEach (vmodel) =>
-            return unless _.contains @models, vmodel
+            return unless _.includes @models, vmodel
 
             @indexes.forEach (set) -> _.pull set, vmodel
             _.pull @models, vmodel
@@ -144,7 +147,7 @@ module.exports = class FilteredCollection
         tag  = _.last app.model.get('filter')?.match tagRegExp
 
         if tag and opts.tagged
-            base.filter (vmodel) -> _.contains vmodel.get('tags'), tag
+            base.filter (vmodel) -> _.includes vmodel.get('tags'), tag
         else
             base
 

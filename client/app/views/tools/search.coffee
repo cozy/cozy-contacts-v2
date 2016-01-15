@@ -28,8 +28,7 @@ module.exports = class SearchView extends Mn.ItemView
         if _.isEmpty value
             value = null
             @toggleUi()
-        app = require 'application'
-        app.search 'text', value
+        require('application').search 'text', value
 
 
     clearSearch: ->

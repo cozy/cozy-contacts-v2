@@ -1,6 +1,7 @@
 MergeView = require 'views/contacts/merge'
 MergeModel = require 'views/models/merge'
 
+app = undefined
 
 module.exports = class AppViewModel extends Backbone.ViewModel
 
@@ -23,6 +24,8 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     initialize: ->
+        app = require 'application'
+
         @set 'selected', []
         @listenTo @, 'change:filter', (nil, value) ->
             @unselectAll()
@@ -41,7 +44,6 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     selectAll: ->
-        app = require 'application'
         select = app.filtered.get(tagged: true).map (contact) -> contact.id
         @set selected: select
 
@@ -51,7 +53,6 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     bulkDelete: ->
-        app      = require 'application'
         selected = @attributes.selected
 
         success = (model) => @unselect model.id
@@ -66,7 +67,6 @@ module.exports = class AppViewModel extends Backbone.ViewModel
     # TODO: probably need to be revamped when doing it for the whole merge
     # feature
     bulkMerge: ->
-        app = require 'application'
         candidates = app.contacts.filter (contact) =>
             contact.id in @attributes.selected
 
@@ -86,7 +86,6 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     bulkExport: (all) ->
-        app      = require 'application'
         selected = @attributes.selected
         len      = if all then app.contacts.size() else selected.length
         toExport = []
@@ -122,7 +121,6 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                     END:VCARD[\r\n]{0,2}$
                 ///
                 if validVCF.test res
-                    app = require 'application'
                     app.contacts.importFromVCF res
                 else
                     @set 'errors', upload: 'error upload wrong filetype'

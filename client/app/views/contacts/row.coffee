@@ -1,7 +1,10 @@
 PATTERN = require('config').search.pattern 'text'
 
+app = undefined
 
 module.exports = class ContactRow extends Backbone.View
+
+    supportsRenderLifecycle: false
 
     tagName: 'li'
 

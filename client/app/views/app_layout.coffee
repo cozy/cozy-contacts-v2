@@ -19,6 +19,7 @@ DuplicatesView     = require 'views/duplicates'
 SettingsView       = require 'views/settings'
 
 t = require 'lib/i18n'
+app = undefined
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -106,8 +107,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showContactsList: ->
-        app = require 'application'
-
         view = new ContactsView collection: app.filtered
 
         @listenToOnce view,
@@ -145,7 +144,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     _buildContactView: (id) ->
-        app = require 'application'
         if id is 'new'
             model = new ContactModel null, parse: true
         else

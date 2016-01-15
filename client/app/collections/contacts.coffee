@@ -24,11 +24,11 @@ module.exports = class Contacts extends Backbone.Collection
 
 
     initialize: ->
-        app = require 'application'
+        {model} = require 'application'
 
-        @comparator = comparator app.model.get 'sort'
+        @comparator = comparator model.get 'sort'
 
-        @listenTo app.model, 'change:sort', (nil, sort) =>
+        @listenTo model, 'change:sort', (nil, sort) =>
             @comparator.sort = sort
             @sort()
 

@@ -115,7 +115,7 @@ module.exports = class Contacts extends Mn.CompositeView
             @collection = filtered
             @childViewContainer = 'ul'
             @filter = (vmodel) =>
-                _.contains @collection.get(index: @model.get 'char'), vmodel
+                _.includes @collection.get(index: @model.get 'char'), vmodel
 
         # We're in indexed mode and hadn't any contact > chunks char root
         else if @_mode is 'indexed' and not @_hasContacts

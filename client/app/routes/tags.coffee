@@ -1,3 +1,5 @@
+app = undefined
+
 module.exports = class ContactsRouter extends Backbone.SubRoute
 
     routes:
@@ -19,7 +21,6 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
 
     filter: (slug) ->
-        app = require 'application'
         app.search 'tag', slug
 
         idx = @sheet.cssRules.length
