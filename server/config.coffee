@@ -1,6 +1,7 @@
-americano = require 'americano'
-path = require 'path'
-fs = require 'fs'
+fs          = require 'fs'
+path        = require 'path'
+americano   = require 'americano'
+compression = require 'compression'
 
 viewsDir = path.resolve __dirname, 'views'
 useBuildView = fs.existsSync path.resolve viewsDir, 'index.js'
@@ -9,6 +10,7 @@ module.exports =
 
     common:
         use: [
+            compression()
             americano.static path.resolve(__dirname, '../client/public'),
                 maxAge: 86400000
             americano.bodyParser limit: '1mb', keepExtensions: true

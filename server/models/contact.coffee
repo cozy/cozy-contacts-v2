@@ -122,32 +122,3 @@ Contact::toVCF = (callback) ->
                 callback null, VCardParser.toVCF(@, picture)
     else
         callback null, VCardParser.toVCF(@)
-
-
-# Migration 2015-01 : datapoints.where 'name' is 'adr':
-# Simple string is replaced by an String[7] .
-Contact::migrateAdr = (callback) ->
-    hasMigrate = false
-
-    datapoints = this?.datapoints or []
-    datapoints?.forEach (dp) ->
-        if dp.name is 'adr'
-            if typeof dp.value is 'string' or dp.value instanceof String
-                dp.value = VCardParser.adrStringToArray dp.value
-                hasMigrate = true
-
-    if hasMigrate
-        @updateAttributes {datapoints}, callback
-    else
-        setImmediate callback
-
-
-Contact.migrateAll = (callback) ->
-    Contact.all {}, (err, contacts) ->
-        if err?
-            console.log err
-            callback()
-        else
-            async.eachLimit contacts, 10, (contact, done) ->
-                contact.migrateAdr done
-            , callback
