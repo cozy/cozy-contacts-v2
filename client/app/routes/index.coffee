@@ -8,6 +8,8 @@ when needed and show them in the app_layout regions.
 ContactsRouter = require 'routes/contacts'
 TagsRouter     = require 'routes/tags'
 
+app = undefined
+
 
 module.exports = class Router extends Backbone.Router
 
@@ -42,7 +44,6 @@ module.exports = class Router extends Backbone.Router
 
 
     settings: ->
-        app = require 'application'
         app.model.set 'dialog', 'settings'
 
 

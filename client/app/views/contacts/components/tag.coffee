@@ -7,4 +7,4 @@ module.exports = class ContactTagView extends Mn.ItemView
 
     serializeData: ->
         tags = @options.contactViewModel.get('tags')
-        _.extend {}, super, selected: _.contains tags, @model.get('name')
+        _.extend {}, super, selected: _.includes tags, @model.get 'name'

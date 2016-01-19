@@ -7,8 +7,7 @@ main region for its subviews.
 
 ContactModel = require 'models/contact'
 
-ContactViewModel            = require 'views/models/contact'
-ContactViewModelsCollection = require 'views/collections/contacts'
+ContactViewModel = require 'views/models/contact'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
@@ -20,6 +19,7 @@ DuplicatesView     = require 'views/duplicates'
 SettingsView       = require 'views/settings'
 
 t = require 'lib/i18n'
+app = undefined
 
 
 module.exports = class AppLayout extends Mn.LayoutView
@@ -44,7 +44,8 @@ module.exports = class AppLayout extends Mn.LayoutView
     regions:
         actions: 'aside .tool-actions'
         labels:  'aside .tool-labels'
-        content: '@ui.content [role="grid"]'
+        indexes: '@ui.content .indexes'
+        results:  '@ui.content .results'
         toolbar: 'main [role="toolbar"]'
         dialogs:
             selector: '.dialogs'
@@ -57,7 +58,7 @@ module.exports = class AppLayout extends Mn.LayoutView
     modelEvents:
         'change:dialog':   'showDialog'
         'change:selected': 'swapContextualMenu'
-        'change:scored':   'showContactsList'
+        'change:scored':   'onSearchResults'
 
     childEvents:
         'drawer:toggle':     'toggleDrawer'
@@ -69,14 +70,14 @@ module.exports = class AppLayout extends Mn.LayoutView
     initialize: ->
         app = require 'application'
 
-        @underlyingContacts = new ContactViewModelsCollection app.contacts
-
-        @listenToOnce app.contacts, 'sync', ->
-            @showContactsList()
-            scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
-            @ui.content.on 'scroll', scroller
-
         @listenToOnce app.tags, 'sync', @showFilters
+        @listenToOnce app.contacts, 'sync', @showContactsList
+
+        @listenTo app.filtered,
+            'update': @updateCounter
+
+        @listenTo app.model,
+            'change:filter': @updateCounter
 
         @bindEntityEvents app.vent,
             'busy:enable':  -> @$el.attr 'aria-busy', true
@@ -86,6 +87,9 @@ module.exports = class AppLayout extends Mn.LayoutView
     onRender: ->
         @showChildView 'toolbar', new ToolbarView()
         @showChildView 'actions', new DefaultActionsTool()
+
+        scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
+        @$(@ui.content).on 'scroll', scroller
 
 
     onKeyPageup: ->
@@ -103,22 +107,28 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showContactsList: ->
-        app = require 'application'
+        view = new ContactsView collection: app.filtered
 
-        view = new ContactsView collection: @underlyingContacts
-
-        @listenTo @underlyingContacts,
-            'update': @updateCounter
-
-        @listenTo view,
-            'dom:refresh': ->
+        @listenToOnce view,
+            'show': ->
                 app.vent.trigger 'busy:disable'
-                @ui.content.trigger 'focus' unless app.model.get 'scored'
+                @ui.content.trigger 'focus'
                 @updateCounter()
-            'filter': ->
-                setTimeout => @updateCounter()
 
-        setTimeout => @showChildView 'content', view
+        @showChildView 'indexes', view
+
+
+    onSearchResults: (nil, isSearch) ->
+        # hide/show indexed list view if is/isnt in search mode
+        @indexes.$el.attr 'aria-hidden', isSearch
+
+        if isSearch
+            # delay search view threats to let the DOM safe
+            setTimeout =>
+                view = new ContactsView collection: app.filtered
+                @showChildView 'results', view
+        else
+            @results.reset()
 
 
     showDialog: (appViewModel, slug) ->
@@ -134,7 +144,6 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     _buildContactView: (id) ->
-        app = require 'application'
         if id is 'new'
             model = new ContactModel null, parse: true
         else
@@ -147,14 +156,14 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     updateCounter: ->
-        size = require('application').getSelected().length
-
-        label = if size
-            t('list counter', {smart_count: size})
-        else unless @underlyingContacts.isEmpty()
-            t('list counter no-search')
+        unless app.contacts.length
+            label = t('list counter empty')
         else
-            t('list counter empty')
+            size = app.filtered.get(tagged: true).length
+            label = if size
+                t('list counter', {smart_count: size})
+            else
+                t('list counter no-search')
 
         @ui.counter
             .text label

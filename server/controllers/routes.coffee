@@ -9,6 +9,7 @@ module.exports =
 
 
     'config':
+        post: application.setConfig
         put: application.setConfig
 
     'contactid':

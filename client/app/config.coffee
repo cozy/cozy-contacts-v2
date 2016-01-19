@@ -11,6 +11,8 @@ module.exports =
     settings:
         sortkeys: ['gn', 'fn']
 
+    indexes: 'abcdefghijklmnopqrstuvwxyz#'
+
     colorSet: [
         '304FFE'
         '2979FF'
@@ -36,4 +38,3 @@ module.exports =
         pattern: (pattern, flags) ->
             flags = if pattern then 'i' else 'ig'
             new RegExp "`#{pattern or '\\w+'}:([^`]+)`", flags
-

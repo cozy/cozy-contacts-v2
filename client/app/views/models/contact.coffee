@@ -3,6 +3,8 @@ Filtered = BackboneProjections.Filtered
 CONFIG = require('config').contact
 CH = require('lib/contact_helper')
 
+app = null
+
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
@@ -35,6 +37,8 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     initialize: ->
+        app = require 'application'
+
         @_setRef()
 
         @getDatapoints = _.memoize @getDatapoints, (key) ->
@@ -145,12 +149,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     addNewTag: (tag) ->
-        app = require 'application'
+        {contacts, tags} = app
 
         # Update tag map used to filter quickly available tags.
-        app.contacts.tagMap[tag] = true
+        contacts.tagMap[tag] = true
 
-        app.tags.create
+        tags.create
             name: tag
         ,
             wait: true
@@ -160,7 +164,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onSave: ->
-        require('application').contacts.add @model if @get 'new'
+        app.contacts.add @model if @get 'new'
 
 
     onReset: -> @_setRef()

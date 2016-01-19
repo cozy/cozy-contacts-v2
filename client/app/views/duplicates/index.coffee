@@ -40,10 +40,10 @@ module.exports = class DuplicatesView extends Mn.CompositeView
 
 
     initialize: ->
-        app = require 'application'
+        {contacts} = require 'application'
 
         # Generate duplicates list.
-        @collection = new Duplicates null, collection: app.contacts
+        @collection = new Duplicates null, collection: contacts
         @toMerge = new BackboneProjections.Filtered @collection,
             filter: (merge) -> merge.isMergeable()
 

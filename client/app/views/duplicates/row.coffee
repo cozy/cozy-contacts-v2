@@ -74,5 +74,5 @@ module.exports = class MergeRow extends Mn.ItemView
             @model.merge()
         else
             MergeView = require 'views/contacts/merge'
-            app = require 'application'
-            app.layout.showChildView 'alerts', new MergeView model: @model
+            {layout}  = require 'application'
+            layout.showChildView 'alerts', new MergeView model: @model

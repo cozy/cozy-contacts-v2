@@ -10,6 +10,7 @@ Router = require 'routes'
 ConfigModel = require 'models/config'
 
 ContactsCollection = require 'collections/contacts'
+FilteredCollection = require 'collections/filtered'
 TagsCollection     = require 'collections/tags'
 
 AppLayout    = require 'views/app_layout'
@@ -35,6 +36,7 @@ class Application extends Mn.Application
             @model    = new AppViewModel null, model: config
 
             @contacts = new ContactsCollection()
+            @filtered = new FilteredCollection()
             @tags     = new TagsCollection()
 
             @layout   = new AppLayout model: @model
@@ -56,20 +58,6 @@ class Application extends Mn.Application
             Backbone.history.start pushState: false if Backbone.history
 
 
-    getSelected: ->
-        view = @layout.getChildView 'content'
-        view.children.reduce (memo, view) ->
-            if view.hasContacts
-                models = view.children.map (view) -> view.model.model
-                memo   = memo.concat models
-            else
-                memo.push view.model.model
-
-            return memo
-        , []
-
-
-
     search: (pattern, string) ->
         filter  = @model.get 'filter'
         input   = "`#{pattern}:#{string}`"
@@ -88,7 +76,7 @@ class Application extends Mn.Application
             filter = filter.replace(_pattern, '')
 
         @model.set 'filter', filter
-        setTimeout => @vent.trigger "filter:#{pattern}", string
+        @vent.trigger "filter:#{pattern}", string
 
 
 # Exports Application singleton instance

@@ -31,6 +31,9 @@ exports.config =
 
 
     plugins:
+        browserSync:
+            notify: false
+
         coffeelint:
             pattern: /^app\/.*\.coffee$/
             options:

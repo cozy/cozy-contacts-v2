@@ -24,7 +24,7 @@ module.exports = class ContactDatapointView extends Mn.ItemView
 
 
     serializeData: ->
-        data = super
+        data = @model.toJSON()
         entity = switch data.name
             when 'social', 'chat' then 'social'
             when 'url'            then 'url'

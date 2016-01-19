@@ -1,3 +1,5 @@
+app = undefined
+
 module.exports = class ContactsRouter extends Backbone.SubRoute
 
     routes:
@@ -8,9 +10,12 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         '':           'index'
 
 
+    initialize: ->
+        app = require 'application'
+
+
     _ensureContacts: (callback) ->
         return unless _.isFunction callback
-        app = require 'application'
         if app.contacts.isEmpty()
             @listenToOnce app.contacts, 'sync', callback
         else
@@ -18,14 +23,12 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
 
     _setCardState: (id, edit) ->
-        app    = require 'application'
         dialog = id in app.contacts.pluck('id') or id is 'new'
         app.model.set 'dialog', if dialog then id else false
         app.vent.trigger 'mode:edit', edit
 
 
     index: ->
-        app = require 'application'
         app.search 'tag', null
 
 
@@ -42,5 +45,4 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
 
     duplicates: ->
-        app = require 'application'
         @_ensureContacts -> app.model.set 'dialog', 'duplicates'
