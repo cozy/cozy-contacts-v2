@@ -20,9 +20,12 @@ module.exports = class ContactRow extends Backbone.View
     initialize: ->
         app = require 'application'
 
-        @listenTo @model, 'change', @render
-        @listenTo app.model, 'change:selected', @refreshChecked
-        @listenTo app.vent, 'content:scroll', @lazyLoadAvatar
+        @listenTo @model, 'change': ->
+            @render()
+            @lazyLoadAvatar()
+
+        @listenTo app.model, 'change:selected': @refreshChecked
+        @listenTo app.vent, 'content:scroll': @lazyLoadAvatar
 
 
     render: ->
