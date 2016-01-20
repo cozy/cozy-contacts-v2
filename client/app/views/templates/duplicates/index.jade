@@ -4,11 +4,6 @@ block content
     h1= t('duplicates title')
 
     if size > 0
-        button(type="submit").mergeall
-            .fa.fa-code-fork
-            span= t('duplicates actions mergeall')
-            |  (#{size})
-
         div(role="grid")
 
     else
