@@ -159,39 +159,3 @@ Contact.prototype.toVCF = function(callback) {
     return callback(null, VCardParser.toVCF(this));
   }
 };
-
-Contact.prototype.migrateAdr = function(callback) {
-  var datapoints, hasMigrate;
-  hasMigrate = false;
-  datapoints = (typeof this !== "undefined" && this !== null ? this.datapoints : void 0) || [];
-  if (datapoints != null) {
-    datapoints.forEach(function(dp) {
-      if (dp.name === 'adr') {
-        if (typeof dp.value === 'string' || dp.value instanceof String) {
-          dp.value = VCardParser.adrStringToArray(dp.value);
-          return hasMigrate = true;
-        }
-      }
-    });
-  }
-  if (hasMigrate) {
-    return this.updateAttributes({
-      datapoints: datapoints
-    }, callback);
-  } else {
-    return setImmediate(callback);
-  }
-};
-
-Contact.migrateAll = function(callback) {
-  return Contact.all({}, function(err, contacts) {
-    if (err != null) {
-      console.log(err);
-      return callback();
-    } else {
-      return async.eachLimit(contacts, 10, function(contact, done) {
-        return contact.migrateAdr(done);
-      }, callback);
-    }
-  });
-};
