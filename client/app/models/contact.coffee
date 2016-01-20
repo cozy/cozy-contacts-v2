@@ -70,6 +70,8 @@ module.exports = class Contact extends Backbone.Model
         # Handle specific attributes.
         attrs = model.toJSON()
 
+        attrs.fn = VCardParser.nToFN attrs.n.split ';'
+
         datapoints = (model.attributes.datapoints?.toJSON() or [])
         attrs.datapoints = datapoints.map (point) ->
             if point.name is 'adr'
