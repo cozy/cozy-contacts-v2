@@ -166,8 +166,8 @@ module.exports = class Contact extends Backbone.Model
             error: options.error
 
 
-    picturetoa: (cb) ->
-        return cb() unless @attributes._attachments?.picture
+    picturetoa: (callback) ->
+        return callback() unless @attributes._attachments?.picture
         picture = new Image()
         picture.onload = ->
             canvas = document.createElement 'canvas'
@@ -176,10 +176,11 @@ module.exports = class Contact extends Backbone.Model
             ctx = canvas.getContext '2d'
             ctx.drawImage @, 0, 0
             [..., base64string] = canvas.toDataURL("image/jpeg").split ','
-            cb base64string
+            callback base64string
         picture.src = "contacts/#{@id}/picture.png"
 
 
-    toVCF: (cb) ->
+    toVCF: (callback) ->
         data = @toJSON()
-        @picturetoa (picture) -> _.delay cb, 0, VCardParser.toVCF data, picture
+        data.datapoints = data.datapoints.toJSON()
+        @picturetoa (picture) -> callback VCardParser.toVCF data, picture
