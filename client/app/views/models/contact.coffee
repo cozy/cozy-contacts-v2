@@ -171,6 +171,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     downloadAsVCF: ->
-        @model.toVCF (card) =>
+        fn = @model.get 'fn'
+        @model.toVCF (card) ->
             blob = new Blob [card], type: "text/plain;charset=utf-8"
-            saveAs blob, "#{@model.get 'fn'}.vcf"
+            saveAs blob, "#{fn}.vcf"
