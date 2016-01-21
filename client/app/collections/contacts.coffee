@@ -63,7 +63,7 @@ module.exports = class Contacts extends Backbone.Collection
 
     importFromVCF: (vcard) ->
         current = 0
-        cards  = vcard.split /END:VCARD[\r\n]{0,2}/gi
+        cards  = vcard.trimRight().split /END:VCARD/gi
             .filter (vcard) -> not _.isEmpty vcard
             .map (vcard) -> "#{vcard}END:VCARD"
 

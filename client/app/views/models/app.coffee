@@ -115,12 +115,8 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             reader.readAsText file
             reader.onloadend = =>
                 res = reader.result
-                validVCF = ///
-                    ^BEGIN:VCARD[\r\n]{1,2}
-                    (?:.+[\r\n]{1,2})+
-                    END:VCARD[\r\n]{0,2}$
-                ///
-                if validVCF.test res
+                isVCF = /^BEGIN:VCARD/
+                if isVCF.test res
                     app.contacts.importFromVCF res
                 else
                     @set 'errors', upload: 'error upload wrong filetype'
