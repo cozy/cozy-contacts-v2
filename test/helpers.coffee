@@ -10,7 +10,10 @@ Config = require "#{prefix}server/models/config"
 Client = require('request-json').JsonClient
 ds = require 'cozydb/lib/utils/client'
 
-TESTPORT = process.env.PORT or 8013
+options =
+    host: 'localhost'
+    port: process.env.PORT or 8013
+    root: prefix
 
 module.exports =
     prefix: prefix
@@ -18,7 +21,7 @@ module.exports =
     startServer: (done) ->
         @timeout 6000
         start = require "#{prefix}server"
-        start 'localhost', TESTPORT, (err, app, server) =>
+        start options, (err, app, server) =>
             @server = server
             done err
 
@@ -42,7 +45,7 @@ module.exports =
             done err
 
     makeTestClient: (done) ->
-        old = new Client "http://localhost:#{TESTPORT}/"
+        old = new Client "http://localhost:#{options.port}/"
         old.headers['accept'] = 'application/json'
 
         store = this # this will be the common scope of tests
