@@ -37,7 +37,7 @@ module.exports =
                 if err
                     next err
                 else
-                    res.send contact, 201
+                    res.status(201).send contact
 
         if isImport
             # If creation is related to an import, it checks first if the
@@ -57,7 +57,7 @@ module.exports =
                 if contacts.length is 0
                     create()
                 else
-                    res.send contacts[0], 201
+                    res.status(201).send contacts[0]
         else
             create()
 
@@ -70,7 +70,7 @@ module.exports =
             if err
                 return res.error 500, "Update failed.", err
             else
-                res.send req.contact, 201
+                res.status(201).send req.contact
 
 
     # Extract and save picture in a temporary folder, then save it to data
@@ -90,7 +90,7 @@ module.exports =
                     if err
                         next err
                     else
-                        res.send req.contact, 201
+                        res.status(201).send req.contact
             else
                 next new Error 'Can\'t change picture, no file is attached.'
 
