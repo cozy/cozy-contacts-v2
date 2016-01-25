@@ -40,7 +40,7 @@ module.exports = {
         if (err) {
           return next(err);
         } else {
-          return res.send(contact, 201);
+          return res.status(201).send(contact);
         }
       });
     };
@@ -65,7 +65,7 @@ module.exports = {
         if (contacts.length === 0) {
           return create();
         } else {
-          return res.send(contacts[0], 201);
+          return res.status(201).send(contacts[0]);
         }
       });
     } else {
@@ -79,7 +79,7 @@ module.exports = {
       if (err) {
         return res.error(500, "Update failed.", err);
       } else {
-        return res.send(req.contact, 201);
+        return res.status(201).send(req.contact);
       }
     });
   },
@@ -99,7 +99,7 @@ module.exports = {
           if (err) {
             return next(err);
           } else {
-            return res.send(req.contact, 201);
+            return res.status(201).send(req.contact);
           }
         });
       } else {
