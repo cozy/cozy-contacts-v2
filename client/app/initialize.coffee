@@ -56,13 +56,14 @@ Starts
 Trigger locale initilization and starts application singleton.
 ###
 application = require './application'
+# Temporary use a global variable to store the `t` helpers, waiting for
+# Marionette allow to register global helpers.
+# see https://github.com/marionettejs/backbone.marionette/issues/2164
+window.t    = require 'lib/i18n'
 
-$ ->
+ColorHash.addScheme 'cozy', require('config').colorSet
+Mn.Behaviors.behaviorsLookup = require 'lib/behaviors'
+
+document.addEventListener 'DOMContentLoaded', ->
     initReporting()
-    ColorHash.addScheme 'cozy', require('config').colorSet
-    Mn.Behaviors.behaviorsLookup = require 'lib/behaviors'
-    # Temporary use a global variable to store the `t` helpers, waiting for
-    # Marionette allow to register global helpers.
-    # see https://github.com/marionettejs/backbone.marionette/issues/2164
-    window.t = require 'lib/i18n'
     application.start()
