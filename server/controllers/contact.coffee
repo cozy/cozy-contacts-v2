@@ -1,15 +1,18 @@
 path       = require 'path'
 multiparty = require 'multiparty'
 async      = require 'async'
+americano  = require 'cozydb'
+log        = require('printit')
+    prefix: 'Contact controller'
+
 Contact    = require '../models/contact'
 helpers    = require '../helpers/helpers'
-americano  = require 'cozydb'
-
 
 baseController = new americano.SimpleController
     model      : Contact
     reqParamID : 'contactid'
     reqProp    : 'contact'
+
 
 module.exports =
     fetch: baseController.fetch
@@ -78,8 +81,6 @@ module.exports =
     updatePicture: (req, res, next) ->
         form = new multiparty.Form()
 
-        res.on 'close', -> req.abort()
-
         form.parse req, (err, fields, files) ->
             if err
                 next err
@@ -120,3 +121,18 @@ module.exports =
             res.attachment "#{date}-#{txt}.vcf"
             res.set 'Content-Type', 'text/x-vcard'
             res.send vCardOutput
+
+
+    # Delete a bunch of contacts. It expects to have an array of contact ids
+    # as request body.
+    # This function is here to avoid many requests while deleting several
+    # contacts.
+    bulkDelete: (req, res, next) ->
+        ids = req.body
+        log.info "Starting bulk delete of #{ids.length} contacts"
+        log.debug ids
+        Contact.requestDestroy 'all', keys: ids, (err) ->
+            return next err if err
+            res.status(200).send success: 'Deletion succeeded'
+            log.info "Deletion of #{ids.length} contacts done."
+
