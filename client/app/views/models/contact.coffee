@@ -144,8 +144,14 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         datapoints.reset models
 
 
+    # Save directly new tags to the server if the model is already created.
+    # If the model is not created (has no id yet), it just updates the tags
+    # attribute to avoid conflicts during the creation process.
     updateTags: (tags) ->
-        @model.save tags: tags
+        if @model.id?
+            @model.save tags: tags
+        else
+            @model.set tags: tags
 
 
     addNewTag: (tag) ->

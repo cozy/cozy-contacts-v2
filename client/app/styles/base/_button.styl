@@ -35,9 +35,19 @@ button
         background-color transparent
         color            blue
 
+        &[aria-busy=true]
+
+            &:before
+                @extend $icon-spinner-grey
+
         &:hover
             background-color blue
             color            white
+
+            &[aria-busy=true]
+
+                &:before
+                    @extend $icon-spinner-white
 
     &.secondary
         background-color grey-04
