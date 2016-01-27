@@ -88,9 +88,6 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'toolbar', new ToolbarView()
         @showChildView 'actions', new DefaultActionsTool()
 
-        scroller = _.debounce (-> app.vent.trigger 'content:scroll'), 80
-        @$(@ui.content).on 'scroll', scroller
-
 
     onKeyPageup: ->
         el = @ui.content[0]
