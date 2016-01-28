@@ -79,7 +79,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         @listenTo app.model,
             'change:filter': @updateCounter
 
-        @bindEntityEvents app.vent,
+        @bindEntityEvents app.channel,
             'busy:enable':  -> @$el.attr 'aria-busy', true
             'busy:disable': -> @$el.attr 'aria-busy', false
 
@@ -108,7 +108,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
         @listenToOnce view,
             'show': ->
-                app.vent.trigger 'busy:disable'
+                app.channel.trigger 'busy:disable'
                 @ui.content.trigger 'focus'
                 @updateCounter()
 
@@ -147,7 +147,7 @@ module.exports = class AppLayout extends Mn.LayoutView
             model = app.contacts.get id
 
         viewModel = new ContactViewModel {new: id is 'new'}, model: model
-        viewModel.listenTo app.vent, 'mode:edit', (edit) -> @set 'edit', edit
+        viewModel.listenTo app.channel, 'mode:edit', (edit) -> @set 'edit', edit
 
         new CardView model: viewModel
 

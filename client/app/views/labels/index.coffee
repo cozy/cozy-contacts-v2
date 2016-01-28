@@ -35,7 +35,7 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
             'update':      @collection.update
             'change:tags': @collection.update
 
-        @listenTo app.vent, 'filter:tag': @toggleSelected
+        @listenTo app.channel, 'filter:tag': @toggleSelected
 
 
     toggleSelected: (tag) ->

@@ -33,7 +33,7 @@ module.exports = class FilteredCollection
         @listenTo app.model,
             'change:scored': (nil, scored) => @comparator.scored = scored
 
-        @listenTo app.vent, 'filter:text': @updateQuery
+        @listenTo app.channel, 'filter:text': @updateQuery
 
         @listenTo @underlying,
             'reset':  @reset
