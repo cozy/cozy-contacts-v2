@@ -18,6 +18,10 @@ module.exports = class ContactsListener extends CozySocketListener
     ]
 
 
+    # Perform remote operation on local collection by batch of contacts to
+    # avoid too many operations like sorting and filtering on the collection.
+    # Makes a pause between each batch to allow the browser to perform other
+    # actions during that time.
     _bulk: (queue) ->
         switch queue
             when 'delete'
@@ -25,15 +29,28 @@ module.exports = class ContactsListener extends CozySocketListener
                 options = {}
             else
                 action  = 'add'
-                options = merge: true
+                options =
+                    merge: true
+                    trigger: false
 
-        @collection[action] @queues[queue], options
-        @queues[queue].length = 0
+
+        @collection.disableSort()
+        @end = new Date().getTime()
+
+        lists = []
+        while @queues[queue].length > 0
+            lists.push @queues[queue].splice 0, 10
+
+        async.eachSeries lists, (list, done) =>
+            @collection[action] list, options
+            setTimeout done, 100
+        , =>
+            @collection.enableSort()
 
 
     constructor: ->
-        @_bulk = _.debounce @_bulk, 1000
         super
+        @_bulk = _.debounce @_bulk, 1000
 
 
     onRemoteCreate: (model) ->
