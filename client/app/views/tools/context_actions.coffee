@@ -6,7 +6,9 @@ module.exports = class DefaultActionsView extends Mn.ItemView
 
 
     behaviors: ->
-        Confirm: triggers: 'click @ui.delete': @_deleteModalCfg
+        Confirm:
+            triggers:
+                'click @ui.delete': @_deleteModalCfg
 
 
     ui:
@@ -23,6 +25,7 @@ module.exports = class DefaultActionsView extends Mn.ItemView
         'click @ui.export':   'bulk:export'
         'click @ui.merge':    'bulk:merge'
 
+
     modelEvents:
         'change:selected': (nil, selected) -> @render() if selected.length
 
@@ -31,12 +34,17 @@ module.exports = class DefaultActionsView extends Mn.ItemView
         Mn.bindEntityEvents @model, @, @model.viewEvents
 
 
+    # Build configuration required to display a proper modal. This modal will
+    # ask the user for a confirmation of deletion.
+    # To display this modal, we rely on the Marionnette behavior called
+    # Confirm.
     _deleteModalCfg: =>
         opts = smart_count: @model.get('selected').length
-        return cfg =
+        return behaviorConfig =
             event:      'bulk:delete'
             title:      t 'bulk confirm delete title', opts
             message:    t 'bulk confirm delete message', opts
             btn_ok:     t 'bulk confirm delete ok'
             btn_cancel: t 'bulk confirm delete cancel'
+            end_event:  'bulk:delete:done'
 
