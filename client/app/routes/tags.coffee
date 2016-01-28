@@ -15,9 +15,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         @sheet = style.sheet
 
         @listenTo app.vent, 'filter:tag', (tag) =>
-            rulesLen = @sheet.cssRules.length
-            if tag and rulesLen > 1 or not tag and rulesLen is 1
-                @sheet.deleteRule 0
+            @sheet.deleteRule idx for rule, idx in @sheet.cssRules
 
 
     filter: (slug) ->

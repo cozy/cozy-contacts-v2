@@ -1,4 +1,4 @@
-a(href=id == 'all'? "contacts" : "tags/#{name}" data-input="radio", data-id=id aria-checked=selected? 'true' : 'false')
+a(href=(_default? "contacts":"tags/#{name}") data-input="radio" aria-checked=selected? 'true' : 'false')
     input(type="radio" id=id name="label-filters" checked=selected)
     label(for=id)
     = name

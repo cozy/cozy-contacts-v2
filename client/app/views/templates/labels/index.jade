@@ -1,7 +1,7 @@
 legend= t('tools labels filters')
 nav: ul
     li
-        - var id  = "all"
+        - var _default = true
         - var name = t('tools labels filters all')
         - var selected = filter == null
         include ./filter.jade 
