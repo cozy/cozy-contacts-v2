@@ -58,6 +58,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
     # other components can be informed.
     bulkDelete: ->
         selected = @attributes.selected
+        app.contacts.contactListener.disable()
         request.post '/contacts/bulk-delete', selected, (err, res) =>
 
             if err
@@ -69,6 +70,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                 app.contacts.remove selected
                 @set selected: []
                 app.contacts.enableSort()
+                setTimeout app.contacts.contactListener.enable, 1500
                 @trigger 'bulk:delete:done'
 
 
