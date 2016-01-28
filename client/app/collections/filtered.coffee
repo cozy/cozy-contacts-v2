@@ -88,6 +88,16 @@ module.exports = class FilteredCollection
         if query
             res = @underlying.filter @_filter
 
+            # Reduce to get max score and get a median limit, then excludes all
+            # results $lt it.
+            maxScore = res.reduce (currentMax, model) =>
+                Math.max currentMax, @scores.get model
+            , 0
+
+            if maxScore > 5
+                median = maxScore / 2
+                res = res.filter (model) => @scores.get(model) > median
+
             toKeep   = @models.filter (vmodel) -> _.includes res, vmodel.model
             toRemove = _.difference @models, toKeep
             toAdd    = _.difference res, toKeep.map (vmodel) -> vmodel.model

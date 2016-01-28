@@ -82,6 +82,8 @@ module.exports = class AppLayout extends Mn.LayoutView
         @bindEntityEvents app.channel,
             'busy:enable':  -> @$el.attr 'aria-busy', true
             'busy:disable': -> @$el.attr 'aria-busy', false
+            'filter:text': @toggleResults
+            'search:error': @error
 
 
     onRender: ->
@@ -181,3 +183,16 @@ module.exports = class AppLayout extends Mn.LayoutView
             @showChildView 'actions', new DefaultActionsTool()
         else
             @showChildView 'actions', new ContextActionsTool model: @model
+
+
+    toggleResults: (text) ->
+        @results.$el?.attr 'aria-hidden', not text.length
+
+
+    error: (err) ->
+        {ERR} = require 'config'
+        if err is ERR.SEARCH_TOO_SHORT
+            @results.$el.attr 'aria-hidden', true
+            @ui.counter
+                .text t 'error search too short'
+                .addClass 'important'
