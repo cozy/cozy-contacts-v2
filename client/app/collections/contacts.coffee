@@ -1,32 +1,45 @@
 ContactsListener = require 'lib/contacts_listener'
+Contact = require 'models/contact'
 
-
-comparator = (sort) ->
-    fn = (a, b) ->
-        [a, b] = [a, b].map (model) ->
-            name = model.get('n').split(';')
-            if fn.sort is 'gn'
-                "#{name[0]}#{name[1]}"
-            else
-                "#{name[1]}#{name[0]}"
-
-        a.localeCompare b
-
-    fn.sort = sort
-    return fn
 
 
 module.exports = class Contacts extends Backbone.Collection
 
-    model: require 'models/contact'
-
+    model: Contact
     url: 'contacts'
+
+    sortDisabled: false
+
+    buildComparator: (sort) =>
+        fn = (a, b) =>
+            if @sortDisabled
+                return -1
+            else
+                [a, b] = [a, b].map (model) ->
+                    name = model.get('n').split(';')
+                    if fn.sort is 'gn'
+                        "#{name[0]}#{name[1]}"
+                    else
+                        "#{name[1]}#{name[0]}"
+
+                a.localeCompare b
+
+        fn.sort = sort
+        return fn
+
+
+    disableSort: ->
+        sortDisabled = true
+
+
+    enableSort: ->
+        sortDisabled = false
 
 
     initialize: ->
         {model} = require 'application'
 
-        @comparator = comparator model.get 'sort'
+        @comparator = @buildComparator model.get 'sort'
 
         @listenTo model, 'change:sort', (nil, sort) =>
             @comparator.sort = sort
@@ -69,15 +82,22 @@ module.exports = class Contacts extends Backbone.Collection
 
         @trigger 'before:import:progress', cards.length
 
+
         processCards = =>
             card = cards.pop()
             if card
                 parser = new VCardParser()
                 parser.read card
-                @create parser.contacts[0], parse: true
-                @trigger 'import:progress', ++current
-                setTimeout processCards
+                contactCard = parser.contacts[0]
+                contact = new Contact contactCard, parse: true
+                contact.save null,
+                    success: =>
+                        @trigger 'import:progress', ++current
+                        processCards()
+                    error: ->
+                        processCards()
             else
                 @trigger 'import', current
 
         setTimeout processCards, 35
+
