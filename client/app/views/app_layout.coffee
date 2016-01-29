@@ -45,7 +45,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         actions: 'aside .tool-actions'
         labels:  'aside .tool-labels'
         indexes: '@ui.content .indexes'
-        results:  '@ui.content .results'
+        results: '@ui.content .results'
         toolbar: 'main [role="toolbar"]'
         dialogs:
             selector: '.dialogs'
@@ -70,25 +70,44 @@ module.exports = class AppLayout extends Mn.LayoutView
     initialize: ->
         app = require 'application'
 
-        @listenToOnce app.tags, 'sync', @showFilters
-        @listenToOnce app.contacts, 'sync', @showContactsList
+        # bind render to collections / appModel events
+        @listenToOnce app.tags, 'sync': @showFilters
+        @listenToOnce app.contacts, 'sync': @showContactsList
+        @listenTo app.filtered, 'update': @updateCounter
+        @listenTo app.model, 'change:filter': @updateCounter
 
-        @listenTo app.filtered,
-            'update': @updateCounter
-
-        @listenTo app.model,
-            'change:filter': @updateCounter
-
-        @bindEntityEvents app.vent,
+        # bind Ui reacts to global channel events
+        @listenTo app.channel,
             'busy:enable':  -> @$el.attr 'aria-busy', true
             'busy:disable': -> @$el.attr 'aria-busy', false
+            'filter:text': @toggleResults
+            'search:error': @error
 
 
+    # Regions contents rendering
+    # ##########################################################################
     onRender: ->
         @showChildView 'toolbar', new ToolbarView()
         @showChildView 'actions', new DefaultActionsTool()
 
 
+    showFilters: ->
+        @showChildView 'labels', new LabelsFiltersTool model: @model
+
+
+    showContactsList: ->
+        view = new ContactsView collection: app.filtered
+
+        @listenToOnce view, 'show': ->
+            app.channel.trigger 'busy:disable'
+            @ui.content.trigger 'focus'
+            @updateCounter()
+
+        @showChildView 'indexes', view
+
+
+    # keybr events bindings
+    # ##########################################################################
     onKeyPageup: ->
         el = @ui.content[0]
         el.scrollTop -= el.offsetHeight
@@ -99,22 +118,33 @@ module.exports = class AppLayout extends Mn.LayoutView
         el.scrollTop += el.offsetHeight
 
 
-    showFilters: ->
-        @showChildView 'labels', new LabelsFiltersTool model: @model
+    # Contextual Region actions
+    #
+    # - toggle the drawer on small screens
+    # - switch contextual menu view when rows are selected
+    # ##########################################################################
+    swapContextualMenu: (appViewModel, selected) ->
+        prev = appViewModel._previousAttributes.selected
+        return if prev.length and selected.length
+
+        if _.isEmpty selected
+            @showChildView 'actions', new DefaultActionsTool()
+        else
+            @showChildView 'actions', new ContextActionsTool model: @model
 
 
-    showContactsList: ->
-        view = new ContactsView collection: app.filtered
-
-        @listenToOnce view,
-            'show': ->
-                app.vent.trigger 'busy:disable'
-                @ui.content.trigger 'focus'
-                @updateCounter()
-
-        @showChildView 'indexes', view
+    toggleDrawer: ->
+        $drawer = @$ 'aside.drawer'
+        isVisible = $drawer.attr('aria-expanded') is 'true'
+        $drawer.attr 'aria-expanded', not isVisible
 
 
+    # Search results rendering
+    #
+    # Results are a secondary view only displayed when filtering is triggered.
+    # It can be hidden when search pattern is to short (ERR.SEARCH_TOO_SHORT),
+    # and showed again when search pattern updates.
+    # ##########################################################################
     onSearchResults: (nil, isSearch) ->
         # hide/show indexed list view if is/isnt in search mode
         @indexes.$el.attr 'aria-hidden', isSearch
@@ -128,6 +158,15 @@ module.exports = class AppLayout extends Mn.LayoutView
             @results.reset()
 
 
+    toggleResults: (text) ->
+        @results.$el?.attr 'aria-hidden', not text.length
+
+
+    # Dialogs showing
+    #
+    # Show modal dialogs in app's layout, such as card contact view, or merge
+    # dialog.
+    # ##########################################################################
     showDialog: (appViewModel, slug) ->
         unless slug
             @dialogs.empty()
@@ -147,37 +186,34 @@ module.exports = class AppLayout extends Mn.LayoutView
             model = app.contacts.get id
 
         viewModel = new ContactViewModel {new: id is 'new'}, model: model
-        viewModel.listenTo app.vent, 'mode:edit', (edit) -> @set 'edit', edit
+        viewModel.listenTo app.channel, 'mode:edit', (edit) -> @set 'edit', edit
 
         new CardView model: viewModel
 
 
+    # Counter updates / actions
+    # ##########################################################################
     updateCounter: ->
-        unless app.contacts.length
-            label = t('list counter empty')
-        else
-            size = app.filtered.get(tagged: true).length
-            label = if size
-                t('list counter', {smart_count: size})
+        # delay counter update at next frame to keep ui more smooth
+        window.requestAnimationFrame =>
+            unless app.contacts.length
+                label = t('list counter empty')
             else
-                t('list counter no-search')
+                size = app.filtered.get(tagged: true).length
+                label = if size
+                    t('list counter', {smart_count: size})
+                else
+                    t('list counter no-search')
 
-        @ui.counter
-            .text label
-            .toggleClass 'important', not size
-
-
-    toggleDrawer: ->
-        $drawer = @$ 'aside.drawer'
-        isVisible = $drawer.attr('aria-expanded') is 'true'
-        $drawer.attr 'aria-expanded', not isVisible
+            @ui.counter
+                .text label
+                .toggleClass 'important', not size
 
 
-    swapContextualMenu: (appViewModel, selected) ->
-        prev = appViewModel._previousAttributes.selected
-        return if prev.length and selected.length
-
-        if _.isEmpty selected
-            @showChildView 'actions', new DefaultActionsTool()
-        else
-            @showChildView 'actions', new ContextActionsTool model: @model
+    error: (err) ->
+        {ERR} = require 'config'
+        if err is ERR.SEARCH_TOO_SHORT
+            @results.$el.attr 'aria-hidden', true
+            @ui.counter
+            .text t 'error search too short'
+            .addClass 'important'

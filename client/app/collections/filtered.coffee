@@ -33,7 +33,7 @@ module.exports = class FilteredCollection
         @listenTo app.model,
             'change:scored': (nil, scored) => @comparator.scored = scored
 
-        @listenTo app.vent, 'filter:text': @updateQuery
+        @listenTo app.channel, 'filter:text': @updateQuery
 
         @listenTo @underlying,
             'reset':  @reset
@@ -87,6 +87,16 @@ module.exports = class FilteredCollection
         @query = query
         if query
             res = @underlying.filter @_filter
+
+            # Reduce to get max score and get a median limit, then excludes all
+            # results $lt it.
+            maxScore = res.reduce (currentMax, model) =>
+                Math.max currentMax, @scores.get model
+            , 0
+
+            if maxScore > 5
+                median = maxScore / 2
+                res = res.filter (model) => @scores.get(model) > median
 
             toKeep   = @models.filter (vmodel) -> _.includes res, vmodel.model
             toRemove = _.difference @models, toKeep

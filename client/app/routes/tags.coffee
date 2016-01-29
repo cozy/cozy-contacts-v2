@@ -14,7 +14,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         document.head.appendChild style
         @sheet = style.sheet
 
-        @listenTo app.vent, 'filter:tag', (tag) =>
+        @listenTo app.channel, 'filter:tag', (tag) =>
             @sheet.deleteRule idx for rule, idx in @sheet.cssRules
 
 

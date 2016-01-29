@@ -11,6 +11,10 @@ exports.config =
                     'vendor/marionette/lodash.js'
                     'vendor/marionette/jquery.js'
                     'vendor/marionette/backbone.js'
+                    'vendor/marionette/backbone.babysitter.js'
+                    'vendor/marionette/backbone.radio.js'
+                    'vendor/marionette/backbone.marionette.js'
+                    'vendor/marionette/radio.shim.js'
                 ]
 
         stylesheets:

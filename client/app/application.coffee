@@ -66,6 +66,7 @@ class Application extends Mn.Application
 
         if string
             if prev
+                last = prev[1]
                 filter = filter.replace _pattern, input
             else if filter?.length
                 filter += input
@@ -76,7 +77,7 @@ class Application extends Mn.Application
             filter = filter.replace(_pattern, '')
 
         @model.set 'filter', filter
-        @vent.trigger "filter:#{pattern}", string
+        @channel.trigger "filter:#{pattern}", string, last
 
 
 # Exports Application singleton instance

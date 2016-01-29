@@ -105,5 +105,6 @@
     "merge actions merge":              "merge contacts",
     "merge actions cancel":             "cancel",
 
-    "error upload wrong filetype": "The uploaded file isn't a valid VCF/VCard format. Please try with another file."
+    "error upload wrong filetype": "The uploaded file isn't a valid VCF/VCard format. Please try with another file.",
+    "error search too short":      "you need to input at least 3 characters to perform a search"
 }
