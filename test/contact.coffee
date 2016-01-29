@@ -156,7 +156,6 @@ describe 'Contacts', ->
 
 
     describe 'Delete - DELETE /contacts/:id', ->
-
         it 'should allow requests', (done) ->
             @client.del "contacts/#{_global.id}", done
 
@@ -168,3 +167,28 @@ describe 'Contacts', ->
 
         it 'then i get an error', ->
             expect(@response.statusCode).to.equal 404
+
+
+    describe 'Delete - POST /contacts/bulk-delete', ->
+
+        ids = []
+
+        before (done) ->
+            @client.get 'contacts', =>
+                ids.push @body[0].id
+                ids.push @body[1].id
+                done()
+
+        it 'should allow requests', (done) ->
+            @client.post "contacts/bulk-delete", ids, done
+
+        it 'should reply with 204 status', ->
+            expect(@response.statusCode).to.equal 200
+
+        it 'when I GET all contacts', (done) ->
+            @client.get "contacts", =>
+                done()
+
+        it 'then deleted contacts are no more there', ->
+            expect(@body.length).to.equal 0
+

@@ -18,11 +18,14 @@ module.exports = class Confirm extends Mn.Behavior
         event.preventDefault()
         event.stopPropagation()
 
-        cfg = @$(event.currentTarget).data('confirm')
-        @_triggerView cfg
+        config = @$(event.currentTarget).data('confirm')
+        @_triggerView config
 
 
     _buildTriggers: ->
+
+        # The view here correspond to the view handling the behavior. It is not
+        # the confirm dialog view.
         view = @view
 
         _.reduce @options.triggers, (memo, opts, eventName) ->
@@ -50,18 +53,41 @@ module.exports = class Confirm extends Mn.Behavior
 
     _triggerView: (cfg) ->
         app         = require 'application'
-        viewOpts    = _.pick cfg, 'title', 'message', 'btn_ok', 'btn_cancel'
+
+        # Build the confirm dialog view from configuration given by the calling
+        # widget.
+        viewOpts    = _.pick(
+            cfg, 'title', 'message', 'btn_ok', 'btn_cancel', 'end_event')
         confirmView = new ConfirmView model: new Backbone.Model viewOpts
 
         @view.$el.attr 'aria-busy', true
 
         Mn.bindEntityEvents @, confirmView,
             'confirm:close': ->
+                # Close confirm dialog view when close button is clicked.
                 @view.$el.attr 'aria-busy', false
-                @view.triggerMethod 'confirm:close'
+                @view.triggerMethod 'confirm:false'
             'confirm:true':  ->
-                @view.triggerMethod 'confirm:true'
                 @view.triggerMethod cfg.event if cfg.event
+
+                # Show loader until end_event is fired. Then closes the
+                # confirm dialog view.
+                if viewOpts.end_event
+                    confirmView.showLoading()
+                    app.model.on viewOpts.end_event, =>
+                        @view.$el.attr 'aria-busy', false
+                        @view.triggerMethod 'confirm:true'
+                        app.model.off viewOpts.end_event
+                        confirmView.onConfirmClose()
+
+                # Close confirm dialog view when ok button is clicked and
+                # when no long processing is running after.
+                else
+                    @view.$el.attr 'aria-busy', false
+                    @view.triggerMethod 'confirm:true'
+                    confirmView.onConfirmClose()
 
         app.layout.showChildView 'alerts', confirmView
         return confirmView
+
+

@@ -166,7 +166,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             wait: true
             success: =>
                 tags = @model.get('tags').concat tag
-                @model.save tags: tags
+                @updateTags tags
 
 
     onSave: ->

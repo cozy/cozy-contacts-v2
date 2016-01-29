@@ -1,5 +1,6 @@
 MergeView = require 'views/contacts/merge'
 MergeModel = require 'views/models/merge'
+request = require 'lib/request'
 
 app = undefined
 
@@ -52,16 +53,25 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         @set selected: []
 
 
+    # Delete currently selected conctacts.
+    # It fires a bulk:delete:done event when everything is done. That way
+    # other components can be informed.
     bulkDelete: ->
         selected = @attributes.selected
+        app.contacts.contactListener.disable()
+        request.post '/contacts/bulk-delete', selected, (err, res) =>
 
-        success = (model) => @unselect model.id
+            if err
+                console.log err
+                alert t 'contacts delete bulk error'
 
-        app.contacts.chain()
-            .filter (contact) ->
-                contact.id in selected
-            .invoke 'destroy', {wait:true, success: success}
-            .value()
+            else
+                app.contacts.disableSort()
+                app.contacts.remove selected
+                @set selected: []
+                app.contacts.enableSort()
+                setTimeout app.contacts.contactListener.enable, 1500
+                @trigger 'bulk:delete:done'
 
 
     # TODO: probably need to be revamped when doing it for the whole merge
@@ -122,3 +132,4 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                     @set 'errors', upload: 'error upload wrong filetype'
         else
             @set 'errors', upload: 'error upload wrong filetype'
+
