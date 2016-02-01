@@ -19,22 +19,42 @@ CC.mayBeSamePerson = (contact1, contact2) ->
     return compareN(contact1.n, contact2.n) > 0
 
 
-# Group similars contacts together.
+# Group similars contacts together. The comparison is based on the couple
+# first name and last name. If the couple matches for two contacts they
+# are considered as similars.
 # A contact can be in only one group.
 CC.findSimilars = (contacts) ->
-    viewed = {}
     similars = []
-    for contact in contacts
-        viewed[contact._id] = true
-        similar = [contact]
-        for contact2 in contacts
-            if contact2._id not of viewed and
-            CC.mayBeSamePerson(contact, contact2)
-                viewed[contact2._id] = true
-                similar.push contact2
 
-        if similar.length > 1
-            similars.push similar
+    # We used a map here to make
+    names = {}
+    for contact in contacts
+
+        # Get first and last name and make comparison insensitive to special
+        # chars.
+        [lastName, firstName, dummy, dummy, dummy] = contact.n.split ';'
+        lastName  = lastName.toAscii().toLowerCase()
+        firstName = firstName.toAscii().toLowerCase()
+
+        # Check if John Doe is already listed.
+        if names["#{firstName} #{lastName}"]?
+            names["#{firstName} #{lastName}"].push contact
+
+        # Check if Doe John is already listed.
+        else if names["#{lastName} #{firstName}"]?
+            names["#{lastName} #{firstName}"].push contact
+
+        # Else register the contact by setting a key based on
+        # his/her first and last names
+        else if "#{firstName} #{lastName}".length > 1
+            names["#{firstName} #{lastName}"] = []
+            names["#{firstName} #{lastName}"].push contact
+
+    # Every keys that is linked with an array of length superior at two is
+    # considered has a name for which there are contacts to merge.
+    similars = Object.keys(names)
+        .filter (key) -> return names[key].length > 1
+        .map (name) -> return names[name]
 
     return similars
 
@@ -75,28 +95,6 @@ CC.mergeContacts = (base, toMerge) ->
 
 # # #
 # Tools
-
-# Name comparators
-# Return > 0 if similar.
-# Check accents, case, parts orders and 'optionnals parts' presence.
-compareN = (n1, n2) ->
-    [lastName1, firstName1, dummy, dummy, dummy] = n1.split ';'
-    [lastName2, firstName2, dummy, dummy, dummy] = n2.split ';'
-
-    lastName1  = lastName1.toAscii().toLowerCase()
-    firstName1 = firstName1.toAscii().toLowerCase()
-    lastName2  = lastName2.toAscii().toLowerCase()
-    firstName2 = firstName2.toAscii().toLowerCase()
-
-    if (lastName1 isnt '' or firstName1 isnt '') and
-    (lastName2 isnt '' or firstName2 isnt '') and
-    (lastName1 is lastName2 and firstName1 is firstName2 or
-    lastName1 is firstName2 and firstName1 is lastName2)
-
-        return 1
-    else
-        return -1
-
 
 # Check if (cozy)contact fuzzily has the specified field
 hasField = (field, contact, checkType = false) ->
