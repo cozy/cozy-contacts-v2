@@ -39,6 +39,7 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         # Generate duplicates list.
         @collection = new Duplicates null, collection: contacts
         @toMerge = new BackboneProjections.Filtered @collection,
-            filter: (merge) -> merge.isMergeable()
+            filter: (merge) ->
+                merge.isMergeable()
 
         @bindEntityEvents @collection, @getOption 'collectionEvents'

@@ -217,3 +217,4 @@ module.exports = class AppLayout extends Mn.LayoutView
             @ui.counter
             .text t 'error search too short'
             .addClass 'important'
+
