@@ -186,3 +186,11 @@ module.exports = class Contact extends Backbone.Model
         data = @toJSON()
         data.datapoints = data.datapoints.toJSON()
         @picturetoa (picture) -> callback VCardParser.toVCF data, picture
+
+
+    # Return a string containing last and first name of the contact.
+    # It's useful for sorting.
+    getLastAndFirstNames: ->
+        name = @get('n').split(';')
+        return "#{name[1]}#{name[0]}"
+
