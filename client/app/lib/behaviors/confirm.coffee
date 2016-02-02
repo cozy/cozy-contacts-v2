@@ -78,14 +78,14 @@ module.exports = class Confirm extends Mn.Behavior
                         @view.$el.attr 'aria-busy', false
                         @view.triggerMethod 'confirm:true'
                         app.model.off viewOpts.end_event
-                        confirmView.onConfirmClose()
+                        confirmView.close()
 
                 # Close confirm dialog view when ok button is clicked and
                 # when no long processing is running after.
                 else
                     @view.$el.attr 'aria-busy', false
                     @view.triggerMethod 'confirm:true'
-                    confirmView.onConfirmClose()
+                    confirmView.close()
 
         app.layout.showChildView 'alerts', confirmView
         return confirmView
