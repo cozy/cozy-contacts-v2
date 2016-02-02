@@ -89,12 +89,10 @@ module.exports = class Contact extends Backbone.Model
 
 
     toString: (opts = {}) ->
-        [gn, fn, ...] = parts = @attributes.n.split ';'
+        [gn, fn, mn, pf, sf] = @attributes.n.split ';'
         # wrap given name (at index 0) in pre/post tags if provided
         gn = _.compact([opts.pre, gn, opts.post]).join ''
-        parts[0] = fn
-        parts[1] = gn
-        _.compact(parts).join ' '
+        _.compact([pf, fn, mn, gn, sf]).join ' '
 
 
     toHighlightedString: (pattern, opts= {})->
