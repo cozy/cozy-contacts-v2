@@ -39,7 +39,6 @@ module.exports = class ContactsListener extends CozySocketListener
             Remote action occured (#{queue}, #{action}), processing start!
             """
 
-            @collection.disableSort()
             @end = new Date().getTime()
 
             # Build batches of 10 models on which to perform operations.
@@ -47,6 +46,7 @@ module.exports = class ContactsListener extends CozySocketListener
             nbOccurences = @queues[queue].length
             while @queues[queue].length > 0
                 lists.push @queues[queue].splice 0, 10
+            options.sort = false
 
             # Make a break between each operation performing to let the
             # browser breath between each of them. This hack is dirty, we
@@ -60,7 +60,6 @@ module.exports = class ContactsListener extends CozySocketListener
                 Remote action processing done for #{nbOccurences} for operation
                 (#{queue}, #{action}).
                 """
-                @collection.enableSort()
         else
             @queues[queue] = []
 
