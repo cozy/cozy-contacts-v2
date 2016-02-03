@@ -16,16 +16,14 @@ module.exports = class ContactRow extends Backbone.View
         pre: '<b>'
         post: '</b>'
 
+    _isAvatarLoaded: false
+
 
     initialize: ->
         app = require 'application'
 
-        @listenTo @model, 'change': ->
-            @render()
-            @lazyLoadAvatar()
-
+        @listenTo @model, 'change': @render
         @listenTo app.model, 'change:selected': @refreshChecked
-        @listenTo app.vent, 'content:scroll': @lazyLoadAvatar
 
 
     render: ->
@@ -37,6 +35,8 @@ module.exports = class ContactRow extends Backbone.View
         template     = require 'views/templates/contacts/row'
         el.innerHTML = template data
 
+        window.requestAnimationFrame @lazyLoadAvatar
+
         @highlight()
 
 
@@ -44,6 +44,7 @@ module.exports = class ContactRow extends Backbone.View
         _.extend @model.toJSON(),
             selected: @model.id in app.model.get 'selected'
             fullname: @model.toString @_format
+            isAvatarLoaded: @_isAvatarLoaded
 
 
     highlight: ->
@@ -62,7 +63,9 @@ module.exports = class ContactRow extends Backbone.View
         @$('[type="checkbox"]').prop 'checked', @model.id in selected
 
 
-    lazyLoadAvatar: ->
+    lazyLoadAvatar: =>
+        return if @_isAvatarLoaded
+
         docEl          = document.documentElement
         imgEl          = @el.querySelector 'img.avatar'
         rect           = @el.getBoundingClientRect()
@@ -70,7 +73,6 @@ module.exports = class ContactRow extends Backbone.View
 
         if isElInViewport and imgEl
             imgEl.setAttribute 'src', imgEl.dataset.src
-
-
-    # methods aliases
-    onShow: @::lazyLoadAvatar
+            @_isAvatarLoaded = true
+        else
+            window.requestAnimationFrame @lazyLoadAvatar

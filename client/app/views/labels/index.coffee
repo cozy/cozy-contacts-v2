@@ -1,7 +1,5 @@
 {Filtered}  = BackboneProjections
 
-PATTERN = require('config').search.pattern 'tag'
-
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
@@ -22,12 +20,8 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
     childView: require 'views/labels/filter'
 
 
-    modelEvents:
-        'change:filter': 'toggleSelected'
-
-
     initialize: ->
-        app     = require 'application'
+        app = require 'application'
 
         # Tag collection filtering is based on the tag map built at the contact
         # collection level. It avoids to do too many checkings while looking
@@ -41,15 +35,16 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
             'update':      @collection.update
             'change:tags': @collection.update
 
+        @listenTo app.channel, 'filter:tag': @toggleSelected
 
-    toggleSelected: (model, value) ->
-        tag = value?.match(PATTERN)?[1]
-        _ref = if tag then @collection.find(name: tag).id else 'all'
 
-        @$ "a:not([data-id='#{_ref}'])"
+    toggleSelected: (tag) ->
+        selector = if tag then "[href$='/#{tag}']" else ':first'
+
+        @$ "a:not(#{selector})"
         .attr 'aria-checked', false
         .find('input').prop 'checked', false
 
-        @$("a[data-id='#{_ref}']")
+        @$ "a#{selector}"
         .attr 'aria-checked', true
         .find('input').prop 'checked', true

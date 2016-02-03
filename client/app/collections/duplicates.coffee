@@ -10,7 +10,7 @@ module.exports = class Duplicates extends Backbone.Collection
     # Local collection
     url: null
 
-    # Initialize the collection with duplicates fund in the sepcified contacts
+    # Initialize the collection with duplicates found in the specified contacts
     # collection.
     initialize: ([], options) ->
         collection = options.collection
@@ -23,3 +23,4 @@ module.exports = class Duplicates extends Backbone.Collection
             # Create a merge ViewModel and add it to the collection,
             # initialize with the specified candidates ContactsViewModels.
             @add { candidates }
+

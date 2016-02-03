@@ -1,4 +1,7 @@
 module.exports =
+    ERR:
+        SEARCH_TOO_SHORT: Symbol 'ERR_SEARCH_TOO_SHORT'
+
     contact:
         xtras: ['bday']
         datapoints:

@@ -25,7 +25,7 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
     _setCardState: (id, edit) ->
         dialog = id in app.contacts.pluck('id') or id is 'new'
         app.model.set 'dialog', if dialog then id else false
-        app.vent.trigger 'mode:edit', edit
+        app.channel.trigger 'mode:edit', edit
 
 
     index: ->
