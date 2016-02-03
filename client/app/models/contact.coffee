@@ -66,13 +66,16 @@ module.exports = class Contact extends Backbone.Model
                         @fetch()
 
                     error: options.error
+        super
 
+
+    validate: (model, options) ->
         # Handle specific attributes.
-        attrs = model.toJSON()
+        attrs = _.clone(model)
 
         attrs.fn = VCardParser.nToFN attrs.n.split ';'
 
-        datapoints = (model.attributes.datapoints?.toJSON() or [])
+        datapoints = (attrs.datapoints?.toJSON() or [])
         attrs.datapoints = datapoints.map (point) ->
             if point.name is 'adr'
                 point.value = VCardParser.adrStringToArray point.value
@@ -84,7 +87,7 @@ module.exports = class Contact extends Backbone.Model
             attrs.url = mainUrl.value
 
         options.attrs = attrs
-        super
+        false
 
 
     toString: (opts = {}) ->
