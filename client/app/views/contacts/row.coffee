@@ -44,6 +44,7 @@ module.exports = class ContactRow extends Backbone.View
         _.extend @model.toJSON(),
             selected: @model.id in app.model.get 'selected'
             fullname: @model.toString @_format
+            isAvatarLoaded: @_isAvatarLoaded
 
 
     highlight: ->
