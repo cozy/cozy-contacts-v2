@@ -69,10 +69,8 @@ module.exports = class Contact extends Backbone.Model
         super
 
 
-    validate: (model, options) ->
+    validate: (attrs, options) ->
         # Handle specific attributes.
-        attrs = _.clone(model)
-
         attrs.fn = VCardParser.nToFN attrs.n.split ';'
 
         datapoints = (attrs.datapoints?.toJSON() or [])
