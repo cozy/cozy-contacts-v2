@@ -27,10 +27,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'tags:update':    'updateTags'
         'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
-        'form:submit':    ->
-            @save()
+        'form:submit':    _.ary @::save, 0
         'export':         'downloadAsVCF'
-        'delete':         -> @destroy()
+        'delete':         _.ary @::destroy, 0
 
 
     proxy: ['toString', 'toHighlightedString', 'match']
