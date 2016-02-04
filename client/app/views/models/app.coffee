@@ -34,13 +34,16 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     select: (id) ->
-        select = @attributes.selected.slice(0)
+        select = @get 'selected'
+        @trigger 'select:start' if _.isEmpty select
         select.push id
         @set selected: select
 
 
     unselect: (id) ->
-        select = _.without @attributes.selected, id
+        select = _.clone @get('selected')
+        select = _.without select, id
+        @trigger 'select:none' if _.isEmpty select
         @set selected: select
 
 
@@ -51,6 +54,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     unselectAll: ->
         @set selected: []
+        @trigger 'select:none'
 
 
     # Delete currently selected conctacts.

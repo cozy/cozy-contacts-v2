@@ -57,7 +57,8 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     modelEvents:
         'change:dialog':   'showDialog'
-        'change:selected': 'swapContextualMenu'
+        'select:start':    'showContextualMenu'
+        'select:none':     'hideContextualMenu'
         'change:scored':   'onSearchResults'
 
     childEvents:
@@ -119,21 +120,11 @@ module.exports = class AppLayout extends Mn.LayoutView
         el = @ui.content[0]
         el.scrollTop += el.offsetHeight
 
+    showContextualMenu: ->
+        @showChildView 'actions', new ContextActionsTool model: @model
 
-    # Contextual Region actions
-    #
-    # - toggle the drawer on small screens
-    # - switch contextual menu view when rows are selected
-    # ##########################################################################
-    swapContextualMenu: (appViewModel, selected) ->
-        prev = appViewModel._previousAttributes.selected
-        return if prev.length and selected.length
-
-        if _.isEmpty selected
-            @showChildView 'actions', new DefaultActionsTool()
-        else
-            @showChildView 'actions', new ContextActionsTool model: @model
-
+    hideContextualMenu: ->
+        @showChildView 'actions', new DefaultActionsTool()
 
     toggleDrawer: ->
         $drawer = @$ 'aside.drawer'
