@@ -25,6 +25,7 @@ getImports = (callback) ->
             config:        config
             locale:        locale
             webDavAccount: webDavAccount
+            env:           process.env.NODE_ENV
 
 
 module.exports =
@@ -44,6 +45,14 @@ module.exports =
             res.send config
 
     logClient: (req, res) ->
-        log.error req.body.data
-        log.error req.body.data.error?.stack
-        res.send 'ok'
+        data = req.body
+        error = data.error
+        delete data.error
+
+        type = if data.type is 'log' then 'debug' else data.type
+
+        log[type] data
+        log[type] error.msg
+        log[type] error.stack if error.stack
+
+        res.status(204).send()
