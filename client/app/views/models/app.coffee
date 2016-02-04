@@ -130,4 +130,3 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                     @set 'errors', upload: 'error upload wrong filetype'
         else
             @set 'errors', upload: 'error upload wrong filetype'
-

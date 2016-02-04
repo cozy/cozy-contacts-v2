@@ -41,7 +41,7 @@
     "lint:jshint": "coffee-jshint --options node,couch ./server/**/*.coffee ./server.coffee",
     "clean": "rm -rf build",
     "tx": "tx pull --all || true",
-    "ensure:client": "cd client && npm update && bower install",
+    "ensure:client": "cd client && npm update --quiet && bower install --quiet",
     "prebuild": "npm-run-all clean tx lint",
     "prebuild:client": "npm run ensure:client",
     "postbuild": "npm-run-all --parallel copy:*",

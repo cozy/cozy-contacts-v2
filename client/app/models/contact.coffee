@@ -1,3 +1,6 @@
+app = undefined
+
+
 class Datapoint extends Backbone.Model
     defaults:
         name: 'other'
@@ -23,11 +26,13 @@ module.exports = class Contact extends Backbone.Model
 
         if attrs.n
             [gn, fn, ...] = attrs.n.split ';'
-            attrs.initials = _.chain([fn, gn])
+            attrs.initials = _.chain [fn, gn]
                 .compact()
                 .map (name) -> name[0].toAscii()[0]
                 .join ''
                 .value()
+
+            attrs.sortedName = @_buildSortedName attrs.n
 
         if (url = attrs.url)
             delete attrs.url
@@ -88,13 +93,33 @@ module.exports = class Contact extends Backbone.Model
         false
 
 
+    _buildSortedName: (n) ->
+        n ?= @get 'n'
+
+        sortKey = app.model.get 'sort'
+        [gn, fn, mn, ...] = n.split ';'
+
+        _.chain if sortKey is 'fn' then [fn, mn, gn] else [gn, fn, mn]
+            .compact()
+            .join ' '
+            .value()
+
+
+    constructor: ->
+        app = require 'application'
+        super
+
+
+    initialize: ->
+        @listenTo app.model, 'change:sort': ->
+            @set 'sortedName': @_buildSortedName()
+
+
     toString: (opts = {}) ->
-        [gn, fn, ...] = parts = @attributes.n.split ';'
+        [gn, fn, mn, pf, sf] = @attributes.n.split ';'
         # wrap given name (at index 0) in pre/post tags if provided
         gn = _.compact([opts.pre, gn, opts.post]).join ''
-        parts[0] = fn
-        parts[1] = gn
-        _.compact(parts).join ' '
+        _.compact([pf, fn, mn, gn, sf]).join ' '
 
 
     toHighlightedString: (pattern, opts= {})->
