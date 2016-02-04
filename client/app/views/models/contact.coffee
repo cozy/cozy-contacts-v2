@@ -103,6 +103,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         @set 'ref', @model.cid
 
 
+    getIndexKey: ->
+        sortIdx = if app.model.get('sort') is 'fn' then 0 else 1
+        initial = @get('initials')[sortIdx]?.toLowerCase() or ''
+        if /[a-z]/.test initial then initial else '#'
+
+
     onAddField: (type) ->
         @set type, '' if type in CONFIG.xtras
 

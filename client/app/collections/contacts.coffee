@@ -2,7 +2,6 @@ ContactsListener = require 'lib/contacts_listener'
 Contact = require 'models/contact'
 
 
-
 module.exports = class Contacts extends Backbone.Collection
 
     model: Contact
@@ -10,29 +9,12 @@ module.exports = class Contacts extends Backbone.Collection
 
     sortDisabled: false
 
-    buildComparator: (sort) =>
-        fn = (a, b) =>
-            if fn.sort is 'gn'
-                return a.get('n').localeCompare b.get('n')
-            else
-                nameA = a.getLastAndFirstNames()
-                nameB = b.getLastAndFirstNames()
-                return nameA.localeCompare nameB
-
-        fn.sort = sort
-        return fn
-
 
     initialize: ->
         {model} = require 'application'
 
-        @comparator = @buildComparator model.get 'sort'
-
-        @listenTo model, 'change:sort', (nil, sort) =>
-            @comparator.sort = sort
-            @sort()
-
-        @listenTo @, 'change:n', @sort
+        @comparator = 'sortedName'
+        @listenTo model, 'change:sort': _.ary @sort, 0
 
         @contactListener = new ContactsListener()
         @listenToOnce @, 'sync', -> @contactListener.watch @
@@ -106,4 +88,3 @@ module.exports = class Contacts extends Backbone.Collection
                     setTimeout @contactListener.enable, 1000
 
         setTimeout processCards, 35
-

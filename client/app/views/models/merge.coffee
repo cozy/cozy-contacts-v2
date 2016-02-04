@@ -160,5 +160,5 @@ module.exports = class MergeViewModel extends Backbone.ViewModel
 
             # Add the contacts after trigger, because add to main contacts
             # collection is a sensitive overhead (~1s)
-            app = require('application')
-            app.contacts.add result, sort: false
+            {contacts} = require('application')
+            contacts.add result, sort: false

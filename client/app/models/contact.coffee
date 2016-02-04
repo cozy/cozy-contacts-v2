@@ -1,3 +1,6 @@
+app = undefined
+
+
 class Datapoint extends Backbone.Model
     defaults:
         name: 'other'
@@ -23,11 +26,13 @@ module.exports = class Contact extends Backbone.Model
 
         if attrs.n
             [gn, fn, ...] = attrs.n.split ';'
-            attrs.initials = _.chain([fn, gn])
+            attrs.initials = _.chain [fn, gn]
                 .compact()
                 .map (name) -> name[0].toAscii()[0]
                 .join ''
                 .value()
+
+            attrs.sortedName = @_buildSortedName attrs.n
 
         if (url = attrs.url)
             delete attrs.url
@@ -86,6 +91,28 @@ module.exports = class Contact extends Backbone.Model
 
         options.attrs = attrs
         false
+
+
+    _buildSortedName: (n) ->
+        n ?= @get 'n'
+
+        sortKey = app.model.get 'sort'
+        [gn, fn, mn, ...] = n.split ';'
+
+        _.chain if sortKey is 'fn' then [fn, mn, gn] else [gn, fn, mn]
+            .compact()
+            .join ' '
+            .value()
+
+
+    constructor: ->
+        app = require 'application'
+        super
+
+
+    initialize: ->
+        @listenTo app.model, 'change:sort': ->
+            @set 'sortedName': @_buildSortedName()
 
 
     toString: (opts = {}) ->
