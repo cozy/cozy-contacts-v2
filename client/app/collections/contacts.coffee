@@ -12,28 +12,15 @@ module.exports = class Contacts extends Backbone.Collection
 
     buildComparator: (sort) =>
         fn = (a, b) =>
-            if @sortDisabled
-                return -1
+            if fn.sort is 'gn'
+                return a.get('n').localeCompare b.get('n')
             else
-                [a, b] = [a, b].map (model) ->
-                    name = model.get('n').split(';')
-                    if fn.sort is 'gn'
-                        "#{name[0]}#{name[1]}"
-                    else
-                        "#{name[1]}#{name[0]}"
-
-                a.localeCompare b
+                nameA = a.getLastAndFirstNames()
+                nameB = b.getLastAndFirstNames()
+                return nameA.localeCompare nameB
 
         fn.sort = sort
         return fn
-
-
-    disableSort: ->
-        sortDisabled = true
-
-
-    enableSort: ->
-        sortDisabled = false
 
 
     initialize: ->

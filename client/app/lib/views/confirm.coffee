@@ -15,7 +15,6 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
     triggers:
         'click @ui.btn_ok':     'confirm:true'
         'click @ui.btn_cancel': 'confirm:false'
-        'click @ui.btn_cancel': 'confirm:close'
 
 
     onDomRefresh: ->
@@ -24,9 +23,12 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
         , 50
 
 
-    onConfirmClose: ->
+    close: ->
         {layout} = require 'application'
         layout.alerts.empty()
+
+
+    onConfirmFalse: @::close
 
 
     showLoading: ->
@@ -35,4 +37,5 @@ module.exports = class ConfirmDialogView extends Mn.ItemView
 
     hideLoading: ->
         @ui.btn_ok.attr 'aria-busy', false
+
 

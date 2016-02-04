@@ -66,10 +66,8 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                 alert t 'contacts delete bulk error'
 
             else
-                app.contacts.disableSort()
-                app.contacts.remove selected
+                app.contacts.remove selected, sort: false
                 @set selected: []
-                app.contacts.enableSort()
                 setTimeout app.contacts.contactListener.enable, 1500
                 @trigger 'bulk:delete:done'
 

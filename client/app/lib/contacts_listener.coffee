@@ -32,6 +32,7 @@ module.exports = class ContactsListener extends CozySocketListener
                 options =
                     merge: true
                     trigger: false
+        options.sort = false
 
 
         if @enabled
@@ -39,28 +40,26 @@ module.exports = class ContactsListener extends CozySocketListener
             Remote action occured (#{queue}, #{action}), processing start!
             """
 
-            @collection.disableSort()
             @end = new Date().getTime()
 
-            # Build batches of 10 models on which to perform operations.
-            lists = []
             nbOccurences = @queues[queue].length
-            while @queues[queue].length > 0
-                lists.push @queues[queue].splice 0, 10
 
-            # Make a break between each operation performing to let the
-            # browser breath between each of them. This hack is dirty, we
-            # should find something better to make the massive addition less
-            # painful.
-            async.eachSeries lists, (list, done) =>
+            # Build batches of 50 models on which to perform operations.
+            # Make a break between each batch operation performing to let the
+            # browser breathes between each of them.
+            # This hack is dirty, we should find something better to make the
+            # massive addition less painful.
+            async.whilst =>
+                @queues[queue].length > 0
+            , (done) =>
+                list = @queues[queue].splice 0, 50
                 @collection[action] list, options
                 setTimeout done, 100
-            , =>
+            , ->
                 console.log """
                 Remote action processing done for #{nbOccurences} for operation
                 (#{queue}, #{action}).
                 """
-                @collection.enableSort()
         else
             @queues[queue] = []
 
