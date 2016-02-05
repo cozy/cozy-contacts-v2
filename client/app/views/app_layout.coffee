@@ -100,7 +100,6 @@ module.exports = class AppLayout extends Mn.LayoutView
         view = new ContactsView collection: app.filtered
 
         @listenToOnce view, 'show': ->
-            app.channel.trigger 'busy:disable'
             @ui.content.trigger 'focus'
             @updateCounter()
 

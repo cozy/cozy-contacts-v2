@@ -44,7 +44,6 @@ module.exports = class Contacts extends Mn.CompositeView
         selector = Mn._getValue @childViewContainer, @
         el  = if _.isString selector then @el.querySelector selector else @el
         el.appendChild buffer
-        @toggleEmpty()
 
 
     buildChildView: (child) ->
@@ -57,29 +56,26 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     showCollection: ->
-        # scored mode, render a filtered collection
-        models = if @_mode is 'scored'
-            filtered.get()
-        # indexed mode, char chunk branch
-        else if @_hasContacts
-            filtered.get index: @model.get 'char'
-        # indexed mode, root indexes collection
-        else
-            @collection.models
+        index = 0
+        models = @_getModels()
 
-        models.forEach (model, index) =>
-            view  = @buildChildView model
+        setTimeout _render = =>
+            model = models[index]
+            return @trigger 'show:collection' unless models.length and model
+
+            view = @buildChildView model
 
             @_updateIndices view, true, index
             @children.add view
             @renderChildView view, index
             view._parent = @
 
+            index++
+            setTimeout _render
+
 
     _createBuffer: ->
-        elBuffer = document.createDocumentFragment()
-        @_bufferedChildren.forEach (buffer) -> elBuffer.appendChild buffer.el
-        return elBuffer
+        document.createDocumentFragment()
 
 
     # To prevents inconsistencies on filtered collection, we find the view to
@@ -97,6 +93,18 @@ module.exports = class Contacts extends Mn.CompositeView
         ChildView = @getChildView child
         @addChild child, ChildView, opts.index
         @toggleEmpty()
+
+
+    _getModels: ->
+        # scored mode, render a filtered collection
+        models = if @_mode is 'scored'
+            filtered.get()
+        # indexed mode, char chunk branch
+        else if @_hasContacts
+            filtered.get index: @model.get 'char'
+        # indexed mode, root indexes collection
+        else
+            @collection.models
 
 
     # This CompositeView can be used in two different mode:
@@ -129,6 +137,8 @@ module.exports = class Contacts extends Mn.CompositeView
         # We're in indexed mode and hadn't any contact > chunks char root
         else if @_mode is 'indexed' and not @_hasContacts
             @collection = new Indexes Array::map.call indexes, (char) -> {char}
+            @once 'show:collection', ->
+                require('application').channel.trigger 'busy:disable'
 
         # Add listener to update tags classes if view displays contacts
         if @_hasContacts
@@ -159,7 +169,7 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     toggleEmpty: ->
-        @el.classList.toggle 'empty', not @children.length
+        @el.classList.toggle 'empty', not @_getModels().length
 
 
     updateTagClasses: ->
