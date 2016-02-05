@@ -11,7 +11,8 @@ ContactViewModel = require 'views/models/contact'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
-LabelsFiltersTool  = require 'views/labels'
+LabelsFiltersView  = require 'views/labels/index'
+LabelsSelectView   = require 'views/labels/admin'
 ToolbarView        = require 'views/tools/toolbar'
 ContactsView       = require 'views/contacts'
 CardView           = require 'views/contacts/card'
@@ -77,6 +78,13 @@ module.exports = class AppLayout extends Mn.LayoutView
         @listenTo app.filtered, 'update': @updateCounter
         @listenTo app.model, 'change:filter': @updateCounter
 
+        # FIXME : should be moved into: app.coffee
+        @listenTo app.tags, 'change:selected': @updateContactsTags
+
+        # FIXME : isnt dispatch (see updateContactsTags)
+        @listenTo app.contacts, 'change:selected', (args...) ->
+            console.log 'update region action', args...
+
         # bind Ui reacts to global channel events
         @listenTo app.channel,
             'busy:enable':  -> @$el.attr 'aria-busy', true
@@ -93,7 +101,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showFilters: ->
-        @showChildView 'labels', new LabelsFiltersTool model: @model
+        @showChildView 'labels', new LabelsFiltersView model: @model
 
 
     showContactsList: ->
@@ -119,15 +127,27 @@ module.exports = class AppLayout extends Mn.LayoutView
         el.scrollTop += el.offsetHeight
 
     showContextualMenu: ->
+        @showChildView 'labels', new LabelsSelectView  model: @model
         @showChildView 'actions', new ContextActionsTool model: @model
 
     hideContextualMenu: ->
+        @showChildView 'labels', new LabelsFiltersView model: @model
         @showChildView 'actions', new DefaultActionsTool()
 
     toggleDrawer: ->
         $drawer = @$ 'aside.drawer'
         isVisible = $drawer.attr('aria-expanded') is 'true'
         $drawer.attr 'aria-expanded', not isVisible
+
+
+    # FIXME : should be moved into: app.coffee
+    # FIXME : do not trigger 'change:selected' on app.contacts
+    updateContactsTags: (label) ->
+        candidates = app.contacts.filter (contact) =>
+            if (filter = contact.id in @model.get 'selected')
+                contact.set 'selected': label['selected']
+            filter
+        console.log 'should update Contacts.list', candidates
 
 
     # Search results rendering

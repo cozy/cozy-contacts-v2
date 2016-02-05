@@ -8,6 +8,7 @@
     "tools search placeholder": "rechercher des contacts",
     "tools labels filters": "libellés",
     "tools labels filters all": "tous les contacts",
+    "tools labels admin": "Ajouter un libéllé",
     "tools contextual selected": "%{smart_count} contact sélectionné |||| %{smart_count} contacts sélectionnés",
     "tools contextual select all": "tout sélectionner",
     "tools contextual select none": "tout désélectionner",
