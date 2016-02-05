@@ -35,26 +35,29 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
     select: (id) ->
         select = @get 'selected'
-        @trigger 'select:start' if _.isEmpty select
+        test = _.isEmpty select
         select.push id
         @set selected: select
+        @trigger 'select:start' if test
 
 
     unselect: (id) ->
         select = _.clone @get('selected')
         select = _.without select, id
-        @trigger 'select:none' if _.isEmpty select
         @set selected: select
+        @trigger 'select:end' if _.isEmpty select
 
 
     selectAll: ->
+        test = _.isEmpty @get 'selected'
         select = app.filtered.get(tagged: true).map (contact) -> contact.id
         @set selected: select
+        @trigger 'select:start' if test
 
 
     unselectAll: ->
         @set selected: []
-        @trigger 'select:none'
+        @trigger 'select:end' unless _.isEmpty @get('selected')
 
 
     # Delete currently selected conctacts.

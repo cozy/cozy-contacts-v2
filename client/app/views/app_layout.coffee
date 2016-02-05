@@ -58,7 +58,7 @@ module.exports = class AppLayout extends Mn.LayoutView
     modelEvents:
         'change:dialog':   'showDialog'
         'select:start':    'showContextualMenu'
-        'select:none':     'hideContextualMenu'
+        'select:end':      'hideContextualMenu'
         'change:scored':   'onSearchResults'
 
     childEvents:
