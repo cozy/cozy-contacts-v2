@@ -7,14 +7,14 @@
     "cozy-realtime-adapter": "1.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "6.2.3",
+    "autoprefixer": "6.3.1",
     "browser-sync-brunch": "0.0.9",
     "coffee-script-brunch": "1.8.3",
     "coffeelint-brunch": "1.7.1",
-    "cozy-ui": "0.1.4",
+    "cozy-ui": "0.1.5",
     "css-brunch": "1.7.0",
     "css-mqpacker": "4.0.0",
-    "csswring": "4.1.1",
+    "csswring": "4.2.1",
     "jade-brunch": "1.8.2",
     "javascript-brunch": "1.8.0",
     "json-brunch": "1.5.4",
