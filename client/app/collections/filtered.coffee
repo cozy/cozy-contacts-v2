@@ -45,6 +45,11 @@ module.exports = class FilteredCollection
             'reset':             @reset
             'add':               @add
             'remove':            @remove
+            'update':            -> @trigger 'update', @
+            'change:tags':       (model, value, opts) ->
+                vmodel = _.find @models, (vmodel) -> vmodel.model is model
+                set = @indexes.get vmodel.getIndexKey()
+                set.channel.trigger 'change:tags', vmodel, value, opts
             'change:sortedName': (model) ->
                 vmodel = _.find @models, (vmodel) -> vmodel.model is model
                 return unless vmodel
@@ -145,8 +150,9 @@ module.exports = class FilteredCollection
 
         unless opts.silent
             set.channel.trigger 'add', vmodel, set, {add: true, index: idx}
+            set.channel.trigger 'update', set
 
-        return vmodel
+        return set
 
 
     removeFromIndex: (vmodel, opts = {}) ->
@@ -163,6 +169,7 @@ module.exports = class FilteredCollection
 
             unless opts.silent
                 set.channel.trigger 'remove', vmodel, set
+                set.channel.trigger 'update', set
 
 
     migrateIndex: (vmodel) ->

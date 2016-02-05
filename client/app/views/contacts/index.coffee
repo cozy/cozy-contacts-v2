@@ -143,8 +143,10 @@ module.exports = class Contacts extends Mn.CompositeView
         # Add listener to update tags classes if view displays contacts
         if @_hasContacts
             @sort = true
-            @listenTo filtered.underlying, 'update': @updateTagClasses
-            @listenTo filtered, 'change:tags': @updateTagClasses
+            @listenTo @collection,
+                'reset':       @updateTagClasses
+                'update':      @updateTagClasses
+                'change:tags': @updateTagClasses
 
         # Force highlight refresh when filter is updated
         if @_mode is 'scored'
