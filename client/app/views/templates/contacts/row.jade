@@ -3,7 +3,7 @@ include helpers.jade
 mixin formatDatapoints(points, prefix)
     if points != null && points.length
         - var pop = points.length > 1
-        dl(role="gridcell", class=prefix, aria-haspopup=(pop? 'true' : 'false'), aria-expanded="false", data-position='bottom left')
+        dl(role="gridcell", class=prefix, aria-haspopup=(pop? 'true' : 'false'), aria-expanded="false", data-position='bottom right')
             dt
                 +formatPoint(points[0])
                 if pop
