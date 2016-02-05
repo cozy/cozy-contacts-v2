@@ -72,8 +72,9 @@ module.exports = class AppLayout extends Mn.LayoutView
 
         # bind render to collections / appModel events
         @listenToOnce app.tags, 'sync': @showFilters
-        @listenToOnce app.contacts, 'sync': @showContactsList
-        @listenTo app.filtered, 'update': @updateCounter
+        @listenToOnce app.contacts,
+            'sync': @showContactsList
+            'update': @updateCounter
         @listenTo app.model, 'change:filter': @updateCounter
 
         # bind Ui reacts to global channel events
@@ -217,4 +218,3 @@ module.exports = class AppLayout extends Mn.LayoutView
             @ui.counter
             .text t 'error search too short'
             .addClass 'important'
-

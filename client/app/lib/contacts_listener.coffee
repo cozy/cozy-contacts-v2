@@ -40,8 +40,6 @@ module.exports = class ContactsListener extends CozySocketListener
             Remote action occured (#{queue}, #{action}), processing start!
             """
 
-            @end = new Date().getTime()
-
             nbOccurences = @queues[queue].length
 
             # Build batches of 50 models on which to perform operations.

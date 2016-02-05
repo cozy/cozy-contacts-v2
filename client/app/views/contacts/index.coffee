@@ -5,6 +5,8 @@ Indexes = Backbone.Collection
 
 {indexes} = require 'config'
 
+filtered = undefined
+
 
 module.exports = class Contacts extends Mn.CompositeView
 
@@ -57,10 +59,10 @@ module.exports = class Contacts extends Mn.CompositeView
     showCollection: ->
         # scored mode, render a filtered collection
         models = if @_mode is 'scored'
-            @collection.get()
+            filtered.get()
         # indexed mode, char chunk branch
         else if @_hasContacts
-            @collection.get index: @model.get 'char'
+            filtered.get index: @model.get 'char'
         # indexed mode, root indexes collection
         else
             @collection.models
@@ -80,13 +82,21 @@ module.exports = class Contacts extends Mn.CompositeView
         return elBuffer
 
 
-    # To prevents inconsistencies on filetered collection, we find the view to
+    # To prevents inconsistencies on filtered collection, we find the view to
     # remove base on its underlying model rather on its viewModel
     _onCollectionRemove: (vmodel) ->
         baseModel = vmodel.model
         view = @children.find (view) -> view.model.model is baseModel
         @removeChildView view
         @checkEmpty()
+        @toggleEmpty()
+
+
+    _onCollectionAdd: (child, collection, opts) ->
+        @destroyEmptyView()
+        ChildView = @getChildView child
+        @addChild child, ChildView, opts.index
+        @toggleEmpty()
 
 
     # This CompositeView can be used in two different mode:
@@ -112,10 +122,9 @@ module.exports = class Contacts extends Mn.CompositeView
 
         # We've Contacts and we're in indexed mode > it's a chunk char branch
         if @_hasContacts and @_mode is 'indexed'
-            @collection = filtered
+            index = @model.get 'char'
+            @collection = Backbone.Radio.channel "idx.#{index}"
             @childViewContainer = 'ul'
-            @filter = (vmodel) =>
-                _.includes @collection.get(index: @model.get 'char'), vmodel
 
         # We're in indexed mode and hadn't any contact > chunks char root
         else if @_mode is 'indexed' and not @_hasContacts
@@ -124,8 +133,8 @@ module.exports = class Contacts extends Mn.CompositeView
         # Add listener to update tags classes if view displays contacts
         if @_hasContacts
             @sort = true
-            @listenTo @collection, 'update': @updateTagClasses
-            @listenTo @collection.underlying, 'change:tags': @updateTagClasses
+            @listenTo filtered.underlying, 'update': @updateTagClasses
+            @listenTo filtered, 'change:tags': @updateTagClasses
 
         # Force highlight refresh when filter is updated
         if @_mode is 'scored'
@@ -142,7 +151,7 @@ module.exports = class Contacts extends Mn.CompositeView
             @stopListening @collection, 'add'
             @stopListening @collection, 'remove'
             @stopListening @collection, 'reset'
-            @stopListening @collection, 'sort'
+            @stopListening @collection, 'sort' if @_hasContacts
         else
             setTimeout =>
                 @_initialEvents()
@@ -154,7 +163,7 @@ module.exports = class Contacts extends Mn.CompositeView
 
 
     updateTagClasses: ->
-        tags = _.chain @collection.get index: @model?.get 'char'
+        tags = _.chain filtered.get index: @model?.get 'char'
             .invoke 'get', 'tags'
             .flatten()
             .compact()

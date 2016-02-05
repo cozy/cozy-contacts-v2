@@ -27,10 +27,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'tags:update':    'updateTags'
         'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
-        'form:submit':    ->
-            @save()
+        'form:submit':    _.ary @::save, 0
         'export':         'downloadAsVCF'
-        'delete':         -> @destroy()
+        'delete':         _.ary @::destroy, 0
 
 
     proxy: ['toString', 'toHighlightedString', 'match']
@@ -102,6 +101,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     _setRef: ->
         @set 'ref', @model.cid
+
+
+    getIndexKey: ->
+        sortIdx = if app.model.get('sort') is 'fn' then 0 else 1
+        initial = @get('initials')[sortIdx]?.toLowerCase() or ''
+        if /[a-z]/.test initial then initial else '#'
 
 
     onAddField: (type) ->
