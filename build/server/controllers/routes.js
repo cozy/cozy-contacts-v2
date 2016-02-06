@@ -28,6 +28,9 @@ module.exports = {
     get: contact.list,
     post: contact.create
   },
+  'contacts/bulk-delete': {
+    post: contact.bulkDelete
+  },
   'contacts/:contactid': {
     get: contact.read,
     put: contact.update,

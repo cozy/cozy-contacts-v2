@@ -38,7 +38,8 @@ getImports = function(callback) {
     return callback(null, {
       config: config,
       locale: locale,
-      webDavAccount: webDavAccount
+      webDavAccount: webDavAccount,
+      env: process.env.NODE_ENV
     });
   });
 };
@@ -64,9 +65,16 @@ module.exports = {
     });
   },
   logClient: function(req, res) {
-    var ref;
-    log.error(req.body.data);
-    log.error((ref = req.body.data.error) != null ? ref.stack : void 0);
-    return res.send('ok');
+    var data, error, type;
+    data = req.body;
+    error = data.error;
+    delete data.error;
+    type = data.type === 'log' ? 'debug' : data.type;
+    log[type](data);
+    log[type](error.msg);
+    if (error.stack) {
+      log[type](error.stack);
+    }
+    return res.status(204).send();
   }
 };
