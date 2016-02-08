@@ -34,17 +34,19 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     select: (id) ->
-        select = @get 'selected'
+        select = _.clone @get 'selected'
         test = _.isEmpty select
         select.push id
-        @set selected: select
-        @trigger 'select:start' if test
+        @set {selected: select}, {silent: true}
 
+        @trigger 'select:start' if test
+        @trigger 'change:selected', @, select
 
     unselect: (id) ->
         select = _.clone @get('selected')
         select = _.without select, id
         @set selected: select
+
         @trigger 'select:end' if _.isEmpty select
 
 
