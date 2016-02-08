@@ -32,6 +32,10 @@ module.exports = class DuplicatesView extends Mn.CompositeView
     collectionEvents:
         'contacts:merge': 'render'
 
+    render: ->
+        super
+        $($('nav a').get(1)).attr 'aria-busy', false
+
 
     initialize: ->
         {contacts} = require 'application'
@@ -41,5 +45,5 @@ module.exports = class DuplicatesView extends Mn.CompositeView
         @toMerge = new BackboneProjections.Filtered @collection,
             filter: (merge) ->
                 merge.isMergeable()
-
         @bindEntityEvents @collection, @getOption 'collectionEvents'
+
