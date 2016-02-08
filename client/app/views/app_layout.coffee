@@ -67,6 +67,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         'contacts:select':   (contactsView, id) -> @model.select id
         'contacts:unselect': (contactsView, id) -> @model.unselect id
         'dialog:close':      -> @model.set 'dialog', false
+        'label:change':      'updateContactsTags'
 
 
     initialize: ->
@@ -77,13 +78,6 @@ module.exports = class AppLayout extends Mn.LayoutView
         @listenToOnce app.contacts, 'sync': @showContactsList
         @listenTo app.filtered, 'update': @updateCounter
         @listenTo app.model, 'change:filter': @updateCounter
-
-        # FIXME : should be moved into: app.coffee
-        @listenTo app.tags, 'change:selected': @updateContactsTags
-
-        # FIXME : isnt dispatch (see updateContactsTags)
-        @listenTo app.contacts, 'change:selected', (args...) ->
-            console.log 'update region action', args...
 
         # bind Ui reacts to global channel events
         @listenTo app.channel,
@@ -126,13 +120,15 @@ module.exports = class AppLayout extends Mn.LayoutView
         el = @ui.content[0]
         el.scrollTop += el.offsetHeight
 
-    showContextualMenu: ->
+
+    showContextualMenu: (selected) ->
         @showChildView 'labels', new LabelsSelectView  model: @model
         @showChildView 'actions', new ContextActionsTool model: @model
 
-    hideContextualMenu: ->
-        @showChildView 'labels', new LabelsFiltersView model: @model
+    hideContextualMenu: (selected) ->
+        @showChildView 'labels', new LabelsFiltersView  model: @model
         @showChildView 'actions', new DefaultActionsTool()
+
 
     toggleDrawer: ->
         $drawer = @$ 'aside.drawer'
@@ -140,14 +136,17 @@ module.exports = class AppLayout extends Mn.LayoutView
         $drawer.attr 'aria-expanded', not isVisible
 
 
-    # FIXME : should be moved into: app.coffee
-    # FIXME : do not trigger 'change:selected' on app.contacts
-    updateContactsTags: (label) ->
+    updateContactsTags: (view, model) ->
+        tag = model.get('name')
         candidates = app.contacts.filter (contact) =>
             if (filter = contact.id in @model.get 'selected')
-                contact.set 'selected': label['selected']
+                tags = _.clone contact.get('tags')
+                if model.get 'selected'
+                    tags.push(tag)
+                else
+                    tags = _.without tags, tag
+                contact.save 'tags': tags
             filter
-        console.log 'should update Contacts.list', candidates
 
 
     # Search results rendering

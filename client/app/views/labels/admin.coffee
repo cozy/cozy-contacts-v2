@@ -26,31 +26,35 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
 
 
     childEvents:
-        'contacts:update': 'updateBulkSelection'
+        'label:update': 'updateSelection'
+
+
+    modelEvents:
+        'change:selected': 'updateAll'
 
 
     initialize: ->
         app = require 'application'
 
-        # TODO : handle mixed selection
         # TODO : sort tags (top = selected tags)
-
-        @setSelected()
         @collection = new SelectCollection app.tags,
             filter: (model) =>
-                if (filter = app.contacts.tagMap[model.get('name')]?)
-                    value = _.contains @getSelected(), model.get('name')
-                    model.set 'selected', value, silent: true
-                filter
+                app.contacts.tagMap[model.get('name')]?
+        @listenTo @collection, 'change', @render
 
+    select: (model) =>
+        # TODO : handle mixed selection
+        value = _.contains @getSelected(), model.get('name')
+        model.set 'selected', value
 
+    # Define selected labels
     setSelected: ->
         app = require 'application'
         result = []
         selected = @model.get 'selected'
-        app.filtered.get(tagged: true).map (contact) ->
-            if _.contains selected, contact.id
-                result.push contact.get('tags')
+        result = app.filtered.get(tagged: true).map (contact) ->
+            filter = _.contains selected, contact.id
+            return if filter then contact.get('tags') else false
         _selected = _.compact _.flatten result
         _selected
 
@@ -58,7 +62,14 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
     getSelected: ->
         _selected
 
+    updateAll: ->
+        @setSelected()
+        @collection.each (model) =>
+            @select model
 
-    updateBulkSelection: (event, tag) ->
+    updateSelection: (event, tag) ->
         model = @collection.findWhere({ id: tag.id })
         model.set({ selected: tag.selected })
+
+        # Update tags into contactList
+        @triggerMethod 'label:change', model

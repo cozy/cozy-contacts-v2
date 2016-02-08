@@ -7,9 +7,8 @@ module.exports = class LabelSelect extends Mn.ItemView
     events:
         'change input[type="checkbox"]': 'select'
 
-
     # FIXME : should move this elsewhere?
     select: (event) ->
-        @triggerMethod 'contacts:update',
+        @triggerMethod 'label:update',
             id: event.currentTarget.id
             selected: !!event.currentTarget.checked
