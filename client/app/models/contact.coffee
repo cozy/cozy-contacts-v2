@@ -6,6 +6,10 @@ class Datapoint extends Backbone.Model
         name: 'other'
         type: 'other'
         value: ''
+        # The mediatype was introduced with the possibility to share a file
+        # with another cloud. It enables us to differentiate an url that
+        # represents an e-mail address from that of a cloud.
+        mediatype: ''
 
     parse: (attrs) ->
         if attrs.name is 'adr' and _.isArray attrs.value
@@ -34,6 +38,13 @@ module.exports = class Contact extends Backbone.Model
 
             attrs.sortedName = @_buildSortedName attrs.n
 
+        # (legacy) Once upon a time it was decided that a contact would have a
+        # main url address and that address would be used as a means for
+        # filtering. To preserve this and, at the same time, to be able to
+        # conform to the RFC vCard - https://tools.ietf.org/html/rfc6350 -
+        # there is a small manipulation that needs to be done when fetching the
+        # data: the url attribute must be converted into a datapoint, hence the
+        # following code.
         if (url = attrs.url)
             delete attrs.url
             attrs.datapoints.unshift
@@ -84,10 +95,25 @@ module.exports = class Contact extends Backbone.Model
                 point.value = VCardParser.adrStringToArray point.value
             return point
 
-        mainUrl = _.findWhere attrs.datapoints, name: 'url'
+        # (legacy, see comments in "parse" function) The condition to decide if
+        # an e-mail address can be the main url is: it must be an url and it's
+        # mediatype is empty. Indeed if an url has a mediatype it means that
+        # it's not an e-mail but the address of a cloud.
+        mainUrl = _.findWhere attrs.datapoints, {name: 'url', mediatype: ''}
         if mainUrl
             attrs.datapoints = _.without attrs.datapoints, mainUrl
             attrs.url = mainUrl.value
+
+        # When the user selects in the dropdown list for other information the
+        # field "cozy cloud" we need to change some attributes of the
+        # corresponding datapoint in order to respect the vCard RFC.
+        # The changes are:
+        # name: 'share' -> name: 'url' + mediatype: 'cloud:cozy'
+        clouds = _.where attrs.datapoints, {name: 'share'}
+        if not _.isEmpty(clouds)
+            for cloud in clouds
+                cloud.name      = 'url'
+                cloud.mediatype = 'cloud:cozy'
 
         options.attrs = attrs
         false

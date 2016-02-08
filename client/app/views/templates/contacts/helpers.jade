@@ -51,7 +51,9 @@ mixin input(name, type)
 mixin groupInput(point, prefix, index)
     - var placeholder = attributes.placeholder? t('datapoint placeholder ' + (entity == 'default'? point.name : entity)) : false
     - var group = prefix + '.' + index
+
     input.type(id="#{group}.type-#{ref}", name="#{group}.type", type='text', value=point.type, list="list-#{entity}")
+
     if prefix == 'adr'
         textarea.value(class=point.value? void 0 : 'empty', id="#{group}.value-#{ref}", name="#{group}.value")= point.value
     else
