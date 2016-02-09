@@ -181,12 +181,22 @@ module.exports = class AppLayout extends Mn.LayoutView
         unless slug
             @dialogs.empty()
         else
+            # Remove old listeners
+            # before updating DialogsRegion
+            if (dialogs = @getChildView 'dialogs')
+                dialogs.stopListening dialogs.model, 'change:tags'
+
             dialogView = switch slug
                 when 'settings'   then new SettingsView model: @model
                 when 'duplicates' then new DuplicatesView()
                 else                   @_buildContactView slug
-
             @showChildView 'dialogs', dialogView
+
+            # Should upgrade LabelsSelectView
+            dialogs = @getChildView 'dialogs'
+            dialogs.listenTo dialogs.model, 'change:tags', (args...) =>
+                labels = @getChildView 'labels'
+                labels.trigger 'change:tags', [args...]
 
 
     _buildContactView: (id) ->

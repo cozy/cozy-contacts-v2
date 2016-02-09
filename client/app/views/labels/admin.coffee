@@ -15,13 +15,17 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
 
     childView: require 'views/labels/select'
 
-
     childEvents:
         'label:update': 'changeSelection'
 
 
     modelEvents:
         'change:selected': 'updateSelection'
+
+
+    initialize: (args) ->
+        super args...
+        @listenTo @, 'change:tags', @updateSelection
 
 
     select: (model, models) =>
@@ -48,7 +52,6 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
             app = require 'application'
             @collection = new Filtered app.tags,
                 filter: (model) ->
-                    console.log 'filter', model
                     app.contacts.tagMap[model.get('name')]?
 
         # Upgrade selected values
