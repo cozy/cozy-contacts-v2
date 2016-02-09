@@ -121,12 +121,12 @@ module.exports = class AppLayout extends Mn.LayoutView
         el.scrollTop += el.offsetHeight
 
 
-    showContextualMenu: (selected) ->
+    showContextualMenu: ->
         @showChildView 'labels', new LabelsSelectView  model: @model
         @showChildView 'actions', new ContextActionsTool model: @model
 
-    hideContextualMenu: (selected) ->
-        @showChildView 'labels', new LabelsFiltersView  model: @model
+    hideContextualMenu: ->
+        @showFilters()
         @showChildView 'actions', new DefaultActionsTool()
 
 

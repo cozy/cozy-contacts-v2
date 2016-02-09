@@ -1,14 +1,5 @@
 {Filtered, Sorted}  = BackboneProjections
 
-_selected = []
-
-class SelectCollection extends Filtered
-    # constructor: (underlying, subtrahend, options = {}) ->
-    #     # options.filter = (model) -> not subtrahend.contains(model)
-    #
-    #     console.log 'new SelectCollection', underlying, options
-    #     super underlying, options
-
 module.exports = class LabelsAdminToolView extends Mn.CompositeView
 
     template: require 'views/templates/labels/admin'
@@ -26,50 +17,52 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
 
 
     childEvents:
-        'label:update': 'updateSelection'
+        'label:update': 'changeSelection'
 
 
     modelEvents:
-        'change:selected': 'updateAll'
+        'change:selected': 'updateSelection'
 
 
-    initialize: ->
-        app = require 'application'
-
-        # TODO : sort tags (top = selected tags)
-        @collection = new SelectCollection app.tags,
-            filter: (model) =>
-                app.contacts.tagMap[model.get('name')]?
-        @listenTo @collection, 'change', @render
-
-    select: (model) =>
+    select: (model, models) =>
         # TODO : handle mixed selection
-        value = _.contains @getSelected(), model.get('name')
-        model.set 'selected', value
+        value = _.contains models, model.get('name')
+        model.set {'selected': value}, {'silent': true}
+
 
     # Define selected labels
-    setSelected: ->
+    getSelection: ->
+        value = @model.get 'selected'
+
         app = require 'application'
-        result = []
-        selected = @model.get 'selected'
         result = app.filtered.get(tagged: true).map (contact) ->
-            filter = _.contains selected, contact.id
+            filter = _.contains value, contact.id
             return if filter then contact.get('tags') else false
-        _selected = _.compact _.flatten result
-        _selected
+
+        _.uniq _.compact _.flatten result
 
 
-    getSelected: ->
-        _selected
+    updateSelection: ->
+        unless @collection
+            # TODO : sort tags (top = selected tags)
+            app = require 'application'
+            @collection = new Filtered app.tags,
+                filter: (model) ->
+                    console.log 'filter', model
+                    app.contacts.tagMap[model.get('name')]?
 
-    updateAll: ->
-        @setSelected()
+        # Upgrade selected values
+        selection = @getSelection()
         @collection.each (model) =>
-            @select model
+            @select model, selection
 
-    updateSelection: (event, tag) ->
-        model = @collection.findWhere({ id: tag.id })
-        model.set({ selected: tag.selected })
+        # Display updated tagsList
+        @render()
 
-        # Update tags into contactList
+
+    changeSelection: (event, tag) ->
+        model = @collection.findWhere 'id': tag.id
+        model.set 'selected', tag.selected
+
+        # Should Update tags into contactList
         @triggerMethod 'label:change', model
