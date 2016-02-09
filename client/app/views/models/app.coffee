@@ -59,7 +59,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
     bulkDelete: ->
         selected = @attributes.selected
         app.contacts.contactListener.disable()
-        request.post '/contacts/bulk-delete', selected, (err, res) =>
+        request.post 'contacts/bulk-delete', selected, (err, res) =>
 
             if err
                 console.log err
