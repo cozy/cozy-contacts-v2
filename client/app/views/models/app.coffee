@@ -32,6 +32,13 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             @unselectAll()
             @set 'scored', require('config').search.pattern('text').test value
 
+        # Save tag filter
+        @listenTo app.channel, 'filter:tag': @setFilter
+
+
+    setFilter: (tag, previous) ->
+        @model.set 'filter': tag
+
 
     select: (id) ->
         select = _.clone @get 'selected'
