@@ -8,6 +8,7 @@
     "tools actions find duplicates": "find duplicates",
     "tools search placeholder":      "search for contacts",
     "tools labels filters":          "labels",
+    "tools labels filters selected": "selected label",
     "tools labels filters all":      "all contacts",
     "tools labels admin":            "add label",
     "tools contextual selected":     "%{smart_count} contact selected |||| %{smart_count} contacts selected",
