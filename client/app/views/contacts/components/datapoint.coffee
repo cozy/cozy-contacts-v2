@@ -38,7 +38,7 @@ module.exports = class ContactDatapointView extends Mn.ItemView
             # convert the data.name from 'share' to 'url' when we store it.
             # Once this is done we still need to set their entity to 'share'.
             when 'url'
-                if data.mediatype? and (data.mediatype.search 'cloud' != -1)
+                if data.mediatype? and data.mediatype.search 'cloud' != -1
                     'share'
                 else
                     'url'

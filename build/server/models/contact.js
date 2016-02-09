@@ -25,8 +25,7 @@ DataPoint = (function(superClass) {
   DataPoint.schema = {
     name: String,
     value: cozydb.NoSchema,
-    type: String,
-    mediatype: String
+    type: String
   };
 
   return DataPoint;
