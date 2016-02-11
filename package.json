@@ -7,7 +7,7 @@
   "engines": [
     "node >= 0.10.x"
   ],
-  "main": "server.coffee",
+  "main": "build/server.js",
   "dependencies": {
     "americano": "0.4.2",
     "async": "1.5.2",
