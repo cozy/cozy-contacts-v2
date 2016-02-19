@@ -168,30 +168,25 @@ module.exports = class Contact extends Backbone.Model
 
 
     match: (pattern, opts = {}) ->
-        search = false
-        format = if opts.format
-            pre: '»'
-            post: '«'
-        else undefined
-
-        targets = [@toString(format)]
+        # default search to name and org only
+        targets = _.compact [@toString(), @attributes.org]
 
         if opts.fullsearch
+            # Get all datapoints but addresses
             points = _.compact @attributes.datapoints.map (item) ->
                 item.get 'value' unless item.get('name') is 'adr'
-            targets = targets.concat(points).concat @attributes.tags
 
-        for value, index in targets
-            res = fuzzy.match pattern, value, opts
-            if res
-                search = res
-                if index is 0 and format
-                    search.rendered = res.rendered
-                        .replace '»', opts.format.pre
-                        .replace '«', opts.format.post
-                break
+            # Mix'em with previous targets and tags
+            targets = targets
+                .concat(points)
+                .concat @attributes.tags
 
-        return search
+        score = targets.reduce (memo, target, index) ->
+            res = fuzzy.match pattern, target
+            return memo + (res?.score or 0)
+        , 0
+
+        return score or false
 
 
     savePicture: (imgData, attrs, options) ->
@@ -245,4 +240,3 @@ module.exports = class Contact extends Backbone.Model
     getLastAndFirstNames: ->
         name = @get('n').split(';')
         return "#{name[1]}#{name[0]}"
-

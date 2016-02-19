@@ -4,12 +4,18 @@ ContactViewModel = require 'views/models/contact'
 
 tagRegExp = search.pattern 'tag'
 app       = null
-scores    = new WeakMap()
+scores    = new Map()
+
+
+Math.median = (array) ->
+    sorted = array.sort (a, b) -> a - b
+    len = array.length
+    sorted[Math.floor array.length / 2]
 
 
 filter = _.curry (query, model) ->
     if query
-        {score} = model.match query
+        score = model.match query, fullsearch: true
         unless score
             scores.delete model
             return false
@@ -63,6 +69,21 @@ module.exports = class FilteredCollection
 
         if query
             res = app.contacts.filter filter @query
+
+            # Reduce to get max score and get a median limit, then excludes all
+            # results $lt it.
+            maxScore = res.reduce (currentMax, model) ->
+                Math.max currentMax, scores.get model
+            , 0
+
+            if maxScore > 5
+                values  = scores.values()
+                _scores = []
+                _scores.push score while score = values.next().value
+
+                median = Math.median _scores
+                console.log median, scores
+                res = res.filter (model) -> scores.get(model) >= median
 
             toKeep   = @models.filter (vmodel) -> _.includes res, vmodel.model
             toAdd    = _.difference res, toKeep.map (vmodel) -> vmodel.model
