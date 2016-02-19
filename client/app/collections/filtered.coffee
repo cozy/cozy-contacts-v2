@@ -82,7 +82,6 @@ module.exports = class FilteredCollection
                 _scores.push score while score = values.next().value
 
                 median = Math.median _scores
-                console.log median, scores
                 res = res.filter (model) -> scores.get(model) >= median
 
             toKeep   = @models.filter (vmodel) -> _.includes res, vmodel.model
