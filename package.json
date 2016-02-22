@@ -1,6 +1,6 @@
 {
   "name": "cozy-contacts",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "author": "Cozy Cloud <contact@cozycloud.cc> (https://cozy.io/)",
   "license": "AGPL-3.0",
   "description": "A cozy application to manage your contacts.",
