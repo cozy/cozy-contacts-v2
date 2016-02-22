@@ -7,15 +7,24 @@ log = require('printit')
 
 
 # Datapoints is an array of { name, type, value ...} objects,
-# values are typically String. Particular case, adr :
+# values are typically String. Name and mediatype are the only values that
+# cannot be modified by the user.
+#
+# Particular case, adr :
 # name: 'adr',
 # type: 'home',
 # value: ['','', '12, rue Basse', 'Paris','','75011', 'France']
+#
+# Mediatype was required in order to be able to share files between clouds: its
+# role is to provide a hint on how to interprete the name that it is linked to.
+# For instance if the name is 'url' and mediatype is 'cozy' then we can
+# categorize the value as being the url address of a cozy cloud.
 class DataPoint extends cozydb.Model
     @schema:
         name: String
         value: cozydb.NoSchema
         type: String
+        mediatype: String
 
 # A contact account in an external service (typically google contact).
 # An account is uniquely identified by the couple of its type and name.
