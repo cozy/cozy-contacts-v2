@@ -87,8 +87,13 @@ module.exports = class AppLayout extends Mn.LayoutView
     # Regions contents rendering
     # ##########################################################################
     onRender: ->
-        @showChildView 'toolbar', new ToolbarView()
+        toolbar = new ToolbarView()
+        @listenToOnce toolbar,
+            'show': -> toolbar.$('#contacts-search').trigger('focus')
+
+        @showChildView 'toolbar', toolbar
         @showChildView 'actions', new DefaultActionsTool()
+
 
 
     showFilters: ->
@@ -98,9 +103,7 @@ module.exports = class AppLayout extends Mn.LayoutView
     showContactsList: ->
         view = new ContactsView collection: app.filtered
 
-        @listenToOnce view, 'show': ->
-            @ui.content.trigger 'focus'
-            @updateCounter()
+        @listenToOnce view, 'show': @updateCounter
 
         @showChildView 'indexes', view
 
