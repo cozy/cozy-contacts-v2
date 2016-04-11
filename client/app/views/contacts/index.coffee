@@ -193,7 +193,6 @@ module.exports = class Contacts extends Mn.CompositeView
         selected = event.currentTarget.checked
         id       = event.currentTarget.value
         method   = if selected then 'contacts:select' else 'contacts:unselect'
-
         @triggerMethod method, id
 
 

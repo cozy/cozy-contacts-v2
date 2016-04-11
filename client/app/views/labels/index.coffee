@@ -3,7 +3,7 @@
 
 module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
-    template: require 'views/templates/labels'
+    template: require 'views/templates/labels/index'
 
     tagName: 'fieldset'
 

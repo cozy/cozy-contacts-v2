@@ -11,7 +11,8 @@ ContactViewModel = require 'views/models/contact'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
-LabelsFiltersTool  = require 'views/labels'
+LabelsFiltersView  = require 'views/labels/index'
+LabelsSelectView   = require 'views/labels/admin'
 ToolbarView        = require 'views/tools/toolbar'
 ContactsView       = require 'views/contacts'
 CardView           = require 'views/contacts/card'
@@ -57,7 +58,8 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     modelEvents:
         'change:dialog':   'showDialog'
-        'change:selected': 'swapContextualMenu'
+        'select:start':    'showContextualMenu'
+        'select:end':      'hideContextualMenu'
         'change:scored':   'onSearchResults'
 
     childEvents:
@@ -65,6 +67,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         'contacts:select':   (contactsView, id) -> @model.select id
         'contacts:unselect': (contactsView, id) -> @model.unselect id
         'dialog:close':      -> @model.set 'dialog', false
+        'label:change':      'updateContactsTags'
 
 
     initialize: ->
@@ -97,7 +100,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showFilters: ->
-        @showChildView 'labels', new LabelsFiltersTool model: @model
+        @showChildView 'labels', new LabelsFiltersView model: @model
 
 
     showContactsList: ->
@@ -120,25 +123,32 @@ module.exports = class AppLayout extends Mn.LayoutView
         el.scrollTop += el.offsetHeight
 
 
-    # Contextual Region actions
-    #
-    # - toggle the drawer on small screens
-    # - switch contextual menu view when rows are selected
-    # ##########################################################################
-    swapContextualMenu: (appViewModel, selected) ->
-        prev = appViewModel._previousAttributes.selected
-        return if prev.length and selected.length
+    showContextualMenu: ->
+        @showChildView 'labels', new LabelsSelectView  model: @model
+        @showChildView 'actions', new ContextActionsTool model: @model
 
-        if _.isEmpty selected
-            @showChildView 'actions', new DefaultActionsTool()
-        else
-            @showChildView 'actions', new ContextActionsTool model: @model
+    hideContextualMenu: ->
+        @showFilters()
+        @showChildView 'actions', new DefaultActionsTool()
 
 
     toggleDrawer: ->
         $drawer = @$ 'aside.drawer'
         isVisible = $drawer.attr('aria-expanded') is 'true'
         $drawer.attr 'aria-expanded', not isVisible
+
+
+    updateContactsTags: (view, model) ->
+        tag = model.get('name')
+        candidates = app.contacts.filter (contact) =>
+            if (filter = contact.id in @model.get 'selected')
+                tags = _.clone contact.get('tags')
+                if model.get 'selected'
+                    tags.push(tag)
+                else
+                    tags = _.without tags, tag
+                contact.save 'tags': tags
+            filter
 
 
     # Search results rendering
@@ -173,12 +183,22 @@ module.exports = class AppLayout extends Mn.LayoutView
         unless slug
             @dialogs.empty()
         else
+            # Remove old listeners
+            # before updating DialogsRegion
+            if (dialogs = @getChildView 'dialogs')
+                dialogs.stopListening dialogs.model, 'change:tags'
+
             dialogView = switch slug
                 when 'settings'   then new SettingsView model: @model
                 when 'duplicates' then new DuplicatesView()
                 else                   @_buildContactView slug
-
             @showChildView 'dialogs', dialogView
+
+            # Should upgrade LabelsSelectView
+            dialogs = @getChildView 'dialogs'
+            dialogs.listenTo dialogs.model, 'change:tags', (args...) =>
+                labels = @getChildView 'labels'
+                labels.trigger 'change:tags', [args...]
 
 
     _buildContactView: (id) ->
