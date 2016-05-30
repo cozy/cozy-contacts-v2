@@ -27,7 +27,7 @@
     "settings display sort gn": "trier par nom",
     "settings display sort fn": "trier par prénom",
     "settings sync title": "synchronisation mobile",
-    "settings sync gplay": "Accédez à votre Cozy depuis votre mobile. Télécharger notre application sur le Google Play Store :",
+    "settings sync gplay": "Accédez à votre Cozy depuis votre mobile. Téléchargez notre application sur le Google Play Store :",
     "settings sync gplay get it": "Disponible sur Google Play",
     "settings sync carddav": "Besoin de synchronisation CardDav ? Jetez un œil à [notre documentation](%{link}).",
     "card actions create": "créer",
@@ -44,6 +44,7 @@
     "card actions add social": "réseau social",
     "card actions add link": "lien",
     "card actions add other": "autre",
+    "card actions add share": "Cozyz",
     "card confirm delete title": "Supprimer %{name} ?",
     "card confirm delete message": "Vous allez supprimer %{name} de vos contacts. Le voulez-vous vraiment ?",
     "card confirm delete ok": "Le supprimer",
@@ -75,6 +76,7 @@
     "datapoint placeholder chat": "ajouter un nom d'utilisateur",
     "datapoint placeholder url": "ajouter une url",
     "datapoint placeholder other": "ajouter une information",
+    "datapoint placeholder share": "Ajouter l'URL cozy",
     "datapoint label bday": "anniversaire",
     "datapoint placeholder bday": "YYYY-MM-DD",
     "datapoint label note": "notes",
@@ -94,5 +96,6 @@
     "merge choose birthday": "Choisissez un anniversaire :",
     "merge actions merge": "fusionner",
     "merge actions cancel": "annuler",
-    "error upload wrong filetype": "Le fichier sélectionné n'est pas un format VCard/VCF valide. Essayez avec un autre fichier."
+    "error upload wrong filetype": "Le fichier sélectionné n'est pas un format VCard/VCF valide. Essayez avec un autre fichier.",
+    "error search too short": "Vous devez saisir au moins3 caractères."
 }
