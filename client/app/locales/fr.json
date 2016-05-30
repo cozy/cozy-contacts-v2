@@ -44,7 +44,7 @@
     "card actions add social": "réseau social",
     "card actions add link": "lien",
     "card actions add other": "autre",
-    "card actions add share": "Cozyz",
+    "card actions add share": "Cozy cloud",
     "card confirm delete title": "Supprimer %{name} ?",
     "card confirm delete message": "Vous allez supprimer %{name} de vos contacts. Le voulez-vous vraiment ?",
     "card confirm delete ok": "Le supprimer",
