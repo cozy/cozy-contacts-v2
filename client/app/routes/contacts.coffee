@@ -45,4 +45,9 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
 
 
     duplicates: ->
-        @_ensureContacts -> app.model.set 'dialog', 'duplicates'
+        @_ensureContacts ->
+            $($('nav a').get(1)).attr 'aria-busy', true
+            setTimeout ->
+                app.model.set 'dialog', 'duplicates'
+            , 500
+

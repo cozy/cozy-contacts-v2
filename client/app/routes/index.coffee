@@ -46,6 +46,6 @@ module.exports = class Router extends Backbone.Router
     settings: ->
         app.model.set 'dialog', 'settings'
 
-
     legacyContactRedirect: (slug) ->
         @navigate "contacts/#{slug}", trigger: true
+
