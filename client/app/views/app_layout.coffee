@@ -180,37 +180,30 @@ module.exports = class AppLayout extends Mn.LayoutView
     # dialog.
     # ##########################################################################
     showDialog: (appViewModel, slug) ->
-        unless slug
-            @dialogs.empty()
-        else
-            # Remove old listeners
-            # before updating DialogsRegion
-            if (dialogs = @getChildView 'dialogs')
-                dialogs.stopListening dialogs.model, 'change:tags'
+        return @dialogs.empty() unless slug
 
-            dialogView = switch slug
-                when 'settings'   then new SettingsView model: @model
-                when 'duplicates' then new DuplicatesView()
-                else                   @_buildContactView slug
-            @showChildView 'dialogs', dialogView
+        # Remove old listeners
+        # before updating DialogsRegion
+        if (dialogs = @getChildView 'dialogs')
+            dialogs.stopListening dialogs.model, 'change:tags'
 
-            # Should upgrade LabelsSelectView
-            dialogs = @getChildView 'dialogs'
-            dialogs.listenTo dialogs.model, 'change:tags', (args...) =>
-                labels = @getChildView 'labels'
-                labels.trigger 'change:tags', [args...]
+        dialogView = switch slug
+            when 'settings'   then new SettingsView model: @model
+            when 'duplicates' then new DuplicatesView()
+            else
+                if slug is 'new'
+                    model = new ContactModel null, parse: true
+                else
+                    model = app.contacts.get slug
 
+                viewModel = new ContactViewModel {new: slug is 'new'},
+                    model: model
+                viewModel.listenTo app.channel,
+                    'mode:edit': (edit) -> @set 'edit', edit
 
-    _buildContactView: (id) ->
-        if id is 'new'
-            model = new ContactModel null, parse: true
-        else
-            model = app.contacts.get id
+                new CardView model: viewModel
 
-        viewModel = new ContactViewModel {new: id is 'new'}, model: model
-        viewModel.listenTo app.channel, 'mode:edit', (edit) -> @set 'edit', edit
-
-        new CardView model: viewModel
+        @showChildView 'dialogs', dialogView
 
 
     # Counter updates / actions

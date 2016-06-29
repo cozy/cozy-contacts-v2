@@ -170,7 +170,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         ,
             wait: true
             success: =>
-                tags = @model.get('tags').concat tag
+                tags = _.clone(@model.get('tags')).concat tag
                 @updateTags tags
 
 

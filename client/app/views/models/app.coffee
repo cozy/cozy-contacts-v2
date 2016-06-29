@@ -32,22 +32,15 @@ module.exports = class AppViewModel extends Backbone.ViewModel
             @unselectAll()
             @set 'scored', require('config').search.pattern('text').test value
 
-        # Save tag filter
-        @listenTo app.channel, 'filter:tag': @setFilter
-
-
-    setFilter: (tag, previous) ->
-        @model.set 'filter': tag
-
 
     select: (id) ->
         select = _.clone @get 'selected'
-        test = _.isEmpty select
+        @trigger 'select:start' if _.isEmpty select
+
         select.push id
         @set {selected: select}, {silent: true}
-
-        @trigger 'select:start' if test
         @trigger 'change:selected', @, select
+
 
     unselect: (id) ->
         select = _.clone @get('selected')
@@ -58,15 +51,15 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     selectAll: ->
-        test = _.isEmpty @get 'selected'
+        @trigger 'select:start' if _.isEmpty @get 'selected'
+
         select = app.filtered.get(tagged: true).map (contact) -> contact.id
         @set selected: select
-        @trigger 'select:start' if test
 
 
     unselectAll: ->
         @set selected: []
-        @trigger 'select:end' unless _.isEmpty @get('selected')
+        @trigger 'select:end'
 
 
     # Delete currently selected conctacts.
