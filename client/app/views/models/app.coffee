@@ -21,6 +21,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         'bulk:delete':     'bulkDelete'
         'bulk:export':     -> @bulkExport()
         'bulk:merge':      'bulkMerge'
+        'bulk:tag':        'bulkTag'
         'contacts:export': -> @bulkExport true
 
 
@@ -100,6 +101,18 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         else
             app.layout.showChildView 'alerts', new MergeView model: toMerge
 
+
+    bulkTag: (tagName, state) ->
+        @get('selected').forEach (id) ->
+            contact = app.contacts.get id
+            tags    = _.clone contact.get 'tags'
+
+            if state
+                tags.push tagName
+            else
+                _.pull tags, tagName
+
+            contact.save tags: tags
 
 
     bulkExport: (all) ->

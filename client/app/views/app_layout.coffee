@@ -12,7 +12,7 @@ ContactViewModel = require 'views/models/contact'
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
 LabelsFiltersView  = require 'views/labels/index'
-LabelsSelectView   = require 'views/labels/admin'
+LabelsEditView     = require 'views/labels/edit'
 ToolbarView        = require 'views/tools/toolbar'
 ContactsView       = require 'views/contacts'
 CardView           = require 'views/contacts/card'
@@ -143,19 +143,6 @@ module.exports = class AppLayout extends Mn.LayoutView
         $drawer = @$ 'aside.drawer'
         isVisible = $drawer.attr('aria-expanded') is 'true'
         $drawer.attr 'aria-expanded', not isVisible
-
-
-    updateContactsTags: (view, model) ->
-        tag = model.get('name')
-        candidates = app.contacts.filter (contact) =>
-            if (filter = contact.id in @model.get 'selected')
-                tags = _.clone contact.get('tags')
-                if model.get 'selected'
-                    tags.push(tag)
-                else
-                    tags = _.without tags, tag
-                contact.save 'tags': tags
-            filter
 
 
     # Search results rendering

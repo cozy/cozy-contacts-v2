@@ -22,20 +22,16 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
     initialize: ->
         app = require 'application'
-
-        # Tag collection filtering is based on the tag map built at the contact
-        # collection level. It avoids to do too many checkings while looking
-        # for available tags.
-        @collection = new Filtered app.tags,
-            filter: (model) ->
-                app.contacts.tagMap[model.get('name')]?
-
-        @collection.listenTo app.contacts,
-            'reset':       @collection.update
-            'update':      @collection.update
-            'change:tags': @collection.update
-
         @listenTo app.channel, 'filter:tag': @toggleSelected
+
+
+    serializeData: ->
+        filter = @model.get('filter') or ''
+
+        data =
+            name:     t('tools labels filters all')
+            href:     'contacts'
+            selected: filter.indexOf('tag:') is -1
 
 
     toggleSelected: (tag) ->
