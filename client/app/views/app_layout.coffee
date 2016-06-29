@@ -74,7 +74,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         app = require 'application'
 
         # bind render to collections / appModel events
-        @listenToOnce app.tags, 'sync': @showFilters
+        @listenToOnce app.tags.underlying, 'sync': @showFilters
         @listenToOnce app.contacts, 'sync': @showContactsList
         @listenTo app.filtered, 'update': @updateCounter
         @listenTo app.model, 'change:filter': @updateCounter
@@ -100,7 +100,9 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showFilters: ->
-        @showChildView 'labels', new LabelsFiltersView model: @model
+        @showChildView 'labels', new LabelsFiltersView
+            model:      @model
+            collection: app.tags
 
 
     showContactsList: ->
@@ -124,7 +126,12 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     showContextualMenu: ->
-        @showChildView 'labels', new LabelsSelectView  model: @model
+        if app.tags.length > 0
+            @showChildView 'labels', new LabelsEditView
+                model:      @model
+                collection: app.tags.underlying
+        else
+            @getRegion('labels').empty()
         @showChildView 'actions', new ContextActionsTool model: @model
 
     hideContextualMenu: ->
