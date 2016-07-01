@@ -19,30 +19,6 @@ module.exports = class Contacts extends Backbone.Collection
         @contactListener = new ContactsListener()
         @listenToOnce @, 'sync', -> @contactListener.watch @
 
-        # Init a map of all available tags in the contact list.
-        @tagMap = {}
-
-        # Reset or update the tag map when changes occur.
-        @on 'reset', @resetTagMap
-        @on 'add', @addTags
-        @on 'update', @addTags
-
-
-    # Rebuild available tag map by adding a key for every tag set on contacts.
-    resetTagMap: ->
-        @tagMap = {}
-        for contact in @models
-            tags = contact.get('tags') or []
-            @tagMap[tag] = true for tag in tags
-
-
-    # When a contact is updated or added, its tags are added to the tag map.
-    # To avoid too many operations, we don't reset the whole map. The
-    # counterpart is that there is no update when a tag is no more used.
-    addTags: (contact) ->
-        tags = contact.get('tags') or []
-        @tagMap[tag] = true for tag in tags
-
 
     # Turns a vcard text into a list of contacts. Then it saves every contacts
     # in the data system. Finally it reloads the contact list.

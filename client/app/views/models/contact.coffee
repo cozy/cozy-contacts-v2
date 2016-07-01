@@ -162,15 +162,12 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     addNewTag: (tag) ->
         {contacts, tags} = app
 
-        # Update tag map used to filter quickly available tags.
-        contacts.tagMap[tag] = true
-
         tags.create
             name: tag
         ,
             wait: true
             success: =>
-                tags = @model.get('tags').concat tag
+                tags = _.clone(@model.get('tags')).concat tag
                 @updateTags tags
 
 

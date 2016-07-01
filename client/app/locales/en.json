@@ -9,6 +9,7 @@
     "tools search placeholder":      "search for contacts",
     "tools labels filters":          "labels",
     "tools labels filters all":      "all contacts",
+    "tools labels admin":            "edit label",
     "tools contextual selected":     "%{smart_count} contact selected |||| %{smart_count} contacts selected",
     "tools contextual select all":   "select all",
     "tools contextual select none":  "select none",

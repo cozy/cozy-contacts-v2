@@ -21,6 +21,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         'bulk:delete':     'bulkDelete'
         'bulk:export':     -> @bulkExport()
         'bulk:merge':      'bulkMerge'
+        'bulk:tag':        'bulkTag'
         'contacts:export': -> @bulkExport true
 
 
@@ -34,23 +35,32 @@ module.exports = class AppViewModel extends Backbone.ViewModel
 
 
     select: (id) ->
-        select = @attributes.selected.slice(0)
+        select = _.clone @get 'selected'
+        @trigger 'select:start' if _.isEmpty select
+
         select.push id
-        @set selected: select
+        @set {selected: select}, {silent: true}
+        @trigger 'change:selected', @, select
 
 
     unselect: (id) ->
-        select = _.without @attributes.selected, id
+        select = _.clone @get('selected')
+        select = _.without select, id
         @set selected: select
+
+        @trigger 'select:end' if _.isEmpty select
 
 
     selectAll: ->
+        @trigger 'select:start' if _.isEmpty @get 'selected'
+
         select = app.filtered.get(tagged: true).map (contact) -> contact.id
         @set selected: select
 
 
     unselectAll: ->
         @set selected: []
+        @trigger 'select:end'
 
 
     # Delete currently selected conctacts.
@@ -91,6 +101,18 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         else
             app.layout.showChildView 'alerts', new MergeView model: toMerge
 
+
+    bulkTag: (tagName, state) ->
+        @get('selected').forEach (id) ->
+            contact = app.contacts.get id
+            tags    = _.clone contact.get 'tags'
+
+            if state
+                tags.push tagName
+            else
+                _.pull tags, tagName
+
+            contact.save tags: tags
 
 
     bulkExport: (all) ->
