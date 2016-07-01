@@ -1,5 +1,4 @@
 ###
-application
 
 Main application that create a Mn.Application singleton and exposes it. Needs
 router and app_layout view.
@@ -29,33 +28,35 @@ class Application extends Mn.Application
               application module later.
     - layout: the application layout view, rendered.
     ###
-    initialize: ->
-        # initialize components before loading app
-        @on 'before:start', ->
-            config    = new ConfigModel require('imports').config
-            @model    = new AppViewModel null, model: config
 
-            @contacts = new ContactsCollection()
-            @filtered = new FilteredCollection()
-            @tags     = new TagsCollection()
+    # initialize components before loading app
+    onBeforeStart: ->
+        config    = new ConfigModel require('imports').config
+        @model    = new AppViewModel null, model: config
 
-            @layout   = new AppLayout model: @model
-            @router   = new Router()
+        @contacts = new ContactsCollection()
+        @filtered = new FilteredCollection()
+        @tags     = new TagsCollection(@contacts)
 
-            @intentManager = new IntentManager
+        # As long as Tags require Contacts to be loaded (see Tags.refs), we
+        # trigger all TagsCollection fetch after syncing ContactsCollection.
+        @listenToOnce @contacts, 'sync': -> @tags.underlying.fetch reset: true
 
-            Object.freeze @ if typeof Object.freeze is 'function'
+        @layout   = new AppLayout model: @model
+        @router   = new Router()
 
-        # render components when app starts
-        @on 'start', ->
-            @layout.render()
+        @intentManager = new IntentManager()
 
-            @contacts.fetch reset: true
-            @tags.fetch reset: true
+        Object.freeze @ if typeof Object.freeze is 'function'
 
-            # prohibit pushState because URIs mapped from cozy-home rely on
-            # fragment
-            Backbone.history.start pushState: false if Backbone.history
+    # render components when app starts
+    onStart: ->
+        @layout.render()
+        @contacts.fetch reset: true
+
+        # prohibit pushState because URIs mapped from cozy-home rely on
+        # fragment
+        Backbone.history.start pushState: false if Backbone.history
 
 
     search: (pattern, string) ->

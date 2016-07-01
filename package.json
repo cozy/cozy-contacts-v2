@@ -1,13 +1,13 @@
 {
   "name": "cozy-contacts",
-  "version": "2.1.5",
+  "version": "2.1.12",
   "author": "Cozy Cloud <contact@cozycloud.cc> (https://cozy.io/)",
   "license": "AGPL-3.0",
   "description": "A cozy application to manage your contacts.",
   "engines": [
     "node >= 0.10.x"
   ],
-  "main": "server.coffee",
+  "main": "build/server.js",
   "dependencies": {
     "americano": "0.4.2",
     "async": "1.5.2",

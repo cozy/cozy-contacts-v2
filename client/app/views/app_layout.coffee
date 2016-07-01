@@ -11,7 +11,8 @@ ContactViewModel = require 'views/models/contact'
 
 DefaultActionsTool = require 'views/tools/default_actions'
 ContextActionsTool = require 'views/tools/context_actions'
-LabelsFiltersTool  = require 'views/labels'
+LabelsFiltersView  = require 'views/labels/index'
+LabelsEditView     = require 'views/labels/edit'
 ToolbarView        = require 'views/tools/toolbar'
 ContactsView       = require 'views/contacts'
 CardView           = require 'views/contacts/card'
@@ -57,7 +58,8 @@ module.exports = class AppLayout extends Mn.LayoutView
 
     modelEvents:
         'change:dialog':   'showDialog'
-        'change:selected': 'swapContextualMenu'
+        'select:start':    'showContextualMenu'
+        'select:end':      'hideContextualMenu'
         'change:scored':   'onSearchResults'
 
     childEvents:
@@ -65,13 +67,14 @@ module.exports = class AppLayout extends Mn.LayoutView
         'contacts:select':   (contactsView, id) -> @model.select id
         'contacts:unselect': (contactsView, id) -> @model.unselect id
         'dialog:close':      -> @model.set 'dialog', false
+        'label:change':      'updateContactsTags'
 
 
     initialize: ->
         app = require 'application'
 
         # bind render to collections / appModel events
-        @listenToOnce app.tags, 'sync': @showFilters
+        @listenToOnce app.tags.underlying, 'sync': @showFilters
         @listenToOnce app.contacts, 'sync': @showContactsList
         @listenTo app.filtered, 'update': @updateCounter
         @listenTo app.model, 'change:filter': @updateCounter
@@ -87,22 +90,42 @@ module.exports = class AppLayout extends Mn.LayoutView
     # Regions contents rendering
     # ##########################################################################
     onRender: ->
-        @showChildView 'toolbar', new ToolbarView()
+        toolbar = new ToolbarView()
+        @listenToOnce toolbar,
+            'show': -> toolbar.$('#contacts-search').trigger('focus')
+
+        @showChildView 'toolbar', toolbar
         @showChildView 'actions', new DefaultActionsTool()
 
 
+
     showFilters: ->
-        @showChildView 'labels', new LabelsFiltersTool model: @model
+        @showChildView 'labels', new LabelsFiltersView
+            model:      @model
+            collection: app.tags
 
 
     showContactsList: ->
         view = new ContactsView collection: app.filtered
 
-        @listenToOnce view, 'show': ->
-            @ui.content.trigger 'focus'
-            @updateCounter()
+        @listenToOnce view, 'show': @updateCounter
 
         @showChildView 'indexes', view
+
+
+    showContextualMenu: ->
+        if app.tags.length > 0
+            @showChildView 'labels', new LabelsEditView
+                model:      @model
+                collection: app.tags.underlying
+        else #do not display edit tags view if no tags are available
+            @getRegion('labels').empty()
+        @showChildView 'actions', new ContextActionsTool model: @model
+
+
+    hideContextualMenu: ->
+        @showFilters()
+        @showChildView 'actions', new DefaultActionsTool()
 
 
     # keybr events bindings
@@ -115,21 +138,6 @@ module.exports = class AppLayout extends Mn.LayoutView
     onKeyPagedown: ->
         el = @ui.content[0]
         el.scrollTop += el.offsetHeight
-
-
-    # Contextual Region actions
-    #
-    # - toggle the drawer on small screens
-    # - switch contextual menu view when rows are selected
-    # ##########################################################################
-    swapContextualMenu: (appViewModel, selected) ->
-        prev = appViewModel._previousAttributes.selected
-        return if prev.length and selected.length
-
-        if _.isEmpty selected
-            @showChildView 'actions', new DefaultActionsTool()
-        else
-            @showChildView 'actions', new ContextActionsTool model: @model
 
 
     toggleDrawer: ->
@@ -167,27 +175,30 @@ module.exports = class AppLayout extends Mn.LayoutView
     # dialog.
     # ##########################################################################
     showDialog: (appViewModel, slug) ->
-        unless slug
-            @dialogs.empty()
-        else
-            dialogView = switch slug
-                when 'settings'   then new SettingsView model: @model
-                when 'duplicates' then new DuplicatesView()
-                else                   @_buildContactView slug
+        return @dialogs.empty() unless slug
 
-            @showChildView 'dialogs', dialogView
+        # Remove old listeners
+        # before updating DialogsRegion
+        if (dialogs = @getChildView 'dialogs')
+            dialogs.stopListening dialogs.model, 'change:tags'
 
+        dialogView = switch slug
+            when 'settings'   then new SettingsView model: @model
+            when 'duplicates' then new DuplicatesView()
+            else
+                if slug is 'new'
+                    model = new ContactModel null, parse: true
+                else
+                    model = app.contacts.get slug
 
-    _buildContactView: (id) ->
-        if id is 'new'
-            model = new ContactModel null, parse: true
-        else
-            model = app.contacts.get id
+                viewModel = new ContactViewModel {new: slug is 'new'},
+                    model: model
+                viewModel.listenTo app.channel,
+                    'mode:edit': (edit) -> @set 'edit', edit
 
-        viewModel = new ContactViewModel {new: id is 'new'}, model: model
-        viewModel.listenTo app.channel, 'mode:edit', (edit) -> @set 'edit', edit
+                new CardView model: viewModel
 
-        new CardView model: viewModel
+        @showChildView 'dialogs', dialogView
 
 
     # Counter updates / actions

@@ -1,4 +1,11 @@
-a(href=(_default? "contacts":"tags/#{name}") data-input="radio" aria-checked=selected? 'true' : 'false')
-    input(type="radio" id=id name="label-filters" checked=selected)
-    label(for=id)
-    = name
+mixin input(type, id, name, selected)
+    input(type=type id=id name="label-filters" checked=!!selected)
+    label(for=id)= name
+
+
+if edit
+    span(data-input="checkbox", aria-checked=selected.toString())
+        +input('checkbox', id, name, selected)
+else
+    a(href=(href? href:"tags/#{name}") data-input="radio" aria-checked=selected.toString())
+        +input('radio', id, name, selected)

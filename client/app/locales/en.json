@@ -9,6 +9,7 @@
     "tools search placeholder":      "search for contacts",
     "tools labels filters":          "labels",
     "tools labels filters all":      "all contacts",
+    "tools labels admin":            "edit label",
     "tools contextual selected":     "%{smart_count} contact selected |||| %{smart_count} contacts selected",
     "tools contextual select all":   "select all",
     "tools contextual select none":  "select none",
@@ -48,6 +49,7 @@
     "card actions add social":    "social media",
     "card actions add link":      "url",
     "card actions add other":     "other information",
+    "card actions add share":     "cozy cloud",
 
     "card confirm delete title":   "Remove %{name}?",
     "card confirm delete message": "You'll remove %{name} from your contacts. Are you sure?",
@@ -83,6 +85,7 @@
     "datapoint placeholder chat":       "add social media nickname",
     "datapoint placeholder url":        "add an url",
     "datapoint placeholder other":      "add any information",
+    "datapoint placeholder share":      "add cozy cloud url",
     "datapoint label bday":             "birthday",
     "datapoint placeholder bday":       "YYYY-MM-DD",
     "datapoint label note":             "notes",

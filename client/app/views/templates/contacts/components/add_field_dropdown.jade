@@ -6,3 +6,11 @@ dd(role="listbox"): ul
     li(role="option"): button.link(value="social")= t('card actions add social')
     li(role="option"): button.link(value="url")= t('card actions add link')
     li(role="option"): button.link(value="other")= t('card actions add other')
+
+    // The text that is displayed for this link is "cozy cloud". This is
+    // because the purpose of this particular link is to provide a url with
+    // which will be able to share data. For now the only - technically
+    // speaking - sharing end-point we have at our disposal is another Cozy
+    // Cloud (but we would like to extend that possibility to other cloud
+    // providers), hence the choice.
+    li(role="option"): button.link(value="share")= t('card actions add share')
