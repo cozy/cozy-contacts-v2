@@ -20,6 +20,8 @@ module.exports = class LabelFilter extends Mn.ItemView
 
     initialize: ->
         app = require 'application'
+        # Update component (more specifically its state) when tag is applied on/
+        # removed from a contact.
         @listenTo app.contacts, 'change:tags': @render
 
 
@@ -27,6 +29,8 @@ module.exports = class LabelFilter extends Mn.ItemView
         name     = @model.get 'name'
         pattern  = new RegExp "tag:#{name}", 'i'
 
+        # @options.edit is passeed from parent view and enable "edit" (aka bulk
+        # tagging) mode.
         if @options.edit
             selection = app.model.get 'selected'
 
@@ -35,13 +39,16 @@ module.exports = class LabelFilter extends Mn.ItemView
                 if name in contact.get('tags') then arr.concat contact else arr
             , []
 
+            # Extract state from the selected contact group:
+            # - all contacts have the tag > TRUE
+            # - no contact have the tag > FALSE
+            # - some contact(s) have the tag > 'mixed'
             selected = if contacts.length is 0 then false
             else if contacts.length is selection.length then true
             else 'mixed'
 
         else
-            filter   = app.model.get('filter')?.match pattern
-            selected = !!filter
+            selected = !!app.model.get('filter')?.match pattern
 
 
         _.extend {}, super,

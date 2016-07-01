@@ -38,6 +38,8 @@ class Application extends Mn.Application
         @filtered = new FilteredCollection()
         @tags     = new TagsCollection(@contacts)
 
+        # As long as Tags require Contacts to be loaded (see Tags.refs), we
+        # trigger all TagsCollection fetch after syncing ContactsCollection.
         @listenToOnce @contacts, 'sync': -> @tags.underlying.fetch reset: true
 
         @layout   = new AppLayout model: @model

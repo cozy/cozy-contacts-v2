@@ -31,6 +31,8 @@ module.exports = class LabelsAdminToolView extends Mn.CompositeView
         tagName = view.model.get 'name'
         state   = view.ui.checkbox.attr 'aria-checked'
 
+        # Cycle decision from the initial state of the component:
+        # - Mixed -> True <=> False
         nextState = if state is "true" then false
         else if state in ["false", "mixed"] then true
 

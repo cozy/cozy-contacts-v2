@@ -1,8 +1,6 @@
 {Filtered} = BackboneProjections
 TagView = require 'views/contacts/components/tag'
 
-app = undefined
-
 
 module.exports = class ContactTagsActonView extends Mn.CompositeView
 
@@ -29,11 +27,13 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
         create:   '.create'
         dropdown: 'dd'
 
+
     events:
-        'change @ui.tags':                'onClickTag'
-        'click @ui.dropdown':             (event) -> event.stopPropagation()
-        'click @ui.create button':        'toggleCreate'
+        'change @ui.tags':                  'onClickTag'
+        'click @ui.create button':          'toggleCreate'
         'keydown @ui.create [name="name"]': 'addNewTag'
+        # Prevent unwanted dropdown close
+        'click @ui.dropdown':               (event) -> event.stopPropagation()
 
     modelEvents:
         'change:tags': (model) ->
@@ -42,20 +42,13 @@ module.exports = class ContactTagsActonView extends Mn.CompositeView
 
 
     initialize: ->
-        app = require 'application'
-
-        # Tag collection filtering is based on the tag map built at the contact
-        # collection level. It avoids to do too many checkings while looking
-        # for available tags.
-        @collection = app.tags
-
         Mn.bindEntityEvents @model, @, @model.viewEvents
 
 
     onClickTag: (event) ->
         tags = @$('li:not(.create) input')
             .serializeArray()
-            .map (tag) -> app.tags.get(tag.value).get 'name'
+            .map (tag) => @collection.get(tag.value).get 'name'
 
         @triggerMethod 'tags:update', tags
 

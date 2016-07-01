@@ -113,6 +113,21 @@ module.exports = class AppLayout extends Mn.LayoutView
         @showChildView 'indexes', view
 
 
+    showContextualMenu: ->
+        if app.tags.length > 0
+            @showChildView 'labels', new LabelsEditView
+                model:      @model
+                collection: app.tags.underlying
+        else #do not display edit tags view if no tags are available
+            @getRegion('labels').empty()
+        @showChildView 'actions', new ContextActionsTool model: @model
+
+
+    hideContextualMenu: ->
+        @showFilters()
+        @showChildView 'actions', new DefaultActionsTool()
+
+
     # keybr events bindings
     # ##########################################################################
     onKeyPageup: ->
@@ -123,20 +138,6 @@ module.exports = class AppLayout extends Mn.LayoutView
     onKeyPagedown: ->
         el = @ui.content[0]
         el.scrollTop += el.offsetHeight
-
-
-    showContextualMenu: ->
-        if app.tags.length > 0
-            @showChildView 'labels', new LabelsEditView
-                model:      @model
-                collection: app.tags.underlying
-        else
-            @getRegion('labels').empty()
-        @showChildView 'actions', new ContextActionsTool model: @model
-
-    hideContextualMenu: ->
-        @showFilters()
-        @showChildView 'actions', new DefaultActionsTool()
 
 
     toggleDrawer: ->

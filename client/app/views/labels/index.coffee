@@ -26,12 +26,10 @@ module.exports = class LabelsFiltersToolView extends Mn.CompositeView
 
 
     serializeData: ->
-        filter = @model.get('filter') or ''
-
-        data =
-            name:     t('tools labels filters all')
-            href:     'contacts'
-            selected: filter.indexOf('tag:') is -1
+        # Export the "All Contacts" fake tag
+        name:     t('tools labels filters all')
+        href:     'contacts'
+        selected: (@model.get('filter') or '').indexOf('tag:') is -1
 
 
     toggleSelected: (tag) ->

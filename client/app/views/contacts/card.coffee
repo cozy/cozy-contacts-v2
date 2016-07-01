@@ -6,6 +6,8 @@ t = require 'lib/i18n'
 
 CONFIG = require('config').contact
 
+app = undefined
+
 
 module.exports = class ContactCardView extends Mn.LayoutView
 
@@ -63,6 +65,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
 
     initialize: ->
+        app  = require 'application'
         Mn.bindEntityEvents @model, @, @model.viewEvents
 
 
@@ -84,7 +87,9 @@ module.exports = class ContactCardView extends Mn.LayoutView
     onRender: ->
         @showChildView 'avatar', new AvatarView model: @model
         @showChildView 'infos', new DataView model: @model
-        @showChildView 'tags', new TagsActionsView model: @model
+        @showChildView 'tags', new TagsActionsView
+            model: @model
+            collection: app.tags
 
         @$('[role="contentinfo"]').toggleClass 'edit', !!@model.get 'edit'
 
@@ -96,7 +101,7 @@ module.exports = class ContactCardView extends Mn.LayoutView
 
     onSave: ->
         return unless @model.get 'new'
-        app  = require 'application'
+
         dest = "contacts/#{@model.get 'id'}"
         @hideSaving()
         app.router.navigate dest, trigger: true
@@ -122,4 +127,3 @@ module.exports = class ContactCardView extends Mn.LayoutView
     # button is called form submit).
     hideSaving: ->
         @ui.formSubmit.attr 'aria-busy', false
-
