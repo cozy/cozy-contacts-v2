@@ -78,7 +78,9 @@ class Application extends Mn.Application
             filter = filter.replace(_pattern, '')
 
         @model.set 'filter', filter
-        @channel.trigger "filter:#{pattern}", string, last
+
+        if string?
+            @channel.trigger "filter:#{pattern}", string, last
 
 
 # Exports Application singleton instance

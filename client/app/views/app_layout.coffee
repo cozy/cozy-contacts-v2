@@ -166,7 +166,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     toggleResults: (text) ->
-        @results.$el?.attr 'aria-hidden', not text.length
+        @results.$el?.attr 'aria-hidden', not text?.length
 
 
     # Dialogs showing
