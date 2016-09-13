@@ -22,6 +22,8 @@ module.exports = class ContactsRouter extends Backbone.SubRoute
         app.search 'tag', slug
 
         idx = @sheet.cssRules.length
+        # escape special characters
+        slug = slug.replace('(', '\\(').replace(')', '\\)')
         @sheet.insertRule """
             [role=row]:not(.tag_#{slug}),
             [role=rowgroup]:not(.tag_#{slug}) { display: none }
