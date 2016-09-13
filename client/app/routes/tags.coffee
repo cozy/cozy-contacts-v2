@@ -1,3 +1,4 @@
+Slugifier = require '../lib/slugifier'
 app = undefined
 
 module.exports = class TagsRouter extends Backbone.SubRoute
@@ -18,9 +19,16 @@ module.exports = class TagsRouter extends Backbone.SubRoute
             @sheet.deleteRule idx for rule, idx in @sheet.cssRules
 
 
-    filter: (slug) ->
-        app.search 'tag', slug
-
+    filter: (tag) ->
+        app.search 'tag', tag
+        # We determine tag's slug right here. It's a little
+        # bit too late, slugs should set at least when data is parsed
+        # from the server, or directly server-side,
+        # but it implies to change how the tags are working
+        # in the whole application (i.e. use plain objects instead of strings).
+        # This refactoring is too much at this time to fix only this bug.
+        # See https://github.com/cozy/cozy-contacts/issues/262
+        slug = Slugifier.slugify tag
         idx = @sheet.cssRules.length
         @sheet.insertRule """
             [role=row]:not(.tag_#{slug}),
