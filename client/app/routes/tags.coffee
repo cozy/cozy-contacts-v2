@@ -1,6 +1,6 @@
 app = undefined
 
-module.exports = class ContactsRouter extends Backbone.SubRoute
+module.exports = class TagsRouter extends Backbone.SubRoute
 
     routes:
         ':slug': 'filter'
