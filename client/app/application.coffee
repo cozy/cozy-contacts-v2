@@ -79,7 +79,7 @@ class Application extends Mn.Application
 
         @model.set 'filter', filter
 
-        if string? || pattern is 'tag'
+        if string? or pattern is 'tag'
             @channel.trigger "filter:#{pattern}", string, last
 
 
