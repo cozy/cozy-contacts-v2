@@ -232,6 +232,9 @@ module.exports = class Contact extends Backbone.Model
     toVCF: (callback) ->
         data = @toJSON()
         data.datapoints = data.datapoints.toJSON()
+        # We remove the BDay datapoint if it doesn't match ISO 8601
+        unless moment(data.bday, 'YYYY-MM-DD', true).isValid()
+            delete data['bday']
         @picturetoa (picture) -> callback VCardParser.toVCF data, picture
 
 
