@@ -1,4 +1,5 @@
 PATTERN = require('config').search.pattern 'text'
+Slugifier = require '../../lib/slugifier'
 
 app = undefined
 
@@ -29,8 +30,15 @@ module.exports = class ContactRow extends Backbone.View
     render: ->
         el   = @el
         data = @serializeData()
+        tags = @model.get 'tags'
 
-        el.className = @model.get('tags')?.map((tag) -> "tag_#{tag}").join(' ')
+        if tags
+            el.className = tags
+                # See TagsRouter#filter and
+                # https://github.com/cozy/cozy-contacts/issues/262
+                .map Slugifier.slugify
+                .map (slug) -> "tag_#{slug}"
+                .join ' '
 
         template     = require 'views/templates/contacts/row'
         el.innerHTML = template data

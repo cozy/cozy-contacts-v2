@@ -1,5 +1,6 @@
 ContactViewModel = require 'views/models/contact'
 ContactRowView   = require 'views/contacts/row'
+Slugifier = require 'lib/slugifier'
 
 Indexes = Backbone.Collection
 
@@ -179,7 +180,10 @@ module.exports = class Contacts extends Mn.CompositeView
             .invoke 'get', 'tags'
             .flatten()
             .compact()
-            .map (tag) -> "tag_#{tag}"
+            # See TagsRouter#filter and
+            # https://github.com/cozy/cozy-contacts/issues/262
+            .map Slugifier.slugify
+            .map (slug) -> "tag_#{slug}"
             .join ' '
             .value()
         if tags.length
