@@ -180,8 +180,11 @@ module.exports = class Contact extends Backbone.Model
             targets = targets
                 .concat(points)
                 .concat @attributes.tags
-
         score = targets.reduce (memo, target, index) ->
+            # Fuzzy does not check if target is a string before calling
+            # toLowerCase().
+            # See https://github.com/cozy/cozy-contacts/issues/259
+            return memo unless typeof target is 'string'
             res = fuzzy.match pattern, target
             return memo + (res?.score or 0)
         , 0
