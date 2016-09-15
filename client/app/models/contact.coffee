@@ -148,6 +148,26 @@ module.exports = class Contact extends Backbone.Model
         _.compact([pf, fn, mn, gn, sf]).join ' '
 
 
+    # We override toJSON to ensure the exported object is the a true object.
+    # Allow a options.toVCF boolean to sanitize the output before.
+    toJSON: ({toVCF} = {}) ->
+        data = super
+        data.datapoints = data.datapoints.toJSON()
+
+        return data unless toVCF
+
+        # Isolate in a try..catch block to go outside main thread and pop error
+        try
+            # We remove the BDay datapoint if it doesn't match ISO 8601
+            unless moment(data.bday, 'YYYY-MM-DD', true).isValid()
+                delete data['bday']
+                throw new Error "Malformed bday for #{data.id}"
+        catch err
+            console.error err
+
+        return data
+
+
     toHighlightedString: (pattern, opts= {})->
         format = if opts.format
             pre: '»'
@@ -230,11 +250,7 @@ module.exports = class Contact extends Backbone.Model
 
 
     toVCF: (callback) ->
-        data = @toJSON()
-        data.datapoints = data.datapoints.toJSON()
-        # We remove the BDay datapoint if it doesn't match ISO 8601
-        unless moment(data.bday, 'YYYY-MM-DD', true).isValid()
-            delete data['bday']
+        data = @toJSON toVCF: true
         @picturetoa (picture) -> callback VCardParser.toVCF data, picture
 
 
