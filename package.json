@@ -27,7 +27,6 @@
     "bower": "1.7.2",
     "brunch": "1.8.5",
     "chai": "1.5.0",
-    "coffee-jshint": "0.2.3",
     "coffee-script": "1.10.0",
     "coffeelint": "1.14.2",
     "cozy-fixtures": "^1.1.3",
@@ -56,40 +55,33 @@
 
   "scripts": {
     "lint": "npm-run-all 'lint:*'",
-    "lint:coffeelint": "coffeelint --file coffeelint.json --quiet ./server/**/*.coffee ./server.coffee ./client/app/**/*.coffee",
-    "lint:jshint": "coffee-jshint --options node,couch ./server/**/*.coffee ./server.coffee",
+    "lint:coffeelint": "coffeelint --file coffeelint.json --quiet ./app/**/*.coffee",
 
     "clean": "rm -rf build",
 
     "tx": "tx pull --all || true",
 
-    "ensure:client": "cd client && npm update --quiet && bower install --quiet",
+    "ensure:client": "npm update --quiet && bower install --quiet",
 
     "prebuild": "npm-run-all clean tx lint",
     "prebuild:client": "npm run ensure:client",
     "postbuild": "npm-run-all --parallel copy:*",
-    "build:server": "coffee --bare --compile --output build/server server && coffee --bare --compile --output build server.coffee",
-    "build:client": "cd client && brunch build --production",
-    "copy:views": "mkdir -p build/server/views && cp -r server/views/* build/server/views/",
+    "build:client": "brunch build --production",
     "build": "npm-run-all --parallel 'build:*'",
 
-    "pretest:server": "cozy-dev db:switch cozy-contacts-tests",
-    "test:server": "env NODE_ENV=test mocha test --globals setTimmediate,clearImmediate --reporter spec --compilers coffee:coffee-script/register --colors",
-    "posttest:server": "cozy-dev db:switch cozy",
     "test:client": "env NODE_PATH=\"./client/app:$NODE_PATH\" mocha client/test --compilers coffee:coffee-script/register --ui bdd --colors",
     "test:build": "env USE_JS=true npm run test",
-    "test": "npm run test:server",
+    "test": "npm run test:client",
 
     "fixtures:generate": "cozy-fixtures load -g -l -n 1000 client/test/fixtures/contacts-model.json",
     "fixtures": "npm-run-all 'fixtures:*'",
 
     "prewatch:client": "npm run ensure:client",
     "watch:inspector": "node-inspector",
-    "watch:server": "nodemon --debug --ignore client/ server.coffee",
-    "watch:client": "cd client && brunch watch",
+    "watch:client": "brunch watch",
     "watch": "npm-run-all --parallel 'watch:*'",
 
-    "start": "node build/server.js"
+    "start": "cozy-dev proxify http://localhost:9104"
   },
   "repository": "https://github.com/cozy/cozy-contacts",
   "readmeFilename": "README.md",
