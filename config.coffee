@@ -15,6 +15,7 @@ exports.config =
                     'vendor/marionette/backbone.radio.js'
                     'vendor/marionette/backbone.marionette.js'
                     'vendor/marionette/radio.shim.js'
+                    'vendor/cozy-client-0.0.1.js'
                 ]
 
         stylesheets:

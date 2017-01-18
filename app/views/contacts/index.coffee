@@ -1,4 +1,3 @@
-ContactViewModel = require 'views/models/contact'
 ContactRowView   = require 'views/contacts/row'
 Slugifier = require 'lib/slugifier'
 

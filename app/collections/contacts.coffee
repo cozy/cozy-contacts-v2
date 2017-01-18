@@ -5,7 +5,6 @@ Contact = require 'models/contact'
 module.exports = class Contacts extends Backbone.Collection
 
     model: Contact
-    url: 'contacts'
 
     sortDisabled: false
 
@@ -18,6 +17,31 @@ module.exports = class Contacts extends Backbone.Collection
 
         @contactListener = new ContactsListener()
         @listenToOnce @, 'sync', -> @contactListener.watch @
+
+
+    fetch: (options={}, success = -> ) ->
+        # This event is listened by layout
+        # to display applications views
+        @trigger 'sync', options
+
+        @reset() if options.reset
+
+        # FIXME: remove this line when
+        # cozy.query will works
+        @add []
+
+        success @models, @
+
+        # cozy.init { isV2: true }
+        # cozy.defineIndex 'io.cozy.contacts', ['id']
+        # .then (index) =>
+        #         cozy.query index, { selector: id: {"$gte": " "} }
+        #         .then (result=[]) =>
+        #             @add result
+        #             success result
+        #     , (err) =>
+        #         success null, err
+
 
 
     # Turns a vcard text into a list of contacts. Then it saves every contacts

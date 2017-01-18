@@ -1,3 +1,4 @@
 module.exports = class Config extends Backbone.Model
 
-    url: 'config'
+    fetch: (success) ->
+        console.log "(fetch) CONFIG"

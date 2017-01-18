@@ -16,8 +16,6 @@ class Tags extends Backbone.Collection
 
     model: require 'models/tag'
 
-    url: 'tags'
-
 
     initialize: ->
         @listenToOnce @, 'sync', -> (new TagsListener()).watch @
@@ -25,6 +23,12 @@ class Tags extends Backbone.Collection
     # We convert all tags to lowercase and remove duplicates at pers time
     parse: (tags) ->
         _.uniq tags, (tag) -> tag.name.toLowerCase()
+
+
+    fetch: (success) ->
+        # TODO: add fake data
+        # TODO: add cozy-client-js code
+        console.log "(fetch) TAGS"
 
 
 # Export TagsCollection is the Contacts aware projection. All tags Collection
@@ -49,7 +53,7 @@ module.exports = class FilteredTags extends Filtered
     # concact tags.
     updateRefs: ->
         @refs = @contacts.chain()
-            .map (model) -> model.get 'tags'
+            .map (model) -> model.get('tags') or []
             .flatten()
             .uniq()
             .value()

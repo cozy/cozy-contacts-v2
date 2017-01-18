@@ -29,6 +29,7 @@ module.exports = class FilteredCollection
 
     query: null
 
+
     constructor: ->
         app = require 'application'
 

@@ -2,6 +2,7 @@ app = undefined
 
 
 class Datapoint extends Backbone.Model
+
     defaults:
         name: 'other'
         type: 'other'
@@ -11,6 +12,7 @@ class Datapoint extends Backbone.Model
         # represents an e-mail address from that of a cloud.
         mediatype: ''
 
+
     parse: (attrs) ->
         if attrs.name is 'adr' and _.isArray attrs.value
             attrs.value = VCardParser.adrArrayToString attrs.value
@@ -18,8 +20,6 @@ class Datapoint extends Backbone.Model
 
 
 module.exports = class Contact extends Backbone.Model
-
-    urlRoot: 'contacts'
 
     defaults:
         n: ';;;;'
@@ -86,7 +86,8 @@ module.exports = class Contact extends Backbone.Model
 
 
     validate: (attrs, options) ->
-        # Handle specific attributes.
+        console.log "PLOP", attrs, options
+        Handle specific attributes.
         attrs.fn = VCardParser.nToFN attrs.n.split ';'
 
         datapoints = (attrs.datapoints?.toJSON() or [])
@@ -151,7 +152,7 @@ module.exports = class Contact extends Backbone.Model
     # We override toJSON to ensure the exported object is the a true object.
     # Allow a options.toVCF boolean to sanitize the output before.
     toJSON: (options) ->
-        _.extend super, datapoints: @attributes.datapoints.toJSON()
+        _.extend super, datapoints: @attributes.datapoints?.toJSON()
 
 
     toHighlightedString: (pattern, opts= {})->
@@ -239,6 +240,7 @@ module.exports = class Contact extends Backbone.Model
 
 
     toVCF: (callback) ->
+        console.log "TO_VCF"
         data = @toJSON()
 
         # Because viewModel call uses the saveAs method, that broke console

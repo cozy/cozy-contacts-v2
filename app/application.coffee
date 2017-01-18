@@ -36,11 +36,7 @@ class Application extends Mn.Application
 
         @contacts = new ContactsCollection()
         @filtered = new FilteredCollection()
-        @tags     = new TagsCollection(@contacts)
-
-        # As long as Tags require Contacts to be loaded (see Tags.refs), we
-        # trigger all TagsCollection fetch after syncing ContactsCollection.
-        @listenToOnce @contacts, 'sync': -> @tags.underlying.fetch reset: true
+        @tags     = new TagsCollection @contacts
 
         @layout   = new AppLayout model: @model
         @router   = new Router()
@@ -49,10 +45,19 @@ class Application extends Mn.Application
 
         Object.freeze @ if typeof Object.freeze is 'function'
 
+
     # render components when app starts
     onStart: ->
         @layout.render()
-        @contacts.fetch reset: true
+
+        callback = (models, collection) =>
+            console.log 'SUCCESS', models
+
+            # As long as Tags require Contacts to be loaded (see Tags.refs), we
+            # trigger all TagsCollection fetch after syncing ContactsCollection.
+            # @tags.underlying.fetch {reset: true}
+
+        @contacts.fetch {reset: true}, callback
 
         # prohibit pushState because URIs mapped from cozy-home rely on
         # fragment

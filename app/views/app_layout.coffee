@@ -62,6 +62,7 @@ module.exports = class AppLayout extends Mn.LayoutView
         'select:end':      'hideContextualMenu'
         'change:scored':   'onSearchResults'
 
+
     childEvents:
         'drawer:toggle':     'toggleDrawer'
         'contacts:select':   (contactsView, id) -> @model.select id
@@ -225,5 +226,5 @@ module.exports = class AppLayout extends Mn.LayoutView
         if err is ERR.SEARCH_TOO_SHORT
             @results.$el.attr 'aria-hidden', true
             @ui.counter
-            .text t 'error search too short'
-            .addClass 'important'
+                .text t 'error search too short'
+                .addClass 'important'

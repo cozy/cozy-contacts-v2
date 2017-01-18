@@ -12,6 +12,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         new:  false
         edit: false
 
+
     map:
         avatar: '_attachments'
         name:   'n'
@@ -21,6 +22,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         'before:save': 'syncDatapoints'
         save:          'onSave'
         reset:         'onReset'
+
 
     viewEvents:
         'edit:cancel':    'reset'
@@ -105,7 +107,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     getIndexKey: ->
         sortIdx = if app.model.get('sort') is 'fn' then 0 else 1
-        initial = @get('initials')[sortIdx]?.toLowerCase() or ''
+        initial = @get('initials')?[sortIdx]?.toLowerCase() or ''
         if /[a-z]/.test initial then initial else '#'
 
 
