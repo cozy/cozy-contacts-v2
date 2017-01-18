@@ -1,4 +1,4 @@
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 
 
 module.exports = class ContactDatapointView extends Mn.ItemView

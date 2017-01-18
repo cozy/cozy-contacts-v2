@@ -2,7 +2,7 @@ Duplicates = require 'collections/duplicates'
 
 t = require 'lib/i18n'
 
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 
 
 module.exports = class DuplicatesView extends Mn.CompositeView

@@ -221,7 +221,7 @@ module.exports = class AppLayout extends Mn.LayoutView
 
 
     error: (err) ->
-        {ERR} = require 'config'
+        {ERR} = require 'const-config'
         if err is ERR.SEARCH_TOO_SHORT
             @results.$el.attr 'aria-hidden', true
             @ui.counter

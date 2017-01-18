@@ -1,6 +1,7 @@
 MergeView = require 'views/contacts/merge'
 MergeModel = require 'views/models/merge'
 request = require 'lib/request'
+CONFIG = require 'const-config'
 
 app = undefined
 
@@ -31,7 +32,7 @@ module.exports = class AppViewModel extends Backbone.ViewModel
         @set 'selected', []
         @listenTo @, 'change:filter', (nil, value) ->
             @unselectAll()
-            @set 'scored', require('config').search.pattern('text').test value
+            @set 'scored', CONFIG.search.pattern('text').test value
 
 
     select: (id) ->
@@ -82,8 +83,8 @@ module.exports = class AppViewModel extends Backbone.ViewModel
                 @trigger 'bulk:delete:done'
 
 
-    # TODO: probably need to be revamped when doing it for the whole merge
-    # feature
+    # TODO: probably need to be revamped
+    # when doing it for the whole merge feature
     bulkMerge: ->
         candidates = app.contacts.filter (contact) =>
             contact.id in @attributes.selected

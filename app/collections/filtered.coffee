@@ -1,6 +1,6 @@
 ContactViewModel = require 'views/models/contact'
 
-{indexes, search} = require 'config'
+{indexes, search} = require 'const-config'
 
 tagRegExp = search.pattern 'tag'
 app       = null

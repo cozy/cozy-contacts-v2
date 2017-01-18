@@ -30,21 +30,25 @@
         <meta name="theme-color" content="#ff9c56"></meta>
 
         <link rel="stylesheet" href="/fonts/fonts.css"></link>
-        <link rel="stylesheet" href="stylesheets/app.css"></link>
-
-        <script>
-            function load() {
-                require.register('imports' function(exports require module) {
-                  module.exports = !{imports}
-                })
-                require('initialize')
-            }
-        </script>
-        <script src="scripts/vendor.js" defer="true"></script>
-        <script src="scripts/app.js" onload="load()" defer="true"></script>
+        <link rel="stylesheet" href="public/stylesheets/app.css"></link>
     </head>
 
     <body>
         <div role='application' aria-busy='true'></div>
+
+        <script src="public/scripts/vendor.js"></script>
+        <script>
+            // FIXME: with stack V2 it is not possible
+            // to get instance from cozy-client-js
+            require.register('imports', function(exports, require, module) {
+                module.exports = {
+                    'config': null,
+                    'locale': 'FR',
+                    'webDavAccount': null,
+                    'env': 'DEV'
+                }
+            })
+        </script>
+        <script src="public/scripts/app.js" onload="require('initialize')"></script>
     </body>
 </html>

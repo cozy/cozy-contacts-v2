@@ -2,7 +2,7 @@ t = require 'lib/i18n'
 
 ContactDatapointView = require 'views/contacts/components/datapoint'
 
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 
 
 module.exports = class ContactDatapointsView extends Mn.CompositeView

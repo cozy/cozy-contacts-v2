@@ -1,6 +1,6 @@
 Filtered = BackboneProjections.Filtered
 
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 CH = require('lib/contact_helper')
 
 app = null

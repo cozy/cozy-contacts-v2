@@ -1,4 +1,4 @@
-PATTERN = require('config').search.pattern 'text'
+PATTERN = require('const-config').search.pattern 'text'
 Slugifier = require '../../lib/slugifier'
 
 app = undefined

@@ -1,4 +1,4 @@
-{settings} = require 'config'
+{settings} = require 'const-config'
 
 t = require 'lib/i18n'
 

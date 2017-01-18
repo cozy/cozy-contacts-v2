@@ -62,7 +62,7 @@ class Application extends Mn.Application
     search: (pattern, string) ->
         filter  = @model.get 'filter'
         input   = "`#{pattern}:#{string}`"
-        _pattern = require('config').search.pattern pattern
+        _pattern = require('const-config').search.pattern pattern
         prev    = filter?.match _pattern
 
         if string

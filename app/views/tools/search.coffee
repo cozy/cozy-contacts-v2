@@ -1,4 +1,4 @@
-{ERR} = require 'config'
+{ERR} = require 'const-config'
 
 app = null
 

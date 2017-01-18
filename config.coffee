@@ -63,7 +63,7 @@ exports.config =
         production:
             paths:
                 watched: ['app', 'vendor']
-                public: '../build/client/public'
+                public: '../build/app/public'
 
             plugins:
                 postcss:

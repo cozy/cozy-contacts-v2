@@ -4,7 +4,7 @@ TagsActionsView = require 'views/contacts/components/edit_tags'
 
 t = require 'lib/i18n'
 
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 
 app = undefined
 

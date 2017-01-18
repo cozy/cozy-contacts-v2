@@ -4,7 +4,7 @@ Slugifier = require 'lib/slugifier'
 
 Indexes = Backbone.Collection
 
-{indexes} = require 'config'
+{indexes} = require 'const-config'
 
 filtered = undefined
 

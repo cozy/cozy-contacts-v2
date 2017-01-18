@@ -2,7 +2,7 @@ DatapointsView  = require 'views/contacts/components/datapoints'
 XtrasView       = require 'views/contacts/components/xtras'
 EditActionsView = require 'views/contacts/components/edit_actions'
 
-CONFIG = require('config').contact
+CONFIG = require('const-config').contact
 
 
 module.exports = class DataView extends Mn.LayoutView
