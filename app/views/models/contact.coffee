@@ -26,12 +26,17 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
     viewEvents:
         'edit:cancel':    'reset'
+        'form:submit':    _.ary @::save, 0
+        'delete':         _.ary @::destroy, 0
+
+        # TODO: handle all these cases
         'tags:update':    'updateTags'
         'tags:add':       'addNewTag'
         'form:field:add': 'onAddField'
-        'form:submit':    _.ary @::save, 0
+
+        # TODO: handle all these cases
         'export':         'downloadAsVCF'
-        'delete':         _.ary @::destroy, 0
+
 
 
     proxy: ['toString', 'toHighlightedString', 'match']

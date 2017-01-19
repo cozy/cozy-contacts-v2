@@ -20,6 +20,7 @@ class Tags extends Backbone.Collection
     initialize: ->
         @listenToOnce @, 'sync', -> (new TagsListener()).watch @
 
+
     # We convert all tags to lowercase and remove duplicates at pers time
     parse: (tags) ->
         _.uniq tags, (tag) -> tag.name.toLowerCase()
@@ -57,6 +58,23 @@ module.exports = class FilteredTags extends Filtered
             .flatten()
             .uniq()
             .value()
+
+
+
+    create: (data={}, options={}) ->
+        callback = options.success or null
+
+        cozy.init { isV2: true }
+        cozy.create 'io.cozy.tags', data
+            .then (resp) =>
+                # Add model to collection
+                # if data is correct
+                @add resp, options
+
+                callback resp, @ if callback
+
+            , () =>
+                console.log '(save.error) TAG', arguments
 
 
     update: ->
