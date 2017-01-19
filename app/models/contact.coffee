@@ -86,8 +86,7 @@ module.exports = class Contact extends Backbone.Model
 
 
     validate: (attrs, options) ->
-        console.log "PLOP", attrs, options
-        Handle specific attributes.
+        # Handle specific attributes.
         attrs.fn = VCardParser.nToFN attrs.n.split ';'
 
         datapoints = (attrs.datapoints?.toJSON() or [])
@@ -111,13 +110,25 @@ module.exports = class Contact extends Backbone.Model
         # The changes are:
         # name: 'share' -> name: 'url' + mediatype: 'cloud:cozy'
         clouds = _.where attrs.datapoints, {name: 'share'}
-        if not _.isEmpty(clouds)
-            for cloud in clouds
-                cloud.name      = 'url'
-                cloud.mediatype = 'cloud:cozy'
+        for cloud in clouds
+            cloud.name      = 'url'
+            cloud.mediatype = 'cloud:cozy'
 
         options.attrs = attrs
         false
+
+
+    # FIXME: isnt saved by ther server
+    # because it is handled threow websocket
+    # thats can't works without server
+    # waits for cozy-client-js can handle this case
+    save: (options={}) ->
+        cozy.init { isV2: true }
+        cozy.create 'io.cozy.contacts', @attributes
+            .then (resp) =>
+                @attributes = resp
+            , () =>
+                console.log 'ERROR', arguments
 
 
     _buildSortedName: (n) ->

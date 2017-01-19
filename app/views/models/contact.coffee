@@ -19,9 +19,9 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     events:
-        'before:save': 'syncDatapoints'
-        save:          'onSave'
-        reset:         'onReset'
+        'before:save':  'syncDatapoints'
+        'save':          'onSave'
+        'reset':         'onReset'
 
 
     viewEvents:
@@ -148,7 +148,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
             models = models.concat CH.getNonEmptyDatapoints collection
 
         # Load new datapoints in the data model.
-        datapoints.reset models
+        datapoints?.reset models
 
 
     # Save directly new tags to the server if the model is already created.

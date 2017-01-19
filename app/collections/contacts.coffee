@@ -26,21 +26,15 @@ module.exports = class Contacts extends Backbone.Collection
 
         @reset() if options.reset
 
-        # FIXME: remove this line when
-        # cozy.query will works
-        @add []
-
-        success @models, @
-
-        # cozy.init { isV2: true }
-        # cozy.defineIndex 'io.cozy.contacts', ['id']
-        # .then (index) =>
-        #         cozy.query index, { selector: id: {"$gte": " "} }
-        #         .then (result=[]) =>
-        #             @add result
-        #             success result
-        #     , (err) =>
-        #         success null, err
+        cozy.init { isV2: true }
+        cozy.defineIndex 'io.cozy.contacts', ['id']
+            .then (index) =>
+                cozy.query index, { selector: id: {"$gte": " "} }
+                    .then (result=[]) =>
+                        @add result
+                        success result
+                    , (err) =>
+                        success null, err
 
 
 
