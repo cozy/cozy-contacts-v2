@@ -16,9 +16,9 @@ results
 node_modules
 npm-debug.log
 
-client/bower_components
-client/public
-client/app/locales/*.json
-!client/app/locales/en.json
+bower_components
+public
+app/locales/*.json
+app/locales/en.json
 
 picture.jpg
