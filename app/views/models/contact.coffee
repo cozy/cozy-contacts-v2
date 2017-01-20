@@ -3,8 +3,6 @@ Filtered = BackboneProjections.Filtered
 CONFIG = require('const-config').contact
 CH = require('lib/contact_helper')
 
-app = null
-
 
 module.exports = class ContactViewModel extends Backbone.ViewModel
 
@@ -42,8 +40,14 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
     proxy: ['toString', 'toHighlightedString', 'match']
 
 
-    initialize: ->
-        app = require 'application'
+    config:
+        datapoints: CONFIG.datapoints.main
+        xtras: CONFIG.xtras
+
+
+    initialize: (options={}) ->
+        { model, contacts } = options
+        @app = { model, contacts }
 
         @_setRef()
 
@@ -60,10 +64,11 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
         data = super
         delete data.datapoints
         data.xtras = @getDatapoints('xtras').toJSON()
-        _.reduce CONFIG.datapoints.main, (memo, attr) =>
+        _.reduce @config.datapoints, (memo, attr) =>
             memo[attr] = @getDatapoints(attr).toJSON()
             return memo
         , data
+        data
 
 
     getMappedAvatar: (attachments) ->
@@ -111,46 +116,48 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     getIndexKey: ->
-        sortIdx = if app.model.get('sort') is 'fn' then 0 else 1
+        sortIdx = if @app.model.get('sort') is 'fn' then 0 else 1
         initial = @get('initials')?[sortIdx]?.toLowerCase() or ''
         if /[a-z]/.test initial then initial else '#'
 
 
     onAddField: (type) ->
-        @set type, '' if type in CONFIG.xtras
+        @set type, '' if type in @config.xtras
 
 
     getDatapoints: (name) ->
-        filter = (datapoint) ->
-            if name in CONFIG.datapoints.main
-                datapoint.get('name') is name
-            else
-                datapoint.get('name') not in CONFIG.datapoints.main
+        isEdit = @attributes.edit
+        datapoints = @model.get 'datapoints'
+        datapointsConfig = @config.datapoints
 
-        if @attributes.edit
-            models = @model.get 'datapoints'
-            .filter filter
-            .map (model) -> model.clone()
+        filter = (datapoint) =>
+            datapointName = datapoint.get('name')
+            if name in @config.datapoints
+                return datapointName is name
+            else
+                return datapointName not in datapointsConfig
+
+        if isEdit
+            models = datapoints.filter(filter).map((model) -> model.clone())
             new Backbone.Collection models
         else
-            new Filtered @model.get('datapoints'), filter: filter
+            new Filtered datapoints, { filter }
 
 
     # Extract datapoints from the view model to store them in the data model.
     syncDatapoints: ->
-
         # The getDatapoints function has been memoized, it means it keeps all
         # its returned values in a cache.
         # Here we deal directly with this cache because this function has
         # already been called for all fields and edited fields were already
         # marked.
-        cache      = @getDatapoints.cache
-        datapoints = @model.get 'datapoints'
+        if (cache = @getDatapoints.cache)
+            datapoints = @model.get 'datapoints'
+            models = []
 
-        # It grabs all datapoints that has been edited.
-        models = []
-        for key, collection of cache.__data__ when /^edit/.test key
-            models = models.concat CH.getNonEmptyDatapoints collection
+            # It grabs all datapoints that has been edited.
+            for key, collection of cache.__data__ when /^edit/.test key
+                models = models.concat CH.getNonEmptyDatapoints collection
 
         # Load new datapoints in the data model.
         datapoints?.reset models
@@ -179,7 +186,7 @@ module.exports = class ContactViewModel extends Backbone.ViewModel
 
 
     onSave: ->
-        app.contacts.add @model if @get 'new'
+        @app.contacts.add @model if @get 'new'
 
 
     onReset: -> @_setRef()

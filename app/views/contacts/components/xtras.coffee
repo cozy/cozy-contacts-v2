@@ -3,10 +3,10 @@ CONFIG = require('const-config').contact
 
 module.exports = class ContactXtrasView extends Mn.ItemView
 
-    tagName: ->
-        if @model.get 'edit' then 'fieldset' else 'ul'
-
     template: require 'views/templates/contacts/components/xtras'
+
+
+    tagName: -> if @model.get 'edit' then 'fieldset' else 'ul'
 
 
     modelEvents: ->
@@ -31,4 +31,3 @@ module.exports = class ContactXtrasView extends Mn.ItemView
         ref   = @model.get 'ref'
         field = _.keys(model.changed)[0]
         @$("##{field}-#{ref}").trigger 'focus'
-

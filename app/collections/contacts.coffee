@@ -26,15 +26,61 @@ module.exports = class Contacts extends Backbone.Collection
 
         @reset() if options.reset
 
-        cozy.init { isV2: true }
-        cozy.defineIndex 'io.cozy.contacts', ['id']
-            .then (index) =>
-                cozy.query index, { selector: id: {"$gte": " "} }
-                    .then (result=[]) =>
-                        @add result
-                        success result
-                    , (err) =>
-                        success null, err
+        # FIXME: remove this fakeData
+        # when request will work
+        n = 'last name;first name;middle name;préfix;suffixe'
+        datapoints = []
+        datapoints.push {
+            id: "06",
+            name: "email",
+            value: "noelie@cozycloud.cc",
+            type: "work"
+        }
+        datapoints.push {
+            id: "05",
+            name: "email",
+            value: "noelieandrieu@gmail.com",
+            type: "work"
+        }
+        datapoints.push {
+            id: "04",
+            name: "tel",
+            value: "0619384462",
+            type: "main"
+        }
+        datapoints.push {
+            id: "03",
+            name: "tel",
+            value: "0619384462",
+            type: "portable"
+        }
+        datapoints.push {
+            id: "02",
+            name: "tel",
+            value: "n0619384462",
+            type: "work"
+        }
+
+
+        result = []
+        result.push { _id: '01', n, datapoints }
+        result.push { _id: '02', n, datapoints }
+        result.push { _id: '03', n, datapoints }
+        result.push { _id: '04', n, datapoints }
+        result.push { _id: '05', n, datapoints }
+        #
+        @add result
+        success result, @
+
+        # cozy.init { isV2: true }
+        # cozy.defineIndex 'io.cozy.contacts', ['id']
+        #     .then (index) =>
+        #         cozy.query index, { selector: id: {"$gte": " "} }
+        #             .then (result=[]) =>
+        #                 @add result
+        #                 success result, @
+        #             , (err) =>
+        #                 success null, err
 
 
 

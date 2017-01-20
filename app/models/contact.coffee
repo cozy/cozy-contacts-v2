@@ -1,6 +1,3 @@
-app = undefined
-
-
 class Datapoint extends Backbone.Model
 
     defaults:
@@ -25,9 +22,24 @@ module.exports = class Contact extends Backbone.Model
         n: ';;;;'
 
 
+    constructor: (model, options={}) ->
+        options.parse = true
+        super model, options
+
+
+    initialize: ->
+        @AppViewModel = require('application').model
+        @listenTo @AppViewModel, 'change:sort': ->
+        @set 'sortedName': @_buildSortedName()
+
+
     parse: (attrs) ->
+        datapoints = attrs.datapoints or []
+
+        # Remove empty values
         delete attrs[key] for key, value of attrs when value is ''
 
+        # Get attrs from n property
         if attrs.n
             [gn, fn, ...] = attrs.n.split ';'
             attrs.initials = _.chain [fn, gn]
@@ -47,20 +59,18 @@ module.exports = class Contact extends Backbone.Model
         # following code.
         if (url = attrs.url)
             delete attrs.url
-            attrs.datapoints.unshift
+            datapoints.unshift
                 name:  'url'
                 type:  'main'
                 value: url
 
         # Ensure Datapoints consistency
-        datapoints = @attributes.datapoints or
-            new Backbone.Collection attrs.datapoints or [],
-                model: Datapoint
-                parse: true
-        datapoints.comparator = 'name'
-        attrs.datapoints = datapoints
+        attrs.datapoints = new Backbone.Collection datapoints,
+            model: Datapoint
+            parse: true
+        attrs.datapoints.comparator = 'name'
 
-        attrs.tags = _.invoke attrs.tags, 'toLowerCase'
+        attrs.tags = _.invoke (attrs.tags or []), 'toLowerCase'
 
         return attrs
 
@@ -89,11 +99,14 @@ module.exports = class Contact extends Backbone.Model
         # Handle specific attributes.
         attrs.fn = VCardParser.nToFN attrs.n.split ';'
 
-        datapoints = (attrs.datapoints?.toJSON() or [])
-        attrs.datapoints = datapoints.map (point) ->
+        datapoints = (attrs.datapoints or []).map (point) ->
             if point.name is 'adr'
                 point.value = VCardParser.adrStringToArray point.value
             return point
+
+        attrs.datapoints = new Backbone.Collection datapoints,
+            model: Datapoint
+            parse: true
 
         # (legacy, see comments in "parse" function) The condition to decide if
         # an e-mail address can be the main url is: it must be an url and it's
@@ -124,7 +137,7 @@ module.exports = class Contact extends Backbone.Model
     # waits for cozy-client-js can handle this case
     save: (options={}) ->
         cozy.init { isV2: true }
-        cozy.create 'io.cozy.contacts', @attributes
+        cozy.create 'io.cozy.contacts', @toJSON()
             .then (resp) =>
                 @attributes = resp
             , () =>
@@ -134,23 +147,13 @@ module.exports = class Contact extends Backbone.Model
     _buildSortedName: (n) ->
         n ?= @get 'n'
 
-        sortKey = app.model.get 'sort'
+        sortKey = @AppViewModel?.get 'sort'
         [gn, fn, mn, ...] = n.split ';'
 
         _.chain if sortKey is 'fn' then [fn, mn, gn] else [gn, fn, mn]
             .compact()
             .join ' '
             .value()
-
-
-    constructor: ->
-        app = require 'application'
-        super
-
-
-    initialize: ->
-        @listenTo app.model, 'change:sort': ->
-            @set 'sortedName': @_buildSortedName()
 
 
     toString: (opts = {}) ->

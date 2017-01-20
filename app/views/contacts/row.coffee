@@ -1,13 +1,14 @@
 PATTERN = require('const-config').search.pattern 'text'
 Slugifier = require '../../lib/slugifier'
 
-app = undefined
 
 module.exports = class ContactRow extends Backbone.View
 
     supportsRenderLifecycle: false
 
+
     tagName: 'li'
+
 
     attributes:
         role: 'row'
@@ -17,14 +18,14 @@ module.exports = class ContactRow extends Backbone.View
         pre: '<b>'
         post: '</b>'
 
+
     _isAvatarLoaded: false
 
 
     initialize: ->
-        app = require 'application'
-
+        @AppViewModel = require('application').model
         @listenTo @model, 'change': @render
-        @listenTo app.model, 'change:selected': @refreshChecked
+        @listenTo @AppViewModel, 'change:selected': @refreshChecked
 
 
     render: ->
@@ -50,13 +51,14 @@ module.exports = class ContactRow extends Backbone.View
 
     serializeData: ->
         _.extend @model.toJSON(),
-            selected: @model.id in app.model.get 'selected'
+            selected: @model.id in @AppViewModel.get 'selected'
             fullname: @model.toString @_format
             isAvatarLoaded: @_isAvatarLoaded
+            bg: ColorHash.getColor @model.get('n'), 'cozy'
 
 
     highlight: ->
-        filter = app.model.get('filter')?.match PATTERN
+        filter = @AppViewModel.get('filter')?.match PATTERN
         return unless filter
 
         fullname = @model.toHighlightedString filter[1],

@@ -10,7 +10,11 @@ filtered = undefined
 
 module.exports = class Contacts extends Mn.CompositeView
 
+    template: require 'views/templates/contacts'
+
+
     sort: false
+
 
     # backbone dom node dynamics are called before initialize, internal sets are
     # so unavailable, so fallback to root method for detection
@@ -23,11 +27,11 @@ module.exports = class Contacts extends Mn.CompositeView
         else
             'div'
 
+
     attributes: ->
         {model} = require 'application'
         role: 'rowgroup' if model.get('scored') or @model?.has('char')
 
-    template: require 'views/templates/contacts'
 
 
     events: ->
@@ -46,13 +50,13 @@ module.exports = class Contacts extends Mn.CompositeView
         el.appendChild buffer
 
 
-    buildChildView: (child) ->
+    buildChildView: (model) ->
         if @_hasContacts
             ChildView = ContactRowView
         else
             ChildView = @constructor
 
-        new ChildView model: child
+        new ChildView { model }
 
 
     showCollection: ->

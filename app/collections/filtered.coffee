@@ -3,7 +3,6 @@ ContactViewModel = require 'views/models/contact'
 {indexes, search} = require 'const-config'
 
 tagRegExp = search.pattern 'tag'
-app       = null
 scores    = new Map()
 
 
@@ -30,8 +29,9 @@ module.exports = class FilteredCollection
     query: null
 
 
-    constructor: ->
-        app = require 'application'
+    constructor: (options={}) ->
+        { model, channel, contacts } = options
+        @app = { model, channel, contacts }
 
         @models     = []
         @indexes    = new Map Array::map.call indexes, (char) ->
@@ -39,16 +39,16 @@ module.exports = class FilteredCollection
             vmodels.channel = Backbone.Radio.channel "idx.#{char}"
             [char, vmodels]
 
-        @listenTo app.model,
+        @listenTo @app.model,
             'change:sort': @reset
             'change:scored': (nil, scored) ->
                 @comparator = if scored
                     (a, b) -> (scores.get(b?.model) or 0) - scores.get(a.model)
                 else 'model.attributes.sortedName'
 
-        @listenTo app.channel, 'filter:text': @setQuery
+        @listenTo @app.channel, 'filter:text': @setQuery
 
-        @listenTo app.contacts,
+        @listenTo @app.contacts,
             'reset':             @reset
             'add':               @add
             'remove':            @remove
@@ -69,7 +69,7 @@ module.exports = class FilteredCollection
         @query = query
 
         if query
-            res = app.contacts.filter filter @query
+            res = @contacts.filter filter @query
 
             # Reduce to get max score and get a median limit, then excludes all
             # results $lt it.
@@ -103,7 +103,7 @@ module.exports = class FilteredCollection
 
     get: (opts = {}) ->
         base = if opts.index then @indexes.get(opts.index) else @models
-        tag  = _.last app.model.get('filter')?.match tagRegExp
+        tag  = _.last @app.model.get('filter')?.match tagRegExp
 
         if tag and opts.tagged
             base.filter (vmodel) -> _.includes vmodel.get('tags'), tag
@@ -114,9 +114,9 @@ module.exports = class FilteredCollection
     # Internal models collection handlers
     # ###################################
     reset: ->
-        @models = app.contacts
+        @models = @app.contacts
             .filter filter @query
-            .map (model) -> new ContactViewModel {}, model: model
+            .map (model) -> new ContactViewModel @app, { model }
 
         @resetIndexes()
 
@@ -127,14 +127,15 @@ module.exports = class FilteredCollection
         models = if _.isArray models then _.clone models else [models]
 
         models.forEach (model) =>
-            return unless filter(@query, model)
+            return unless filter @query, model
 
-            vmodel = new ContactViewModel {}, model: model
-
+            vmodel = new ContactViewModel @app, { model }
             idx = _.sortedIndex @models, vmodel, @comparator
+
             @models.splice idx, 0, vmodel
 
             @addToIndex vmodel
+
             @trigger 'add', vmodel, @, {add:true, index: idx}
 
 
@@ -163,9 +164,9 @@ module.exports = class FilteredCollection
 
     addToIndex: (vmodel, opts = {}) ->
         set = @indexes.get vmodel.getIndexKey()
-
         return vmodel if _.includes set, vmodel
 
+        # add model to collection
         idx = _.sortedIndex set, vmodel, @comparator
         set.splice idx, 0, vmodel
 
