@@ -30,6 +30,8 @@ module.exports = class TagsRouter extends Backbone.SubRoute
         # See https://github.com/cozy/cozy-contacts/issues/262
         slug = Slugifier.slugify tag
         idx = @sheet.cssRules.length
+        # escape special characters
+        slug = slug.replace('(', '\\(').replace(')', '\\)')
         @sheet.insertRule """
             [role=row]:not(.tag_#{slug}),
             [role=rowgroup]:not(.tag_#{slug}) { display: none }
