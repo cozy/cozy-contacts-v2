@@ -1,4 +1,6 @@
-# [Cozy](https://cozy.io) Contacts
+# [Cozy](https://cozy.io) Contacts v2
+
+**This repo contains the code for the previous version of Cozy Contacts and is not supported anymore. The newest version of the app can be found [here](https://github.com/cozy/cozy-contacts)**
 
 Cozy Contacts makes your contact management easy. Main features are:
 
